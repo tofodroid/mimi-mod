@@ -26,13 +26,13 @@ public final class ModItems {
     public static final BlockItem PIANO = null;
     public static final BlockItem DRUMS = null;
 
-    public static PianoManModItemGroup ITEM_GROUP;
+    public static MIMIModItemGroup ITEM_GROUP;
 
     @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistrationHandler {
         @SubscribeEvent
         public static void registerItems(final RegistryEvent.Register<Item> event) {
-            ITEM_GROUP = new PianoManModItemGroup();
+            ITEM_GROUP = new MIMIModItemGroup();
 
             // Other Items
             event.getRegistry().register(new ItemTransmitter());

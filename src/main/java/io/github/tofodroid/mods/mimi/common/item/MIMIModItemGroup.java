@@ -10,8 +10,8 @@ import javax.annotation.Nonnull;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 
-public class PianoManModItemGroup extends ItemGroup {
-    public PianoManModItemGroup() {
+public class MIMIModItemGroup extends ItemGroup {
+    public MIMIModItemGroup() {
         super(MIMIMod.MODID + ".group");
     }
 
