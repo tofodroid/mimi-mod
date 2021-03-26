@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "NW ",
+        "WI ",
+        "  I"
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "W": {
+            "tag": "minecraft:wool"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        }
+    },
+    "result": {
+        "item": "mimi:microphone"
+    }
+}

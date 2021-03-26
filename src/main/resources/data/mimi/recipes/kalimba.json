@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "III",
+        "PNP",
+        " P "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:kalimba"
+    }
+}

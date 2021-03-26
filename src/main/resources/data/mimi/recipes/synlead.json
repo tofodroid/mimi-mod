@@ -1,0 +1,28 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ILI",
+        "INI",
+        "BRB"
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "B": {
+            "item": "minecraft:stone_button"
+        },
+        "L": {
+            "item": "minecraft:redstone_lamp"
+        }
+    },
+    "result": {
+        "item": "mimi:synlead"
+    }
+}

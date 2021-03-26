@@ -1,0 +1,266 @@
+{
+    "__comment": "Model generated using MrCrayfish's Model Creator (https://mrcrayfish.com/tools?id=mc)",
+    "textures": {
+        "particle": "mimi:block/drums",
+        "drum_kit": "mimi:block/drums"
+    },
+    "display": {
+        "gui": {
+            "rotation": [ 30, 45, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.625, 0.625, 0.625 ]
+        },
+        "ground": {
+            "rotation": [ 0, 0, 0 ],
+            "translation": [ 0, 3, 0 ],
+            "scale": [ 0.25, 0.25, 0.25 ]
+        },
+        "fixed": {
+            "rotation": [ 0, 180, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 1, 1, 1 ]
+        },
+        "head": {
+            "rotation": [ 0, 180, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 1, 1, 1 ]
+        },
+        "firstperson_righthand": {
+            "rotation": [ 0, 315, 0 ],
+            "translation": [ 0, 2.5, 0 ],
+            "scale": [ 0.4, 0.4, 0.4 ]
+        },
+        "thirdperson_righthand": {
+            "rotation": [ 75, 315, 0 ],
+            "translation": [ 0, 2.5, 0 ],
+            "scale": [ 0.375, 0.375, 0.375 ]
+        }
+    },
+    "elements": [
+        {
+            "name": "bass",
+            "from": [ 4, 0, 0 ], 
+            "to": [ 12, 8, 6 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 8, 8 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 7, 0, 13, 8 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 8, 8 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 7, 0, 13, 8 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 0, 7, 8, 13 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 7, 8, 13 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "snare_stand",
+            "from": [ 2, 0, 11 ], 
+            "to": [ 3, 4, 12 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 4 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 4 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 4 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 4 ] },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "snare",
+            "from": [ 1, 4, 10 ], 
+            "to": [ 5, 7, 14 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 12, 4, 16, 7 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 12, 4, 16, 7 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "r_tom_stand",
+            "from": [ 10, 8, 2 ], 
+            "to": [ 11, 9, 3 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] }
+            }
+        },
+        {
+            "name": "l_tom_stand",
+            "from": [ 5, 8, 2 ], 
+            "to": [ 6, 9, 3 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ] }
+            }
+        },
+        {
+            "name": "hh_stand",
+            "from": [ 1, 0, 8 ], 
+            "to": [ 2, 10, 9 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 10 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 10 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 10 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 10 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "hh",
+            "from": [ -1, 8, 6 ], 
+            "to": [ 4, 9, 11 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 9 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 8, 12, 13, 13 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 9 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 8, 12, 13, 13 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 13 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 13 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "b_tom",
+            "from": [ 12, 3, 8 ], 
+            "to": [ 16, 8, 12 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 12, 2, 16, 7 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 12, 2, 16, 7 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 12, 2, 16, 7 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 12, 2, 16, 7 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 270 },
+                "down": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "b_tom_stand_1",
+            "from": [ 15, 0, 11 ], 
+            "to": [ 16, 3, 12 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "r_cymbal_stand",
+            "from": [ 14, 0, 1 ], 
+            "to": [ 15, 16, 2 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "r_cymbal",
+            "from": [ 11, 14, 0 ], 
+            "to": [ 16, 15, 5 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 9 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 8, 12, 13, 13 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 9 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 8, 11, 13, 12 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 13 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 13 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "b_tom_stand_2",
+            "from": [ 12, 0, 11 ], 
+            "to": [ 13, 3, 12 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "b_tom_stand_3",
+            "from": [ 12, 0, 8 ], 
+            "to": [ 13, 3, 9 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "b_tom_stand_4",
+            "from": [ 15, 0, 8 ], 
+            "to": [ 16, 3, 9 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 3 ] },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "l_cymbal_stand",
+            "from": [ 1, 0, 1 ], 
+            "to": [ 2, 16, 2 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 16 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 0, 0, 1, 1 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "l_tom",
+            "from": [ 3, 9, 1 ], 
+            "to": [ 7, 12, 5 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 90 },
+                "down": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "r_tom",
+            "from": [ 9, 9, 1 ], 
+            "to": [ 13, 12, 5 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 12, 4, 16, 7 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 12, 1, 16, 4 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 12, 4, 16, 7 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ] },
+                "down": { "texture": "#drum_kit", "uv": [ 2, 2, 6, 6 ], "rotation": 180 }
+            }
+        },
+        {
+            "name": "l_cymbal",
+            "from": [ 0, 14, 0 ], 
+            "to": [ 5, 15, 5 ], 
+            "faces": {
+                "north": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 9 ] },
+                "east": { "texture": "#drum_kit", "uv": [ 8, 12, 13, 13 ] },
+                "south": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 9 ] },
+                "west": { "texture": "#drum_kit", "uv": [ 8, 12, 13, 13 ] },
+                "up": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 13 ], "rotation": 180 },
+                "down": { "texture": "#drum_kit", "uv": [ 8, 8, 13, 13 ], "rotation": 180 }
+            }
+        }
+    ]
+}

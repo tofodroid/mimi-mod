@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "P  ",
+        "IPI",
+        "  N"
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "I": {
+            "item": "minecraft:ink_sac"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:clarinet"
+    }
+}

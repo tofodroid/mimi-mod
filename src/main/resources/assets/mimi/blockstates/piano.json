@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "mimi:block/piano" },
+    "facing=west": { "model": "mimi:block/piano", "y": 90 },
+    "facing=north": { "model": "mimi:block/piano", "y": 180 },
+    "facing=east": { "model": "mimi:block/piano", "y": 270 }
+  }
+}

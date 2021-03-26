@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " SP",
+        "SP ",
+        "N  "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "S": {
+            "item": "minecraft:string"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:acguitar"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " SL",
+        "SL ",
+        "N  "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "S": {
+            "item": "minecraft:string"
+        },
+        "L": {
+            "tag": "minecraft:logs"
+        }
+    },
+    "result": {
+        "item": "mimi:acbass"
+    }
+}

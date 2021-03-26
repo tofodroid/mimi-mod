@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "P  ",
+        "PNP",
+        " P "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:ocarina"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " SL",
+        "SLT",
+        "N S"
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "S": {
+            "item": "minecraft:string"
+        },
+        "T": {
+            "item": "minecraft:stick"
+        },
+        "L": {
+            "tag": "minecraft:logs"
+        }
+    },
+    "result": {
+        "item": "mimi:violin"
+    }
+}

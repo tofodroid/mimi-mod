@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " GG",
+        "SNG",
+        "G  "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "G": {
+            "item": "minecraft:gold_ingot"
+        },
+        "S": {
+            "item": "minecraft:stone_button"
+        }
+    },
+    "result": {
+        "item": "mimi:trumpet"
+    }
+}

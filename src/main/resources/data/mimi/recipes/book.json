@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " L ",
+        "PNP",
+        " L "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "P": {
+            "item": "minecraft:paper"
+        },
+        "L": {
+            "item": "minecraft:leather"
+        }
+    },
+    "result": {
+        "item": "patchouli:guide_book",
+        "nbt": {
+            "patchouli:book": "mimi:guide_book"
+        }
+    }
+}

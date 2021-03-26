@@ -1,0 +1,101 @@
+{
+    "__comment": "Model generated using MrCrayfish's Model Creator (https://mrcrayfish.com/tools?id=mc)",
+    "textures": {
+        "particle": "mimi:block/piano",
+        "piano": "mimi:block/piano"
+    },
+    "display": {
+        "gui": {
+            "rotation": [ 33, 45, 0 ],
+            "translation": [ 0, 1, 0 ],
+            "scale": [ 0.625, 0.625, 0.625 ]
+        },
+        "ground": {
+            "rotation": [ 0, 0, 0 ],
+            "translation": [ 0, 3, 0 ],
+            "scale": [ 0.25, 0.25, 0.25 ]
+        },
+        "fixed": {
+            "rotation": [ 0, 180, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 1, 1, 1 ]
+        },
+        "head": {
+            "rotation": [ 0, 180, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 1, 1, 1 ]
+        },
+        "firstperson_righthand": {
+            "rotation": [ 0, 315, 0 ],
+            "translation": [ 0, 2.5, 0 ],
+            "scale": [ 0.4, 0.4, 0.4 ]
+        },
+        "thirdperson_righthand": {
+            "rotation": [ 75, 315, 0 ],
+            "translation": [ 0, 2.5, 0 ],
+            "scale": [ 0.375, 0.375, 0.375 ]
+        }
+    },
+    "elements": [
+        {
+            "name": "Cube",
+            "from": [ 0, 0, 0 ], 
+            "to": [ 16, 12, 10 ], 
+            "faces": {
+                "north": { "texture": "#piano", "uv": [ 0, 0, 16, 10 ] },
+                "east": { "texture": "#piano", "uv": [ 0, 0, 10, 10 ], "rotation": 90 },
+                "south": { "texture": "#piano", "uv": [ 0, 0, 16, 10 ] },
+                "west": { "texture": "#piano", "uv": [ 0, 0, 10, 10 ], "rotation": 90 },
+                "up": { "texture": "#piano", "uv": [ 0, 0, 16, 10 ] },
+                "down": { "texture": "#piano", "uv": [ 0, 0, 16, 10 ] }
+            }
+        },
+        {
+            "name": "Cube",
+            "from": [ 0, 0, 10 ], 
+            "to": [ 1, 8, 16 ], 
+            "faces": {
+                "east": { "texture": "#piano", "uv": [ 15, 0, 16, 8 ] },
+                "south": { "texture": "#piano", "uv": [ 0, 0, 1, 8 ] },
+                "west": { "texture": "#piano", "uv": [ 15, 0, 16, 8 ] },
+                "up": { "texture": "#piano", "uv": [ 0, 10, 1, 16 ] },
+                "down": { "texture": "#piano", "uv": [ 0, 10, 1, 16 ] }
+            }
+        },
+        {
+            "name": "Cube",
+            "from": [ 15, 0, 10 ], 
+            "to": [ 16, 8, 16 ], 
+            "faces": {
+                "east": { "texture": "#piano", "uv": [ 15, 0, 16, 8 ] },
+                "south": { "texture": "#piano", "uv": [ 0, 0, 1, 8 ] },
+                "west": { "texture": "#piano", "uv": [ 15, 0, 16, 8 ] },
+                "up": { "texture": "#piano", "uv": [ 0, 10, 1, 16 ] },
+                "down": { "texture": "#piano", "uv": [ 0, 10, 1, 16 ] }
+            }
+        },
+        {
+            "name": "Cube",
+            "from": [ 1, 6, 10 ], 
+            "to": [ 15, 7, 16 ], 
+            "faces": {
+                "south": { "texture": "#piano", "uv": [ 1, 0, 15, 1 ] },
+                "up": { "texture": "#piano", "uv": [ 1, 9, 15, 15 ] },
+                "down": { "texture": "#piano", "uv": [ 1, 1, 15, 7 ] }
+            }
+        },
+        {
+            "name": "Cube",
+            "from": [ 5, -16, 3 ], 
+            "to": [ 11, -13, 4 ], 
+            "rotation": { "origin": [ 8, 8, -64 ], "axis": "x", "angle": -22.5 },
+            "faces": {
+                "north": { "texture": "#piano", "uv": [ 5, 6, 11, 9 ] },
+                "east": { "texture": "#piano", "uv": [ 0, 0, 1, 3 ] },
+                "south": { "texture": "#piano", "uv": [ 5, 7, 11, 10 ] },
+                "west": { "texture": "#piano", "uv": [ 0, 0, 1, 3 ] },
+                "up": { "texture": "#piano", "uv": [ 0, 0, 6, 1 ] }
+            }
+        }
+    ]
+}

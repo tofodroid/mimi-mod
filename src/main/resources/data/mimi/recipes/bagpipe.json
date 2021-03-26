@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "S S",
+        "WNW",
+        "SW "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "S": {
+            "item": "minecraft:stick"
+        },
+        "W": {
+            "tag": "minecraft:wool"
+        }
+    },
+    "result": {
+        "item": "mimi:bagpipe"
+    }
+}

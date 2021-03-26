@@ -1,0 +1,15 @@
+# IDEs
+bin
+.settings
+.vscode
+.metadata
+.classpath
+.project
+
+# Gradle
+.gradle
+build
+
+# Forge
+run
+logs
