@@ -1,0 +1,6 @@
+{
+	"name": "MIDI - Overview",
+	"description": "$(l)M$()usical$(br)$(l)I$()nstrument$(br)$(l)D$()igital$(br)$(l)I$()nterface$(br2)MIDI is a communication protocol that allows digital instruments to talk to each-other and to other MIDI-enabled devices for playing, recording, and editing music.",
+	"icon": "mimi:synlead",
+	"sortnum": 3
+}

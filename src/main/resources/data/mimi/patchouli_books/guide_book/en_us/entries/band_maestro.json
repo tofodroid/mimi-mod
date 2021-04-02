@@ -1,0 +1,27 @@
+{
+    "name": "The Maestro",
+    "icon": "minecraft:player_head",
+    "category": "mimi:band",
+    "pages": [
+        {
+            "type": "text",
+            "text": "The Maestro is the leader of the band and the player responsible for providing the MIDI input for the rest of the band.$(br2)Each instrument can be linked to a single player as its Maestro and when the instrument is set to Maestro input mode it will play any MIDI notes that it receives from the Maestro."
+        },
+        {
+            "type": "text",
+            "title": "Linking a Maestro",
+            "text": "In order for an instrument to play MIDI notes from a Maestro it must first be linked. To learn how to link an instrument to a Maestro check the relevant instrument sections:$(br2)$(l:instruments_hand_held)Hand-held Instruments$(/l)$(br2)$(l:instruments_block)Block Instruments$(/l)."
+        },
+        {
+            "type": "text",
+            "title": "Receiving MIDI",
+            "text": "In order to receive notes from the linked Maestro they must be within 16 blocks of you and have an enabled $(l:band_transmitter)Transmitter$(/l) on their hot-bar.$(br2)Notes are transmitted on the same $(l:midi_channels)MIDI channel$(/l) that the Maestro receives them on so your instrument must also have the channels enabled that you want to receive notes for."
+        },
+        {
+            "type": "text",
+            "title": "Broadcasting MIDI",
+            "text": "When you want to broadcast MIDI notes to instruments that are linked to you as a Maestro you must use a $(l:band_transmitter)Transmitter$(/l).$(br2)When a transmitter is enabled and on your hot-bar it will intercept any $(l:midi_messages)MIDI messages$(/l) from your configured $(l:configuration_midi_input)system MIDI input device$(/l) and transmit them to any instruments linked to you within 16 blocks."
+        }
+    ],
+    "sortnum": 1
+}

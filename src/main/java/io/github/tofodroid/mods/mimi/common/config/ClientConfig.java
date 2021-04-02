@@ -29,7 +29,7 @@ public class ClientConfig {
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
             .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrection")
-            .define("enableSynthJitterCorrection", true);
+            .define("synthJitterCorrection", true);
         latency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms)? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.latency")
             .defineInRange("synthBaselineLatency", 250, 10, 800);

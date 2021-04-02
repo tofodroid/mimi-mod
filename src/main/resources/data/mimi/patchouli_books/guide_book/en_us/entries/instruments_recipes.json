@@ -1,0 +1,76 @@
+{
+    "name": "Instrument Recipes",
+    "icon": "minecraft:crafting_table",
+    "category": "mimi:instruments",
+    "pages": [
+        {
+            "type": "text",
+            "text": "This section lists the crafting recipe for each instrument currently available in MIMI, sorted alphabetically."
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:acbass"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:acguitar"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:bagpipe"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:clarinet"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:drums"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:elecguitar"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:flute"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:frenchhorn"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:kalimba"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:microphone"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:ocarina"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:piano"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:saxophone"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:synlead"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:trumpet"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:violin"
+        }
+    ],
+    "sortnum": 4
+}

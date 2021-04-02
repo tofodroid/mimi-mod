@@ -1,0 +1,27 @@
+{
+    "name": "Instrument Properties",
+    "icon": "minecraft:name_tag",
+    "category": "mimi:instruments",
+    "pages": [
+        {
+            "type": "text",
+            "text": "Each instrument has several properties that can be set in the $(l:interface_instrument)Instrument GUI$(/l).$(br2)These properties are saved to the instrument and will apply to all players who use it."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Input",
+            "text": "This property stores the active MIDI Input mode and can have one of three values:$(br2)1. $(l)None$() - Will receive no MIDI input.$(br2)2.  $(l)Maestro$() - Will receive MIDI input from the linked $(l:introduction_maestro)Maestro$(/l).$(br2)3. $(l)MIDI$() - Will receive MIDI input from the configured $(l:configuration_midi)System MIDI Input Device$(/l)."
+        },
+        {
+            "type": "text",
+            "title": "Maestro",
+            "text": "This property stores which player this instrument should receive MIDI broadcasts from when $(l)Maestro$() is the selected MIDI Input mode.$(br2)In order to receive messages the linked player must have an active MIDI Transmitter in their hot-bar and be within 16 blocks."
+        },
+        {
+            "type": "text",
+            "title": "Enabled MIDI Channels",
+            "text": "This property stores the list of which MIDI Channels this instrument should respond to messages from when a MIDI Input mode other than $(l)None$() is selected.$(br2)It is generally recommended to enable only some channels at the same time because if the same note is played on multiple enabled channels simultaneously it could cause minor issues with note timing sustain."
+        }
+    ],
+    "sortnum": 3
+}

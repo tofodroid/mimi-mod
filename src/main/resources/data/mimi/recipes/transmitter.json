@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "  L",
+        "IRI",
+        "ITI"
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "L": {
+            "item": "minecraft:redstone_lamp"
+        },
+        "T": {
+            "item": "minecraft:lever"
+        }
+    },
+    "result": {
+        "item": "mimi:transmitter"
+    }
+}

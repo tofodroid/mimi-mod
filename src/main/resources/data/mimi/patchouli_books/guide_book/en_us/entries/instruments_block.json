@@ -1,0 +1,27 @@
+{
+    "name": "Block Instruments",
+    "icon": "mimi:drums",
+    "category": "mimi:instruments",
+    "pages": [
+        {
+            "type": "text",
+            "text": "Some instruments in MIMI are larger and must be placed into the world as a block before they can be played.$(br2)Note that only one player can be seated at a block instrument at a time."
+        },
+        {
+            "type": "text",
+            "title": "Opening the GUI",
+            "text": "To play an open block instrument first right-click on it while not holding another instrument to seat yourself at it and then right-click it again to open the $(l:interface_instrument)Instrument GUI$(/l).$(br2)To leave a block instrument use the same keybind that you would use to dismount a horse or boat."
+        },
+        {
+            "type": "text",
+            "title": "Playing without the GUI",
+            "text": "Block instruments can also be played without the GUI being open by setting a MIDI Input on the instrument. Note that you must still be seated at the block instrument to play it using a MIDI Input."
+        },
+        {
+            "type": "text",
+            "title": "Setting the Maestro",
+            "text": "Since you cannot use a block instrument on a player to set them as the maestro like you can for a hand-held instrument you can set the maestro in another way.$(br2)By right-clicking on a block instrument while holding a hand-held instrument you will copy the linked maestro from the hand-held instrument into the block instrument (if one is set)."
+        }
+    ],
+    "sortnum": 2
+}

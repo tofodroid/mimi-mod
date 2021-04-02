@@ -1,0 +1,16 @@
+{
+    "name": "The Transmitter",
+    "icon": "mimi:transmitter",
+    "category": "mimi:band",
+    "pages": [
+        {
+            "type": "text",
+            "text": "The transmitter allows Maestros to transmit MIDI data to nearby (16 blocks) instruments that are linked to them and set to Maestro MIDI Input mode when the transmitter is enabled.$(br2)To toggle a transmitter between enabled and disabled shift-right-click while holding it in your main hand. An enabled transmitter will appear with an enchantment glow."
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:transmitter"
+        }
+    ],
+    "sortnum": 2
+}
