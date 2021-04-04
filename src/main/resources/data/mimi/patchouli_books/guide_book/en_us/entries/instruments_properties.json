@@ -5,12 +5,12 @@
     "pages": [
         {
             "type": "text",
-            "text": "Each instrument has several properties that can be set in the $(l:interface_instrument)Instrument GUI$(/l).$(br2)These properties are saved to the instrument and will apply to all players who use it."
+            "text": "Each instrument has several properties that can be set in the $(l:instruments_gui)Instrument GUI$(/l).$(br2)These properties are saved to the instrument and will apply to all players who use it."
         },
         {
             "type": "text",
             "title": "MIDI Input",
-            "text": "This property stores the active MIDI Input mode and can have one of three values:$(br2)1. $(l)None$() - Will receive no MIDI input.$(br2)2.  $(l)Maestro$() - Will receive MIDI input from the linked $(l:introduction_maestro)Maestro$(/l).$(br2)3. $(l)MIDI$() - Will receive MIDI input from the configured $(l:configuration_midi)System MIDI Input Device$(/l)."
+            "text": "This property stores the active MIDI Input mode and can have one of three values:$(br2)1. $(l)None$() - Will receive no MIDI input.$(br2)2.  $(l)Maestro$() - Will receive MIDI input from the linked $(l:band_maestro)Maestro$(/l).$(br2)3. $(l)MIDI$() - Will receive MIDI input from the configured $(l:configuration_midi_input)System MIDI Input Device$(/l)."
         },
         {
             "type": "text",

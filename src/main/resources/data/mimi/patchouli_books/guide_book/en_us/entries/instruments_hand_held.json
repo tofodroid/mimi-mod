@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "Opening the GUI",
-            "text": "A hand-held instrument can be played by right-clicking while holding the instrument in your main hand. This will open up the $(l:interface_instrument)Instrument GUI$(/l).$(br2)While the GUI is open you will be unable to walk around as your keyboard input will be used by the GUI to play notes."
+            "text": "A hand-held instrument can be played by right-clicking while holding the instrument in your main hand. This will open up the $(l:instruments_gui)Instrument GUI$(/l).$(br2)While the GUI is open you will be unable to walk around as your keyboard input will be used by the GUI to play notes."
         },
         {
             "type": "text",
@@ -20,7 +20,7 @@
         {
             "type": "text",
             "title": "Setting the Maestro",
-            "text": "If you want to set a player other than yourself as the Maestro for a hand-held instrument you can simply hold the instrument in your main hand and right click the player you want."
+            "text": "If you want to set a player other than yourself as the $(l:band_maestro)Maestro$(/l) for a hand-held instrument you can simply hold the instrument in your main hand and right click the player you want."
         }
     ],
     "sortnum": 1

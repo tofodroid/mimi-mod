@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "Opening the GUI",
-            "text": "To play an open block instrument first right-click on it while not holding another instrument to seat yourself at it and then right-click it again to open the $(l:interface_instrument)Instrument GUI$(/l).$(br2)To leave a block instrument use the same keybind that you would use to dismount a horse or boat."
+            "text": "To play an open block instrument first right-click on it while not holding another instrument to seat yourself at it and then right-click it again to open the $(l:instruments_gui)Instrument GUI$(/l).$(br2)To leave a block instrument use the same keybind that you would use to dismount a horse or boat."
         },
         {
             "type": "text",
@@ -20,7 +20,7 @@
         {
             "type": "text",
             "title": "Setting the Maestro",
-            "text": "Since you cannot use a block instrument on a player to set them as the maestro like you can for a hand-held instrument you can set the maestro in another way.$(br2)By right-clicking on a block instrument while holding a hand-held instrument you will copy the linked maestro from the hand-held instrument into the block instrument (if one is set)."
+            "text": "Since you cannot use a block instrument on a player to set them as the $(l:band_maestro)maestro$(/l) like you can for a hand-held instrument you can set the maestro in another way.$(br2)By right-clicking on a block instrument while holding a hand-held instrument you will copy the linked maestro from the hand-held instrument into the block instrument (if one is set)."
         }
     ],
     "sortnum": 2

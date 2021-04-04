@@ -1,9 +1,20 @@
 {
   "itemGroup.mimi.group": "mimi",
-  "item.mimi.ocarina": "Ocarina",
+  "item.mimi.acbass": "Acoustic Bass",
   "item.mimi.acguitar": "Acoustic Guitar",
-  "item.mimi.transmitter": "MIDI Transmitter",
+  "item.mimi.bagpipe": "Bagpipes",
+  "item.mimi.clarinet": "Clarinet",
+  "item.mimi.elecguitar": "Electric Guitar",
+  "item.mimi.flute": "Flute",
+  "item.mimi.frechnhorn": "French Horn",
+  "item.mimi.kalimba": "Kalimba",
+  "item.mimi.microphone": "Microphone",
+  "item.mimi.ocarina": "Ocarina",
+  "item.mimi.saxophone": "Saxophone",
+  "item.mimi.synlead": "Synth Lead",
+  "item.mimi.trumpet": "Trumpet",
+  "item.mimi.violin": "Violin",
+  "item.mimi.transmitter": "Transmitter",
   "block.mimi.piano": "Piano",
-  "block.mimi.drums": "Drum Kit",
-  "block.mimi.speaker": "Speaker"
+  "block.mimi.drums": "Drum Kit"
 }
