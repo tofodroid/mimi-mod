@@ -39,6 +39,7 @@ import net.minecraft.util.Hand;
 public class MidiInputManager implements AutoCloseable {
     private Integer selectedDeviceId = null;
     private Transmitter activeTransmitter = null;
+    private Receiver activeReceiver = null;
     private List<MidiDevice> midiDevices = new ArrayList<>();
     private GuiInstrument instrumentGui = null;
 
@@ -170,35 +171,34 @@ public class MidiInputManager implements AutoCloseable {
 
     protected void openMidiTransmitterWithDevice(MidiDevice device) {
         if(device != null) {
-            try {    
-                // Init new connection
-                if(!device.isOpen()) {
-                    device.open();
-                }
+            try {
+                String oldVal = System.setProperty("javax.sound.midi.Transmitter", device.getDeviceInfo().getName());
 
-                activeTransmitter = device.getTransmitter();
-                activeTransmitter.setReceiver(new MidiInputReceiver(this));
+                activeTransmitter = MidiSystem.getTransmitter();
+                activeReceiver = new MidiInputReceiver(this);
+                activeTransmitter.setReceiver(activeReceiver);
+
+                if(oldVal != null) {
+                    System.setProperty("javax.sound.midi.Transmitter", oldVal);
+                } else {
+                    System.clearProperty("javax.sound.midi.Transmitter");
+                }
             } catch(MidiUnavailableException e) {
                 MIMIMod.LOGGER.error("Midi Device Error: ", e);
-                closeActiveMidiTransmitter();
                 closeActiveMidiDevice();
             }
         }
     }
 
     protected void closeActiveMidiDevice() {
-        this.closeActiveMidiTransmitter();
-
-        if(selectedDeviceId != null && selectedDeviceId >= 0 && midiDevices != null && selectedDeviceId < midiDevices.size() &&  midiDevices.get(selectedDeviceId) != null) {
-            if(midiDevices.get(selectedDeviceId).isOpen()) {
-                midiDevices.get(selectedDeviceId).close();
-            }
+        if(activeReceiver != null) {
+            MIMIMod.LOGGER.info("[UNBUG]: DEVICE CLOSE - CLOSE RECEIVER");
+            activeReceiver.close();
+            activeReceiver = null;
         }
-    }
 
-    protected void closeActiveMidiTransmitter() {
         if(activeTransmitter != null) {
-            activeTransmitter.setReceiver(null);
+            MIMIMod.LOGGER.info("[UNBUG]: DEVICE CLOSE - CLOSE TRANSMITTER");
             activeTransmitter.close();
             activeTransmitter = null;
         }
