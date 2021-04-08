@@ -48,6 +48,7 @@ public class MidiChannelDef {
         this.playerId = playerId;
         this.instrumentId = instrument.getId();
         this.channel.programChange(instrument.getBank(), instrument.getPatch());
+        this.channel.controlChange(7, 0);
     }
 
     public void reset() {
