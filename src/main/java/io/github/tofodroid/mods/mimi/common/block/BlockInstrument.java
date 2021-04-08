@@ -66,8 +66,8 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
         if(tileInstrument != null) {
             UUID instrumentMaestro = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
 
-            // Server-Side: If right clicked with instrument then set maestro, otherwise sit
-            if(instrumentMaestro != null) {
+            // Server-Side: If right clicked with instrument and not currently being used then set maestro, otherwise sit
+            if(instrumentMaestro != null && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
                 if(!worldIn.isRemote) {
                     tileInstrument.setMaestro(instrumentMaestro);
                     tileInstrument.markDirty();
@@ -76,6 +76,8 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
                     String instrumentMaestroName = PlayerNameUtils.getPlayerNameFromUUID(instrumentMaestro, worldIn);
                     player.sendStatusMessage(new StringTextComponent("Linked " + this.getTranslatedName().getString() + " Maestro: " +  instrumentMaestroName), true);
                 }
+            } else if(instrumentMaestro != null && worldIn.isRemote) {
+                player.sendStatusMessage(new StringTextComponent("You can only set the Maestro when the instrument is not being used."), true);
             } else if(!worldIn.isRemote) {
                 return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
             } else if(worldIn.isRemote) {
@@ -169,9 +171,13 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
     }
     
     public static TileInstrument getTileInstrumentForEntity(LivingEntity entity) {
-        if(isEntitySittingAtInstrument(entity)) {
-            TileEntity sourceEntity = entity.getEntityWorld().getTileEntity(getSeatForEntity(entity).getSource());
-            return sourceEntity != null && sourceEntity instanceof TileInstrument ? (TileInstrument) sourceEntity : null;
+        if(entity.isAlive() && isEntitySittingAtInstrument(entity)) {
+            BlockPos pos = getSeatForEntity(entity).getSource();
+
+            if(pos != null && !World.isOutsideBuildHeight(pos)) {
+                TileEntity sourceEntity = entity.getEntityWorld().getTileEntity(getSeatForEntity(entity).getSource());
+                return sourceEntity != null && sourceEntity instanceof TileInstrument ? (TileInstrument) sourceEntity : null;
+            }
         }
 
         return null;

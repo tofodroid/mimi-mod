@@ -72,13 +72,22 @@ public class EntitySeat extends Entity {
     public BlockPos getSource() {
         return source;
     }
+
+    public static Boolean seatExists(World world, BlockPos pos, Vector3d sitOffsetPos) {
+        EntitySeat newSeat = new EntitySeat(world, pos, sitOffsetPos);
+        return seatExists(world, newSeat.getPosX(), newSeat.getPosY(), newSeat.getPosZ());
+    }
+
+    private static Boolean seatExists(World world, Double posX, Double posY, Double posZ) {
+        List<EntitySeat> seats = world.getEntitiesWithinAABB(EntitySeat.class, new AxisAlignedBB(posX - 0.05, posY - 0.05, posZ - 0.05, posX + 0.05, posY + 0.05, posZ + 0.05));
+        return !seats.isEmpty();
+    }
     
     public static ActionResultType create(World world, BlockPos pos, Vector3d sitOffsetPos, PlayerEntity player) {
         if(!world.isRemote) {
-
             EntitySeat newSeat = new EntitySeat(world, pos, sitOffsetPos);
-            List<EntitySeat> seats = world.getEntitiesWithinAABB(EntitySeat.class, new AxisAlignedBB(newSeat.getPosX() - 0.05, newSeat.getPosY() - 0.05, newSeat.getPosZ() - 0.05, newSeat.getPosX() + 0.05, newSeat.getPosY() + 0.05, newSeat.getPosZ() + 0.05));
-            if(seats.isEmpty()) {
+            
+            if(!seatExists(world, newSeat.getPosX(), newSeat.getPosY(), newSeat.getPosZ())) {
                 world.addEntity(newSeat);
                 player.startRiding(newSeat, false);
             }
