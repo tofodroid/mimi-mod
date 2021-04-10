@@ -30,7 +30,6 @@ public class ModConfigs {
     @SubscribeEvent
     public static void onFileChange(final ModConfig.Reloading event) {
         if(event.getConfig().getSpec() == CLIENTSPEC) {
-            MIMIMod.LOGGER.info("Config reload detected!");
             MIMIMod.proxy.getMidiSynth().close();
             MIMIMod.proxy.getMidiSynth().init();
         }

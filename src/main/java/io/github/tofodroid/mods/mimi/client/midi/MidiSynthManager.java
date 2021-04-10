@@ -125,7 +125,7 @@ public class MidiSynthManager implements AutoCloseable {
 
             // 2. Clear idle channels
             toUnassign.forEach(channel -> {
-                MIMIMod.LOGGER.info("["+ channelAssignmentMap.get(channel) + "] - Channel is now idle. Clearing.");
+                MIMIMod.LOGGER.debug("["+ channelAssignmentMap.get(channel) + "] - Channel is now idle. Clearing.");
                 midiChannelSet.get(channel.ordinal()).reset();
                 channelAssignmentMap.remove(channel);
             });
@@ -151,7 +151,7 @@ public class MidiSynthManager implements AutoCloseable {
                 if(channelAssignmentMap.get(num) == null) {
                     channelAssignmentMap.put(num, channelIdentifier);
                     this.midiChannelSet.get(num.ordinal()).assign(playerId, MidiInstrument.getBydId(instrumentId));
-                    MIMIMod.LOGGER.info("[" + channelIdentifier + "] Assigned to MIDI channel " + num.ordinal());
+                    MIMIMod.LOGGER.debug("[" + channelIdentifier + "] Assigned to MIDI channel " + num.ordinal());
                     return num;
                 }
             }
