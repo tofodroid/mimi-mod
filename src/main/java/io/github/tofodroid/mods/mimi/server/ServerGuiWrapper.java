@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.server;
 
-import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
+import io.github.tofodroid.mods.mimi.common.GuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
 import net.minecraft.entity.player.PlayerEntity;

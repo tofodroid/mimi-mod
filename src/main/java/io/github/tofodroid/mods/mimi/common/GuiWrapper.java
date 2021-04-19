@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.gui;
+package io.github.tofodroid.mods.mimi.common;
 
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 

@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.client;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.client.gui.GuiMidiInputConfig;
-import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
+import io.github.tofodroid.mods.mimi.common.GuiWrapper;
 import io.github.tofodroid.mods.mimi.common.instruments.EntityInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
@@ -24,7 +24,7 @@ public class ClientGuiWrapper implements GuiWrapper {
     public void openInstrumentGui(World world, PlayerEntity player, Byte instrumentId, TileInstrument instrumentTile) {
         openGui(world, new GuiInstrument<TileInstrument>(player, world, instrumentId, instrumentTile, EntityInstrumentDataUtil.INSTANCE));
     }
-        
+
     @Override
     public void openConfigGui(World world, PlayerEntity player) {
         openGui(world, new GuiMidiInputConfig(player));

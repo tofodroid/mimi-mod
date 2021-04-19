@@ -24,5 +24,6 @@ public class NetworkManager {
         NET_CHANNEL.registerMessage(3, SpeakerNoteOffPacket.class, SpeakerNoteOffPacket::encodePacket, SpeakerNoteOffPacket::decodePacket, SpeakerNotePacketHandler::handlePacket);
         NET_CHANNEL.registerMessage(4, InstrumentItemDataUpdatePacket.class, InstrumentItemDataUpdatePacket::encodePacket, InstrumentItemDataUpdatePacket::decodePacket, InstrumentItemDataUpdatePacketHandler::handlePacket);
         NET_CHANNEL.registerMessage(5, InstrumentTileDataUpdatePacket.class, InstrumentTileDataUpdatePacket::encodePacket, InstrumentTileDataUpdatePacket::decodePacket, InstrumentTileDataUpdatePacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(5, WriteDiskDataPacket.class, WriteDiskDataPacket::encodePacket, WriteDiskDataPacket::decodePacket, WriteDiskDataPacketHandler::handlePacket);
     }
 }
