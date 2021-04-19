@@ -5,5 +5,5 @@
 	"show_progress": false,
 	"creative_tab": "mimi.group",
 	"book_texture": "patchouli:textures/gui/book_blue.png",
-	"model": "mimi:config"
+	"model": "mimi:guide"
 }
