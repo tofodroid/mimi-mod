@@ -11,7 +11,7 @@ public class ItemDiskDrive extends Item {
         );
         this.setRegistryName("drive");
     }
-    
+        
     public boolean isEmptyDrive(ItemStack stack) {
         return ModItems.DISK.isEmptyDisk(stack);
     }

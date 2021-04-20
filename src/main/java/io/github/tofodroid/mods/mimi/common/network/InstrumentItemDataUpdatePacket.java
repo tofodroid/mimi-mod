@@ -9,16 +9,13 @@ import net.minecraft.network.PacketBuffer;
 
 public class InstrumentItemDataUpdatePacket extends InstrumentDataUpdatePacket {
 
-    public InstrumentItemDataUpdatePacket(UUID maestroId, Integer inputMode, String acceptedChannelString) {
-        super(maestroId, inputMode, acceptedChannelString);
+    public InstrumentItemDataUpdatePacket(UUID maestroId, Boolean midiEnabled, String acceptedChannelString) {
+        super(maestroId, midiEnabled, acceptedChannelString);
     }
     
     public static InstrumentItemDataUpdatePacket decodePacket(PacketBuffer buf) {
         try {
-            Integer inputMode = buf.readInt();
-            if(inputMode == NULL_INPUT_MODE_VAL) {
-                inputMode = null;
-            }
+            Boolean midiEnabled = buf.readBoolean();
 
             String acceptedChannelString = buf.readString(38);
             if(acceptedChannelString.trim().isEmpty()) {
@@ -30,7 +27,7 @@ public class InstrumentItemDataUpdatePacket extends InstrumentDataUpdatePacket {
                 maestroId = null;
             }
 
-            return new InstrumentItemDataUpdatePacket(maestroId, inputMode, acceptedChannelString);
+            return new InstrumentItemDataUpdatePacket(maestroId, midiEnabled, acceptedChannelString);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("InstrumentDataUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -41,7 +38,7 @@ public class InstrumentItemDataUpdatePacket extends InstrumentDataUpdatePacket {
     }
 
     public static void encodePacket(InstrumentItemDataUpdatePacket pkt, PacketBuffer buf) {
-        buf.writeInt(pkt.inputMode != null ? pkt.inputMode : NULL_INPUT_MODE_VAL);
+        buf.writeBoolean(pkt.midiEnabled != null ? pkt.midiEnabled : false);
         buf.writeString(pkt.acceptedChannelString != null ? pkt.acceptedChannelString : "", 38);
         buf.writeUniqueId(pkt.maestroId != null ? pkt.maestroId : NULL_MAESTRO_VAL);
     }

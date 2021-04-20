@@ -47,9 +47,9 @@ public class GuiInstrument<T> extends Screen {
     private static final Integer BUTTON_SIZE = 15;
 
     // GUI    
-    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(184,14);
-    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(203,14);
-    private static final Vector2f TOGGLE_INPUT_BUTTON_COORDS = new Vector2f(339,14);
+    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(221,14);
+    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(240,14);
+    private static final Vector2f TOGGLE_MIDI_BUTTON_COORDS = new Vector2f(332,14);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,54);
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,54);
     private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(34,54);
@@ -86,7 +86,6 @@ public class GuiInstrument<T> extends Screen {
     private final InstrumentDataUtil<T> instrumentUtil;
     private final PlayerEntity player;
     private final World world;
-    private String selectedInputString = "None";
     private String selectedMaestroName = "None";
 
     public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil) {
@@ -97,7 +96,6 @@ public class GuiInstrument<T> extends Screen {
         this.player = player;
         this.world = worldIn;
         this.midiInputManager = MIMIMod.proxy.getMidiInput();
-        this.selectedInputString = instrumentUtil.getSelectedInputString(instrumentData);
         this.refreshMaestroName();
     }
 
@@ -197,18 +195,13 @@ public class GuiInstrument<T> extends Screen {
             } else if(clickedBox(imouseX, imouseY, MAESTRO_CLEAR_BUTTON_COORDS)) {
                 // Speaker Link Clear Button
                 instrumentUtil.linkToMaestro(instrumentData, null);
-                if(new Integer(1).equals(instrumentUtil.getInputMode(instrumentData))) {
-                    // Force to input 0
-                    instrumentUtil.cycleInputMode(instrumentData, false);
-                    this.selectedInputString = instrumentUtil.getSelectedInputString(instrumentData);
-                }
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
-            } else if(clickedBox(imouseX, imouseY, TOGGLE_INPUT_BUTTON_COORDS)) {
-                // Cycle Input Button
-                instrumentUtil.cycleInputMode(instrumentData, this.midiDevicesExist());
+            } else if(clickedBox(imouseX, imouseY, TOGGLE_MIDI_BUTTON_COORDS)) {
+                // Toggle MIDI Enabled
+                // TODO
+                //instrumentUtil.cycleInputMode(instrumentData, this.midiDevicesExist());
                 this.syncInstrumentToServer();
-                this.selectedInputString = instrumentUtil.getSelectedInputString(instrumentData);
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 // Clear Midi Channels Button
                 instrumentUtil.clearAcceptedChannels(instrumentData);
@@ -338,19 +331,19 @@ public class GuiInstrument<T> extends Screen {
     }
 
     public void onMidiNoteOn(Byte channel, Byte midiNote, Byte velocity) {
-        if(instrumentUtil.midiInputSelected(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
+        if(instrumentUtil.isMidiEnabled(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
             this.onGuiNotePress(midiNote, velocity);
         }
     }
     
     public void onMidiNoteOff(Byte channel, Byte midiNote) {
-        if(instrumentUtil.midiInputSelected(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
+        if(instrumentUtil.isMidiEnabled(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
             this.onGuiNoteRelease(midiNote);
         }
     }
 
     public void onMidiAllNotesOff(Byte channel) {
-        if(instrumentUtil.midiInputSelected(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
+        if(instrumentUtil.isMidiEnabled(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
             this.allNotesOff();
         }
     }
@@ -395,10 +388,6 @@ public class GuiInstrument<T> extends Screen {
         if(this.heldNotes.remove(midiNote) != null) {
             this.releasedNotes.put(midiNote, Instant.now());
         }
-    }
-
-    private Boolean midiDevicesExist() {
-        return this.midiInputManager != null && this.midiInputManager.getNumDevices() > 0;
     }
 
     // Keyboard Input Functions
@@ -476,13 +465,18 @@ public class GuiInstrument<T> extends Screen {
         // Note Key Covers
         blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 222, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
-        // Maestro Status Ligt
+        // Maestro Status Light
         if(!this.selectedMaestroName.equals("None")) {
             if(this.isMaestroOnline()) {
                 blit(matrixStack, startX + 177, startY + 20, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             } else {
                 blit(matrixStack, startX + 177, startY + 20, this.getBlitOffset(), 373, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
+        }
+
+        // MIDI Enabled Status Light
+        if(this.instrumentUtil.isMidiEnabled(instrumentData)) {
+            blit(matrixStack, startX + 351, startY + 20, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Channel Output Status Lights
@@ -546,10 +540,7 @@ public class GuiInstrument<T> extends Screen {
         font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 199, 0xFF00E600);
 
         // Maestro Name
-        font.drawString(matrixStack, this.selectedMaestroName, startX + 62, startY + 18, 0xFF00E600);
-
-        // Midi Device Text
-        font.drawString(matrixStack, this.selectedInputString, startX + 294, startY + 18, 0xFF00E600);
+        font.drawString(matrixStack, this.selectedMaestroName, startX + 96, startY + 18, 0xFF00E600);
         
         return matrixStack;
     }

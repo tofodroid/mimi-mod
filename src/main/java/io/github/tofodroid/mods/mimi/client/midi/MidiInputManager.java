@@ -10,36 +10,31 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
+import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Transmitter;
 import javax.sound.midi.MidiDevice.Info;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.instruments.EntityInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemTransmitter;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SpeakerNoteOffPacket;
 import io.github.tofodroid.mods.mimi.common.network.SpeakerNoteOnPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 
 @SuppressWarnings("rawtypes")
 public class MidiInputManager implements AutoCloseable {
     private Integer selectedDeviceId = null;
     private Transmitter activeTransmitter = null;
     private Receiver activeReceiver = null;
+    private Sequencer activeSequener = null;
+    private Transmitter seqTransmitter = null;
+    private Receiver seqReceiver = null;
     private List<MidiDevice> midiDevices = new ArrayList<>();
     private GuiInstrument instrumentGui = null;
 
@@ -54,6 +49,14 @@ public class MidiInputManager implements AutoCloseable {
 
     public Boolean devicesAvailable() {
         return this.midiDevices != null && !this.midiDevices.isEmpty();
+    }
+
+    public Boolean sequencerAvailable() {
+        return this.activeSequener != null && this.activeSequener.isOpen();
+    }
+
+    public Sequencer getSequencer() {
+        return this.activeSequener;
     }
 
     public Boolean isSelectedDeviceAvailable() {
@@ -135,6 +138,21 @@ public class MidiInputManager implements AutoCloseable {
     public void loadMidiDevices() {
         List<MidiDevice> devices = new ArrayList<>();
 
+        // Sequencer
+        try {
+            this.activeSequener = MidiSystem.getSequencer(false);
+            this.seqReceiver = new MidiInputReceiver(this);
+            this.seqTransmitter = this.activeSequener.getTransmitter();
+            this.seqTransmitter.setReceiver(seqReceiver);
+            this.activeSequener.open();
+        } catch(Exception e) {
+            this.activeSequener = null;
+            this.seqReceiver = null;
+            this.seqTransmitter = null;
+            MIMIMod.LOGGER.error("Midi Sequencer Error. Will not setup sequencer. Error: ", e);
+        }
+
+        // Devices
         for (int i = 0; i < MidiSystem.getMidiDeviceInfo().length; i++) {
             try {
                 devices.add(MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo()[i]));
@@ -192,13 +210,11 @@ public class MidiInputManager implements AutoCloseable {
 
     protected void closeActiveMidiDevice() {
         if(activeReceiver != null) {
-            MIMIMod.LOGGER.info("[UNBUG]: DEVICE CLOSE - CLOSE RECEIVER");
             activeReceiver.close();
             activeReceiver = null;
         }
 
         if(activeTransmitter != null) {
-            MIMIMod.LOGGER.info("[UNBUG]: DEVICE CLOSE - CLOSE TRANSMITTER");
             activeTransmitter.close();
             activeTransmitter = null;
         }
@@ -222,8 +238,6 @@ public class MidiInputManager implements AutoCloseable {
             } else if(isAllNotesOffMessage(message)) {
                 this.sendRelayNoteOffPacket(new Integer(message.getChannel()).byteValue(), SpeakerNoteOffPacket.ALL_NOTES_OFF, player.getUniqueID());
             }
-        } else {
-            this.handleSingleNote(message, player);
         }
     }
 
@@ -238,15 +252,6 @@ public class MidiInputManager implements AutoCloseable {
         return false;
     }
 
-    protected void handleSingleNote(ShortMessage message, PlayerEntity player) {
-        if(this.instrumentGui != null) {
-            this.handleMidiMessageGui(message);
-        } else {
-            this.handleMidiMessageHeldInstruments(message, player);
-            this.handleMidimessageSeatedInstrument(message, player);
-        }
-    }
-
     protected void handleMidiMessageGui(ShortMessage midiMessage) {        
         if(isNoteOnMessage(midiMessage)) {
             this.instrumentGui.onMidiNoteOn(getChannel(midiMessage), getData1(midiMessage), getData2(midiMessage));
@@ -257,48 +262,7 @@ public class MidiInputManager implements AutoCloseable {
         }
     }
 
-    protected void handleMidiMessageHeldInstruments(ShortMessage midiMessage, PlayerEntity player) {
-        ItemStack mainStack = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.MAIN_HAND);
-        ItemStack offStack = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.OFF_HAND);
-
-        if(isNoteOnMessage(midiMessage)) {
-            if(mainStack != null) this.instrumentStackMidiNoteOn(mainStack, getChannel(midiMessage), getData1(midiMessage), getData2(midiMessage), player);
-            if(offStack != null)  this.instrumentStackMidiNoteOn(offStack, getChannel(midiMessage), getData1(midiMessage), getData2(midiMessage), player);
-        } else if(isNoteOffMessage(midiMessage)) {
-            if(mainStack != null) this.instrumentStackMidiNoteOff(mainStack, getChannel(midiMessage), getData1(midiMessage), player);
-            if(offStack != null) this.instrumentStackMidiNoteOff(offStack, getChannel(midiMessage), getData1(midiMessage), player);
-        } else if(isAllNotesOffMessage(midiMessage)) {
-            if(mainStack != null) this.instrumentStackMidiNoteOff(mainStack, getChannel(midiMessage), MidiNoteOffPacket.ALL_NOTES_OFF, player);
-            if(offStack != null) this.instrumentStackMidiNoteOff(offStack, getChannel(midiMessage), MidiNoteOffPacket.ALL_NOTES_OFF, player);
-        }
-    }
-    
-    protected void handleMidimessageSeatedInstrument(ShortMessage midiMessage, PlayerEntity player) {
-        if(BlockInstrument.isEntitySittingAtInstrument(player)) {
-            TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
-
-            if(instrumentEntity != null && isNoteOnMessage(midiMessage)) {
-                instrumentEntityMidiNoteOn(instrumentEntity, getChannel(midiMessage), getData1(midiMessage), getData2(midiMessage), player);
-            } else if(instrumentEntity != null && isNoteOffMessage(midiMessage)) {
-                instrumentEntityMidiNoteOff(instrumentEntity, getChannel(midiMessage), getData1(midiMessage), player);
-            } else if(instrumentEntity != null && isAllNotesOffMessage(midiMessage)) {
-                instrumentEntityMidiNoteOff(instrumentEntity, getChannel(midiMessage), MidiNoteOffPacket.ALL_NOTES_OFF, player);
-            }
-        }
-        
-    }
-
     // Packets
-    protected void sendNoteOnPacket(Byte instrumentId, Byte note, Byte velocity, PlayerEntity player) {
-        MidiNoteOnPacket packet = new MidiNoteOnPacket(note, velocity, instrumentId, player.getUniqueID(), player.getPosition());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
-    }
-    
-    protected void sendNoteOffPacket(Byte instrumentId, Byte midiNote, PlayerEntity player) {
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(midiNote, instrumentId, player.getUniqueID());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
-    }
-    
     public void sendRelayNoteOnPacket(Byte channel, Byte midiNote, Byte velocity, UUID playerId) {
         SpeakerNoteOnPacket packet = new SpeakerNoteOnPacket(channel, midiNote, velocity, playerId);
         NetworkManager.NET_CHANNEL.sendToServer(packet);
@@ -337,45 +301,6 @@ public class MidiInputManager implements AutoCloseable {
     protected Boolean isAllNotesOffMessage(ShortMessage msg) {
         return ShortMessage.CONTROL_CHANGE == msg.getCommand() && ( msg.getData1() == 120 || msg.getData2() == 123);
     }
-
-    // Item Stack Functions
-    protected Boolean instrumentStackShouldHandleMessage(ItemStack instrumentStack, Byte channel) {
-        return ItemInstrumentDataUtil.INSTANCE.midiInputSelected(instrumentStack) && ItemInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentStack, channel);
-    }
-
-    protected void instrumentStackMidiNoteOn(ItemStack instrumentStack, Byte channel, Byte note, Byte velocity, PlayerEntity player) {
-        Byte instrumentId = ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(instrumentStack);
-        if(instrumentId != null && this.instrumentStackShouldHandleMessage(instrumentStack, channel)) {
-            this.sendNoteOnPacket(instrumentId, note, velocity, player);
-        }
-    }
-
-    protected void instrumentStackMidiNoteOff(ItemStack instrumentStack, Byte channel, Byte note, PlayerEntity player) {
-        Byte instrumentId = ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(instrumentStack);
-        if(instrumentId != null && this.instrumentStackShouldHandleMessage(instrumentStack, channel)) {
-            this.sendNoteOffPacket(instrumentId, note, player);
-        }
-    }
-
-    // Entity Functions
-    protected Boolean instrumentEntityShouldHandleMessage(TileInstrument instrumentEntity, Byte channel) {
-        return EntityInstrumentDataUtil.INSTANCE.midiInputSelected(instrumentEntity) && EntityInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentEntity, channel);
-    }
-
-    protected void instrumentEntityMidiNoteOn(TileInstrument instrumentEntity, Byte channel, Byte note, Byte velocity, PlayerEntity player) {
-        Byte instrumentId = EntityInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(instrumentEntity);
-        if(instrumentId != null && this.instrumentEntityShouldHandleMessage(instrumentEntity, channel)) {
-            this.sendNoteOnPacket(instrumentId, note, velocity, player);
-        }
-    }
-
-    protected void instrumentEntityMidiNoteOff(TileInstrument instrumentEntity, Byte channel, Byte note, PlayerEntity player) {
-        Byte instrumentId = EntityInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(instrumentEntity);
-        if(instrumentId != null && this.instrumentEntityShouldHandleMessage(instrumentEntity, channel)) {
-            this.sendNoteOffPacket(instrumentId, note, player);
-        }
-    }
-
 
     // Receiver    
     public class MidiInputReceiver implements Receiver {

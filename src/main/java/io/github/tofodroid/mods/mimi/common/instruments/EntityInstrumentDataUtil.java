@@ -8,11 +8,6 @@ public class EntityInstrumentDataUtil extends InstrumentDataUtil<TileInstrument>
     public static final EntityInstrumentDataUtil INSTANCE = new EntityInstrumentDataUtil();
 
     @Override
-    protected void setInputMode(TileInstrument instrumentData, Integer inputMode) {
-        instrumentData.setInputMode(inputMode);
-    }
-
-    @Override
     protected void setAcceptedChannelString(TileInstrument instrumentData, String acceptedChannelsString) {
         instrumentData.setAcceptedChannelsString(acceptedChannelsString);
     }
@@ -21,18 +16,6 @@ public class EntityInstrumentDataUtil extends InstrumentDataUtil<TileInstrument>
     protected String getAcceptedChannelsString(TileInstrument instrumentData) {
         return instrumentData.getAcceptedChannelsString();
     }
-
-    /*
-    @Override
-    public void linkToSpeaker(TileInstrument instrumentData, BlockPos speakerPos) {
-        instrumentData.setLinkedSpeaker(speakerPos);
-    }
-
-    @Override
-    public BlockPos getConnectedSpeaker(TileInstrument instrumentData) {
-        return instrumentData.getLinkedSpeaker();
-    }
-    */
 
     @Override
     public void linkToMaestro(TileInstrument instrumentData, UUID playerId) {
@@ -45,12 +28,18 @@ public class EntityInstrumentDataUtil extends InstrumentDataUtil<TileInstrument>
     }
 
     @Override
-    public Integer getInputMode(TileInstrument instrumentData) {
-        return instrumentData.getInputMode();
+    public Byte getInstrumentIdFromData(TileInstrument instrumentData) {
+        return instrumentData.getInstrumentId();
     }
 
     @Override
-    public Byte getInstrumentIdFromData(TileInstrument instrumentData) {
-        return instrumentData.getInstrumentId();
+    protected void setMidiEnabled(TileInstrument instrumentData, Boolean enabled) {
+        instrumentData.setMidiEnabled(enabled);
+        
+    }
+
+    @Override
+    public Boolean isMidiEnabled(TileInstrument instrumentData) {
+        return instrumentData.isMidiEnabled();
     }
 }

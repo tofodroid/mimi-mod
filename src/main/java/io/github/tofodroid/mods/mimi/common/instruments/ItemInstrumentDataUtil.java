@@ -46,25 +46,25 @@ public class ItemInstrumentDataUtil extends InstrumentDataUtil<ItemStack> {
     }
 
     @Override
-    public void setInputMode(ItemStack stack, Integer inputMode) {
-        if (inputMode != null && inputMode > 0) {
-            stack.getOrCreateTag().putInt(INPUT_MODE_TAG, inputMode);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(INPUT_MODE_TAG);
-        }
-    }
-
-    @Override
-    public Integer getInputMode(ItemStack stack) {
-        return stackTagContainsKey(stack, INPUT_MODE_TAG) ? stack.getTag().getInt(INPUT_MODE_TAG) : null;
-    }
-
-    @Override
     public Byte getInstrumentIdFromData(ItemStack stack) {
         if (stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemInstrument) {
             return ((ItemInstrument) stack.getItem()).getInstrumentId();
         }
         return null;
+    }
+
+    @Override
+    protected void setMidiEnabled(ItemStack stack, Boolean enabled) {
+        if(enabled) {
+            stack.getOrCreateTag().putBoolean(MIDI_ENABLED_TAG, enabled);
+        } else if(stack.hasTag()) {
+            stack.getTag().remove(MIDI_ENABLED_TAG);
+        }
+    }
+
+    @Override
+    public Boolean isMidiEnabled(ItemStack stack) {
+        return stackTagContainsKey(stack, MIDI_ENABLED_TAG);
     }
 
     protected Boolean stackTagContainsKey(ItemStack stack, String tag) {

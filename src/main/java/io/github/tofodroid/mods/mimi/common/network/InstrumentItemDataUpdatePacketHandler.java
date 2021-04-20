@@ -27,10 +27,10 @@ public class InstrumentItemDataUpdatePacketHandler {
         if (instrumentStack != null && !instrumentStack.isEmpty() && instrumentStack.getItem() instanceof ItemInstrument) {
             CompoundNBT comp = instrumentStack.getOrCreateTag();
             
-            if(message.inputMode != null) {
-                comp.putInt(InstrumentDataUtil.INPUT_MODE_TAG, message.inputMode);
+            if(message.midiEnabled) {
+                comp.putBoolean(InstrumentDataUtil.MIDI_ENABLED_TAG, message.midiEnabled);
             } else {
-                comp.remove(InstrumentDataUtil.INPUT_MODE_TAG);
+                comp.remove(InstrumentDataUtil.MIDI_ENABLED_TAG);
             }
 
             if(message.acceptedChannelString != null) {

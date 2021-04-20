@@ -101,7 +101,7 @@ public class SpeakerNotePacketHandler {
     
     // Tile Entity Functions
     protected static Boolean instrumentEntityShouldHandleMessage(UUID sender, TileInstrument instrumentEntity, Byte channel) {
-        return EntityInstrumentDataUtil.INSTANCE.relayInputSelected(instrumentEntity) && sender.equals(EntityInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentEntity)) && EntityInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentEntity, channel);
+        return EntityInstrumentDataUtil.INSTANCE.isMidiEnabled(instrumentEntity) && sender.equals(EntityInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentEntity)) && EntityInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentEntity, channel);
     }
 
     protected static void handleEntityInstrumentRelayNoteOn(ServerPlayerEntity player, final SpeakerNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
@@ -129,7 +129,7 @@ public class SpeakerNotePacketHandler {
 
     // Item Stack Functions
     protected static Boolean instrumentStackShouldHandleMessage(UUID sender, ItemStack instrumentStack, Byte channel) {
-        return ItemInstrumentDataUtil.INSTANCE.relayInputSelected(instrumentStack) && sender.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentStack)) && ItemInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentStack, channel);
+        return ItemInstrumentDataUtil.INSTANCE.isMidiEnabled(instrumentStack) && sender.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentStack)) && ItemInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentStack, channel);
     }
 
     protected static void handleHeldInstrumentRelayNoteOn(ServerPlayerEntity player, Hand handIn, final SpeakerNoteOnPacket message, List<MidiNoteOnPacket> packetList) {

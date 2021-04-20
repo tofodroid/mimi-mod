@@ -16,7 +16,7 @@ public class TileInstrument extends TileEntity {
 
     private Byte instrumentId;
     private UUID maestro;
-    private Integer inputMode;
+    private Boolean midiEnabled;
     private String acceptedChannelsString;
 
     public TileInstrument() {
@@ -37,10 +37,10 @@ public class TileInstrument extends TileEntity {
             this.maestro = null;
         }
 
-        if(compound.contains(InstrumentDataUtil.INPUT_MODE_TAG)) {
-            this.inputMode = compound.getInt(InstrumentDataUtil.INPUT_MODE_TAG);
+        if(compound.contains(InstrumentDataUtil.MIDI_ENABLED_TAG)) {
+            this.midiEnabled = compound.getBoolean(InstrumentDataUtil.MIDI_ENABLED_TAG);
         } else {
-            this.inputMode = null;
+            this.midiEnabled = false;
         }
 
         if(compound.contains(InstrumentDataUtil.LISTEN_CHANNELS_TAG)) {
@@ -62,8 +62,8 @@ public class TileInstrument extends TileEntity {
             compound.putUniqueId(InstrumentDataUtil.MAESTRO_TAG, this.maestro);
         }
         
-        if(this.inputMode != null && this.inputMode != 0) {
-            compound.putInt(InstrumentDataUtil.INPUT_MODE_TAG, this.inputMode);
+        if(this.midiEnabled != null && this.midiEnabled) {
+            compound.putBoolean(InstrumentDataUtil.MIDI_ENABLED_TAG, this.midiEnabled);
         }
         
         if(this.acceptedChannelsString != null && !this.acceptedChannelsString.isEmpty()) {
@@ -111,12 +111,12 @@ public class TileInstrument extends TileEntity {
         this.acceptedChannelsString = acceptedChannelsString;
     }
 
-    public Integer getInputMode() {
-        return inputMode;
+    public Boolean isMidiEnabled() {
+        return this.midiEnabled;
     }
 
-    public void setInputMode(Integer inputMode) {
-        this.inputMode = inputMode;
+    public void setMidiEnabled(Boolean enabled) {
+        this.midiEnabled = enabled;
     }
 
     public UUID getMaestro() {
@@ -131,7 +131,7 @@ public class TileInstrument extends TileEntity {
         return new InstrumentTileDataUpdatePacket(
             e.getPos(),
             e.getMaestro(), 
-            e.getInputMode(), 
+            e.isMidiEnabled(), 
             e.getAcceptedChannelsString()
         );
     }

@@ -11,8 +11,8 @@ import net.minecraft.util.math.BlockPos;
 public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
     public final BlockPos tilePos;
 
-    public InstrumentTileDataUpdatePacket(BlockPos tilePos, UUID maestroId, Integer inputMode, String acceptedChannelString) {
-        super(maestroId, inputMode, acceptedChannelString);
+    public InstrumentTileDataUpdatePacket(BlockPos tilePos, UUID maestroId, Boolean midiEnabled, String acceptedChannelString) {
+        super(maestroId, midiEnabled, acceptedChannelString);
         this.tilePos = tilePos;
     }
     
@@ -20,10 +20,7 @@ public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
         try {
             BlockPos tilePos = BlockPos.fromLong(buf.readLong());
 
-            Integer inputMode = buf.readInt();
-            if(inputMode == NULL_INPUT_MODE_VAL) {
-                inputMode = null;
-            }
+            Boolean midiEnabled = buf.readBoolean();
 
             String acceptedChannelString = buf.readString(38);
             if(acceptedChannelString.trim().isEmpty()) {
@@ -35,7 +32,7 @@ public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
                 maestroId = null;
             }
 
-            return new InstrumentTileDataUpdatePacket(tilePos, maestroId, inputMode, acceptedChannelString);
+            return new InstrumentTileDataUpdatePacket(tilePos, maestroId, midiEnabled, acceptedChannelString);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("InstrumentTileUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -47,7 +44,7 @@ public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
 
     public static void encodePacket(InstrumentTileDataUpdatePacket pkt, PacketBuffer buf) {
         buf.writeLong(pkt.tilePos.toLong());
-        buf.writeInt(pkt.inputMode != null ? pkt.inputMode : NULL_INPUT_MODE_VAL);
+        buf.writeBoolean(pkt.midiEnabled != null ? pkt.midiEnabled : false);
         buf.writeString(pkt.acceptedChannelString != null ? pkt.acceptedChannelString : "", 38);
         buf.writeUniqueId(pkt.maestroId != null ? pkt.maestroId : NULL_MAESTRO_VAL);
     }

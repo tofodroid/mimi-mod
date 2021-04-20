@@ -67,8 +67,9 @@ public class ItemInstrument extends Item {
             }
         } else {
             if(playerIn.isSneaking()) {
-                ItemInstrumentDataUtil.INSTANCE.cycleInputMode(heldItem, MIMIMod.proxy.getMidiInput().devicesAvailable());
-                playerIn.sendStatusMessage(new StringTextComponent("MIDI Input: " + ItemInstrumentDataUtil.INSTANCE.getSelectedInputString(heldItem)), true);
+                ItemInstrumentDataUtil.INSTANCE.toggleMidiEnabled(heldItem);
+                Boolean enabled = ItemInstrumentDataUtil.INSTANCE.isMidiEnabled(heldItem);
+                playerIn.sendStatusMessage(new StringTextComponent(enabled ? "MIDI Input Enabled" : "MIDI Input Disabled"), true);
                 return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
             }
         }
@@ -87,8 +88,8 @@ public class ItemInstrument extends Item {
             
             tooltip.add(new StringTextComponent("----------------"));
 
-            // Input mode
-            tooltip.add(new StringTextComponent("MIDI Input: " + ItemInstrumentDataUtil.INSTANCE.getSelectedInputString(stack)));
+            Boolean enabled = ItemInstrumentDataUtil.INSTANCE.isMidiEnabled(stack);
+            tooltip.add(new StringTextComponent(enabled ? "MIDI Input Enabled" : "MIDI Input Disabled"));
 
             // Linked Maestro
             if(maestroId != null) {
@@ -143,7 +144,7 @@ public class ItemInstrument extends Item {
     public static InstrumentItemDataUpdatePacket getSyncPacket(ItemStack stack) {
         return new InstrumentItemDataUpdatePacket(
             ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(stack), 
-            ItemInstrumentDataUtil.INSTANCE.getInputMode(stack), 
+            ItemInstrumentDataUtil.INSTANCE.isMidiEnabled(stack), 
             ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsString(stack)
         );
     }
