@@ -32,7 +32,7 @@ public class MidiInputManager implements AutoCloseable {
     private Integer selectedDeviceId = null;
     private Transmitter activeTransmitter = null;
     private Receiver activeReceiver = null;
-    private Sequencer activeSequener = null;
+    private Sequencer activeSequencer = null;
     private Transmitter seqTransmitter = null;
     private Receiver seqReceiver = null;
     private List<MidiDevice> midiDevices = new ArrayList<>();
@@ -52,11 +52,11 @@ public class MidiInputManager implements AutoCloseable {
     }
 
     public Boolean sequencerAvailable() {
-        return this.activeSequener != null && this.activeSequener.isOpen();
+        return this.activeSequencer != null && this.activeSequencer.isOpen();
     }
 
     public Sequencer getSequencer() {
-        return this.activeSequener;
+        return this.activeSequencer;
     }
 
     public Boolean isSelectedDeviceAvailable() {
@@ -140,13 +140,13 @@ public class MidiInputManager implements AutoCloseable {
 
         // Sequencer
         try {
-            this.activeSequener = MidiSystem.getSequencer(false);
+            this.activeSequencer = MidiSystem.getSequencer(false);
             this.seqReceiver = new MidiInputReceiver(this);
-            this.seqTransmitter = this.activeSequener.getTransmitter();
+            this.seqTransmitter = this.activeSequencer.getTransmitter();
             this.seqTransmitter.setReceiver(seqReceiver);
-            this.activeSequener.open();
+            this.activeSequencer.open();
         } catch(Exception e) {
-            this.activeSequener = null;
+            this.activeSequencer = null;
             this.seqReceiver = null;
             this.seqTransmitter = null;
             MIMIMod.LOGGER.error("Midi Sequencer Error. Will not setup sequencer. Error: ", e);
