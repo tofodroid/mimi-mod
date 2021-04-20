@@ -199,8 +199,7 @@ public class GuiInstrument<T> extends Screen {
                 this.refreshMaestroName();
             } else if(clickedBox(imouseX, imouseY, TOGGLE_MIDI_BUTTON_COORDS)) {
                 // Toggle MIDI Enabled
-                // TODO
-                //instrumentUtil.cycleInputMode(instrumentData, this.midiDevicesExist());
+                instrumentUtil.toggleMidiEnabled(instrumentData);
                 this.syncInstrumentToServer();
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 // Clear Midi Channels Button
