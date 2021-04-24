@@ -24,6 +24,7 @@ public class ClientProxy implements Proxy {
         MinecraftForge.EVENT_BUS.register(MIDI_SYNTH);
         
         MIDI_INPUT = new MidiInputManager();
+        MinecraftForge.EVENT_BUS.register(MIDI_INPUT);
 
         // Screens
         ScreenManager.registerFactory(ModContainers.CONTAINER_TYPE_CONTAINER_DISK_RECORDER, ScreenContainerDiskRecorder::new);
