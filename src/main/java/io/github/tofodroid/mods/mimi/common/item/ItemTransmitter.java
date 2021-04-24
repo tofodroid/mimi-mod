@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -18,6 +19,7 @@ import net.minecraft.world.World;
 
 public class ItemTransmitter extends Item {
     public static final String ENABLED_TAG = "enabled";
+    public static final String MODE_TAG = "midi";
 
     public ItemTransmitter() {
         super(new Properties().group(ModItems.ITEM_GROUP).maxStackSize(1));
@@ -30,14 +32,14 @@ public class ItemTransmitter extends Item {
         final ItemStack heldItem = playerIn.getHeldItem(handIn);
 
         if(!worldIn.isRemote() && playerIn.isSneaking()) {
-            if(!heldItem.getOrCreateTag().contains(ENABLED_TAG)) {
-                heldItem.getOrCreateTag().putBoolean(ENABLED_TAG, true);
+            if(toggleEnabled(heldItem)) {
                 playerIn.sendStatusMessage(new StringTextComponent("Transmitter Enabled"), true);
             } else {
-                heldItem.getOrCreateTag().remove(ENABLED_TAG);
                 playerIn.sendStatusMessage(new StringTextComponent("Transmitter Disabled"), true);
             }
             return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
+        } else if(worldIn.isRemote && !playerIn.isSneaking()) {
+            MIMIMod.guiWrapper.openTransmitterGui(worldIn, playerIn, heldItem);
         }
         return new ActionResult<>(ActionResultType.PASS, heldItem);
     }
@@ -56,5 +58,33 @@ public class ItemTransmitter extends Item {
     @Override
     public boolean hasEffect(ItemStack stack) {
         return stack.getOrCreateTag().contains(ENABLED_TAG); 
+    }
+
+    public Boolean toggleEnabled(ItemStack stack) {
+        if(!stack.getOrCreateTag().contains(ENABLED_TAG)) {
+            stack.getOrCreateTag().putBoolean(ENABLED_TAG, true);
+            return true;
+        } else {
+            stack.getOrCreateTag().remove(ENABLED_TAG);
+            return false;
+        }
+    }
+    
+    public Boolean isEnabled(ItemStack stack) {
+        return stack.getOrCreateTag().contains(ENABLED_TAG);
+    }
+    
+    public Boolean toggleMode(ItemStack stack) {
+        if(!stack.getOrCreateTag().contains(MODE_TAG)) {
+            stack.getOrCreateTag().putBoolean(MODE_TAG, true);
+            return true;
+        } else {
+            stack.getOrCreateTag().remove(MODE_TAG);
+            return false;
+        }
+    }
+
+    public Boolean isMidiMode(ItemStack stack) {
+        return stack.getOrCreateTag().contains(MODE_TAG);
     }
 }
