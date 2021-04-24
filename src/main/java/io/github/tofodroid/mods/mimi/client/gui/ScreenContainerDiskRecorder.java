@@ -108,6 +108,7 @@ public class ScreenContainerDiskRecorder extends ContainerScreen<ContainerDiskRe
         
     }
     
+    @SuppressWarnings("deprecation")
     @Override
     protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
@@ -39,28 +38,27 @@ public class GuiInstrument<T> extends Screen {
     // Texture
     private static final ResourceLocation guiTexture = new ResourceLocation(MIMIMod.MODID, "textures/gui/gui_instrument.png");
     private static final Integer GUI_WIDTH = 368;
-    private static final Integer GUI_HEIGHT = 221;
+    private static final Integer GUI_HEIGHT = 246;
     private static final Integer NOTE_OFFSET_X = 11;
-    private static final Integer NOTE_OFFSET_Y = 84;
-    private static final Integer TEXTURE_SIZE = 418;
+    private static final Integer NOTE_OFFSET_Y = 109;
+    private static final Integer TEXTURE_SIZE = 402;
     private static final Integer NOTE_WIDTH = 14;
     private static final Integer BUTTON_SIZE = 15;
 
     // GUI    
-    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(221,14);
-    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(240,14);
-    private static final Vector2f TOGGLE_MIDI_BUTTON_COORDS = new Vector2f(332,14);
-    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,54);
-    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,54);
-    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(34,54);
-    private static final Vector2f GEN_SHIFT_BUTTON_COORDS = new Vector2f(327,99);
+    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(213,39);
+    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(232,39);
+    private static final Vector2f TOGGLE_MIDI_BUTTON_COORDS = new Vector2f(332,39);
+    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,79);
+    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,79);
+    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(34,79);
+    private static final Vector2f GEN_SHIFT_BUTTON_COORDS = new Vector2f(327,124);
     
     private Integer startX;
     private Integer startY;
 
     // MIDI
     private static final Integer KEYBOARD_START_NOTE = 21;
-    private MidiInputManager midiInputManager;
 
     // Mouse
     private Byte mouseNote = null;
@@ -89,13 +87,12 @@ public class GuiInstrument<T> extends Screen {
     private String selectedMaestroName = "None";
 
     public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil) {
-        super(new TranslationTextComponent("item.MIMIMod.instrument_gui"));
+        super(new TranslationTextComponent("item.MIMIMod.gui_instrument"));
         this.instrumentId = instrumentId;
         this.instrumentData = instrumentData;
         this.instrumentUtil = instrumentUtil;
         this.player = player;
         this.world = worldIn;
-        this.midiInputManager = MIMIMod.proxy.getMidiInput();
         this.refreshMaestroName();
     }
 
@@ -110,21 +107,12 @@ public class GuiInstrument<T> extends Screen {
         startY = Math.round((this.height - GUI_HEIGHT) / 1.25f);
         this.heldNotes.clear();
         this.releasedNotes.clear();
-        
-        if(this.midiInputManager != null && this.midiInputManager.devicesAvailable()) {
-            this.midiInputManager.setGuiInstance(this);
-        }
     }
     
     @Override
     public void closeScreen() {
         super.closeScreen();
-
         this.allNotesOff();
-
-        if(this.midiInputManager != null) {
-            this.midiInputManager.setGuiInstance(null);
-        }
     }
 
     @Override
@@ -201,6 +189,9 @@ public class GuiInstrument<T> extends Screen {
                 // Toggle MIDI Enabled
                 instrumentUtil.toggleMidiEnabled(instrumentData);
                 this.syncInstrumentToServer();
+                if(!instrumentUtil.isMidiEnabled(instrumentData)) {
+                    this.allNotesOff();
+                }
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 // Clear Midi Channels Button
                 instrumentUtil.clearAcceptedChannels(instrumentData);
@@ -437,14 +428,14 @@ public class GuiInstrument<T> extends Screen {
 
     // Render Functions
     private MatrixStack renderGraphics(MatrixStack matrixStack) {
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        setAlpha(1.0f);
 
         // Set Texture
         Minecraft.getInstance().getTextureManager().bindTexture(guiTexture);
 
         // Visible Notes
         Integer keyboardTextureShift = (visibleNoteShift % (NOTE_WIDTH/2)) * NOTE_WIDTH;
-        blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 249, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 274, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Edges
         if(visibleNoteShift == 0) {
@@ -456,26 +447,26 @@ public class GuiInstrument<T> extends Screen {
         matrixStack = renderAndCleanNoteSet(matrixStack, this.releasedNotes, 1000, false, entry -> {this.releasedNotes.remove(entry.getKey());});
 
         // Reset alpha for next layers
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        setAlpha(1.0f);
 
         // GUI Background and Note Keys
         blit(matrixStack, startX, startY, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Key Covers
-        blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 222, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 247, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Maestro Status Light
         if(!this.selectedMaestroName.equals("None")) {
             if(this.isMaestroOnline()) {
-                blit(matrixStack, startX + 177, startY + 20, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, startX + 206, startY + 45, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             } else {
-                blit(matrixStack, startX + 177, startY + 20, this.getBlitOffset(), 373, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, startX + 206, startY + 45, this.getBlitOffset(), 373, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
 
         // MIDI Enabled Status Light
         if(this.instrumentUtil.isMidiEnabled(instrumentData)) {
-            blit(matrixStack, startX + 351, startY + 20, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, startX + 351, startY + 45, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Channel Output Status Lights
@@ -483,7 +474,7 @@ public class GuiInstrument<T> extends Screen {
 
         if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
             for(Byte channelId : acceptedChannels) {
-                blit(matrixStack, startX + 40 + 19 * channelId, startY + 72, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, startX + 40 + 19 * channelId, startY + 97, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
         
@@ -518,8 +509,8 @@ public class GuiInstrument<T> extends Screen {
         if(!held) {
             alpha -= Math.min(Math.abs(ChronoUnit.MILLIS.between(Instant.now(), releaseTime))/1000f, 1.0f);
         }
-        
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, alpha);
+
+        setAlpha(alpha);
 
         blit(
             matrixStack, 
@@ -536,10 +527,10 @@ public class GuiInstrument<T> extends Screen {
 
     private MatrixStack renderText(MatrixStack matrixStack) {
         // Min Note Text
-        font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 199, 0xFF00E600);
+        font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 224, 0xFF00E600);
 
         // Maestro Name
-        font.drawString(matrixStack, this.selectedMaestroName, startX + 96, startY + 18, 0xFF00E600);
+        font.drawString(matrixStack, this.selectedMaestroName, startX + 88, startY + 43, 0xFF00E600);
         
         return matrixStack;
     }
@@ -608,5 +599,10 @@ public class GuiInstrument<T> extends Screen {
         if(packet != null) {
             NetworkManager.NET_CHANNEL.sendToServer(packet);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setAlpha(float alpha) {
+        RenderSystem.color4f(1.0f, 1.0f, 1.0f, alpha);
     }
 }

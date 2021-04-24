@@ -112,7 +112,7 @@ public class TileInstrument extends TileEntity {
     }
 
     public Boolean isMidiEnabled() {
-        return this.midiEnabled;
+        return this.midiEnabled != null ? this.midiEnabled : false;
     }
 
     public void setMidiEnabled(Boolean enabled) {

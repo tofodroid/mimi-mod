@@ -13,7 +13,7 @@ public class WriteDiskDataPacketHandler {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
             ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
         } else {
-            MIMIMod.LOGGER.warn("Client recevied unexpected InstrumentTileUpdatePacket!");
+            MIMIMod.LOGGER.warn("Client recevied unexpected WriteDiskDataPacket!");
         }
         ctx.get().setPacketHandled(true);
     }

@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import javax.sound.midi.MidiDevice.Info;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
@@ -37,7 +36,7 @@ public class GuiMidiInputConfig extends Screen {
     private MidiInputManager midiInputManager;
 
     public GuiMidiInputConfig(PlayerEntity player) {
-        super(new TranslationTextComponent("item.MIMIMod.guid_midi_input_config"));
+        super(new TranslationTextComponent("item.MIMIMod.gui_midi_input_config"));
         this.midiInputManager = MIMIMod.proxy.getMidiInput();
     }
 
@@ -69,11 +68,11 @@ public class GuiMidiInputConfig extends Screen {
         int imouseY = (int)Math.round(mouseY);
 
         if(clickedBox(imouseX, imouseY, REFRESH_DEVICES_BUTTON)) {
-            this.midiInputManager.loadMidiDevices();
+            this.midiInputManager.inputDeviceManager.loadMidiDevices();
         } else if(clickedBox(imouseX, imouseY, SHIFT_DEVICE_UP_BUTTON)) {
-            this.midiInputManager.shiftMidiDevice(true);
+            this.midiInputManager.inputDeviceManager.shiftMidiDevice(true);
         } else if(clickedBox(imouseX, imouseY, SHIFT_DEVICE_DOWN_BUTTON)) {
-            this.midiInputManager.shiftMidiDevice(false);
+            this.midiInputManager.inputDeviceManager.shiftMidiDevice(false);
         }
         
         return super.mouseReleased(mouseX, mouseY, button);
@@ -95,8 +94,6 @@ public class GuiMidiInputConfig extends Screen {
     }
 
     private MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-
         // Set Texture
         Minecraft.getInstance().getTextureManager().bindTexture(guiTexture);
 
@@ -104,31 +101,28 @@ public class GuiMidiInputConfig extends Screen {
         blit(matrixStack, startX, startY, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Device Status Lights
-        if(this.midiInputManager != null && this.midiInputManager.getSelectedDeviceId() != null) {
+        if(this.midiInputManager != null && this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null) {
             Integer statusX = startX + 283;
             Integer statusY = startY + 69;
-            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.isSelectedDeviceAvailable() ? 0 : 4, 174, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isSelectedDeviceAvailable() ? 0 : 4, 174, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
-
-        // Reset alpha for next layers
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         
         return matrixStack;
     }
 
     private MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Num Devices
-        String numDeviceString = this.midiInputManager.getNumDevices().toString();
+        String numDeviceString = this.midiInputManager.inputDeviceManager.getNumDevices().toString();
         font.drawString(matrixStack, numDeviceString, startX + 224, startY + 41, 0xFF00E600);
 
         // Selected Device Name
-        String deviceNameString = (this.midiInputManager.getSelectedDeviceId() != null ? 
-            this.midiInputManager.getSelectedDeviceId() + ": " : "")
-            + this.midiInputManager.getSelectedDeviceName();
+        String deviceNameString = (this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null ? 
+            this.midiInputManager.inputDeviceManager.getSelectedDeviceId() + ": " : "")
+            + this.midiInputManager.inputDeviceManager.getSelectedDeviceName();
         font.drawString(matrixStack, deviceNameString, startX + 142, startY + 67, 0xFF00E600);
 
         // Selected Device Info
-        Info info = this.midiInputManager.getSelectedDeviceInfo();
+        Info info = this.midiInputManager.inputDeviceManager.getSelectedDeviceInfo();
         if(info != null) {
             String descString = "Description: " + info.getDescription();
             Integer yOffset = 0;
