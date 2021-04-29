@@ -10,19 +10,28 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 
 public class ClientConfig {
+    public static final String MIDI_PLAYER_CATEGORY_NAME = "MIDI Player";
     public static final String MIDI_INPUT_CATEGORY_NAME = "MIDI Input";
     public static final String MIDI_SYNTH_CATEGORY_NAME = "MIDI Synth";
 
+    // PLAYER
+    public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
+    // INPUT
     public ForgeConfigSpec.IntValue defaultMidiInputDevice;
+    // SYNTH
     public ForgeConfigSpec.BooleanValue jitterCorrection;
     public ForgeConfigSpec.IntValue latency;
     public ForgeConfigSpec.ConfigValue<Integer> synthSampleRate;
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
-
     public ClientConfig(ForgeConfigSpec.Builder builder) {
+        builder.push(MIDI_PLAYER_CATEGORY_NAME);
+        playlistFolderPath = builder.comment("Optional full path to a folder containing MIDI files to be used by the MIDI Player. See project page for more information.")
+            .translation(MIMIMod.MODID + ".config.midi.player.playlist.path")
+            .define("playlistFolderPath", "");
+        builder.pop();
         builder.push(MIDI_INPUT_CATEGORY_NAME);
-        defaultMidiInputDevice = builder.comment("What MIDI Input Device ID should be used by default (if available)? Set to -1 to have no default slection.")
+        defaultMidiInputDevice = builder.comment("What MIDI Input Device ID should be used by default (if available)? Set to -1 to have no default selection.")
             .translation(MIMIMod.MODID + ".config.midi.input.defaultdevice")
             .defineInRange("defaultMidiInputDevice", -1, -1, 99);
         builder.pop();

@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
 
+import java.io.File;
 import java.net.URL;
 
 import javax.annotation.Nullable;
@@ -68,7 +69,7 @@ public class ScreenContainerDiskRecorder extends ContainerScreen<ContainerDiskRe
         nameField.setResponder(this::handleNameChange);
         urlField = this.addListener(new TextFieldWidget(this.font, this.startX + 41, this.startY + 38, 125, 10, StringTextComponent.EMPTY));
         urlField.setMaxStringLength(256);
-        urlField.setResponder(this::handleUrlChange);
+        urlField.setResponder(this::handlePathChange);
     }
 
     @Override
@@ -140,6 +141,27 @@ public class ScreenContainerDiskRecorder extends ContainerScreen<ContainerDiskRe
         this.updateValidity();
     }
 
+    protected void handlePathChange(String filePath) {
+        if(filePath != null && !filePath.trim().isEmpty() && filePath.matches("^.*\\/+.*.midi?$")) {
+            try {
+                if(new File(filePath).exists()) {
+                    this.urlString = filePath.trim();
+                    this.urlField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
+                } else {
+                    throw new RuntimeException("File not found: " + filePath);
+                }
+            } catch(Exception e) {
+                this.urlString = null;
+                this.urlField.setTextColor(13112340);
+            }
+        } else {
+            this.urlString = null;
+            this.urlField.setTextColor(13112340);
+        }
+        this.updateValidity();
+    }
+
+    // TODO: Currently unused
     protected void handleUrlChange(String url) {
         if(url != null && !url.trim().isEmpty() && url.matches("https?:\\/\\/.*\\/[^\\/,\\s]+\\.midi?$")) {
             try {

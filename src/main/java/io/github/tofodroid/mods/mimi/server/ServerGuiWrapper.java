@@ -19,5 +19,8 @@ public class ServerGuiWrapper implements GuiWrapper {
     public void openTransmitterGui(World world, PlayerEntity player, ItemStack transmitterStack) { }
     
     @Override
+    public void openPlaylistGui(World world, PlayerEntity player) { }
+
+    @Override
     public void openConfigGui(World world, PlayerEntity player) { }
 }

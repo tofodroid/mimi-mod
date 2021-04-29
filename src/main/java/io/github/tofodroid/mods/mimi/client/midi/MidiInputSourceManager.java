@@ -6,6 +6,7 @@ public abstract class MidiInputSourceManager {
     protected Transmitter activeTransmitter = null;
 
     protected abstract void openTransmitter();
+    public abstract void open();
 
     public void close() {
         if(activeTransmitter != null) {
