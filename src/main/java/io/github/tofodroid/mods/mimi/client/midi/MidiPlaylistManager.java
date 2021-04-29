@@ -26,6 +26,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
     private List<MidiFileInfo> originalList;
     private Long pausedTickPosition;
     private Long pausedMicrosecond;
+    private Integer lastTempoBPM;
     private Integer selectedSongIndex;
     private LoopMode currentLoopMode = LoopMode.NONE;
     private Boolean shuffled = false;
@@ -49,6 +50,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         this.songList = new ArrayList<>();
         this.pausedTickPosition = null;
         this.pausedMicrosecond = null;
+        this.lastTempoBPM = 120;
         this.selectedSongIndex = null;
         this.shuffled = false;
     }
@@ -76,6 +78,11 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
                                 stop();
                                 break;
                         }
+                    } else if(MidiUtils.isMetaTempo(meta) | (meta.getType() == 81 && meta.getData().length == 3)) {
+                        byte[] data = meta.getData();
+                        int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);
+                        lastTempoBPM = Math.round(60000001f / mspq);
+                        activeSequencer.setTempoInBPM(lastTempoBPM);
                     }
                 }
                 
@@ -93,7 +100,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
             try {
                 Path activePath = Paths.get(this.playlistFolderPath, this.songList.get(this.selectedSongIndex).fileName);
                 activeSequencer.setSequence(MidiSystem.getSequence(activePath.toFile()));
-                activeSequencer.setTempoInBPM(this.songList.get(this.selectedSongIndex).tempo);
+                this.lastTempoBPM = this.songList.get(this.selectedSongIndex).tempo;
                 return true;
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to open MIDI file " + Paths.get(this.playlistFolderPath, this.songList.get(this.selectedSongIndex).fileName).toString(), e);
@@ -183,7 +190,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
     public void playFromBeginning() {
         if(isSongLoaded()) {
             stop();
-            this.activeSequencer.setTempoInBPM(this.songList.get(this.selectedSongIndex).tempo);
+            this.lastTempoBPM = this.songList.get(this.selectedSongIndex).tempo;
             this.activeSequencer.start();
         }
     }
@@ -196,7 +203,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         if(isSongLoaded() && this.pausedTickPosition != null) {
             this.activeSequencer.stop();
             this.activeSequencer.setTickPosition(this.pausedTickPosition);
-            this.activeSequencer.setTempoInBPM(this.songList.get(this.selectedSongIndex).tempo);
+            this.activeSequencer.setTempoInBPM(this.lastTempoBPM);
             this.pausedTickPosition = null;
             this.pausedMicrosecond = null;
             this.activeSequencer.start();
@@ -309,7 +316,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         if(isOpen()) {
             try {
                 this.activeTransmitter = this.activeSequencer.getTransmitter();
-                this.activeTransmitter.setReceiver(new MidiInputReceiver());
+                this.activeTransmitter.setReceiver(new MidiSequenceInputReceiver());
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Midi Device Error: ", e);
                 close();

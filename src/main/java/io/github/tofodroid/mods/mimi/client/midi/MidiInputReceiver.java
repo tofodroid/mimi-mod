@@ -6,35 +6,51 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOffPacket;
 import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 
-// Receiver
-public class MidiInputReceiver implements Receiver {
+public abstract class MidiInputReceiver implements Receiver {
+    @SuppressWarnings("resource")
     public void send(MidiMessage msg, long timeStamp) {
-        if(msg instanceof ShortMessage ) {
-            handleMidiSequenceMessage((ShortMessage)msg);
+        PlayerEntity player = Minecraft.getInstance().player;
+
+        if(player != null && msg instanceof ShortMessage) {
+            handleMessage((ShortMessage)msg, player);
         }
     }
 
     public void close() { }
 
-    protected void handleMidiSequenceMessage(ShortMessage message) {
+    protected abstract void handleMessage(ShortMessage message, PlayerEntity player);
+        
+    protected void handleMessageMaestro(ShortMessage message) {
         if(isNoteOnMessage(message)) {
-            this.sendRelayNoteOnPacket(new Integer(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
+            this.sendMaestroNoteOnPacket(new Integer(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         } else if(isNoteOffMessage(message)) {
-            this.sendRelayNoteOffPacket(new Integer(message.getChannel()).byteValue(), message.getMessage()[1]);
+            this.sendMaestroNoteOffPacket(new Integer(message.getChannel()).byteValue(), message.getMessage()[1]);
         } else if(isAllNotesOffMessage(message)) {
-            this.sendRelayNoteOffPacket(new Integer(message.getChannel()).byteValue(), MaestroNoteOffPacket.ALL_NOTES_OFF);
+            this.sendMaestroNoteOffPacket(new Integer(message.getChannel()).byteValue(), MaestroNoteOffPacket.ALL_NOTES_OFF);
+        } else {
+            // TODO handle unknown message
+        }
+    }
+    
+    protected void handleMessageMidi(ShortMessage message, PlayerEntity player, Byte instrument) {
+        if(isNoteOnMessage(message)) {
+            sendMidiNoteOnPacket(instrument, message.getMessage()[1], message.getMessage()[2], player);
+        } else if(isNoteOffMessage(message)) {
+            sendMidiNoteOffPacket(instrument, message.getMessage()[1], player);
+        } else if(isAllNotesOffMessage(message)) {
+            sendMidiNoteOffPacket(instrument, MidiNoteOffPacket.ALL_NOTES_OFF, player);
         } else {
             // TODO handle unknown message
         }
     }
     
     // Message Utils
-    protected Boolean isInterestingMessage(ShortMessage msg) {
-        return isNoteOnMessage(msg) || isNoteOffMessage(msg) || isAllNotesOffMessage(msg);
-    }
-
     protected Boolean isNoteOnMessage(ShortMessage msg) {
         return ShortMessage.NOTE_ON == msg.getCommand() && msg.getData2() > 0;
     }
@@ -48,13 +64,23 @@ public class MidiInputReceiver implements Receiver {
     }
     
     // Packets
-    public void sendRelayNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
+    public void sendMaestroNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
         MaestroNoteOnPacket packet = new MaestroNoteOnPacket(channel, midiNote, velocity);
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
     
-    public void sendRelayNoteOffPacket(Byte channel, Byte midiNote) {
+    public void sendMaestroNoteOffPacket(Byte channel, Byte midiNote) {
         MaestroNoteOffPacket packet = new MaestroNoteOffPacket(channel, midiNote);
+        NetworkManager.NET_CHANNEL.sendToServer(packet);
+    }
+    
+    public void sendMidiNoteOnPacket(Byte instrument, Byte midiNote, Byte velocity, PlayerEntity player) {
+        MidiNoteOnPacket packet = new MidiNoteOnPacket(midiNote, velocity, instrument, player.getUniqueID(), player.getPosition());
+        NetworkManager.NET_CHANNEL.sendToServer(packet);
+    }
+    
+    public void sendMidiNoteOffPacket(Byte instrument, Byte midiNote, PlayerEntity player) {
+        MidiNoteOffPacket packet = new MidiNoteOffPacket(midiNote, instrument, player.getUniqueID());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
 }

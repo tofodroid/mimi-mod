@@ -1,3 +1,4 @@
+/*
 package io.github.tofodroid.mods.mimi.common.recipes;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -27,3 +28,4 @@ public final class ModRecipes {
         return t;
     }
 }
+*/

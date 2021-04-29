@@ -65,7 +65,7 @@ public class ContainerDiskRecorder extends Container {
 
         // Slots
         this.inventory = new Inventory(2);
-        this.addSlot(new FilteredSlot(inventory, 0, DISK_IN_XPOS, DISK_YPOS, Arrays.asList(ModItems.DISK), 1, ModItems.DISK::isEmptyDisk));
+        //this.addSlot(new FilteredSlot(inventory, 0, DISK_IN_XPOS, DISK_YPOS, Arrays.asList(ModItems.DISK), 1, ModItems.DISK::isEmptyDisk));
         this.addSlot(new FilteredSlot(inventory, 1, DISK_OUT_XPOS, DISK_YPOS, new ArrayList<>()));
 	}
 	
@@ -88,7 +88,7 @@ public class ContainerDiskRecorder extends Container {
 
 	public boolean writeDisk(String title, String url, String playerName) {
         if(canWriteDisk()) {
-            inventory.setInventorySlotContents(1, ModItems.DISK.writeDiskData(inventory.getStackInSlot(0), title, url, playerName));
+            //inventory.setInventorySlotContents(1, ModItems.DISK.writeDiskData(inventory.getStackInSlot(0), title, url, playerName));
             inventory.removeStackFromSlot(0);
             this.detectAndSendChanges();
             return true;
@@ -98,6 +98,7 @@ public class ContainerDiskRecorder extends Container {
     }
 
     public boolean canWriteDisk() {
-        return ModItems.DISK.equals(inventory.getStackInSlot(0).getItem()) && ItemStack.EMPTY.equals(inventory.getStackInSlot(1));
+        //return ModItems.DISK.equals(inventory.getStackInSlot(0).getItem()) && ItemStack.EMPTY.equals(inventory.getStackInSlot(1));
+        return false;
     }
 }

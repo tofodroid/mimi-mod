@@ -1,3 +1,4 @@
+/*
 package io.github.tofodroid.mods.mimi.common.recipes;
 
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -60,3 +61,4 @@ public class InsertDisk extends SpecialRecipe {
         return ModRecipes.INSERT_DISK;
     }
 }
+*/

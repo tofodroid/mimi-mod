@@ -1,3 +1,4 @@
+/*
 package io.github.tofodroid.mods.mimi.common.recipes;
 
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -66,3 +67,4 @@ public class EjectDisk extends SpecialRecipe {
     }
     
 }
+*/

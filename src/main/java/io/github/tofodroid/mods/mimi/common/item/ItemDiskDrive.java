@@ -13,7 +13,7 @@ public class ItemDiskDrive extends Item {
     }
 
     public boolean isEmptyDrive(ItemStack stack) {
-        return ModItems.DISK.isEmptyDisk(stack);
+        return true;
     }
 
     public ItemStack insertDisk(ItemStack diskStack, ItemStack driveStack) {
@@ -30,6 +30,7 @@ public class ItemDiskDrive extends Item {
             return null;
         }
 
+        /*
         ItemStack result = new ItemStack(ModItems.DISK, 1);
         return ModItems.DISK.writeDiskData(
             result,
@@ -37,5 +38,7 @@ public class ItemDiskDrive extends Item {
             driveStack.getOrCreateTag().getString(ItemFloppyDisk.URL_TAG), 
             driveStack.getOrCreateTag().getString(ItemFloppyDisk.AUTHOR_TAG)
         );
+        */
+        return null;
     }
 }

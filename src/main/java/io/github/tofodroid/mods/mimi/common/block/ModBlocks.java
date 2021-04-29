@@ -13,7 +13,7 @@ public class ModBlocks {
     // Instrument Blocks
     public static final BlockPiano PIANO = null;
     public static final BlockDrums DRUMS = null;
-    public static final BlockDiskRecorder DISKRECORDER = null;
+    //public static final BlockDiskRecorder DISKRECORDER = null;
 
     @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistrationHandler {
@@ -21,7 +21,7 @@ public class ModBlocks {
         public static void registerBlocks(final RegistryEvent.Register<Block> event) {
             event.getRegistry().registerAll(
                 // Other Blocks
-                new BlockDiskRecorder(),
+                //new BlockDiskRecorder(),
 
                 // Instrument Blocks
                 new BlockPiano(),

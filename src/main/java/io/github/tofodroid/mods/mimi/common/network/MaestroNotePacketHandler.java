@@ -100,16 +100,12 @@ public class MaestroNotePacketHandler {
     }
     
     // Tile Entity Functions
-    protected static Boolean instrumentEntityShouldHandleMessage(UUID sender, TileInstrument instrumentEntity, Byte channel) {
-        return EntityInstrumentDataUtil.INSTANCE.isMidiEnabled(instrumentEntity) && sender.equals(EntityInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentEntity)) && EntityInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentEntity, channel);
-    }
-
     protected static void handleEntityInstrumentRelayNoteOn(ServerPlayerEntity target, UUID maestro, final MaestroNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(target);
 
         if(instrumentEntity != null) { 
             Byte instrumentId = EntityInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(instrumentEntity);
-            if(instrumentId != null && instrumentEntityShouldHandleMessage(maestro, instrumentEntity, message.channel)) {
+            if(instrumentId != null && EntityInstrumentDataUtil.INSTANCE.shouldHandleMessage(instrumentEntity, maestro, message.channel)) {
                 packetList.add(new MidiNoteOnPacket(message.note, message.velocity, instrumentId, target.getUniqueID(), target.getPosition()));
             }
         }
@@ -120,7 +116,7 @@ public class MaestroNotePacketHandler {
 
         if(instrumentEntity != null) { 
             Byte instrumentId = EntityInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(instrumentEntity);
-            if(instrumentId != null && instrumentEntityShouldHandleMessage(maestro, instrumentEntity, message.channel)) {
+            if(instrumentId != null && EntityInstrumentDataUtil.INSTANCE.shouldHandleMessage(instrumentEntity, maestro, message.channel)) {
                 packetList.add(new MidiNoteOffPacket(message.note, instrumentId, target.getUniqueID()));
             }
         }
@@ -128,14 +124,10 @@ public class MaestroNotePacketHandler {
 
 
     // Item Stack Functions
-    protected static Boolean instrumentStackShouldHandleMessage(UUID sender, ItemStack instrumentStack, Byte channel) {
-        return ItemInstrumentDataUtil.INSTANCE.isMidiEnabled(instrumentStack) && sender.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentStack)) && ItemInstrumentDataUtil.INSTANCE.doesAcceptChannel(instrumentStack, channel);
-    }
-
     protected static void handleHeldInstrumentRelayNoteOn(ServerPlayerEntity target, UUID maestro, Hand handIn, final MaestroNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
         ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
         Byte instrumentId = ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack);
-        if(instrumentId != null && stack != null && instrumentStackShouldHandleMessage(maestro, stack, message.channel)) {
+        if(instrumentId != null && stack != null && ItemInstrumentDataUtil.INSTANCE.shouldHandleMessage(stack, maestro, message.channel)) {
             packetList.add(new MidiNoteOnPacket(message.note, message.velocity, instrumentId, target.getUniqueID(), target.getPosition()));
         }
     }
@@ -143,7 +135,7 @@ public class MaestroNotePacketHandler {
     protected static void handleHeldInstrumentRelayNoteOff(ServerPlayerEntity target, UUID maestro, Hand handIn, final MaestroNoteOffPacket message, List<MidiNoteOffPacket> packetList) {
         ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
         Byte instrumentId = ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack);
-        if(instrumentId != null && stack != null && instrumentStackShouldHandleMessage(maestro, stack, message.channel)) {
+        if(instrumentId != null && stack != null && ItemInstrumentDataUtil.INSTANCE.shouldHandleMessage(stack, maestro, message.channel)) {
             packetList.add(new MidiNoteOffPacket(message.note, instrumentId, target.getUniqueID()));
         }
     }

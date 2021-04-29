@@ -87,7 +87,7 @@ public class MidiInputSequenceManager extends MidiInputSourceManager {
         if(this.activeSequencer != null) {
             try {
                 this.activeTransmitter = this.activeSequencer.getTransmitter();
-                this.activeTransmitter.setReceiver(new MidiInputReceiver());
+                this.activeTransmitter.setReceiver(new MidiSequenceInputReceiver());
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Midi Device Error: ", e);
                 close();

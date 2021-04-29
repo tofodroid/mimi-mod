@@ -33,6 +33,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
+import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -67,7 +68,7 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
             UUID instrumentMaestro = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
 
             // Server-Side: If right clicked with instrument and not currently being used then set maestro, otherwise sit
-            if(instrumentMaestro != null && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
+            if(instrumentMaestro != null && !InstrumentDataUtil.MIDI_MAESTRO_ID.equals(instrumentMaestro) && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
                 if(!worldIn.isRemote) {
                     tileInstrument.setMaestro(instrumentMaestro);
                     tileInstrument.markDirty();

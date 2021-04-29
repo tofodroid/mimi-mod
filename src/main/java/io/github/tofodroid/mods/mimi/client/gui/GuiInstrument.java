@@ -45,9 +45,10 @@ public class GuiInstrument<T> extends Screen {
     private static final Integer NOTE_WIDTH = 14;
     private static final Integer BUTTON_SIZE = 15;
 
-    // GUI    
-    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(213,39);
-    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(232,39);
+    // GUI
+    private static final Vector2f MAESTRO_MIDI_BUTTON_COORDS = new Vector2f(217,39);
+    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(236,39);
+    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(255,39);
     private static final Vector2f TOGGLE_MIDI_BUTTON_COORDS = new Vector2f(332,39);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,79);
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,79);
@@ -175,13 +176,18 @@ public class GuiInstrument<T> extends Screen {
 
         // Midi Buttons
         if(instrumentData != null) {
-            if(clickedBox(imouseX, imouseY, MAESTRO_SELF_BUTTON_COORDS)) {
-                // Speaker Link Self Button
+            if(clickedBox(imouseX, imouseY, MAESTRO_MIDI_BUTTON_COORDS)) {
+                // Link MIDI Device Button
+                instrumentUtil.linkToMaestro(instrumentData, InstrumentDataUtil.MIDI_MAESTRO_ID);
+                this.syncInstrumentToServer();
+                this.refreshMaestroName();
+            } else if(clickedBox(imouseX, imouseY, MAESTRO_SELF_BUTTON_COORDS)) {
+                // Link Self Button
                 instrumentUtil.linkToMaestro(instrumentData, player.getUniqueID());
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
             } else if(clickedBox(imouseX, imouseY, MAESTRO_CLEAR_BUTTON_COORDS)) {
-                // Speaker Link Clear Button
+                // Link Clear Button
                 instrumentUtil.linkToMaestro(instrumentData, null);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
@@ -455,15 +461,6 @@ public class GuiInstrument<T> extends Screen {
         // Note Key Covers
         blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 247, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
-        // Maestro Status Light
-        if(!this.selectedMaestroName.equals("None")) {
-            if(this.isMaestroOnline()) {
-                blit(matrixStack, startX + 206, startY + 45, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-            } else {
-                blit(matrixStack, startX + 206, startY + 45, this.getBlitOffset(), 373, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-            }
-        }
-
         // MIDI Enabled Status Light
         if(this.instrumentUtil.isMidiEnabled(instrumentData)) {
             blit(matrixStack, startX + 351, startY + 45, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -530,7 +527,7 @@ public class GuiInstrument<T> extends Screen {
         font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 224, 0xFF00E600);
 
         // Maestro Name
-        font.drawString(matrixStack, this.selectedMaestroName, startX + 88, startY + 43, 0xFF00E600);
+        font.drawString(matrixStack, this.selectedMaestroName.length() <= 22 ? this.selectedMaestroName : this.selectedMaestroName.substring(0,21) + "...", startX + 81, startY + 43, 0xFF00E600);
         
         return matrixStack;
     }
@@ -561,20 +558,13 @@ public class GuiInstrument<T> extends Screen {
         if(linkedMaestro != null) {
             if(linkedMaestro.equals(player.getUniqueID())) {
                 this.selectedMaestroName = player.getName().getString();
+            } else if(linkedMaestro.equals(InstrumentDataUtil.MIDI_MAESTRO_ID)) {
+                this.selectedMaestroName = "MIDI Input Device";
             } else {
                 this.selectedMaestroName = PlayerNameUtils.getPlayerNameFromUUID(linkedMaestro, world);
             }
         } else {
             this.selectedMaestroName = "None";
-        }
-    }
-
-    private Boolean isMaestroOnline() {
-        UUID linkedMaestro = instrumentUtil.getLinkedMaestro(instrumentData);
-        if(linkedMaestro != null) {
-            return world.getPlayerByUuid(linkedMaestro) != null;
-        } else {
-            return null;
         }
     }
 

@@ -23,7 +23,7 @@ public class ItemFloppyDisk extends Item {
     }
     
     public ItemStack writeDiskData(ItemStack diskStack, String title, String url, String playerName) {
-        if(diskStack != null && ModItems.DISK.equals(diskStack.getItem())) {
+        if(diskStack != null && this == diskStack.getItem()) {
             diskStack.getOrCreateTag().putString(TITLE_TAG, title);
             diskStack.getOrCreateTag().putString(URL_TAG, url);
             diskStack.getOrCreateTag().putString(AUTHOR_TAG, playerName);
