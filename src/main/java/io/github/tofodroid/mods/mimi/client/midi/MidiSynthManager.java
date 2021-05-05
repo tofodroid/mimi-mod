@@ -30,9 +30,10 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
-
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
@@ -104,6 +105,12 @@ public class MidiSynthManager implements AutoCloseable {
             }
         }
     }
+    
+    public void allNotesOff(MidiChannelNumber num) {
+        if(midiSynth != null && midiReceiver != null && num != null) {
+            this.midiChannelSet.get(num.ordinal()).noteOff(MidiNoteOffPacket.ALL_NOTES_OFF);
+        }
+    }
 
     @SubscribeEvent
     public void handleTick(PlayerTickEvent event) {
@@ -132,6 +139,35 @@ public class MidiSynthManager implements AutoCloseable {
 
             midiTickCounter = 0;
         }
+    }
+
+    @SubscribeEvent
+    public void handleSelfLogOut(LoggedOutEvent event) {
+        if(event.getPlayer() != null && event.getPlayer().isUser()) {
+            this.allNotesOff();
+        }
+    }
+    
+    @SubscribeEvent
+    public void handleOtherLogOut(PlayerLoggedOutEvent event) {
+        if(!event.getPlayer().isUser()) {
+            List<MidiChannelNumber> channelsToStop = getAllChannelsForPlayer(event.getPlayer().getUniqueID());
+            for(MidiChannelNumber num : channelsToStop) {
+                this.allNotesOff(num);
+            }
+        }
+    }
+    
+    protected List<MidiChannelNumber> getAllChannelsForPlayer(UUID playerId) {
+        List<MidiChannelNumber> result = new ArrayList<>();
+
+        for(String name : channelAssignmentMap.values()) {
+            if(name.contains(playerId.toString() + "-")) {
+                result.add(channelAssignmentMap.inverse().get(name));
+            }
+        }
+
+        return result;
     }
 
     protected MidiChannelNumber getChannelForPlayer(UUID playerId, Byte instrumentId, Boolean getNew) {
@@ -188,7 +224,6 @@ public class MidiSynthManager implements AutoCloseable {
         if(channelDef != null) channelDef.noteOff(message.note);
     }
 
-    @SuppressWarnings("resource")
     protected Synthesizer openNewSynth(Soundbank sounds) {
         try {
             Synthesizer midiSynth = MidiSystem.getSynthesizer();

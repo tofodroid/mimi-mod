@@ -20,8 +20,6 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
                 sendMidiNoteOffPacket(instrument, message.getMessage()[1], player);
             } else if(isAllNotesOffMessage(message)) {
                 sendMidiNoteOffPacket(instrument, MidiNoteOffPacket.ALL_NOTES_OFF, player);
-            } else {
-                // TODO handle unknown message
             }
         });
     }

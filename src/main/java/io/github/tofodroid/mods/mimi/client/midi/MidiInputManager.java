@@ -14,6 +14,7 @@ import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -63,6 +64,13 @@ public class MidiInputManager {
 
         this.hasTransmitter = hasTransmitter(event.player);
         this.localInstrumentToPlay = localInstrumentsToPlay(event.player);
+    }
+    
+    @SubscribeEvent
+    public void handleSelfLogOut(LoggedOutEvent event) {
+        if(event.getPlayer() != null && event.getPlayer().isUser()) {
+            this.playlistManager.stop();
+        }
     }
     
     protected Boolean hasTransmitter(PlayerEntity player) {

@@ -181,16 +181,19 @@ public class GuiInstrument<T> extends Screen {
                 instrumentUtil.linkToMaestro(instrumentData, InstrumentDataUtil.MIDI_MAESTRO_ID);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, MAESTRO_SELF_BUTTON_COORDS)) {
                 // Link Self Button
                 instrumentUtil.linkToMaestro(instrumentData, player.getUniqueID());
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, MAESTRO_CLEAR_BUTTON_COORDS)) {
                 // Link Clear Button
                 instrumentUtil.linkToMaestro(instrumentData, null);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, TOGGLE_MIDI_BUTTON_COORDS)) {
                 // Toggle MIDI Enabled
                 instrumentUtil.toggleMidiEnabled(instrumentData);
@@ -202,10 +205,12 @@ public class GuiInstrument<T> extends Screen {
                 // Clear Midi Channels Button
                 instrumentUtil.clearAcceptedChannels(instrumentData);
                 this.syncInstrumentToServer();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
                 // Select All Midi Channels Button
                 instrumentUtil.setAcceptAllChannels(instrumentData);
                 this.syncInstrumentToServer();
+                this.allNotesOff();
             } else {
                 // Individual Midi Channel Buttons
                 for(int i = 0; i < 16; i++) {
@@ -217,6 +222,7 @@ public class GuiInstrument<T> extends Screen {
                     if(clickedBox(imouseX, imouseY, buttonCoords)) {
                         instrumentUtil.toggleChannel(instrumentData, new Integer(i).byteValue());
                         this.syncInstrumentToServer();
+                        this.allNotesOff();
                         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
                     }
                 }
