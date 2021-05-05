@@ -23,7 +23,7 @@ public class MidiInputManager {
     public final MidiInputDeviceManager inputDeviceManager;
     public final MidiPlaylistManager playlistManager;
 
-    private Boolean hasEnabledTransmitter = false;
+    private Boolean hasTransmitter = false;
     private List<Object> localInstrumentToPlay = new ArrayList<>();
 
     public MidiInputManager() {
@@ -33,8 +33,8 @@ public class MidiInputManager {
         this.inputDeviceManager.open();
     }
 
-    public Boolean hasEnabledTransmitter() {
-        return hasEnabledTransmitter;
+    public Boolean hasTransmitter() {
+        return hasTransmitter;
     }
     
     public List<Byte> getLocalInstrumentsToPlay(Byte channel) {
@@ -61,33 +61,30 @@ public class MidiInputManager {
             return;
         }
 
-        this.hasEnabledTransmitter = hasEnabledTransmitter(event.player);
+        this.hasTransmitter = hasTransmitter(event.player);
         this.localInstrumentToPlay = localInstrumentsToPlay(event.player);
     }
     
-    protected Boolean hasEnabledTransmitter(PlayerEntity player) {
+    protected Boolean hasTransmitter(PlayerEntity player) {
         if(player.inventory != null) {
-            ItemStack transmitterStack = null;
-
-            // If an active transmitter is on cursor then don't update
-            if(player.inventory.getItemStack() != null && ModItems.TRANSMITTER.equals(player.inventory.getItemStack().getItem()) && ModItems.TRANSMITTER.isEnabled(player.inventory.getItemStack())) {
-                return hasEnabledTransmitter;
-            }
 
             // Off-hand isn't part of hotbar, so check it explicitly
-            if(ModItems.TRANSMITTER.equals(player.getHeldItemOffhand().getItem()) && ModItems.TRANSMITTER.isEnabled(player.getHeldItemOffhand())) {
-                transmitterStack = player.getHeldItemOffhand();
+            if(ModItems.TRANSMITTER.equals(player.getHeldItemOffhand().getItem())) {
+                return true;
             }
 
             // check hotbar
             for(int i = 0; i < 9; i++) {
                 ItemStack invStack = player.inventory.getStackInSlot(i);
-                if(transmitterStack == null && ModItems.TRANSMITTER.equals(invStack.getItem()) && ModItems.TRANSMITTER.isEnabled(invStack)) {
-                    transmitterStack = player.inventory.getStackInSlot(i);
+                if(invStack != null && ModItems.TRANSMITTER.equals(invStack.getItem())) {
+                    return true;
                 }
             }
 
-            return transmitterStack != null;
+            // check mouse item
+            if(player.inventory.getItemStack() != null && ModItems.TRANSMITTER.equals(player.inventory.getItemStack().getItem())) {
+                return hasTransmitter;
+            }
         }
 
         return false;

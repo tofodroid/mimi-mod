@@ -18,8 +18,6 @@ import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
 public final class ModItems {
     // Other
     public static final ItemTransmitter TRANSMITTER = null;
-    //public static final ItemFloppyDisk DISK = null;
-    //public static final ItemDiskDrive DRIVE = null;
 
     // Instruments
     public static List<ItemInstrument> INSTRUMENT_ITEMS = null;
@@ -38,11 +36,6 @@ public final class ModItems {
 
             // Other Items
             event.getRegistry().register(new ItemTransmitter());
-            //event.getRegistry().register(new ItemFloppyDisk());
-            //event.getRegistry().register(new ItemDiskDrive());
-
-            // Other Blocks
-            //event.getRegistry().register(new BlockItem(ModBlocks.DISKRECORDER, new Item.Properties().group(ITEM_GROUP).maxStackSize(16)).setRegistryName("diskrecorder"));
 
             // Instrument Items
             INSTRUMENT_ITEMS = buildInstruments();

@@ -24,7 +24,5 @@ public class NetworkManager {
         NET_CHANNEL.registerMessage(3, MaestroNoteOffPacket.class, MaestroNoteOffPacket::encodePacket, MaestroNoteOffPacket::decodePacket, MaestroNotePacketHandler::handlePacket);
         NET_CHANNEL.registerMessage(4, InstrumentItemDataUpdatePacket.class, InstrumentItemDataUpdatePacket::encodePacket, InstrumentItemDataUpdatePacket::decodePacket, InstrumentItemDataUpdatePacketHandler::handlePacket);
         NET_CHANNEL.registerMessage(5, InstrumentTileDataUpdatePacket.class, InstrumentTileDataUpdatePacket::encodePacket, InstrumentTileDataUpdatePacket::decodePacket, InstrumentTileDataUpdatePacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(6, WriteDiskDataPacket.class, WriteDiskDataPacket::encodePacket, WriteDiskDataPacket::decodePacket, WriteDiskDataPacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(7, TransmitterDataUpdatePacket.class, TransmitterDataUpdatePacket::encodePacket, TransmitterDataUpdatePacket::decodePacket, TransmitterDataUpdatePacketHandler::handlePacket);
     }
 }

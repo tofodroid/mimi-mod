@@ -34,7 +34,7 @@ public class ModBindings {
         PlayerEntity playerIn = Minecraft.getInstance().player;
 
         if(MIDIPLAYLIST.isPressed()) {
-            if(worldIn != null && playerIn != null) {
+            if(worldIn != null && playerIn != null && MIMIMod.proxy.getMidiInput().hasTransmitter()) {
                 MIMIMod.guiWrapper.openPlaylistGui(worldIn, playerIn);
             }
         }
