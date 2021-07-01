@@ -24,7 +24,7 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiChannelDef.MidiChannelNumbe
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.network.InstrumentItemDataUpdatePacket;
-import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
+import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
 
 public class ItemInstrument extends Item {
     private final Byte instrumentId;
@@ -84,7 +84,6 @@ public class ItemInstrument extends Item {
         // Client-side only
         if(worldIn != null && worldIn.isRemote) {
             SortedArraySet<Byte> acceptedChannels = ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsSet(stack);
-            UUID maestroId = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(stack);
             
             tooltip.add(new StringTextComponent("----------------"));
 
@@ -92,10 +91,13 @@ public class ItemInstrument extends Item {
             tooltip.add(new StringTextComponent(enabled ? "MIDI Input Enabled" : "MIDI Input Disabled"));
 
             // Linked Maestro
-            if(maestroId != null) {
-                tooltip.add(new StringTextComponent("Linked Maestro: " + PlayerNameUtils.getPlayerNameFromUUID(maestroId, worldIn)));
-            } else {
-                tooltip.add(new StringTextComponent("Linked Maestro: None"));
+            UUID maestroId = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(stack);
+            if(InstrumentDataUtil.MIDI_MAESTRO_ID.equals(maestroId)) {
+                tooltip.add(new StringTextComponent("Linked to System MIDI Device"));
+            } else if(InstrumentDataUtil.PUBLIC_MAESTRO_ID.equals(maestroId)) {
+                tooltip.add(new StringTextComponent("Linked to Public Transmitters"));
+            } else if(maestroId != null) {
+                tooltip.add(new StringTextComponent("Linked to Player Transmitter"));
             }
     
             // Listen Channels
@@ -103,7 +105,7 @@ public class ItemInstrument extends Item {
                 if(acceptedChannels.size() == MidiChannelNumber.values().length) {
                     tooltip.add(new StringTextComponent("Enabled Channels: All"));
                 } else {
-                    tooltip.add(new StringTextComponent("Enabled Channels: " + acceptedChannels.stream().map(c -> c.toString()).collect(Collectors.joining(", "))));
+                    tooltip.add(new StringTextComponent("Enabled Channels: " + acceptedChannels.stream().map(c -> new Integer(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
                 }
             } else {
                 tooltip.add(new StringTextComponent("Enabled Channels: None"));
