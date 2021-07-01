@@ -22,3 +22,8 @@ MIMI - Musical Instrument Minecraft Interface
     mandatory=true
     versionRange="[1.16.4,1.17)"
     side="BOTH"
+[[dependencies.mimi]]
+    modId="patchouli"
+    mandatory=true
+    versionRange="[1.16.4-48,1.17)"
+    side="BOTH"
