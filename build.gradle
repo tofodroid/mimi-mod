@@ -20,9 +20,9 @@ repositories {
     maven { url 'https://maven.blamejared.com' }
 }
 
-version = '1.0'
+version = '1.16.5-1.0.0'
 group = 'io.github.tofodroid.mods.mimi'
-archivesBaseName = 'mimi'
+archivesBaseName = 'mimimod'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
