@@ -1,6 +1,6 @@
 {
 	"name": "MIMI and Me",
-	"landing_text": "$(l)M$()usical    ---> $(l)M$()usical$(br)$(l)I$()nstrument  ---> $(l)I$()nstrument$(br)$(l)D$()igital      ---> $(l)M$()inecraft$(br)$(l)I$()nterface     ---> $(l)I$()nterface$(br2)MIMI is this mod! It's all about making use of MIDI in Minecraft - hence the name. This guide will teach you all there is to know about using MIMI to play and make msuic in Minecraft!",
+	"landing_text": "$(l)M$()usical    ---> $(l)M$()usical$(br)$(l)I$()nstrument  ---> $(l)I$()nstrument$(br)$(l)D$()igital      ---> $(l)M$()inecraft$(br)$(l)I$()nterface     ---> $(l)I$()nterface$(br2)This guide will teach you all there is to know about using MIMI to play and make msuic in Minecraft!",
 	"version": 1,
 	"show_progress": false,
 	"creative_tab": "mimi.group",

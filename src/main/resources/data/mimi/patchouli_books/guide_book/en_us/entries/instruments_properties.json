@@ -5,23 +5,43 @@
     "pages": [
         {
             "type": "text",
-            "text": "Each instrument has several properties that can be set in the $(l:instruments_gui)Instrument GUI$(/l).$(br2)These properties are saved to the instrument and will apply to all players who use it."
+            "text": "Each instrument has several properties that can be set in the $(l:instruments_gui)Instrument GUI$(/l).$(br2)These properties are saved to the instrument and will apply to all players who use it.$(br2)Note that Block Instruments will lose their saved properties when they are broken."
         },
         {
             "type": "text",
-            "title": "MIDI Input",
-            "text": "This property stores the active MIDI Input mode and can have one of three values:$(br2)1. $(l)None$() - Will receive no MIDI input.$(br2)2.  $(l)Maestro$() - Will receive MIDI input from the linked $(l:band_maestro)Maestro$(/l).$(br2)3. $(l)MIDI$() - Will receive MIDI input from the configured $(l:configuration_midi_input)System MIDI Input Device$(/l)."
+            "title": "MIDI Toggle",
+            "text": "This controls whether or not the instrument should respond to MIDI notes from the configured MIDI Source.$(br2)If enabled the instrument will play notes it receives from the configured MIDI Source automatically."
         },
         {
             "type": "text",
-            "title": "Maestro",
-            "text": "This property stores which player this instrument should receive MIDI broadcasts from when $(l)Maestro$() is the selected MIDI Input mode.$(br2)In order to receive messages the linked player must have an active MIDI Transmitter in their hot-bar and be within 16 blocks."
+            "title": "MIDI Source",
+            "text": "This property stores where instrument should receive MIDI messages from and supports several modes.$(br2)Note that if a player transmitter is set as the MIDI Source the player must be within 16 blocks of the instrument for notes to be received."
         },
         {
             "type": "text",
-            "title": "Enabled MIDI Channels",
-            "text": "This property stores the list of which MIDI Channels this instrument should respond to messages from when a MIDI Input mode other than $(l)None$() is selected.$(br2)It is generally recommended to enable only some channels at the same time because if the same note is played on multiple enabled channels simultaneously it could cause minor issues with note timing sustain."
+            "title": "MIDI Source",
+            "text": "$(l)Public Transmitters$() - The instrument will play notes from any nearby MIDI Transmitters that are set to public mode.$(br2)$(l)Player Transmitter$() - The instrument will play notes from the specified player's MIDI Transmitter if it is set to linked mode (or self mode if linked to your transmitter)."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Source",
+            "text": "$(br2)$(l)System MIDI Device$() - The instrument will play notes from the configured System MIDI Input Device if it is available.$(br2)"
+        },
+        {
+            "type": "text",
+            "title": "MIDI Channels",
+            "text": "A MIDI file is able to play 16 different instruments at a time. Each instrument is assigned a number - called a channel - and notes for that instrument are sent to that channel. Each MIMI instrument can choose which channels it should use using the buttons near the top of the Instrument GUI.$(br2)$(l)Channel 10$() is intended for percussion and doesn't usually work well for any other instrument."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Channels",
+            "text": "When the MIDI Source is set to a System MIDI Input Device you may need to consult the user guide of the device to determine which MIDI Channels it sends its MIDI messages to."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Channels",
+            "text": "Note that it is generally recommended to enable only some channels at the same time because if the same note is played on multiple enabled channels simultaneously it could cause minor issues with note timing sustain as the note on one channel may last longer than the note on another channel."
         }
     ],
-    "sortnum": 3
+    "sortnum": 0
 }

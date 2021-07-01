@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "Channel Usage",
-            "text": "While the MIDI standard defines 16 channels not every device or sequence will use them all.$(br2)Some controllers, like a digital piano, may only send data to a single channel. Conversely, some MIDI sequences may use all 16 at the same time to create complex music.$(br2)"
+            "text": "While the MIDI standard defines 16 channels not every device or sequence will use them all.$(br2)Some controllers, like a digital piano, may only send data to a single channel. Conversely, some MIDI sequences may use all 16 at the same time to create complex music."
         },
         {
             "type": "text",

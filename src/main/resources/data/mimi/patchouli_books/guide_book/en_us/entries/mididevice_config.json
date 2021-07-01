@@ -1,0 +1,37 @@
+{
+    "name": "MIDI Input Device",
+    "icon": "mimi:synlead",
+    "category": "mimi:mididevice",
+    "pages": [
+        {
+            "type": "text",
+            "text": "The MIDI Input Device Configuration GUI allows you to get a list of MIDI devices currently available on your system and select the one to use for the MIMI System MIDI Input Device MIDI Source on your instruments."
+        },
+        {
+            "type": "text",
+            "title": "Accessing the GUI",
+            "text": "You can access the MIDI Input Device Configuration GUI by pressing the configured Keybind at any time while loaded into a world.$(br2)The current keybind is: $(l)$(k:key.mimi.midi.settings)$()"
+        },
+        {
+            "type": "text",
+            "title": "Setting a Default",
+            "text": "You can set a default MIDI device to use for MIMI in the $(l:config_file)MIMI config file$(/l). When a default is set it will be selected when Minecraft starts if it is available.$(br2)Note that the default is set by device ID which may not always be consistent between system restarts if you have more than one available device. If you have a default set but don't receive input check the GUI."
+        },
+        {
+            "type": "text",
+            "title": "Physical MIDI Devices",
+            "text": "In order to play MIDI data in MIMI you must have at least one compatible MIDI device available on your system.$(br2)If you have a physical MIDI-enabled device (like a digital piano) that should work with a USB to MIDI adapter as long as your system is able to recognize it. For help with connecting a MIDI device to your system see $(l:https://www.musicrepo.com/how-to-connect-midi-keyboard-to-computer/)here$(/l)."
+        },
+        {
+            "type": "text",
+            "title": "Loopback Devices",
+            "text": "You can also use any MIDI output available on your system as MIDI input into MIMI via a Loopback Device.$(br2)A loopback device is essentially a device that takes a MIDI output and re-broadcasts it as a MIDI input to be used in another MIDI device. This could be used to use an installed MIDI player program as a MIDI device in MIMI."
+        },
+        {
+            "type": "text",
+            "title": "Loopback Devices",
+            "text": "Setting up MIDI loopback varies based on your operating system. Here are some links to get you started:$(br2)$(l)Windows$() - $(l:https://www.tobias-erichsen.de/software/loopmidi.html)loopMIDI$(/l)$(br2)$(l)Mac$() - $(l:https://help.ableton.com/hc/en-us/articles/209774225-Setting-up-a-virtual-MIDI-bus#Mac)Built-in IAC$(/l)$(br2)$(l)Linux$() - This depends on your distribution and some don't play nice with Java. One popular option is $(l:https://jackaudio.org/)JACK$(/l)."
+        }
+    ],
+    "sortnum": 2
+}

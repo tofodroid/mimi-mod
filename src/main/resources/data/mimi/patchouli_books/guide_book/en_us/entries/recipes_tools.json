@@ -1,0 +1,16 @@
+{
+    "name": "Tools",
+    "icon": "mimi:transmitter",
+    "category": "mimi:recipes",
+    "pages": [
+        {
+            "type": "text",
+            "text": "This section lists the crafting recipe for each non-instrument tool currently in MIMI."
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:transmitter"
+        }
+    ],
+    "sortnum": 1
+}

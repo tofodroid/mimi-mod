@@ -1,6 +1,6 @@
 {
 	"name": "Getting Started",
-	"description": "Welcome to MIMI! This section is intended to serve as a quick TL;DR of the mod to get you up and running quickly.$(br2)To dive into more detail about any of the topics mentioned here please refer to the respective sections of this guide.",
+	"description": "This section is intended to serve as a quick TL;DR of the mod to get you up and running quickly.$(br2)To dive into more detail about any of the topics mentioned here please refer to the respective sections of this guide.",
 	"icon": "mimi:piano",
 	"sortnum": 0
 }

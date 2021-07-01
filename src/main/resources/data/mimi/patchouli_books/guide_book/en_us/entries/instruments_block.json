@@ -5,23 +5,28 @@
     "pages": [
         {
             "type": "text",
-            "text": "Some instruments in MIMI are larger and must be placed into the world as a block before they can be played.$(br2)Note that only one player can be seated at a block instrument at a time."
+            "text": "Some instruments in MIMI are larger and must be placed into the world as a block before they can be played.$(br2)Once placed, a player must sit down at the instrument before they are able to play it. $(br2)Note that only one player can be seated at a block instrument at a time."
         },
         {
             "type": "text",
             "title": "Opening the GUI",
-            "text": "To play an open block instrument first right-click on it while not holding another instrument to seat yourself at it and then right-click it again to open the $(l:instruments_gui)Instrument GUI$(/l).$(br2)To leave a block instrument use the same keybind that you would use to dismount a horse or boat."
+            "text": "To play an open block instrument first right-click on it while not holding another instrument to seat yourself at it and then right-click it again to open the $(l:instruments_gui)Instrument GUI$(/l).$(br2)To leave a block instrument use the same keybind that you would use to dismount a horse or boat (deafult: Shift)."
         },
         {
             "type": "text",
-            "title": "Playing without the GUI",
-            "text": "Block instruments can also be played without the GUI being open by setting a MIDI Input on the instrument. Note that you must still be seated at the block instrument to play it using a MIDI Input."
+            "title": "Opening the GUI",
+            "text": "The instrument GUI can also be opened for block instruments by pressing the configured keybind when seated at an instrument. Opening the GUI this way allows you to play two or more instruments at the same time and easily access the GUI for each one.$(br2)Seated Instrument Keybind: $(l)$(k:key.mimi.midi.gui.seat)$()"
         },
         {
             "type": "text",
-            "title": "Setting the Maestro",
-            "text": "Since you cannot use a block instrument on a player to set them as the $(l:band_maestro)maestro$(/l) like you can for a hand-held instrument you can set the maestro in another way.$(br2)By right-clicking on a block instrument while holding a hand-held instrument you will copy the linked maestro from the hand-held instrument into the block instrument (if one is set)."
+            "title": "Playing without GUI",
+            "text": "Block instruments can also be played without the GUI being open by setting a MIDI Source on the instrument. Note that you must still be seated at the block instrument to play it using a MIDI Source."
+        },
+        {
+            "type": "text",
+            "title": "Setting a Player Source",
+            "text": "If you want to set a player other than yourself as the MIDI Source for a block instrument you can either right-click the instrument while holding a hand-held instrument that is linked to the desired player or you can have the desired player sit at the Block Instrument and use the GUI to make themselves the MIDI Source."
         }
     ],
-    "sortnum": 2
+    "sortnum": 3
 }

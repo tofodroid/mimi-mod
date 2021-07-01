@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "Most instruments in MIMI are hand-held instruments which can be played while being held in your hand.$(br2)By using a MIDI Input it is possible to play two hand-held instruments at the same time in your main and off hands."
+            "text": "Most instruments in MIMI are hand-held instruments which can be played while being held in your hand.$(br2)By using a MIDI Source it is possible to play two hand-held instruments at the same time in your main and off hands."
         },
         {
             "type": "text",
@@ -14,14 +14,19 @@
         },
         {
             "type": "text",
-            "title": "Playing without the GUI",
-            "text": "Hand-held instruments can also be played without the GUI by setting a MIDI Input on the instrument and then holding it in either your main hand or off hand.$(br2)The MIDI Input mode of the instrument in your main hand can be toggled by shift-right-clicking.$(br2)Player a hand-held instrument without the GUI will allow you to move while playing."
+            "title": "Opening the GUI",
+            "text": "The instrument GUI can also be opened for hand-held instruments by pressing configured keybinds for each hand. Opening the GUI this way allows you to play two instruments at the same time and easily access the GUI for each one.$(br2)Main Hand Keybind: $(l)$(k:key.mimi.midi.gui.main)$()$(br2)Off Hand Keybind: $(l)$(k:key.mimi.midi.gui.off)$()"
         },
         {
             "type": "text",
-            "title": "Setting the Maestro",
-            "text": "If you want to set a player other than yourself as the $(l:band_maestro)Maestro$(/l) for a hand-held instrument you can simply hold the instrument in your main hand and right click the player you want."
+            "title": "Playing without GUI",
+            "text": "Hand-held instruments can also be played without the GUI by setting a MIDI Source on the instrument and then holding it in either your main hand or off hand.$(br2)Playing hand-held instruments without the GUI open using a MIDI Source will allow you to move while playing."
+        },
+        {
+            "type": "text",
+            "title": "Setting a Player Source",
+            "text": "If you want to set a player other than yourself as the MIDI Source for a hand-held instrument you can simply hold the instrument in your main hand and right click the player you want or give the instrument to the desired player and have them use the GUI to make themselves the MIDI Source."
         }
     ],
-    "sortnum": 1
+    "sortnum": 2
 }

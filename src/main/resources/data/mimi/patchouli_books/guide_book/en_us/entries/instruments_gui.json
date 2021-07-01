@@ -19,19 +19,19 @@
         },
         {
             "type": "text",
-            "title": "Setting the Maestro",
-            "text": "The top-left section of the instrument GUI allows you to configure the Maestro linked to the instrument.$(br2)The GUI allows you to see the current linked Maestro and provides buttons to set yourself as the Maestro or clear the linked Maestro.$(br2)To link another player as the Maestro see the $(l:instruments_hand_held)hand-held$(/l) and $(l:instruments_block)block$(/l) instrument chapters."
+            "title": "Enabling MIDI Input",
+            "text": "The top-right section of the instrument GUI allows you to toggle MIDI input on and off.$(br2)When the instrument has MIDI enabled it will play any notes that it receives from the configured MIDI Source automatically."
         },
         {
             "type": "text",
-            "title": "MIDI Input Mode",
-            "text": "The top-right section of the instrument GUI allows you to configure the MIDI Input mode of the instrument.$(br2)When cycling through the MIDI Input modes only modes that are valid will show up. If there is no system MIDI input device configured then MIDI will not be available, and if there is no linked Maestro then Maestro will not be available."
+            "title": "Setting a MIDI Source",
+            "text": "The top left section of the Instrument GUI lets you configure the MIDI Source to use for this instrument."
         },
         {
             "type": "text",
             "title": "MIDI Channel Toggles",
-            "text": "The numbered buttons spanning the full length of the GUI are the MIDI channel toggles. These buttons allow you to toggle each MIDI channel on or off for this instrument when it is playing MIDI input.$(br2)Channel 10 is a special color to indicate that it is primarily used for percussion.$(br2)The X and O buttons allow you to clear and enable all channels, respectively."
+            "text": "The numbered buttons spanning the full length of the GUI are the MIDI channel toggles. These buttons allow you to toggle each MIDI channel on or off for this instrument when it is playing from a MIDI Source.$(br2)Channel 10 is a special color to indicate that it is primarily used for percussion.$(br2)The X and O buttons allow you to clear and enable all channels, respectively."
         }
     ],
-    "sortnum": 0
+    "sortnum": 1
 }

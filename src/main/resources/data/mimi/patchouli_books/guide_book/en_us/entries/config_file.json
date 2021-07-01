@@ -1,7 +1,7 @@
 {
-    "name": "Configuration File",
+    "name": "Config File",
     "icon": "minecraft:book",
-    "category": "mimi:configuration",
+    "category": "mimi:config",
     "pages": [
         {
             "type": "text",
@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "Default MIDI Device",
-            "text": "$(l)Param:$() defaultMidiInputDevice$(br)$(l)Type:$() Integer$(br)$(l)Default:$() -1$(br2)This parameter holds the device ID of the $(l:configuration_midi_input)system MIDI device$(/l) that should be used for MIMI input by default. If a value is set MIMI will attempt to use that device when Minecraft launches if it is available.$(br2)To have no default device set this to -1."
+            "text": "$(l)Param:$() defaultMidiInputDevice$(br)$(l)Type:$() Integer$(br)$(l)Default:$() -1$(br2)This parameter holds the device ID of the $(l:config_midi_input)system MIDI device$(/l) that should be used for MIMI input by default. If a value is set MIMI will attempt to use that device when Minecraft launches if it is available.$(br2)To have no default device set this to -1."
         },
         {
             "type": "text",

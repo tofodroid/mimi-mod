@@ -1,6 +1,6 @@
 {
-	"name": "MIMI Instruments",
-	"description": "MIMI comes with a variety of instruments that can be crafted.$(br2)Some instruments can be played while being held in your hand while others must be placed as a block.",
+	"name": "Instruments",
+	"description": "MIMI comes with a variety of instruments that you can play.$(br2)Some instruments can be played while being held in your hand while others must be placed as a block.",
 	"icon": "mimi:violin",
 	"sortnum": 1
 }

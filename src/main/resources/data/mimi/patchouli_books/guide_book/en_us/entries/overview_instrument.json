@@ -1,0 +1,54 @@
+{
+    "name": "Using Instruments",
+    "icon": "mimi:acguitar",
+    "category": "mimi:overview",
+    "pages": [
+        {
+            "type": "text",
+            "text": "MIMI provides a large variety of different instruments that you can craft and play.$(br2)Instruments come in two types: Hand-Held, which can be played from your hand, and Block, which must be placed into the world to play."
+        },
+        {
+            "type": "crafting",
+            "title": "Hand-Held Instrument",
+            "recipe": "mimi:acguitar",
+            "text": "$(br)Once you've crafted the instrument shown above simply hold it in your main hand and right click to open the Instrument GUI."
+        },
+        {
+            "type": "crafting",
+            "title": "Block Instrument",
+            "recipe": "mimi:piano",
+            "text": "$(br)Once you've crafted the instrument shown above you must place it into the world as a block in order to play it. Once placed, right click on it with an empty hand to sit down and then right click it again to open the Instrument GUI."
+        },
+        {
+            "type": "text",
+            "title": "The Instrument GUI",
+            "text": "You should now see the instrument GUI on your screen.$(br2)This GUI lets you play the instrument you're holding either by pressing the keys on your keyboard shown on the piano or by simply clicking the note you want to play.$(br2)The right side of the GUI shows the controls for shifting the displayed piano up and down so that you can play lower or higher notes."
+        },
+        {
+            "type": "text",
+            "title": "The Instrument GUI",
+            "text": "The $(l)ZNote$() indicator displays which note on the piano is currently mapped to Z on your keyboard.$(br2)The top section of the instrument GUI lets you configure the MIDI settings of your instrument which can be used to play notes from a MIDI Transmitter or System MIDI Input Device."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Source",
+            "text": "The top left section of the Instrument GUI lets you configure the MIDI Source to use for this instrument.$(br2)When the instrument has MIDI enabled it will play any notes that it receives from the configured MIDI Source automatically."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Source",
+            "text": "$(l)Public Transmitters$() - The instrument will play notes from any nearby MIDI Transmitters that are set to public mode.$(br2)$(l)Player Transmitter$() - The instrument will play notes from the specified player's MIDI Transmitter if it is set to linked mode (or self mode if linked to your transmitter)."
+        },
+        {
+            "type": "text",
+            "title": "MIDI Source",
+            "text": "To link an instrument to another player right click on them while holding the instrument (hand-held instruments) or right click on the instrument while holding one that is already linked to the desired player (block instruments).$(br2)$(l)System MIDI Device$() - The instrument will play notes from the configured System MIDI Input Device if one is available.$(br2)"
+        },
+        {
+            "type": "text",
+            "title": "MIDI Channels",
+            "text": "A MIDI file is able to play up to 16 different instruments to at a time. Each instrument is assigned a number - called a channel - and notes for that instrument are sent to that channel. Each MIMI instrument can choose which channels it should use using the buttons near the top of the Instrument GUI.$(br2)$(l)Channel 10$() is intended for percussion and doesn't usually work well for any other instrument."
+        }
+    ],
+    "sortnum": 0
+}
