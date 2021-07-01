@@ -48,7 +48,8 @@ public class GuiInstrument<T> extends Screen {
     // GUI
     private static final Vector2f MAESTRO_MIDI_BUTTON_COORDS = new Vector2f(217,39);
     private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(236,39);
-    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(255,39);
+    private static final Vector2f MAESTRO_PUBLIC_BUTTON_COORDS = new Vector2f(255,39);
+    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(274,39);
     private static final Vector2f TOGGLE_MIDI_BUTTON_COORDS = new Vector2f(332,39);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,79);
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,79);
@@ -185,6 +186,12 @@ public class GuiInstrument<T> extends Screen {
             } else if(clickedBox(imouseX, imouseY, MAESTRO_SELF_BUTTON_COORDS)) {
                 // Link Self Button
                 instrumentUtil.linkToMaestro(instrumentData, player.getUniqueID());
+                this.syncInstrumentToServer();
+                this.refreshMaestroName();
+                this.allNotesOff();
+            } else if(clickedBox(imouseX, imouseY, MAESTRO_PUBLIC_BUTTON_COORDS)) {
+                // Link Public Button
+                instrumentUtil.linkToMaestro(instrumentData,  InstrumentDataUtil.PUBLIC_MAESTRO_ID);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
                 this.allNotesOff();
@@ -563,9 +570,11 @@ public class GuiInstrument<T> extends Screen {
         UUID linkedMaestro = instrumentUtil.getLinkedMaestro(instrumentData);
         if(linkedMaestro != null) {
             if(linkedMaestro.equals(player.getUniqueID())) {
-                this.selectedMaestroName = player.getName().getString();
+                this.selectedMaestroName = "My Transmitter";
             } else if(linkedMaestro.equals(InstrumentDataUtil.MIDI_MAESTRO_ID)) {
                 this.selectedMaestroName = "MIDI Input Device";
+            } else if(linkedMaestro.equals(InstrumentDataUtil.PUBLIC_MAESTRO_ID)) {
+                this.selectedMaestroName = "Public Transmitters";
             } else {
                 this.selectedMaestroName = PlayerNameUtils.getPlayerNameFromUUID(linkedMaestro, world);
             }

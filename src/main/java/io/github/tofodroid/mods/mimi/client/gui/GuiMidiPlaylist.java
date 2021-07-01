@@ -42,18 +42,20 @@ public class GuiMidiPlaylist extends Screen {
     // Button Boxes
     private static final Vector2f REFRESH_FOLDER_BUTTON = new Vector2f(339,37);
     private static final Vector2f PREVIOUS_BUTTON = new Vector2f(14,271);
-    private static final Vector2f RESTART_BUTTON = new Vector2f(33,271);
-    private static final Vector2f STOP_BUTTON = new Vector2f(52,271);
-    private static final Vector2f PAUSE_BUTTON = new Vector2f(71,271);
-    private static final Vector2f PLAY_BUTTON = new Vector2f(90,271);
-    private static final Vector2f NEXT_BUTTON = new Vector2f(109,271);
-    private static final Vector2f LOOP_BUTTON = new Vector2f(128,271);
-    private static final Vector2f SHUFFLE_BUTTON = new Vector2f(147,271);
+    private static final Vector2f STOP_BUTTON = new Vector2f(33,271);
+    private static final Vector2f PLAY_PAUSE_BUTTON = new Vector2f(52,271);
+    private static final Vector2f NEXT_BUTTON = new Vector2f(71,271);
+    private static final Vector2f LOOP_BUTTON = new Vector2f(90,271);
+    private static final Vector2f LOOP_SCREEN = new Vector2f(108,272);
+    private static final Vector2f SHUFFLE_BUTTON = new Vector2f(125,271);
+    private static final Vector2f SHUFFLE_SCREEN = new Vector2f(143,272);
+    private static final Vector2f TRANSMIT_BUTTON = new Vector2f(160,271);
+    private static final Vector2f TRANSMIT_SCREEN = new Vector2f(178,272);
 
     // Time Slider
     private static final Integer SLIDE_Y = 270;
-    private static final Integer SLIDE_MIN_X = 190;
-    private static final Integer SLIDE_MAX_X = 324;
+    private static final Integer SLIDE_MIN_X = 203;
+    private static final Integer SLIDE_MAX_X = 343;
     private static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
 
     // MIDI
@@ -101,21 +103,33 @@ public class GuiMidiPlaylist extends Screen {
         if(clickedBox(imouseX, imouseY, REFRESH_FOLDER_BUTTON)) {
             this.midiInputManager.playlistManager.loadFromFolder(this.folderPathString);
         } else if(clickedBox(imouseX, imouseY, PREVIOUS_BUTTON)) {
-            this.midiInputManager.playlistManager.shiftSong(false);
-        } else if(clickedBox(imouseX, imouseY, RESTART_BUTTON)) {
-            this.midiInputManager.playlistManager.playFromBeginning();
+            Double slidePercentage = null;
+
+            if(this.midiInputManager.playlistManager.isSongLoaded()) {
+                slidePercentage =  new Double(this.midiInputManager.playlistManager.getCurrentSongPosSeconds()) / new Double(this.midiInputManager.playlistManager.getSongLengthSeconds());
+            }
+
+            if(slidePercentage != null && slidePercentage <= 0.1) {
+                this.midiInputManager.playlistManager.playFromBeginning();
+            } else {
+                this.midiInputManager.playlistManager.shiftSong(false);
+            }
         } else if(clickedBox(imouseX, imouseY, STOP_BUTTON)) {
             this.midiInputManager.playlistManager.stop();
-        } else if(clickedBox(imouseX, imouseY, PAUSE_BUTTON)) {
-            this.midiInputManager.playlistManager.pause();
-        } else if(clickedBox(imouseX, imouseY, PLAY_BUTTON)) {
-            this.midiInputManager.playlistManager.playFromLastTickPosition();
+        } else if(clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
+            if(this.midiInputManager.playlistManager.isPlaying()) { 
+                this.midiInputManager.playlistManager.pause();
+            } else {
+                this.midiInputManager.playlistManager.playFromLastTickPosition();
+            }            
         } else if(clickedBox(imouseX, imouseY, NEXT_BUTTON)) {
             this.midiInputManager.playlistManager.shiftSong(true);
         } else if(clickedBox(imouseX, imouseY, LOOP_BUTTON)) {
             this.midiInputManager.playlistManager.shiftLoopMode();
         } else if(clickedBox(imouseX, imouseY, SHUFFLE_BUTTON)) {
             this.midiInputManager.playlistManager.toggleShuffle();
+        } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
+            this.midiInputManager.playlistManager.shiftTransmitMode();
         }
         
         return super.mouseReleased(mouseX, mouseY, button);
@@ -168,11 +182,17 @@ public class GuiMidiPlaylist extends Screen {
             blit(matrixStack, startX + 15, startY + boxY, this.getBlitOffset(), 1, 301, 338, 11, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
-        // Loop Button
-        blit(matrixStack, startX + 129, startY + 272, this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        // Play/Pause Button
+        blit(matrixStack, startX + 53, startY + 272, this.getBlitOffset(), 1 + this.midiInputManager.playlistManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
-        // Shuffle Button    
-        blit(matrixStack, startX + 148, startY + 272, this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        // Loop Screen
+        blit(matrixStack, startX + new Float(LOOP_SCREEN.x).intValue(), startY + new Float(LOOP_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+
+        // Shuffle Screen    
+        blit(matrixStack, startX + new Float(SHUFFLE_SCREEN.x).intValue(), startY + new Float(SHUFFLE_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        
+        // Transmit Screen    
+        blit(matrixStack, startX + new Float(TRANSMIT_SCREEN.x).intValue(), startY + new Float(TRANSMIT_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;

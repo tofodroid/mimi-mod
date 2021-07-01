@@ -10,6 +10,7 @@ import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -36,6 +37,10 @@ public class MidiInputManager {
 
     public Boolean hasTransmitter() {
         return hasTransmitter;
+    }
+
+    public TransmitMode getTransmitMode() {
+        return playlistManager.getTransmitMode();
     }
     
     public List<Byte> getLocalInstrumentsToPlay(Byte channel) {

@@ -18,6 +18,7 @@ import com.sun.media.sound.MidiUtils;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
 
 public class MidiPlaylistManager extends MidiInputSourceManager {
     // Playlist
@@ -29,10 +30,12 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
     private Integer lastTempoBPM;
     private Integer selectedSongIndex;
     private LoopMode currentLoopMode = LoopMode.NONE;
+    private TransmitMode currentTransmitMode = TransmitMode.PUBLIC;
     private Boolean shuffled = false;
         
     // MIDI Sequencer
     private Sequencer activeSequencer;
+    private MidiSequenceInputReceiver activeReceiver;
 
     public MidiPlaylistManager() {
         // Create Sequencer
@@ -90,6 +93,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
             return true;
         } catch(Exception e) {
             this.activeSequencer = null;
+            this.activeReceiver = null;
             MIMIMod.LOGGER.error("Failed to create MIDI Sequencer: ", e);
             return false;
         }
@@ -251,6 +255,10 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
     }
 
     public void shiftSong(Boolean up) {
+        if(this.songList == null || this.songList.isEmpty()) {
+            return;
+        }
+
         if(!up) {
             if(this.selectedSongIndex > 0) {
                 selectSong(this.selectedSongIndex-1);
@@ -278,6 +286,27 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
 
     public Integer getLoopMode() {
         return currentLoopMode.ordinal();
+    }
+
+    public void shiftTransmitMode() {
+        if(currentTransmitMode == TransmitMode.PUBLIC) {
+            stop();
+            currentTransmitMode = TransmitMode.LINKED;
+        } else if(currentTransmitMode == TransmitMode.LINKED) {
+            stop();
+            currentTransmitMode = TransmitMode.SELF;
+        } else {
+            stop();
+            currentTransmitMode = TransmitMode.PUBLIC;
+        }
+    }
+
+    public TransmitMode getTransmitMode() {
+        return currentTransmitMode;
+    }
+
+    public Integer getTransmitModeInt() {
+        return currentTransmitMode.ordinal();
     }
 
     public Integer getShuffleMode() {
@@ -316,7 +345,8 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         if(isOpen()) {
             try {
                 this.activeTransmitter = this.activeSequencer.getTransmitter();
-                this.activeTransmitter.setReceiver(new MidiSequenceInputReceiver());
+                this.activeReceiver = new MidiSequenceInputReceiver();
+                this.activeTransmitter.setReceiver(this.activeReceiver);
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Midi Device Error: ", e);
                 close();
@@ -344,6 +374,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
     public void close() {
         stop();
         super.close();
+        this.activeReceiver = null;
 
         if(this.activeSequencer != null) {
             this.activeSequencer.close();

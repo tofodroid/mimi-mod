@@ -38,7 +38,7 @@ public class MidiNotePacketHandler {
     
     public static void handlePacketServer(final MidiNoteOffPacket message, ServerPlayerEntity sender) {
         PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
-            new PacketDistributor.TargetPoint(sender.getPosX(), sender.getPosY(), sender.getPosZ(), 68.0D, sender.getServerWorld().getDimensionKey())
+            new PacketDistributor.TargetPoint(sender.getPosX(), sender.getPosY(), sender.getPosZ(), 96.0D, sender.getServerWorld().getDimensionKey())
         );
         NetworkManager.NET_CHANNEL.send(target, message);
     }

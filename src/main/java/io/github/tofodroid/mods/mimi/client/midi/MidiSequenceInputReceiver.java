@@ -26,12 +26,12 @@ public class MidiSequenceInputReceiver extends MidiInputReceiver {
     }
     
     public void sendMaestroNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
-        MaestroNoteOnPacket packet = new MaestroNoteOnPacket(channel, midiNote, velocity);
+        MaestroNoteOnPacket packet = new MaestroNoteOnPacket(channel, midiNote, velocity, MIMIMod.proxy.getMidiInput().getTransmitMode());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
     
     public void sendMaestroNoteOffPacket(Byte channel, Byte midiNote) {
-        MaestroNoteOffPacket packet = new MaestroNoteOffPacket(channel, midiNote);
+        MaestroNoteOffPacket packet = new MaestroNoteOffPacket(channel, midiNote, MIMIMod.proxy.getMidiInput().getTransmitMode());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
 }

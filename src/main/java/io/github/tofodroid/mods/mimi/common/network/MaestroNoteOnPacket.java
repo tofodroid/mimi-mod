@@ -8,11 +8,19 @@ public class MaestroNoteOnPacket {
     public final Byte channel;
     public final Byte note;
     public final Byte velocity;
+    public final TransmitMode transmitMode;
     
-    public MaestroNoteOnPacket(Byte channel, Byte note, Byte velocity) {
+    public static enum TransmitMode {
+        PUBLIC,
+        LINKED,
+        SELF;
+    }
+    
+    public MaestroNoteOnPacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode) {
         this.channel = channel;
         this.note = note;
         this.velocity = velocity;
+        this.transmitMode = transmitMode;
     }
 
     public static MaestroNoteOnPacket decodePacket(PacketBuffer buf) {
@@ -20,7 +28,8 @@ public class MaestroNoteOnPacket {
             byte channel = buf.readByte();
             byte note = buf.readByte();
             byte velocity = buf.readByte();
-            return new MaestroNoteOnPacket(channel, note, velocity);
+            TransmitMode transmitMode = TransmitMode.values()[new Byte(buf.readByte()).intValue()];
+            return new MaestroNoteOnPacket(channel, note, velocity, transmitMode);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("SpeakerNoteOnPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -31,5 +40,6 @@ public class MaestroNoteOnPacket {
         buf.writeByte(pkt.channel);
         buf.writeByte(pkt.note);
         buf.writeByte(pkt.velocity);
+        buf.writeByte(new Integer(pkt.transmitMode.ordinal()).byteValue());
     }
 }
