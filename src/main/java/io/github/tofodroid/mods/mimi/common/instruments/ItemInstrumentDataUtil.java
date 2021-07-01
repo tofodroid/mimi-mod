@@ -67,6 +67,11 @@ public class ItemInstrumentDataUtil extends InstrumentDataUtil<ItemStack> {
         return stackTagContainsKey(stack, MIDI_ENABLED_TAG);
     }
 
+    @Override
+    public String getInstrumentName(ItemStack stcak) {
+        return stcak.getItem().getName().getString();
+    }
+
     protected Boolean stackTagContainsKey(ItemStack stack, String tag) {
         return stack != null && stack.getTag() != null && stack.getTag().contains(tag);
     }

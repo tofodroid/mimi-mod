@@ -25,6 +25,8 @@ public abstract class InstrumentDataUtil<T extends Object> {
 
     abstract public Byte getInstrumentIdFromData(T instrumentData);
 
+    abstract public String getInstrumentName(T instrumentData);
+
     public Boolean shouldHandleMessage(T instrumentData, UUID sender, Byte channel, Boolean publicTransmit) {
         return isMidiEnabled(instrumentData) && doesAcceptChannel(instrumentData, channel) && 
             (publicTransmit && PUBLIC_MAESTRO_ID.equals(getLinkedMaestro(instrumentData)) || sender.equals(getLinkedMaestro(instrumentData)));

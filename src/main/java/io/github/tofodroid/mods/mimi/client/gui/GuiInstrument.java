@@ -87,12 +87,14 @@ public class GuiInstrument<T> extends Screen {
     private final PlayerEntity player;
     private final World world;
     private String selectedMaestroName = "None";
+    private String instrumentNameString;
 
     public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil) {
         super(new TranslationTextComponent("item.MIMIMod.gui_instrument"));
         this.instrumentId = instrumentId;
         this.instrumentData = instrumentData;
         this.instrumentUtil = instrumentUtil;
+        this.instrumentNameString = instrumentUtil.getInstrumentName(instrumentData);
         this.player = player;
         this.world = worldIn;
         this.refreshMaestroName();
@@ -536,6 +538,9 @@ public class GuiInstrument<T> extends Screen {
     }
 
     private MatrixStack renderText(MatrixStack matrixStack) {
+        // Instrument Name
+        font.drawString(matrixStack, this.instrumentNameString, startX + 214, startY + 17, 0xFF00E600);
+
         // Min Note Text
         font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 224, 0xFF00E600);
 
