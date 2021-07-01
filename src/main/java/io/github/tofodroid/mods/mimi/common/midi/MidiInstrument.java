@@ -5,7 +5,7 @@ public enum MidiInstrument {
     ORGAN       (1,19,true), //TODO CHANGE TO BLOCK
     ACGUITAR    (2,25,false),
     ELECGUITAR  (3,30,false),
-    ACBASS      (4,34,false),
+    BASSGUITAR  (4,34,false),
     VIOLIN      (5,48,false),
     MICROPHONE  (6,53,false),
     TRUMPET     (7,57,false),

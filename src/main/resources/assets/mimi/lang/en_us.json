@@ -3,7 +3,7 @@
   "key.mimi.midi.settings": "Open MIDI Input Device Configuration GUI",
   "key.mimi.midi.alloff": "Stop all currently playing MIDI notes",
   "itemGroup.mimi.group": "MIMI",
-  "item.mimi.acbass": "Acoustic Bass",
+  "item.mimi.bassguitar": "Bass Guitar",
   "item.mimi.acguitar": "Acoustic Guitar",
   "item.mimi.bagpipe": "Bagpipes",
   "item.mimi.clarinet": "Clarinet",
