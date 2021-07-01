@@ -58,3 +58,12 @@ This is a list of features and improvements that I am currently considering addi
 - Add mechanical musician that can play instruments like a player
 
 - Add additional midi settings from config file to in-game GUI
+
+## Credits
+
+### **MIMI Development**
+- TofoDroid
+
+### **Utilized Mods and Libraries**
+- Forge by Forge Team
+- Patchouli by Vazkii
