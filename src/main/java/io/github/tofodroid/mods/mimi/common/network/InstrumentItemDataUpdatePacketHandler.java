@@ -5,6 +5,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Hand;
 
 import java.util.function.Supplier;
 
@@ -23,7 +24,7 @@ public class InstrumentItemDataUpdatePacketHandler {
     }
     
     public static void handlePacketServer(final InstrumentItemDataUpdatePacket message, ServerPlayerEntity sender) {
-        ItemStack instrumentStack = sender.getHeldItemMainhand();
+        ItemStack instrumentStack = sender.getHeldItem(message.mainHand ? Hand.MAIN_HAND : Hand.OFF_HAND);
         if (instrumentStack != null && !instrumentStack.isEmpty() && instrumentStack.getItem() instanceof ItemInstrument) {
             CompoundNBT comp = instrumentStack.getOrCreateTag();
             

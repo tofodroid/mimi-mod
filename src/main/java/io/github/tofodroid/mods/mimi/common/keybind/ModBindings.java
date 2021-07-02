@@ -62,12 +62,12 @@ public class ModBindings {
             } else if(MIDIGUIMAIN.isPressed()) {
                 ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(playerIn, Hand.MAIN_HAND);
                 if(stack != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack);
+                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.MAIN_HAND);
                 }
             } else if(MIDIGUIOFF.isPressed()) {
                 ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(playerIn, Hand.OFF_HAND);
                 if(stack != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack);
+                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.OFF_HAND);
                 }
             } else if(MIDIGUISEAT.isPressed()) {
                 TileInstrument tile = BlockInstrument.getTileInstrumentForEntity(playerIn);
