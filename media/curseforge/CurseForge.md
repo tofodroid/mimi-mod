@@ -3,11 +3,12 @@
 <p><span style="font-family: trebuchet ms, geneva, sans-serif;"><iframe allowfullscreen="allowfullscreen" src="https://www.youtube.com/embed/2kgmgaoGpYQ" height="315" width="100%"></iframe></span></p>
 <p><span style="font-family: trebuchet ms, geneva, sans-serif;">&nbsp;</span></p>
 <p><br /><span style="font-size: 24px; font-family: trebuchet ms, geneva, sans-serif;"><strong>MIMI is a Forge mod for Minecraft Java Edition that allows you to play music from MIDI files, a MIDI Input Device, or just your keyboard using a variety of instruments either solo or with a group. The implementation is similar to the way that Rust instruments work and makes for a really easy to use yet powerful system.</strong></span></p>
-<p><span style="font-family: trebuchet ms, geneva, sans-serif;">&nbsp;</span></p>
+<p>&nbsp;</p>
 <p style="text-align: left;"><span style="font-size: 24px; font-family: trebuchet ms, geneva, sans-serif;"><strong>Minecraft &lt; 1.16: <span style="color: #ff0000;"><em>Unsupported</em></span></strong></span></p>
 <p style="text-align: left;"><span style="font-size: 24px; font-family: trebuchet ms, geneva, sans-serif;"><strong>Minecraft 1.16.x: <span style="color: #008000;"><em>Features &amp; Fixes</em></span></strong></span></p>
 <p style="text-align: left;"><span style="font-size: 24px; font-family: trebuchet ms, geneva, sans-serif;"><strong>Minecraft &gt;= 1.17: <span style="color: #ff6600;"><em>Unsupported for now</em></span></strong></span></p>
-<p><span style="font-family: trebuchet ms, geneva, sans-serif;">&nbsp;</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 24px; font-family: trebuchet ms, geneva, sans-serif;"><strong>To get started craft the guide book with two leather, two paper, and a note block. The guide&nbsp; explains all of the features of MIMI in detail!<br /></strong></span><span style="font-size: 24px; font-family: trebuchet ms, geneva, sans-serif;"><strong><br /><img src="https://i.imgur.com/nN3Xz58.png" alt="Guide Recipe" width="1280" height="240" /></strong></span><span style="font-family: trebuchet ms, geneva, sans-serif;">&nbsp;</span></p>
 <p><span style="font-family: trebuchet ms, geneva, sans-serif;">&nbsp;</span></p>
 <p><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;"><img style="display: block; margin-left: auto; margin-right: auto;" src="https://i.imgur.com/tBHcgQE.png" alt="Features" width="1114" height="212" /></span></p>
 <ul>
