@@ -12,18 +12,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 public class ClientGuiWrapper implements GuiWrapper {
 
     @Override
-    public void openInstrumentGui(World world, PlayerEntity player, Byte instrumentId, ItemStack instrumentItemStack) {
-        openGui(world, new GuiInstrument<ItemStack>(player, world, instrumentId, instrumentItemStack, ItemInstrumentDataUtil.INSTANCE));
+    public void openInstrumentGui(World world, PlayerEntity player, Byte instrumentId, ItemStack instrumentItemStack, Hand handIn) {
+        openGui(world, new GuiInstrument<ItemStack>(player, world, instrumentId, instrumentItemStack, ItemInstrumentDataUtil.INSTANCE, handIn));
     }
 
     @Override
     public void openInstrumentGui(World world, PlayerEntity player, Byte instrumentId, TileInstrument instrumentTile) {
-        openGui(world, new GuiInstrument<TileInstrument>(player, world, instrumentId, instrumentTile, EntityInstrumentDataUtil.INSTANCE));
+        openGui(world, new GuiInstrument<TileInstrument>(player, world, instrumentId, instrumentTile, EntityInstrumentDataUtil.INSTANCE, null));
     }
 
     @Override

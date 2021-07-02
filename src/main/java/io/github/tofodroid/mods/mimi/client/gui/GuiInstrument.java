@@ -25,6 +25,7 @@ import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.SoundEvents;
@@ -85,17 +86,19 @@ public class GuiInstrument<T> extends Screen {
     private final T instrumentData;
     private final InstrumentDataUtil<T> instrumentUtil;
     private final PlayerEntity player;
+    private final Hand handIn;
     private final World world;
     private String selectedMaestroName = "None";
     private String instrumentNameString;
 
-    public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil) {
+    public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil, Hand handIn) {
         super(new TranslationTextComponent("item.MIMIMod.gui_instrument"));
         this.instrumentId = instrumentId;
         this.instrumentData = instrumentData;
         this.instrumentUtil = instrumentUtil;
         this.instrumentNameString = instrumentUtil.getInstrumentName(instrumentData);
         this.player = player;
+        this.handIn = handIn;
         this.world = worldIn;
         this.refreshMaestroName();
     }
@@ -601,7 +604,7 @@ public class GuiInstrument<T> extends Screen {
         InstrumentDataUpdatePacket packet = null;
 
         if(instrumentData instanceof ItemStack) {
-            packet = ItemInstrument.getSyncPacket((ItemStack)instrumentData);
+            packet = ItemInstrument.getSyncPacket((ItemStack)instrumentData, handIn);
         } else if(instrumentData instanceof TileInstrument) {
             packet = TileInstrument.getSyncPacket((TileInstrument)instrumentData);
         }

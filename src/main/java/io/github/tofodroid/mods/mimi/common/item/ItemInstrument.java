@@ -62,7 +62,7 @@ public class ItemInstrument extends Item {
         if(worldIn.isRemote) {
             // Regular right click - Open GUI, Sneak right click - cycle input mode
             if(!playerIn.isSneaking()) {
-                MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, instrumentId, heldItem);
+                MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, instrumentId, heldItem, handIn);
                 return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
             }
         } else {
@@ -143,11 +143,12 @@ public class ItemInstrument extends Item {
         return null;
     }
 
-    public static InstrumentItemDataUpdatePacket getSyncPacket(ItemStack stack) {
+    public static InstrumentItemDataUpdatePacket getSyncPacket(ItemStack stack, Hand handIn) {
         return new InstrumentItemDataUpdatePacket(
             ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(stack), 
             ItemInstrumentDataUtil.INSTANCE.isMidiEnabled(stack), 
-            ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsString(stack)
+            ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsString(stack),
+            Hand.MAIN_HAND.equals(handIn)
         );
     }
 }
