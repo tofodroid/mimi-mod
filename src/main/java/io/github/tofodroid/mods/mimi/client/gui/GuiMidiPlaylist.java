@@ -118,7 +118,7 @@ public class GuiMidiPlaylist extends Screen {
                 slidePercentage =  new Double(this.midiInputManager.playlistManager.getCurrentSongPosSeconds()) / new Double(this.midiInputManager.playlistManager.getSongLengthSeconds());
             }
 
-            if(slidePercentage != null && slidePercentage <= 0.1) {
+            if(slidePercentage != null && slidePercentage >= 0.25) {
                 this.midiInputManager.playlistManager.playFromBeginning();
             } else {
                 this.midiInputManager.playlistManager.shiftSong(false);
