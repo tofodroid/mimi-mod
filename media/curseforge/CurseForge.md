@@ -11,7 +11,7 @@
 <p><span style="font-family: trebuchet ms, geneva, sans-serif;">&nbsp;</span></p>
 <p><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;"><img style="display: block; margin-left: auto; margin-right: auto;" src="https://i.imgur.com/tBHcgQE.png" alt="Features" width="1114" height="212" /></span></p>
 <ul>
-<li><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;">Craft and play 14 (and counting) different instruments</span></li>
+<li><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;">Craft and play 16 (and counting) different instruments</span></li>
 <li><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;">Play up to 3 instruments at the same time by yourself</span></li>
 <li><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;">Hear up to 16 instruments being played around you at the same time</span></li>
 <li><span style="font-size: 18px; font-family: trebuchet ms, geneva, sans-serif;">Load MIDI files from your system and play them using your instruments</span></li>
