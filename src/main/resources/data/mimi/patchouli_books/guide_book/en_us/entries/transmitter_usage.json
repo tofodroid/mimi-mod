@@ -5,12 +5,12 @@
     "pages": [
         {
             "type": "text",
-            "text": "The MIDI Transmitter in MIMI provides the ability to play MIDI files from your system in MIMI and broadcast the notes not only to your own instruments but also to other nearby instruments. $(br2)Once you've crafted the $(l:overview_transmitter)MIDI Transmitter$(/l) simply hold it in your main hand and right click to open the Playlist GUI."
+            "text": "The MIDI Transmitter in MIMI provides the ability to play MIDI files from your system in MIMI and broadcast the notes not only to your own instruments but also to other nearby instruments. $(br2)Once you've crafted the $(l:overview_transmitter)MIDI Transmitter$(/l) simply hold it in your main hand and right click to open the Transmitter GUI."
         },
         {
             "type": "text",
             "title": "Loading Songs",
-            "text": "Once you've opened the Playlist GUI you can select a folder from your system to open and load songs from.$(br2)Note that the playlist is not saved to the transmitter itself but is instead saved globally and all transmitters will open the same playlist (similar to how all Ender Chests open the same inventory)."
+            "text": "Once you've opened the Transmitter GUI you can select a folder from your system to open and load songs from.$(br2)Note that the playlist is not saved to the transmitter itself but is instead saved globally and all transmitters will open the same playlist (similar to how all Ender Chests open the same inventory)."
         },
         {
             "type": "text",
@@ -20,7 +20,7 @@
         {
             "type": "text",
             "title": "Playing Songs",
-            "text": "The Playlist GUI includes media controls that allow you to play songs and shift around the loaded playlist.$(br2)When a song is selected you will see a mapping of which instruments are assigned to each of the song's 16 channels. This mapping allows you to decide which channels each of your instruments should have enabled and inform anyone that you're playing along with which channels they should enable."
+            "text": "The Transmitter GUI includes media controls that allow you to play songs and shift around the loaded playlist.$(br2)When a song is selected you will see a mapping of which instruments are assigned to each of the song's 16 channels. This mapping allows you to decide which channels each of your instruments should have enabled and inform anyone that you're playing along with which channels they should enable."
         },
         {
             "type": "text",
@@ -30,7 +30,7 @@
         {
             "type": "text",
             "title": "Playing Songs",
-            "text": "Songs from the playlist will only play when there is at least one transmitter item on your hotbar. If a song is playing and all transmitters are removed from your hotbar the song will stop playing.$(br2)When a transmitter is in your hotbar you can access its GUI quickly by pressing the configured Playlist GUI keybind. $(br2)The current keybind is: $(l)$(k:key.mimi.midi.playlist)$()"
+            "text": "Songs from the playlist will only play when there is at least one transmitter item on your hotbar. If a song is playing and all transmitters are removed from your hotbar the song will stop playing.$(br2)When a transmitter is in your hotbar you can access its GUI quickly by pressing the configured Transmitter GUI keybind. $(br2)The current keybind is: $(l)$(k:key.mimi.midi.playlist)$()"
         },
         {
             "type": "text",

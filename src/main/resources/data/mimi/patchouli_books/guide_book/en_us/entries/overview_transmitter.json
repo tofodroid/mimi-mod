@@ -11,16 +11,16 @@
             "type": "crafting",
             "title": "Crafting and Opening",
             "recipe": "mimi:transmitter",
-            "text": "$(br)Once you've crafted the MIDI Transmitter as shown above simply hold it in your main hand and right click to open the Playlist GUI."
+            "text": "$(br)Once you've crafted the MIDI Transmitter as shown above simply hold it in your main hand and right click to open the Transmitter GUI."
         },
         {
             "type": "text",
-            "title": "The Playlist GUI",
-            "text": "You should now see the Playlist GUI on your screen.$(br2)This GUI lets you select a folder on your system from which to load MIDI files and then displays all loaded files in a playlist. Use the media control buttons in the bottom left to control playback of the playlist."
+            "title": "The Transmitter GUI",
+            "text": "You should now see the Transmitter GUI on your screen.$(br2)This GUI lets you select a folder on your system from which to load MIDI files and then displays all loaded files in a playlist. Use the media control buttons in the bottom left to control playback of the playlist."
         },
         {
             "type": "text",
-            "title": "The Playlist GUI",
+            "title": "The Transmitter GUI",
             "text": "The buttons to the right of the media controls allow you to toggle the song loop mode (loop single, loop all, and no loop), toggle shuffle on and off, and toggle the Transmit Mode (public, linked, and self).$(br2)The area below the playlist shows the instrument-channel-mapping for the current song which can help give you an idea of which MIDI channels you should enable on your instrument(s)."
         },
         {

@@ -9,6 +9,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.tofodroid.mods.mimi.client.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -40,7 +41,9 @@ public class GuiMidiPlaylist extends Screen {
     private String folderPathString;
     
     // Button Boxes
-    private static final Vector2f REFRESH_FOLDER_BUTTON = new Vector2f(339,37);
+    private static final Vector2f LOAD_FOLDER_BUTTON = new Vector2f(301,37);
+    private static final Vector2f SAVE_DEFAULT_BUTTON = new Vector2f(320,37);
+    private static final Vector2f LOAD_DEFAULT_BUTTON = new Vector2f(339,37);
     private static final Vector2f PREVIOUS_BUTTON = new Vector2f(14,271);
     private static final Vector2f STOP_BUTTON = new Vector2f(33,271);
     private static final Vector2f PLAY_PAUSE_BUTTON = new Vector2f(52,271);
@@ -54,15 +57,15 @@ public class GuiMidiPlaylist extends Screen {
 
     // Time Slider
     private static final Integer SLIDE_Y = 270;
-    private static final Integer SLIDE_MIN_X = 203;
-    private static final Integer SLIDE_MAX_X = 343;
+    private static final Integer SLIDE_MIN_X = 205;
+    private static final Integer SLIDE_MAX_X = 339;
     private static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
 
     // MIDI
     private MidiInputManager midiInputManager;
     
     public GuiMidiPlaylist(PlayerEntity player) {
-        super(new TranslationTextComponent("item.MIMIMod.gui_midi_playllist"));
+        super(new TranslationTextComponent("item.MIMIMod.gui_midi_playlist"));
         this.midiInputManager = MIMIMod.proxy.getMidiInput();
         this.folderPathString = this.midiInputManager.playlistManager.getPlaylistFolderPath();
     }
@@ -78,7 +81,7 @@ public class GuiMidiPlaylist extends Screen {
         startY = (this.height - GUI_HEIGHT) / 2;
 
         // Fields
-        folderPathField = this.addListener(new TextFieldWidget(this.font, this.startX + 118, this.startY + 40, 216, 10, StringTextComponent.EMPTY));
+        folderPathField = this.addListener(new TextFieldWidget(this.font, this.startX + 90, this.startY + 40, 207, 10, StringTextComponent.EMPTY));
         folderPathField.setText(folderPathString);
         folderPathField.setMaxStringLength(256);
         folderPathField.setResponder(this::handlePathChange);
@@ -100,7 +103,13 @@ public class GuiMidiPlaylist extends Screen {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(clickedBox(imouseX, imouseY, REFRESH_FOLDER_BUTTON)) {
+        if(this.folderPathString != null && clickedBox(imouseX, imouseY, LOAD_FOLDER_BUTTON)) {
+            this.midiInputManager.playlistManager.loadFromFolder(this.folderPathString);
+        } else if(this.folderPathString != null && clickedBox(imouseX, imouseY, SAVE_DEFAULT_BUTTON)) {
+            ModConfigs.CLIENT.playlistFolderPath.set(this.folderPathString);
+        } else if(ModConfigs.CLIENT.playlistFolderPath.get() != null && !ModConfigs.CLIENT.playlistFolderPath.get().isEmpty() && clickedBox(imouseX, imouseY, LOAD_DEFAULT_BUTTON)) {
+            this.folderPathString = ModConfigs.CLIENT.playlistFolderPath.get();
+            this.folderPathField.setText(this.folderPathString);
             this.midiInputManager.playlistManager.loadFromFolder(this.folderPathString);
         } else if(clickedBox(imouseX, imouseY, PREVIOUS_BUTTON)) {
             Double slidePercentage = null;
