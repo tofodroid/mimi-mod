@@ -37,10 +37,6 @@ This is a list of features and improvements that I am currently considering addi
 
 - Add controllable instrument volume
 
-- Add redstone "listener" that can output redstone signals based on nearby played notes and configured settings
-
-- Add redstone "receiver" that can output redstone signals based on nearby transmitted notes and configured settings
-
 - Add instrument variants (piano woods, drum colors via dye, etc.)
 
 - Add uncraftable instruments that can only be found as loot or from villagers
@@ -54,8 +50,6 @@ This is a list of features and improvements that I am currently considering addi
 - Add note particles when instruments are playing
 
 - Add basic animations for playing instruments
-
-- Add mechanical musician that can play instruments like a player
 
 - Add additional midi settings from config file to in-game GUI
 
