@@ -16,3 +16,6 @@ logs
 
 # Temp
 src/main/resources/data/mimi/patchouli_books/guide_book/old
+
+# Media
+media/**/*.png
