@@ -8,25 +8,40 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 // 1. Default MIDI Input Device
 
-
 public class ClientConfig {
+    public static final String INSTRUMENT_GUI_CATEGORY_NAME = "Instrument GUI";
     public static final String MIDI_PLAYER_CATEGORY_NAME = "MIDI Player";
     public static final String MIDI_INPUT_CATEGORY_NAME = "MIDI Input";
     public static final String MIDI_SYNTH_CATEGORY_NAME = "MIDI Synth";
 
+    // INSTRUMENT GUI
+    public static enum KEYBOARD_LAYOUTS {
+        MIMI,
+        VPiano
+    }
+    public ForgeConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
+
     // PLAYER
     public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
+
     // INPUT
     public ForgeConfigSpec.IntValue defaultMidiInputDevice;
+
     // SYNTH
     public ForgeConfigSpec.BooleanValue jitterCorrection;
     public ForgeConfigSpec.IntValue latency;
     public ForgeConfigSpec.ConfigValue<Integer> synthSampleRate;
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
+
     public ClientConfig(ForgeConfigSpec.Builder builder) {
+        builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
+        keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
+            .translation(MIMIMod.MODID + ".config.instrument.keyboard.layout")
+            .defineEnum("playlistFolderPath", KEYBOARD_LAYOUTS.MIMI);
+        builder.pop();
         builder.push(MIDI_PLAYER_CATEGORY_NAME);
-        playlistFolderPath = builder.comment("Optional full path to a folder containing MIDI files to be used by the MIDI Player. See project page for more information.")
+        playlistFolderPath = builder.comment("Optional full path to a folder containing MIDI files to be used by the MIDI Player. See guide book for more information.")
             .translation(MIMIMod.MODID + ".config.midi.player.playlist.path")
             .define("playlistFolderPath", "");
         builder.pop();
