@@ -16,7 +16,6 @@ public class TileInstrument extends TileEntity {
 
     private Byte instrumentId;
     private UUID maestro;
-    private Boolean midiEnabled;
     private String acceptedChannelsString;
 
     public TileInstrument() {
@@ -37,12 +36,6 @@ public class TileInstrument extends TileEntity {
             this.maestro = null;
         }
 
-        if(compound.contains(InstrumentDataUtil.MIDI_ENABLED_TAG)) {
-            this.midiEnabled = compound.getBoolean(InstrumentDataUtil.MIDI_ENABLED_TAG);
-        } else {
-            this.midiEnabled = false;
-        }
-
         if(compound.contains(InstrumentDataUtil.LISTEN_CHANNELS_TAG)) {
             this.acceptedChannelsString = compound.getString(InstrumentDataUtil.LISTEN_CHANNELS_TAG);
         } else {
@@ -61,11 +54,7 @@ public class TileInstrument extends TileEntity {
         if(this.maestro != null) {
             compound.putUniqueId(InstrumentDataUtil.MAESTRO_TAG, this.maestro);
         }
-        
-        if(this.midiEnabled != null && this.midiEnabled) {
-            compound.putBoolean(InstrumentDataUtil.MIDI_ENABLED_TAG, this.midiEnabled);
-        }
-        
+                
         if(this.acceptedChannelsString != null && !this.acceptedChannelsString.isEmpty()) {
             compound.putString(InstrumentDataUtil.LISTEN_CHANNELS_TAG, this.acceptedChannelsString);
         }
@@ -111,14 +100,6 @@ public class TileInstrument extends TileEntity {
         this.acceptedChannelsString = acceptedChannelsString;
     }
 
-    public Boolean isMidiEnabled() {
-        return this.midiEnabled != null ? this.midiEnabled : false;
-    }
-
-    public void setMidiEnabled(Boolean enabled) {
-        this.midiEnabled = enabled;
-    }
-
     public UUID getMaestro() {
         return maestro;
     }
@@ -131,7 +112,6 @@ public class TileInstrument extends TileEntity {
         return new InstrumentTileDataUpdatePacket(
             e.getPos(),
             e.getMaestro(), 
-            e.isMidiEnabled(), 
             e.getAcceptedChannelsString()
         );
     }

@@ -33,17 +33,6 @@ public class EntityInstrumentDataUtil extends InstrumentDataUtil<TileInstrument>
     }
 
     @Override
-    protected void setMidiEnabled(TileInstrument instrumentData, Boolean enabled) {
-        instrumentData.setMidiEnabled(enabled);
-        
-    }
-
-    @Override
-    public Boolean isMidiEnabled(TileInstrument instrumentData) {
-        return instrumentData.isMidiEnabled();
-    }
-
-    @Override
     public String getInstrumentName(TileInstrument instrumentData) {
         return instrumentData.getBlockState().getBlock().asItem().getName().getString();
     }

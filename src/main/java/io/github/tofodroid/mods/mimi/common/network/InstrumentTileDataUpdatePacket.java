@@ -11,16 +11,14 @@ import net.minecraft.util.math.BlockPos;
 public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
     public final BlockPos tilePos;
 
-    public InstrumentTileDataUpdatePacket(BlockPos tilePos, UUID maestroId, Boolean midiEnabled, String acceptedChannelString) {
-        super(maestroId, midiEnabled, acceptedChannelString);
+    public InstrumentTileDataUpdatePacket(BlockPos tilePos, UUID maestroId, String acceptedChannelString) {
+        super(maestroId, acceptedChannelString);
         this.tilePos = tilePos;
     }
     
     public static InstrumentTileDataUpdatePacket decodePacket(PacketBuffer buf) {
         try {
             BlockPos tilePos = BlockPos.fromLong(buf.readLong());
-
-            Boolean midiEnabled = buf.readBoolean();
 
             String acceptedChannelString = buf.readString(38);
             if(acceptedChannelString.trim().isEmpty()) {
@@ -32,7 +30,7 @@ public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
                 maestroId = null;
             }
 
-            return new InstrumentTileDataUpdatePacket(tilePos, maestroId, midiEnabled, acceptedChannelString);
+            return new InstrumentTileDataUpdatePacket(tilePos, maestroId, acceptedChannelString);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("InstrumentTileUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -44,7 +42,6 @@ public class InstrumentTileDataUpdatePacket extends InstrumentDataUpdatePacket {
 
     public static void encodePacket(InstrumentTileDataUpdatePacket pkt, PacketBuffer buf) {
         buf.writeLong(pkt.tilePos.toLong());
-        buf.writeBoolean(pkt.midiEnabled != null ? pkt.midiEnabled : false);
         buf.writeString(pkt.acceptedChannelString != null ? pkt.acceptedChannelString : "", 38);
         buf.writeUniqueId(pkt.maestroId != null ? pkt.maestroId : NULL_MAESTRO_VAL);
     }
