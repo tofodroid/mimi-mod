@@ -26,7 +26,7 @@
         {
             "type": "text",
             "title": "Playing with Others",
-            "text": "To play songs with other players set your MIDI Transmitter transmit mode to public. This will allow any instrument within 16 blocks of you to receive the notes you are transmitting if they have 'Public Transmitters' set as their MIDI source and have MIDI enabled."
+            "text": "To play songs with other players set your MIDI Transmitter transmit mode to public. This will allow any instrument within 16 blocks of you to receive the notes you are transmitting if they have 'Public Transmitters' set as their MIDI source."
         }
     ],
     "sortnum": 1
