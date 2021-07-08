@@ -2,7 +2,7 @@
     "parent": "minecraft:recipes/root",
     "rewards": {
       "recipes": [
-        "mimi:piano"
+        "mimi:transmitter"
       ]
     },
     "criteria": {
@@ -11,7 +11,7 @@
         "conditions": {
           "items": [
             {
-              "item": "minecraft:note_block"
+              "item": "minecraft:iron_ingot"
             }
           ]
         }
@@ -19,7 +19,7 @@
       "has_the_recipe": {
         "trigger": "minecraft:recipe_unlocked",
         "conditions": {
-          "recipe": "mimi:piano"
+          "recipe": "mimi:transmitter"
         }
       }
     },
