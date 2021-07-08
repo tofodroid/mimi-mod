@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "MIMI provides a large variety of different instruments that you can craft and play.$(br2)Instruments come in two types: Hand-Held, which can be played from your hand, and Block, which must be placed into the world to play."
+            "text": "MIMI provides two types of instruments: Hand-Held, which can be played from your hand, and Block, which must be placed into the world to play.$(br2)$(l)Note:$() The volume for all MIMI instruments can be set globally by adjusting the 'Players' volume slider in the Minecraft settings menu."
         },
         {
             "type": "crafting",
