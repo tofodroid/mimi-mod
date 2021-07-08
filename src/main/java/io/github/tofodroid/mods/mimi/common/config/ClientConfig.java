@@ -38,7 +38,7 @@ public class ClientConfig {
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
             .translation(MIMIMod.MODID + ".config.instrument.keyboard.layout")
-            .defineEnum("playlistFolderPath", KEYBOARD_LAYOUTS.MIMI);
+            .defineEnum("instrumentKeyboardLayout", KEYBOARD_LAYOUTS.MIMI);
         builder.pop();
         builder.push(MIDI_PLAYER_CATEGORY_NAME);
         playlistFolderPath = builder.comment("Optional full path to a folder containing MIDI files to be used by the MIDI Player. See guide book for more information.")
