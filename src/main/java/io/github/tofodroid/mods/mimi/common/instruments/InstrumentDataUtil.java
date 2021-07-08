@@ -14,9 +14,6 @@ public abstract class InstrumentDataUtil<T extends Object> {
     public static final UUID PUBLIC_MAESTRO_ID = new UUID(0,2);
     protected static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
 
-    abstract protected void setMidiEnabled(T instrumentData, Boolean enabled);
-    abstract public Boolean isMidiEnabled(T instrumentData);
-
     abstract protected void setAcceptedChannelString(T instrumentData, String acceptedChannelsString);
     abstract protected String getAcceptedChannelsString(T instrumentData);
     
@@ -28,7 +25,7 @@ public abstract class InstrumentDataUtil<T extends Object> {
     abstract public String getInstrumentName(T instrumentData);
 
     public Boolean shouldHandleMessage(T instrumentData, UUID sender, Byte channel, Boolean publicTransmit) {
-        return isMidiEnabled(instrumentData) && doesAcceptChannel(instrumentData, channel) && 
+        return doesAcceptChannel(instrumentData, channel) && 
             (publicTransmit && PUBLIC_MAESTRO_ID.equals(getLinkedMaestro(instrumentData)) || sender.equals(getLinkedMaestro(instrumentData)));
     }
 
@@ -73,9 +70,5 @@ public abstract class InstrumentDataUtil<T extends Object> {
         }
 
         return SortedArraySet.newSet(0);
-    }
-    
-    public void toggleMidiEnabled(T instrumentData) {
-        setMidiEnabled(instrumentData, !isMidiEnabled(instrumentData));
     }
 }

@@ -54,20 +54,6 @@ public class ItemInstrumentDataUtil extends InstrumentDataUtil<ItemStack> {
     }
 
     @Override
-    protected void setMidiEnabled(ItemStack stack, Boolean enabled) {
-        if(enabled) {
-            stack.getOrCreateTag().putBoolean(MIDI_ENABLED_TAG, enabled);
-        } else if(stack.hasTag()) {
-            stack.getTag().remove(MIDI_ENABLED_TAG);
-        }
-    }
-
-    @Override
-    public Boolean isMidiEnabled(ItemStack stack) {
-        return stackTagContainsKey(stack, MIDI_ENABLED_TAG);
-    }
-
-    @Override
     public String getInstrumentName(ItemStack stcak) {
         return stcak.getItem().getName().getString();
     }

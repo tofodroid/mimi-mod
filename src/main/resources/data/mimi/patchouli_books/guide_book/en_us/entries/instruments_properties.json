@@ -9,11 +9,6 @@
         },
         {
             "type": "text",
-            "title": "MIDI Toggle",
-            "text": "This controls whether or not the instrument should respond to MIDI notes from the configured MIDI Source.$(br2)If enabled the instrument will play notes it receives from the configured MIDI Source automatically."
-        },
-        {
-            "type": "text",
             "title": "MIDI Source",
             "text": "This property stores where instrument should receive MIDI messages from and supports several modes.$(br2)Note that if a player transmitter is set as the MIDI Source the player must be within 16 blocks of the instrument for notes to be received."
         },

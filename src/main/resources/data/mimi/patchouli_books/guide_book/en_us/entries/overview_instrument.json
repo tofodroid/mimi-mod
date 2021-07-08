@@ -27,12 +27,12 @@
         {
             "type": "text",
             "title": "The Instrument GUI",
-            "text": "The $(l)ZNote$() indicator displays which note on the piano is currently mapped to Z on your keyboard.$(br2)The top section of the instrument GUI lets you configure the MIDI settings of your instrument which can be used to play notes from a MIDI Transmitter or System MIDI Input Device."
+            "text": "The $(l)<| Note$() indicator displays the minimum note on the piano that is currently visible.$(br2)The top section of the instrument GUI lets you configure the MIDI settings of your instrument which can be used to play notes from a MIDI Transmitter or System MIDI Input Device."
         },
         {
             "type": "text",
             "title": "MIDI Source",
-            "text": "The top left section of the Instrument GUI lets you configure the MIDI Source to use for this instrument.$(br2)When the instrument has MIDI enabled it will play any notes that it receives from the configured MIDI Source automatically."
+            "text": "The top left section of the Instrument GUI lets you configure the MIDI Source to use for this instrument.$(br2)When the instrument has a MIDI source configured it will play any notes that it receives from the configured MIDI Source automatically."
         },
         {
             "type": "text",

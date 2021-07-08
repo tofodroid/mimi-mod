@@ -9,6 +9,17 @@
         },
         {
             "type": "text",
+            "title": "MIDI Playlist Folder",
+            "text": "$(l)Param:$() playlistFolderPath$(br)$(l)Type:$() Folder Path$(br)$(l)Default:$() unset$(br2)This parameter stores the default MIDI Playlist Folder to load into the Transmitter GUI when the game starts. This can be set using the in-game controls on the Transmitter GUI or set directly in the config file."
+        },
+        {
+            "type": "text",
+            "title": "Keyboard Layout",
+            "text": "$(l)Param:$() instrumentKeyboardLayout$(br)$(l)Type:$() Layout Name$(br)$(l)Default:$() MIMI$(br2)This parameter stores the keyboard layout to use for the Instrument GUI. The value can be set using the in-game controls on the Instrument GUI or via the config file.$(br2)Valid Values: MIMI, VPiano"
+        },
+
+        {
+            "type": "text",
             "title": "Default MIDI Device",
             "text": "$(l)Param:$() defaultMidiInputDevice$(br)$(l)Type:$() Integer$(br)$(l)Default:$() -1$(br2)This parameter holds the device ID of the $(l:config_midi_input)system MIDI device$(/l) that should be used for MIMI input by default. If a value is set MIMI will attempt to use that device when Minecraft launches if it is available.$(br2)To have no default device set this to -1."
         },

@@ -25,7 +25,6 @@ public class InstrumentTileDataUpdatePacketHandler {
         TileInstrument instrumentTile = tileEntity instanceof TileInstrument ? (TileInstrument) tileEntity : null;
 
         if (instrumentTile != null) {
-            instrumentTile.setMidiEnabled(message.midiEnabled);
             instrumentTile.setAcceptedChannelsString(message.acceptedChannelString);
             instrumentTile.setMaestro(message.maestroId);
             instrumentTile.markDirty();

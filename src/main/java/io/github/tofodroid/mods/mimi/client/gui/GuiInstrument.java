@@ -4,10 +4,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -18,6 +22,8 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
+import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
 
 import net.minecraft.client.Minecraft;
@@ -42,16 +48,16 @@ public class GuiInstrument<T> extends Screen {
     private static final Integer GUI_HEIGHT = 246;
     private static final Integer NOTE_OFFSET_X = 11;
     private static final Integer NOTE_OFFSET_Y = 109;
-    private static final Integer TEXTURE_SIZE = 402;
+    private static final Integer TEXTURE_SIZE = 530;
     private static final Integer NOTE_WIDTH = 14;
     private static final Integer BUTTON_SIZE = 15;
 
     // GUI
-    private static final Vector2f MAESTRO_MIDI_BUTTON_COORDS = new Vector2f(217,39);
-    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(236,39);
-    private static final Vector2f MAESTRO_PUBLIC_BUTTON_COORDS = new Vector2f(255,39);
-    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(274,39);
-    private static final Vector2f TOGGLE_MIDI_BUTTON_COORDS = new Vector2f(332,39);
+    private static final Vector2f MAESTRO_MIDI_BUTTON_COORDS = new Vector2f(184,39);
+    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(202,39);
+    private static final Vector2f MAESTRO_PUBLIC_BUTTON_COORDS = new Vector2f(220,39);
+    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(238,39);
+    private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(339,39);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,79);
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,79);
     private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(34,79);
@@ -72,6 +78,8 @@ public class GuiInstrument<T> extends Screen {
     private String minNoteString = "C3";
     private ConcurrentHashMap<Byte, Instant> heldNotes = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Byte, Instant> releasedNotes = new ConcurrentHashMap<>();
+
+    // MIMI Layout
     private final Integer ACCENT_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S);
     private final Integer ACCENT_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_APOSTROPHE);
     private final Integer ACCENT_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_1);
@@ -80,6 +88,74 @@ public class GuiInstrument<T> extends Screen {
     private final Integer NOTE_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_SLASH);
     private final Integer NOTE_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Q);
     private final Integer NOTE_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_RIGHT_BRACKET);
+
+    // VPiano Layout
+    private final Integer V_PIANO_MIN_SHIFT = 14;
+    private final Integer V_PIANO_MAX_SHIFT = 28;
+    private final Integer V_PIANO_MAX_NOTE = 49;
+    private final Map<Integer,Integer> VPianoMidiMap = Stream.of(new Integer[][] {
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_1), 0},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_1), 1},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_2), 2},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_2), 3},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_3), 4},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_4), 5},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_4), 6},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_5), 7},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_5), 8},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_6), 9},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_6), 10},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_7), 11},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_8), 12},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_8), 13},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_9), 14},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_9), 15},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_0), 16},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Q), 17},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Q), 18},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_W), 19},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_W), 20},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_E), 21},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_E), 22},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_R), 23},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_T), 24},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_T), 25},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Y), 26},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Y), 27},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_U), 28},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_I), 29},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_I), 30},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_O), 31},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_O), 32},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_P), 33},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_P), 34},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_A), 35},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S), 36},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S), 37},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_D), 38},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_D), 39},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_F), 40},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_G), 41},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_G), 42},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_H), 43},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_H), 44},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_J), 45},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_J), 46},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_K), 47},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_L), 48},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_L), 49},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Z), 50},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Z), 51},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_X), 52},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_C), 53},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_C), 54},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_V), 55},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_V), 56},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_B), 57},
+        {-GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_B), 58},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_N), 59},
+        {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_M), 60}
+    }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
     // Data
     private final Byte instrumentId;
@@ -206,12 +282,12 @@ public class GuiInstrument<T> extends Screen {
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
                 this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, TOGGLE_MIDI_BUTTON_COORDS)) {
-                // Toggle MIDI Enabled
-                instrumentUtil.toggleMidiEnabled(instrumentData);
-                this.syncInstrumentToServer();
-                if(!instrumentUtil.isMidiEnabled(instrumentData)) {
-                    this.allNotesOff();
+            } else if(clickedBox(imouseX, imouseY, KEYBOARD_LAYOUT_BUTTON_COORDS)) {
+                // Change Keyboard Layout
+                if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
+                    ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
+                } else {
+                    ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[0]);
                 }
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 // Clear Midi Channels Button
@@ -267,7 +343,7 @@ public class GuiInstrument<T> extends Screen {
         } else if(keyCode == GLFW.GLFW_KEY_UP) {
             shiftVisibleNotes(true, 7);
         } else {
-            Byte midiNoteNum = getMidiNoteFromScanCode(scanCode);
+            Byte midiNoteNum = getMidiNoteFromScanCode(scanCode, modifiers == 1);
 
             if(midiNoteNum != null && !this.heldNotes.containsKey(midiNoteNum)) {
                 this.onGuiNotePress(midiNoteNum, Byte.MAX_VALUE);
@@ -281,7 +357,7 @@ public class GuiInstrument<T> extends Screen {
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         super.keyReleased(keyCode, scanCode, modifiers);
 
-        Byte midiNoteNum = getMidiNoteFromScanCode(scanCode);
+        Byte midiNoteNum = getMidiNoteFromScanCode(scanCode, modifiers == 1);
 
         if(midiNoteNum != null) {
             this.onGuiNoteRelease(midiNoteNum);
@@ -335,8 +411,8 @@ public class GuiInstrument<T> extends Screen {
             visibleNoteShift -= amount;
         }
 
-        // Clamp between 0 and 66
-        visibleNoteShift = visibleNoteShift < 0 ? 0 : visibleNoteShift > 30 ? 30 : visibleNoteShift;
+        // Clamp between 0 and 53
+        visibleNoteShift = visibleNoteShift < 0 ? 0 : visibleNoteShift > 53 ? 53 : visibleNoteShift;
         
         // Set Min Note String
         Integer octaveNoteNum = visibleNoteShift % 7;
@@ -345,19 +421,19 @@ public class GuiInstrument<T> extends Screen {
     }
 
     public void onMidiNoteOn(Byte channel, Byte midiNote, Byte velocity) {
-        if(instrumentUtil.isMidiEnabled(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
+        if(instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
             this.onGuiNotePress(midiNote, velocity);
         }
     }
     
     public void onMidiNoteOff(Byte channel, Byte midiNote) {
-        if(instrumentUtil.isMidiEnabled(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
+        if(instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
             this.onGuiNoteRelease(midiNote);
         }
     }
 
     public void onMidiAllNotesOff(Byte channel) {
-        if(instrumentUtil.isMidiEnabled(instrumentData) && instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
+        if(instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
             this.allNotesOff();
         }
     }
@@ -405,7 +481,19 @@ public class GuiInstrument<T> extends Screen {
     }
 
     // Keyboard Input Functions
-    private Byte getMidiNoteFromScanCode(Integer scanCode) {
+    private Byte getMidiNoteFromScanCode(Integer scanCode, Boolean modifier) {
+        switch(ModConfigs.CLIENT.keyboardLayout.get()) {
+            case MIMI:
+                return getMidiNoteFromScanCode_MIMI(scanCode);
+            case VPiano:
+                return getMidiNoteFromScanCode_VPiano(scanCode, modifier);
+            default:
+                MIMIMod.LOGGER.info("Warning: Unknown keyboard layout selected for Instrument GUI.");
+                return null;
+        }
+    }
+
+    private Byte getMidiNoteFromScanCode_MIMI(Integer scanCode) {
         Integer keyNum = null;
 
         if (scanCode >= ACCENT_LEFT_MIN_SCAN && scanCode <= ACCENT_LEFT_MAX_SCAN) {
@@ -432,6 +520,11 @@ public class GuiInstrument<T> extends Screen {
         }
 
         return null;
+    }
+
+    private Byte getMidiNoteFromScanCode_VPiano(Integer scanCode, Boolean modifier) {
+        Integer midiInt = VPianoMidiMap.get(scanCode * (modifier ? -1 : 1));
+        return midiInt != null ?  new Integer(12 * 2 + midiInt).byteValue() : null;
     }
 
     // Mouse Input Functions
@@ -461,6 +554,21 @@ public class GuiInstrument<T> extends Screen {
         Integer keyboardTextureShift = (visibleNoteShift % (NOTE_WIDTH/2)) * NOTE_WIDTH;
         blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 274, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
+        // Note Labels
+        if(ClientConfig.KEYBOARD_LAYOUTS.MIMI.equals(ModConfigs.CLIENT.keyboardLayout.get())) {
+            blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 456, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+        } else {
+            if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
+                Integer widthShift = (V_PIANO_MIN_SHIFT - visibleNoteShift) * NOTE_WIDTH;
+                blit(matrixStack, startX + NOTE_OFFSET_X - 1 + widthShift, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+            } else if(visibleNoteShift >= V_PIANO_MIN_SHIFT && visibleNoteShift <= V_PIANO_MAX_SHIFT) {
+                blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH , 402, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+            } else if(visibleNoteShift <= V_PIANO_MAX_NOTE) {
+                Integer widthShift = (V_PIANO_MAX_SHIFT - visibleNoteShift) * -NOTE_WIDTH;
+                blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
+        }
+
         // Note Edges
         if(visibleNoteShift == 0) {
             blit(matrixStack, startX + NOTE_OFFSET_X , startY + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 249, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -473,17 +581,12 @@ public class GuiInstrument<T> extends Screen {
         // Reset alpha for next layers
         setAlpha(1.0f);
 
-        // GUI Background and Note Keys
+        // GUI Background
         blit(matrixStack, startX, startY, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Key Covers
         blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 247, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
-        // MIDI Enabled Status Light
-        if(this.instrumentUtil.isMidiEnabled(instrumentData)) {
-            blit(matrixStack, startX + 351, startY + 45, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-        }
-
         // Channel Output Status Lights
         SortedArraySet<Byte> acceptedChannels = this.instrumentUtil.getAcceptedChannelsSet(this.instrumentData);
 
@@ -547,9 +650,12 @@ public class GuiInstrument<T> extends Screen {
         // Min Note Text
         font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 224, 0xFF00E600);
 
-        // Maestro Name
-        font.drawString(matrixStack, this.selectedMaestroName.length() <= 22 ? this.selectedMaestroName : this.selectedMaestroName.substring(0,21) + "...", startX + 81, startY + 43, 0xFF00E600);
+        // MIDI Source Name
+        font.drawString(matrixStack, this.selectedMaestroName.length() <= 22 ? this.selectedMaestroName : this.selectedMaestroName.substring(0,21) + "...", startX + 80, startY + 43, 0xFF00E600);
         
+        // Keyboard Layout
+        font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), startX + 303, startY + 43, 0xFF00E600);
+
         return matrixStack;
     }
 

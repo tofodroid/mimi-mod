@@ -11,14 +11,13 @@ public class InstrumentItemDataUpdatePacket extends InstrumentDataUpdatePacket {
 
     public Boolean mainHand;
 
-    public InstrumentItemDataUpdatePacket(UUID maestroId, Boolean midiEnabled, String acceptedChannelString, Boolean mainHand) {
-        super(maestroId, midiEnabled, acceptedChannelString);
+    public InstrumentItemDataUpdatePacket(UUID maestroId, String acceptedChannelString, Boolean mainHand) {
+        super(maestroId, acceptedChannelString);
         this.mainHand = mainHand;
     }
     
     public static InstrumentItemDataUpdatePacket decodePacket(PacketBuffer buf) {
         try {
-            Boolean midiEnabled = buf.readBoolean();
             Boolean mainHand = buf.readBoolean();
 
             String acceptedChannelString = buf.readString(38);
@@ -31,7 +30,7 @@ public class InstrumentItemDataUpdatePacket extends InstrumentDataUpdatePacket {
                 maestroId = null;
             }
 
-            return new InstrumentItemDataUpdatePacket(maestroId, midiEnabled, acceptedChannelString, mainHand);
+            return new InstrumentItemDataUpdatePacket(maestroId, acceptedChannelString, mainHand);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("InstrumentDataUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -42,7 +41,6 @@ public class InstrumentItemDataUpdatePacket extends InstrumentDataUpdatePacket {
     }
 
     public static void encodePacket(InstrumentItemDataUpdatePacket pkt, PacketBuffer buf) {
-        buf.writeBoolean(pkt.midiEnabled != null ? pkt.midiEnabled : false);
         buf.writeBoolean(pkt.mainHand != null ? pkt.mainHand : true);
         buf.writeString(pkt.acceptedChannelString != null ? pkt.acceptedChannelString : "", 38);
         buf.writeUniqueId(pkt.maestroId != null ? pkt.maestroId : NULL_MAESTRO_VAL);

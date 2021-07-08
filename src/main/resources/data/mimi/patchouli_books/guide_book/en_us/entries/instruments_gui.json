@@ -15,12 +15,7 @@
         {
             "type": "text",
             "title": "Shifting the Piano",
-            "text": "To shift the piano you can either click the shift buttons on the right side 'Shift' panel, or use the arrow keys on your keyboard that match the arrow on each shift GUI button.$(br2)Shifting +/- 1 moves the keyboard one natural note (white key) while +/- 7 moves the keyboard one full octave.$(br2)The $(l)ZNote$() indicator displays which note on the piano is mapped to Z on your keyboard."
-        },
-        {
-            "type": "text",
-            "title": "Enabling MIDI Input",
-            "text": "The top-right section of the instrument GUI allows you to toggle MIDI input on and off.$(br2)When the instrument has MIDI enabled it will play any notes that it receives from the configured MIDI Source automatically."
+            "text": "To shift the piano you can either click the shift buttons on the right side 'Shift' panel, or use the arrow keys on your keyboard that match the arrow on each shift GUI button.$(br2)Shifting +/- 1 moves the keyboard one natural note (white key) while +/- 7 moves the keyboard one full octave.$(br2)The $(l)<| Note$() indicator displays the minimum note on the piano that is currently visible."
         },
         {
             "type": "text",
@@ -31,6 +26,16 @@
             "type": "text",
             "title": "MIDI Channel Toggles",
             "text": "The numbered buttons spanning the full length of the GUI are the MIDI channel toggles. These buttons allow you to toggle each MIDI channel on or off for this instrument when it is playing from a MIDI Source.$(br2)Channel 10 is a special color to indicate that it is primarily used for percussion.$(br2)The X and O buttons allow you to clear and enable all channels, respectively."
+        },
+        {
+            "type": "text",
+            "title": "Keyboard Layout",
+            "text": "The top right section of the Instrument GUI lets you cycle between keyboard layouts for the piano. The selected layout is saved globally using the $(l:config_file)Config File$(/l), not per-instrument.$(br2)$(l)MIMI$() is the default mode and is a 'floating' mode where the same keys are used regardless of where you are on the keyboard. This mode allows you to play all notes from C0-G10 but only the notes currently visible on your screen."
+        },
+        {
+            "type": "text",
+            "title": "Keyboard Layout",
+            "text": "$(l)VPiano$() is a mode that uses the same layout as virtualpiano.net and is a 'static' mode where keys are assigned to specific notes and do not follow your current view on the keyboard.$(br2)This mode allows you to play notes from C2-C7 and play notes that are not currently visible on your screen. This mode is case-sensitive so in order to play the black keys you will need to hold Shift."
         }
     ],
     "sortnum": 1
