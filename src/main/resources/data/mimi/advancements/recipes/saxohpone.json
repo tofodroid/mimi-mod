@@ -2,7 +2,7 @@
     "parent": "minecraft:recipes/root",
     "rewards": {
       "recipes": [
-        "mimi:piano"
+        "mimi:saxophone"
       ]
     },
     "criteria": {
@@ -19,7 +19,7 @@
       "has_the_recipe": {
         "trigger": "minecraft:recipe_unlocked",
         "conditions": {
-          "recipe": "mimi:piano"
+          "recipe": "mimi:saxophone"
         }
       }
     },
