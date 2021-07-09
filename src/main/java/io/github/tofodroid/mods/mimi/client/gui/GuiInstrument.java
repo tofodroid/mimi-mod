@@ -74,6 +74,7 @@ public class GuiInstrument<T> extends Screen {
 
     //Keyboard
     private static final Integer VISIBLE_NOTES = 44;
+    private static final Integer MAX_NOTE_SHIFT = 53;
     private Integer visibleNoteShift = KEYBOARD_START_NOTE;
     private String minNoteString = "C3";
     private ConcurrentHashMap<Byte, Instant> heldNotes = new ConcurrentHashMap<>();
@@ -412,7 +413,7 @@ public class GuiInstrument<T> extends Screen {
         }
 
         // Clamp between 0 and 53
-        visibleNoteShift = visibleNoteShift < 0 ? 0 : visibleNoteShift > 53 ? 53 : visibleNoteShift;
+        visibleNoteShift = visibleNoteShift < 0 ? 0 : visibleNoteShift > MAX_NOTE_SHIFT ? MAX_NOTE_SHIFT : visibleNoteShift;
         
         // Set Min Note String
         Integer octaveNoteNum = visibleNoteShift % 7;
@@ -571,7 +572,9 @@ public class GuiInstrument<T> extends Screen {
 
         // Note Edges
         if(visibleNoteShift == 0) {
-            blit(matrixStack, startX + NOTE_OFFSET_X , startY + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 249, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, startX + NOTE_OFFSET_X, startY + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+        } else if(visibleNoteShift == MAX_NOTE_SHIFT) {
+            blit(matrixStack, startX + 311, startY + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Active Notes
