@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
@@ -344,10 +345,14 @@ public class GuiInstrument<T> extends Screen {
         } else if(keyCode == GLFW.GLFW_KEY_UP) {
             shiftVisibleNotes(true, 7);
         } else {
-            Byte midiNoteNum = getMidiNoteFromScanCode(scanCode, modifiers == 1);
+            List<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
 
-            if(midiNoteNum != null && !this.heldNotes.containsKey(midiNoteNum)) {
-                this.onGuiNotePress(midiNoteNum, Byte.MAX_VALUE);
+            if(midiNoteNums != null) {
+                for(Byte midiNoteNum : midiNoteNums) {
+                    if(!this.heldNotes.containsKey(midiNoteNum)) {
+                        this.onGuiNotePress(midiNoteNum, Byte.MAX_VALUE);
+                    }
+                }
             }
         }
         
@@ -358,10 +363,12 @@ public class GuiInstrument<T> extends Screen {
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         super.keyReleased(keyCode, scanCode, modifiers);
 
-        Byte midiNoteNum = getMidiNoteFromScanCode(scanCode, modifiers == 1);
+        List<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
 
-        if(midiNoteNum != null) {
-            this.onGuiNoteRelease(midiNoteNum);
+        if(midiNoteNums != null) {
+            for(Byte midiNoteNum : midiNoteNums) {
+                this.onGuiNoteRelease(midiNoteNum);
+            }
         }
 
         return true;
@@ -482,12 +489,13 @@ public class GuiInstrument<T> extends Screen {
     }
 
     // Keyboard Input Functions
-    private Byte getMidiNoteFromScanCode(Integer scanCode, Boolean modifier) {
+    private List<Byte> getMidiNoteFromScanCode(Integer scanCode, Boolean modifier, Boolean ignoreModifier) {
         switch(ModConfigs.CLIENT.keyboardLayout.get()) {
             case MIMI:
-                return getMidiNoteFromScanCode_MIMI(scanCode);
+                return Arrays.asList(getMidiNoteFromScanCode_MIMI(scanCode));
             case VPiano:
-                return getMidiNoteFromScanCode_VPiano(scanCode, modifier);
+                return Arrays.asList(getMidiNoteFromScanCode_VPiano(scanCode, modifier), ignoreModifier ? getMidiNoteFromScanCode_VPiano(scanCode, !modifier) : null)
+                    .stream().filter(b -> b != null).collect(Collectors.toList());
             default:
                 MIMIMod.LOGGER.info("Warning: Unknown keyboard layout selected for Instrument GUI.");
                 return null;
