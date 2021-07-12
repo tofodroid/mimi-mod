@@ -4,50 +4,74 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 
+import java.util.List;
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNoteOnPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handleOnPacketsServer(Arrays.asList(message), ctx.get().getSender()));
         } else {
-            ctx.get().enqueueWork(() -> handlePacketClient(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handleOnPacketClient(message, ctx.get().getSender()));
         }
         ctx.get().setPacketHandled(true);
     }
     
     public static void handlePacket(final MidiNoteOffPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handleOffPacketsServer(Arrays.asList(message), ctx.get().getSender()));
         } else {
-            ctx.get().enqueueWork(() -> handlePacketClient(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handleOffPacketClient(message, ctx.get().getSender()));
         }
         
         ctx.get().setPacketHandled(true);
     }
 
-    public static void handlePacketServer(final MidiNoteOnPacket message, ServerPlayerEntity sender) {
-        PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
-            new PacketDistributor.TargetPoint(message.pos.getX(), message.pos.getY(), message.pos.getZ(), 64.0D, sender.getServerWorld().getDimensionKey())
-        );
-        NetworkManager.NET_CHANNEL.send(target, message);
+    public static void handleOnPacketsServer(final List<MidiNoteOnPacket> messages, ServerPlayerEntity sender) {
+        if(messages != null && !messages.isEmpty()) {
+            // Forward to players
+                PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
+                new PacketDistributor.TargetPoint(sender.getPosition().getX(), sender.getPosition().getY(), sender.getPosition().getZ(), 64.0D, sender.getServerWorld().getDimensionKey())
+            );
+
+            // Check redstone listeners
+            AxisAlignedBB queryBox = new AxisAlignedBB(sender.getPosition().getX() - 16, sender.getPosition().getY() - 16, sender.getPosition().getZ() - 16, 
+                                                    sender.getPosition().getX() + 16, sender.getPosition().getY() + 16, sender.getPosition().getZ() + 16);
+
+            BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.LISTENER.equals(sender.getServerWorld().getBlockState(pos).getBlock())).forEach(pos -> {
+                ModBlocks.LISTENER.powerTarget(sender.getServerWorld(), sender.getServerWorld().getBlockState(pos), 15, pos, 0);
+            });
+
+            for(MidiNoteOnPacket packet : messages) {
+                NetworkManager.NET_CHANNEL.send(target, packet);
+            }
+        }
     }
     
-    public static void handlePacketServer(final MidiNoteOffPacket message, ServerPlayerEntity sender) {
-        PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
-            new PacketDistributor.TargetPoint(sender.getPosX(), sender.getPosY(), sender.getPosZ(), 96.0D, sender.getServerWorld().getDimensionKey())
-        );
-        NetworkManager.NET_CHANNEL.send(target, message);
+    public static void handleOffPacketsServer(final List<MidiNoteOffPacket> messages, ServerPlayerEntity sender) {
+        if(messages != null && !messages.isEmpty()) {
+            PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
+                new PacketDistributor.TargetPoint(sender.getPosition().getX(), sender.getPosition().getY(), sender.getPosition().getZ(), 64.0D, sender.getServerWorld().getDimensionKey())
+            );
+
+            for(MidiNoteOffPacket packet : messages) {
+                NetworkManager.NET_CHANNEL.send(target, packet);
+            }
+        }
     }
 
-    public static void handlePacketClient(final MidiNoteOnPacket message, ServerPlayerEntity sender) {
+    public static void handleOnPacketClient(final MidiNoteOnPacket message, ServerPlayerEntity sender) {
         MIMIMod.proxy.getMidiSynth().handleNoteOn(message);
     }
     
-    public static void handlePacketClient(final MidiNoteOffPacket message, ServerPlayerEntity sender) {
+    public static void handleOffPacketClient(final MidiNoteOffPacket message, ServerPlayerEntity sender) {
         MIMIMod.proxy.getMidiSynth().handleNoteOff(message);
     }
 }

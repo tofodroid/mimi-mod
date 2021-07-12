@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
@@ -11,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -25,7 +25,7 @@ import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 public class MaestroNotePacketHandler {
     public static void handlePacket(final MaestroNoteOnPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handleOnPacketServer(message, ctx.get().getSender()));
         }
 
         ctx.get().setPacketHandled(true);
@@ -33,40 +33,50 @@ public class MaestroNotePacketHandler {
     
     public static void handlePacket(final MaestroNoteOffPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handleOffPacketServer(message, ctx.get().getSender()));
         }
         
         ctx.get().setPacketHandled(true);
     }
 
-    public static void handlePacketServer(final MaestroNoteOnPacket message, ServerPlayerEntity sender) {
-        List<MidiNoteOnPacket> notePackets = new ArrayList<>();
+    public static void handleOnPacketServer(final MaestroNoteOnPacket message, ServerPlayerEntity sender) {
+        HashMap<ServerPlayerEntity, List<MidiNoteOnPacket>> notePackets = new HashMap<>();
 
         for(ServerPlayerEntity player : getPotentialPlayers(message.transmitMode, sender)) {
+            List<MidiNoteOnPacket> playerPackets = new ArrayList<>();
+            
             // Held Instruments
-            handleHeldInstrumentRelayNoteOn(player, sender.getUniqueID(), Hand.MAIN_HAND, message, notePackets);
-            handleHeldInstrumentRelayNoteOn(player, sender.getUniqueID(), Hand.OFF_HAND, message, notePackets);
+            handleHeldInstrumentRelayNoteOn(player, sender.getUniqueID(), Hand.MAIN_HAND, message, playerPackets);
+            handleHeldInstrumentRelayNoteOn(player, sender.getUniqueID(), Hand.OFF_HAND, message, playerPackets);
 
             // Seated Instrument
-            handleEntityInstrumentRelayNoteOn(player, sender.getUniqueID(), message, notePackets);
+            handleEntityInstrumentRelayNoteOn(player, sender.getUniqueID(), message, playerPackets);
+
+            notePackets.put(player, playerPackets);
         }
 
-        sendPackets(notePackets, sender, 64.0d);
+        sendOnPackets(notePackets, 64.0d);
     }
     
-    public static void handlePacketServer(final MaestroNoteOffPacket message, ServerPlayerEntity sender) {
-        List<MidiNoteOffPacket> notePackets = new ArrayList<>();
+    public static void handleOffPacketServer(final MaestroNoteOffPacket message, ServerPlayerEntity sender) {
+        HashMap<ServerPlayerEntity, List<MidiNoteOffPacket>> notePackets = new HashMap<>();
 
         for(ServerPlayerEntity player : getPotentialPlayers(message.transmitMode, sender)) {
+            List<MidiNoteOffPacket> playerPackets = new ArrayList<>();
+
             // Held Instruments
-            handleHeldInstrumentRelayNoteOff(player, sender.getUniqueID(), Hand.MAIN_HAND, message, notePackets);
-            handleHeldInstrumentRelayNoteOff(player, sender.getUniqueID(), Hand.OFF_HAND, message, notePackets);
+            handleHeldInstrumentRelayNoteOff(player, sender.getUniqueID(), Hand.MAIN_HAND, message, playerPackets);
+            handleHeldInstrumentRelayNoteOff(player, sender.getUniqueID(), Hand.OFF_HAND, message, playerPackets);
 
             // Seated Instrument
-            handleEntityInstrumentRelayNoteOff(player, sender.getUniqueID(), message, notePackets);
+            handleEntityInstrumentRelayNoteOff(player, sender.getUniqueID(), message, playerPackets);
+
+            if(!playerPackets.isEmpty()) {
+                notePackets.put(player, playerPackets);
+            }
         }
 
-        sendPackets(notePackets, sender, 96.0d);
+        sendOffPackets(notePackets, 96.0d);
     }
     
     // Tile Entity Functions
@@ -126,14 +136,26 @@ public class MaestroNotePacketHandler {
         return potentialPlayers;
     }
 
-    protected static void sendPackets(List<? extends Object> notePackets, ServerPlayerEntity sender, Double range) {
+    protected static void sendOnPackets(HashMap<ServerPlayerEntity, List<MidiNoteOnPacket>> notePackets, Double range) {
         if(!notePackets.isEmpty()) {
-            PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
-                new PacketDistributor.TargetPoint(sender.getPosX(), sender.getPosY(), sender.getPosZ(), range, sender.getServerWorld().getDimensionKey())
-            );
+            for(ServerPlayerEntity player : notePackets.keySet()) {
+                List<MidiNoteOnPacket> playerPackets = notePackets.get(player);
 
-            for(Object packet : notePackets) {
-                NetworkManager.NET_CHANNEL.send(target, packet);
+                if(playerPackets != null && !playerPackets.isEmpty()) {
+                    MidiNotePacketHandler.handleOnPacketsServer(notePackets.get(player), player);
+                }
+            }
+        }
+    }
+    
+    protected static void sendOffPackets(HashMap<ServerPlayerEntity, List<MidiNoteOffPacket>> notePackets, Double range) {
+        if(!notePackets.isEmpty()) {
+            for(ServerPlayerEntity player : notePackets.keySet()) {
+                List<MidiNoteOffPacket> playerPackets = notePackets.get(player);
+
+                if(playerPackets != null && !playerPackets.isEmpty()) {
+                    MidiNotePacketHandler.handleOffPacketsServer(notePackets.get(player), player);
+                }
             }
         }
     }
