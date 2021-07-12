@@ -22,6 +22,9 @@ public final class ModItems {
     // Instruments
     public static List<ItemInstrument> INSTRUMENT_ITEMS = null;
 
+    // Blocks - Other
+    public static final BlockItem LISTENER = null;
+
     // Blocks - Instruments
     public static final BlockItem PIANO = null;
     public static final BlockItem DRUMS = null;
@@ -36,6 +39,9 @@ public final class ModItems {
 
             // Other Items
             event.getRegistry().register(new ItemTransmitter());
+
+            // Other Blocks
+            event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
 
             // Instrument Items
             INSTRUMENT_ITEMS = buildInstruments();

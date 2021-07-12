@@ -10,6 +10,9 @@ import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(MIMIMod.MODID)
 public class ModBlocks {
+    // Other Blocks
+    public static final BlockListener LISTENER = null;
+
     // Instrument Blocks
     public static final BlockPiano PIANO = null;
     public static final BlockDrums DRUMS = null;
@@ -19,6 +22,9 @@ public class ModBlocks {
         @SubscribeEvent
         public static void registerBlocks(final RegistryEvent.Register<Block> event) {
             event.getRegistry().registerAll(
+                // Other Blocks
+                new BlockListener(),
+
                 // Instrument Blocks
                 new BlockPiano(),
                 new BlockDrums()
