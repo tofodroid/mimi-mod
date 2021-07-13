@@ -492,7 +492,8 @@ public class GuiInstrument<T> extends Screen {
     private List<Byte> getMidiNoteFromScanCode(Integer scanCode, Boolean modifier, Boolean ignoreModifier) {
         switch(ModConfigs.CLIENT.keyboardLayout.get()) {
             case MIMI:
-                return Arrays.asList(getMidiNoteFromScanCode_MIMI(scanCode));
+                return Arrays.asList(getMidiNoteFromScanCode_MIMI(scanCode))
+                    .stream().filter(b -> b != null).collect(Collectors.toList());
             case VPiano:
                 return Arrays.asList(getMidiNoteFromScanCode_VPiano(scanCode, modifier), ignoreModifier ? getMidiNoteFromScanCode_VPiano(scanCode, !modifier) : null)
                     .stream().filter(b -> b != null).collect(Collectors.toList());
