@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
@@ -65,10 +65,10 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
         
 
         if(tileInstrument != null) {
-            UUID instrumentMaestro = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
+            UUID instrumentMaestro = ItemInstrumentDataUtil.INSTANCE.getMidiSource(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
 
             // Server-Side: If right clicked with instrument and not currently being used then set maestro, otherwise sit
-            if(instrumentMaestro != null && !InstrumentDataUtil.MIDI_MAESTRO_ID.equals(instrumentMaestro) && !InstrumentDataUtil.PUBLIC_MAESTRO_ID.equals(instrumentMaestro) && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
+            if(instrumentMaestro != null && !InstrumentDataUtil.SYS_SOURCE_ID.equals(instrumentMaestro) && !InstrumentDataUtil.PUBLIC_SOURCE_ID.equals(instrumentMaestro) && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
                 if(!worldIn.isRemote) {
                     tileInstrument.setMaestro(instrumentMaestro);
                     tileInstrument.markDirty();

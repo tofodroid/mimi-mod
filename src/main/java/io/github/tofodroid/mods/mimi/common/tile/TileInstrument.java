@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.network.InstrumentTileDataUpdatePacket;
 
 import net.minecraft.block.BlockState;

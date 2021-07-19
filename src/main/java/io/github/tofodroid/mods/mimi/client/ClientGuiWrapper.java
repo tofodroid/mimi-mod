@@ -4,8 +4,8 @@ import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.client.gui.GuiMidiInputConfig;
 import io.github.tofodroid.mods.mimi.client.gui.GuiMidiPlaylist;
 import io.github.tofodroid.mods.mimi.common.GuiWrapper;
-import io.github.tofodroid.mods.mimi.common.instruments.EntityInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.EntityInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
 import net.minecraft.client.Minecraft;

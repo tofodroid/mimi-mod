@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.instruments.EntityInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.EntityInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 

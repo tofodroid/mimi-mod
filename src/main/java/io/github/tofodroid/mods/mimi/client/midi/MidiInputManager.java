@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.instruments.EntityInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.EntityInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
@@ -108,18 +108,18 @@ public class MidiInputManager {
 
         // Check for seated instrument
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
-        if(instrumentEntity != null && InstrumentDataUtil.MIDI_MAESTRO_ID.equals(EntityInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentEntity))) {
+        if(instrumentEntity != null && InstrumentDataUtil.SYS_SOURCE_ID.equals(EntityInstrumentDataUtil.INSTANCE.getMidiSource(instrumentEntity))) {
             result.add(instrumentEntity);
         }
 
         // Check for held instruments
         ItemStack mainHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.MAIN_HAND);
-        if(mainHand != null && InstrumentDataUtil.MIDI_MAESTRO_ID.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(mainHand))) {
+        if(mainHand != null && InstrumentDataUtil.SYS_SOURCE_ID.equals(ItemInstrumentDataUtil.INSTANCE.getMidiSource(mainHand))) {
             result.add(mainHand);
         }
 
         ItemStack offHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.OFF_HAND);
-        if(offHand != null && InstrumentDataUtil.MIDI_MAESTRO_ID.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(mainHand))) {
+        if(offHand != null && InstrumentDataUtil.SYS_SOURCE_ID.equals(ItemInstrumentDataUtil.INSTANCE.getMidiSource(mainHand))) {
             result.add(offHand);
         }
 

@@ -10,7 +10,7 @@ import net.minecraft.util.Hand;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 
 public class InstrumentItemDataUpdatePacketHandler {

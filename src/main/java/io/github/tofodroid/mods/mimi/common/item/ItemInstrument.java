@@ -22,9 +22,9 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.midi.MidiChannelDef.MidiChannelNumber;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
+import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.network.InstrumentItemDataUpdatePacket;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
 
 public class ItemInstrument extends Item {
     private final Byte instrumentId;
@@ -40,7 +40,7 @@ public class ItemInstrument extends Item {
         // Server-side only
         if(!playerIn.getEntityWorld().isRemote()) {  
             if(target instanceof PlayerEntity) {
-                ItemInstrumentDataUtil.INSTANCE.linkToMaestro(stack, target.getUniqueID());
+                ItemInstrumentDataUtil.INSTANCE.setMidiSource(stack, target.getUniqueID());
                 playerIn.setHeldItem(hand, stack);
                 playerIn.sendStatusMessage(new StringTextComponent("Linked Maestro: " +  target.getName().getString()), true);
                 return ActionResultType.CONSUME;
@@ -81,10 +81,10 @@ public class ItemInstrument extends Item {
             tooltip.add(new StringTextComponent("----------------"));
 
             // MIDI Source
-            UUID maestroId = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(stack);
-            if(InstrumentDataUtil.MIDI_MAESTRO_ID.equals(maestroId)) {
+            UUID maestroId = ItemInstrumentDataUtil.INSTANCE.getMidiSource(stack);
+            if(InstrumentDataUtil.SYS_SOURCE_ID.equals(maestroId)) {
                 tooltip.add(new StringTextComponent("Linked to System MIDI Device"));
-            } else if(InstrumentDataUtil.PUBLIC_MAESTRO_ID.equals(maestroId)) {
+            } else if(InstrumentDataUtil.PUBLIC_SOURCE_ID.equals(maestroId)) {
                 tooltip.add(new StringTextComponent("Linked to Public Transmitters"));
             } else if(maestroId != null) {
                 tooltip.add(new StringTextComponent("Linked to Player Transmitter"));
@@ -135,7 +135,7 @@ public class ItemInstrument extends Item {
 
     public static InstrumentItemDataUpdatePacket getSyncPacket(ItemStack stack, Hand handIn) {
         return new InstrumentItemDataUpdatePacket(
-            ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(stack), 
+            ItemInstrumentDataUtil.INSTANCE.getMidiSource(stack), 
             ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsString(stack),
             Hand.MAIN_HAND.equals(handIn)
         );

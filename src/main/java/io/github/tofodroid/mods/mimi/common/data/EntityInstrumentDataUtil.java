@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.instruments;
+package io.github.tofodroid.mods.mimi.common.data;
 
 import java.util.UUID;
 
@@ -18,12 +18,12 @@ public class EntityInstrumentDataUtil extends InstrumentDataUtil<TileInstrument>
     }
 
     @Override
-    public void linkToMaestro(TileInstrument instrumentData, UUID playerId) {
-        instrumentData.setMaestro(playerId);
+    public void setMidiSource(TileInstrument instrumentData, UUID sourceId) {
+        instrumentData.setMaestro(sourceId);
     }
     
     @Override
-    public UUID getLinkedMaestro(TileInstrument instrumentData) {
+    public UUID getMidiSource(TileInstrument instrumentData) {
         return instrumentData.getMaestro();
     }
 

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.instruments;
+package io.github.tofodroid.mods.mimi.common.data;
 
 import java.util.UUID;
 
@@ -10,18 +10,22 @@ public class ItemInstrumentDataUtil extends InstrumentDataUtil<ItemStack> {
     public static final ItemInstrumentDataUtil INSTANCE = new ItemInstrumentDataUtil();
 
     @Override
-    public void linkToMaestro(ItemStack stack, UUID playerId) {
-        if (playerId != null) {
-            stack.getOrCreateTag().putUniqueId(MAESTRO_TAG, playerId);
+    public void setMidiSource(ItemStack stack, UUID sourceId) {
+        if (sourceId != null) {
+            stack.getOrCreateTag().putUniqueId(SOURCE_TAG, sourceId);
         } else if (stack.hasTag()) {
             stack.getTag().remove(MAESTRO_TAG);
+            stack.getTag().remove(SOURCE_TAG);
         }
     }
 
     @Override
-    public UUID getLinkedMaestro(ItemStack stack) {
-        if (stackTagContainsKey(stack, MAESTRO_TAG)) {
-            return stack.getTag().getUniqueId(MAESTRO_TAG);
+    public UUID getMidiSource(ItemStack stack) {
+        if (stackTagContainsKey(stack, SOURCE_TAG)) {
+            return stack.getTag().getUniqueId(SOURCE_TAG);
+        } else if(stackTagContainsKey(stack, MAESTRO_TAG)) {
+            setMidiSource(stack, stack.getTag().getUniqueId(MAESTRO_TAG));
+            return stack.getTag().getUniqueId(SOURCE_TAG);
         }
 
         return null;

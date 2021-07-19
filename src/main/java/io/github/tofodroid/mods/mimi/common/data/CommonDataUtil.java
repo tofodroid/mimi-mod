@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.instruments;
+package io.github.tofodroid.mods.mimi.common.data;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -6,27 +6,24 @@ import java.util.stream.Collectors;
 
 import net.minecraft.util.SortedArraySet;
 
-public abstract class InstrumentDataUtil<T extends Object> {
+public abstract class CommonDataUtil<T extends Object> {
     public static final String MAESTRO_TAG = "maestro_uuid";
+    public static final String SOURCE_TAG = "source_uuid";
     public static final String MIDI_ENABLED_TAG = "midi_enabled";
     public static final String LISTEN_CHANNELS_TAG = "listen_channels";
-    public static final UUID MIDI_MAESTRO_ID = new UUID(0,1);
-    public static final UUID PUBLIC_MAESTRO_ID = new UUID(0,2);
-    protected static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
+    public static final UUID SYS_SOURCE_ID = new UUID(0,1);
+    public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
+    public static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
 
     abstract protected void setAcceptedChannelString(T instrumentData, String acceptedChannelsString);
     abstract protected String getAcceptedChannelsString(T instrumentData);
     
-    abstract public void linkToMaestro(T instrumentData, UUID playerId);
-    abstract public UUID getLinkedMaestro(T instrumentData);
-
-    abstract public Byte getInstrumentIdFromData(T instrumentData);
-
-    abstract public String getInstrumentName(T instrumentData);
+    abstract public void setMidiSource(T instrumentData, UUID sourceId);
+    abstract public UUID getMidiSource(T instrumentData);
 
     public Boolean shouldHandleMessage(T instrumentData, UUID sender, Byte channel, Boolean publicTransmit) {
         return doesAcceptChannel(instrumentData, channel) && 
-            (publicTransmit && PUBLIC_MAESTRO_ID.equals(getLinkedMaestro(instrumentData)) || sender.equals(getLinkedMaestro(instrumentData)));
+            ((publicTransmit && PUBLIC_SOURCE_ID.equals(getMidiSource(instrumentData))) || sender.equals(getMidiSource(instrumentData)));
     }
 
     public void toggleChannel(T instrumentData, Byte channelId) {
