@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.network.InstrumentDataUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
@@ -25,33 +24,24 @@ import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SortedArraySet;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import org.lwjgl.glfw.GLFW;
 
-public class GuiInstrument<T> extends Screen {
+public class GuiInstrument<T> extends BaseGui {
     // Texture
-    private static final ResourceLocation guiTexture = new ResourceLocation(MIMIMod.MODID, "textures/gui/gui_instrument.png");
-    private static final Integer GUI_WIDTH = 368;
-    private static final Integer GUI_HEIGHT = 246;
+    private static final Integer NOTE_WIDTH = 14;
     private static final Integer NOTE_OFFSET_X = 11;
     private static final Integer NOTE_OFFSET_Y = 109;
-    private static final Integer TEXTURE_SIZE = 530;
-    private static final Integer NOTE_WIDTH = 14;
-    private static final Integer BUTTON_SIZE = 15;
 
     // GUI
     private static final Vector2f MAESTRO_MIDI_BUTTON_COORDS = new Vector2f(184,39);
@@ -64,9 +54,6 @@ public class GuiInstrument<T> extends Screen {
     private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(34,79);
     private static final Vector2f GEN_SHIFT_BUTTON_COORDS = new Vector2f(327,124);
     
-    private Integer startX;
-    private Integer startY;
-
     // MIDI
     private static final Integer KEYBOARD_START_NOTE = 21;
 
@@ -170,7 +157,7 @@ public class GuiInstrument<T> extends Screen {
     private String instrumentNameString;
 
     public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil, Hand handIn) {
-        super(new TranslationTextComponent("item.MIMIMod.gui_instrument"));
+        super(368, 246, 530, "textures/gui/gui_instrument.png", "item.MIMIMod.gui_instrument");
         this.instrumentId = instrumentId;
         this.instrumentData = instrumentData;
         this.instrumentUtil = instrumentUtil;
@@ -188,8 +175,7 @@ public class GuiInstrument<T> extends Screen {
 
     @Override
     public void init() {
-        startX = (this.width - GUI_WIDTH) / 2;
-        startY = Math.round((this.height - GUI_HEIGHT) / 1.25f);
+        super.init();
         this.heldNotes.clear();
         this.releasedNotes.clear();
     }
@@ -201,22 +187,16 @@ public class GuiInstrument<T> extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        matrixStack = renderGraphics(matrixStack);
-        matrixStack = renderText(matrixStack);
-    }
-
-    @Override
     public boolean mouseClicked(double dmouseX, double dmouseY, int mouseButton) {
         int imouseX = (int)Math.round(dmouseX);
         int imouseY = (int)Math.round(dmouseY);
-        int firstNoteX = startX + NOTE_OFFSET_X;
-        int firstNoteY = startY + NOTE_OFFSET_Y;
+        int firstNoteX = START_X + NOTE_OFFSET_X;
+        int firstNoteY = START_Y + NOTE_OFFSET_Y;
         int relativeMouseX = imouseX - firstNoteX;
         int relativeMouseY = imouseY - firstNoteY;
 
         // Check if click position is within keyboard
-        if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (startX + GUI_WIDTH - 51) && imouseY < (startY + GUI_HEIGHT - 11)) {
+        if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (START_X + GUI_WIDTH - 51) && imouseY < (START_Y + GUI_HEIGHT - 11)) {
             Byte midiNote = null;
             
             if(relativeMouseY <= 84) {
@@ -262,25 +242,25 @@ public class GuiInstrument<T> extends Screen {
         if(instrumentData != null) {
             if(clickedBox(imouseX, imouseY, MAESTRO_MIDI_BUTTON_COORDS)) {
                 // Link MIDI Device Button
-                instrumentUtil.linkToMaestro(instrumentData, InstrumentDataUtil.MIDI_MAESTRO_ID);
+                instrumentUtil.setMidiSource(instrumentData, InstrumentDataUtil.SYS_SOURCE_ID);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
                 this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, MAESTRO_SELF_BUTTON_COORDS)) {
                 // Link Self Button
-                instrumentUtil.linkToMaestro(instrumentData, player.getUniqueID());
+                instrumentUtil.setMidiSource(instrumentData, player.getUniqueID());
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
                 this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, MAESTRO_PUBLIC_BUTTON_COORDS)) {
                 // Link Public Button
-                instrumentUtil.linkToMaestro(instrumentData,  InstrumentDataUtil.PUBLIC_MAESTRO_ID);
+                instrumentUtil.setMidiSource(instrumentData,  InstrumentDataUtil.PUBLIC_SOURCE_ID);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
                 this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, MAESTRO_CLEAR_BUTTON_COORDS)) {
                 // Link Clear Button
-                instrumentUtil.linkToMaestro(instrumentData, null);
+                instrumentUtil.setMidiSource(instrumentData, null);
                 this.syncInstrumentToServer();
                 this.refreshMaestroName();
                 this.allNotesOff();
@@ -476,7 +456,6 @@ public class GuiInstrument<T> extends Screen {
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
 
-
     private void holdNote(Byte midiNote, Byte velocity) {
         this.releasedNotes.remove(midiNote);
         this.heldNotes.put(midiNote, Instant.now());
@@ -537,24 +516,9 @@ public class GuiInstrument<T> extends Screen {
         return midiInt != null ?  new Integer(12 * 2 + midiInt).byteValue() : null;
     }
 
-    // Mouse Input Functions
-    private Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
-        Integer buttonMinX = startX + new Float(buttonPos.x).intValue();
-        Integer buttonMaxX = buttonMinX + BUTTON_SIZE;
-        Integer buttonMinY = startY + new Float(buttonPos.y).intValue();
-        Integer buttonMaxY = buttonMinY + BUTTON_SIZE;
-
-        Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
-
-        if(result) {
-            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-        }
-
-        return result;
-    }
-
     // Render Functions
-    private MatrixStack renderGraphics(MatrixStack matrixStack) {
+    @Override
+    protected MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         setAlpha(1.0f);
 
         // Set Texture
@@ -562,28 +526,28 @@ public class GuiInstrument<T> extends Screen {
 
         // Visible Notes
         Integer keyboardTextureShift = (visibleNoteShift % (NOTE_WIDTH/2)) * NOTE_WIDTH;
-        blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 274, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 274, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Labels
         if(ClientConfig.KEYBOARD_LAYOUTS.MIMI.equals(ModConfigs.CLIENT.keyboardLayout.get())) {
-            blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 456, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 456, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
             if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
                 Integer widthShift = (V_PIANO_MIN_SHIFT - visibleNoteShift) * NOTE_WIDTH;
-                blit(matrixStack, startX + NOTE_OFFSET_X - 1 + widthShift, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + NOTE_OFFSET_X - 1 + widthShift, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift >= V_PIANO_MIN_SHIFT && visibleNoteShift <= V_PIANO_MAX_SHIFT) {
-                blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH , 402, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH , 402, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift <= V_PIANO_MAX_NOTE) {
                 Integer widthShift = (V_PIANO_MAX_SHIFT - visibleNoteShift) * -NOTE_WIDTH;
-                blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
 
         // Note Edges
         if(visibleNoteShift == 0) {
-            blit(matrixStack, startX + NOTE_OFFSET_X, startY + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + NOTE_OFFSET_X, START_Y + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         } else if(visibleNoteShift == MAX_NOTE_SHIFT) {
-            blit(matrixStack, startX + 311, startY + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 311, START_Y + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Active Notes
@@ -594,17 +558,17 @@ public class GuiInstrument<T> extends Screen {
         setAlpha(1.0f);
 
         // GUI Background
-        blit(matrixStack, startX, startY, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Key Covers
-        blit(matrixStack, startX + NOTE_OFFSET_X - 1, startY + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 247, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 247, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Channel Output Status Lights
         SortedArraySet<Byte> acceptedChannels = this.instrumentUtil.getAcceptedChannelsSet(this.instrumentData);
 
         if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
             for(Byte channelId : acceptedChannels) {
-                blit(matrixStack, startX + 40 + 19 * channelId, startY + 97, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + 40 + 19 * channelId, START_Y + 97, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
         
@@ -644,8 +608,8 @@ public class GuiInstrument<T> extends Screen {
 
         blit(
             matrixStack, 
-            startX + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
-            startY + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
+            START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
+            START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
             this.getBlitOffset(), 
             382 - (keyNum % 2) * 13, 
             0, 12, 41, 
@@ -655,18 +619,19 @@ public class GuiInstrument<T> extends Screen {
         return matrixStack;
     }
 
-    private MatrixStack renderText(MatrixStack matrixStack) {
+    @Override
+    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Instrument Name
-        font.drawString(matrixStack, this.instrumentNameString, startX + 214, startY + 17, 0xFF00E600);
+        font.drawString(matrixStack, this.instrumentNameString, START_X + 214, START_Y + 17, 0xFF00E600);
 
         // Min Note Text
-        font.drawString(matrixStack, this.minNoteString, startX + 335, startY + 224, 0xFF00E600);
+        font.drawString(matrixStack, this.minNoteString, START_X + 335, START_Y + 224, 0xFF00E600);
 
         // MIDI Source Name
-        font.drawString(matrixStack, this.selectedMaestroName.length() <= 22 ? this.selectedMaestroName : this.selectedMaestroName.substring(0,21) + "...", startX + 80, startY + 43, 0xFF00E600);
+        font.drawString(matrixStack, this.selectedMaestroName.length() <= 22 ? this.selectedMaestroName : this.selectedMaestroName.substring(0,21) + "...", START_X + 80, START_Y + 43, 0xFF00E600);
         
         // Keyboard Layout
-        font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), startX + 303, startY + 43, 0xFF00E600);
+        font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 303, START_Y + 43, 0xFF00E600);
 
         return matrixStack;
     }
@@ -693,13 +658,13 @@ public class GuiInstrument<T> extends Screen {
     }
 
     private void refreshMaestroName() {
-        UUID linkedMaestro = instrumentUtil.getLinkedMaestro(instrumentData);
+        UUID linkedMaestro = instrumentUtil.getMidiSource(instrumentData);
         if(linkedMaestro != null) {
             if(linkedMaestro.equals(player.getUniqueID())) {
                 this.selectedMaestroName = "My Transmitter";
-            } else if(linkedMaestro.equals(InstrumentDataUtil.MIDI_MAESTRO_ID)) {
+            } else if(linkedMaestro.equals(InstrumentDataUtil.SYS_SOURCE_ID)) {
                 this.selectedMaestroName = "MIDI Input Device";
-            } else if(linkedMaestro.equals(InstrumentDataUtil.PUBLIC_MAESTRO_ID)) {
+            } else if(linkedMaestro.equals(InstrumentDataUtil.PUBLIC_SOURCE_ID)) {
                 this.selectedMaestroName = "Public Transmitters";
             } else {
                 this.selectedMaestroName = PlayerNameUtils.getPlayerNameFromUUID(linkedMaestro, world);

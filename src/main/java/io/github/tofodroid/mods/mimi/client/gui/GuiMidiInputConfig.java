@@ -7,26 +7,10 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.text.TranslationTextComponent;
 
-public class GuiMidiInputConfig extends Screen {
-    // Texture
-    private static final ResourceLocation guiTexture = new ResourceLocation(MIMIMod.MODID, "textures/gui/gui_midi_config.png");
-    private static final Integer GUI_WIDTH = 300;
-    private static final Integer GUI_HEIGHT = 173;
-    private static final Integer TEXTURE_SIZE = 300;
-    private static final Integer BUTTON_SIZE = 15;
-    
-    // GUI
-    private Integer startX;
-    private Integer startY;
-    
+public class GuiMidiInputConfig extends BaseGui {    
     // Button Boxes
     private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(268,37);
     private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(120,63);
@@ -36,30 +20,8 @@ public class GuiMidiInputConfig extends Screen {
     private MidiInputManager midiInputManager;
 
     public GuiMidiInputConfig(PlayerEntity player) {
-        super(new TranslationTextComponent("item.MIMIMod.gui_midi_input_config"));
+        super(300, 173, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
         this.midiInputManager = MIMIMod.proxy.getMidiInput();
-    }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
-    @Override
-    public void init() {
-        startX = (this.width - GUI_WIDTH) / 2;
-        startY = Math.round((this.height - GUI_HEIGHT) / 1.25f);
-    }
-
-    @Override
-    public void closeScreen() {
-        super.closeScreen();
-    }
-
-    @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        matrixStack = renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
-        matrixStack = renderText(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -78,48 +40,35 @@ public class GuiMidiInputConfig extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    private Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
-        Integer buttonMinX = startX + new Float(buttonPos.x).intValue();
-        Integer buttonMaxX = buttonMinX + BUTTON_SIZE;
-        Integer buttonMinY = startY + new Float(buttonPos.y).intValue();
-        Integer buttonMaxY = buttonMinY + BUTTON_SIZE;
-
-        Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
-
-        if(result) {
-            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-        }
-
-        return result;
-    }
-
-    private MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    @Override
+    protected MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         Minecraft.getInstance().getTextureManager().bindTexture(guiTexture);
 
         // Background
-        blit(matrixStack, startX, startY, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Device Status Lights
         if(this.midiInputManager != null && this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null) {
-            Integer statusX = startX + 283;
-            Integer statusY = startY + 69;
+            Integer statusX = START_X + 283;
+            Integer statusY = START_Y + 69;
             blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isSelectedDeviceAvailable() ? 0 : 4, 174, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         return matrixStack;
     }
 
-    private MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    @Override
+    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Num Devices
         String numDeviceString = this.midiInputManager.inputDeviceManager.getNumDevices().toString();
-        font.drawString(matrixStack, numDeviceString, startX + 224, startY + 41, 0xFF00E600);
+        font.drawString(matrixStack, numDeviceString, START_X + 224, START_Y + 41, 0xFF00E600);
 
         // Selected Device Name
         String deviceNameString = (this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null ? 
             this.midiInputManager.inputDeviceManager.getSelectedDeviceId() + ": " : "")
             + this.midiInputManager.inputDeviceManager.getSelectedDeviceName();
-        font.drawString(matrixStack, deviceNameString, startX + 142, startY + 67, 0xFF00E600);
+        font.drawString(matrixStack, deviceNameString, START_X + 142, START_Y + 67, 0xFF00E600);
 
         // Selected Device Info
         Info info = this.midiInputManager.inputDeviceManager.getSelectedDeviceInfo();
@@ -128,15 +77,15 @@ public class GuiMidiInputConfig extends Screen {
             Integer yOffset = 0;
 
             if(descString.length() <= 45) {
-                font.drawString(matrixStack, descString, startX + 16, startY + 102, 0xFF00E600);
+                font.drawString(matrixStack, descString, START_X + 16, START_Y + 102, 0xFF00E600);
             } else {
                 yOffset = 16;
-                font.drawString(matrixStack, descString.substring(0, 45), startX + 16, startY + 102, 0xFF00E600);
-                font.drawString(matrixStack, descString.substring(45), startX + 16, startY + 118, 0xFF00E600);
+                font.drawString(matrixStack, descString.substring(0, 45), START_X + 16, START_Y + 102, 0xFF00E600);
+                font.drawString(matrixStack, descString.substring(45), START_X + 16, START_Y + 118, 0xFF00E600);
             }
 
-            font.drawString(matrixStack, "Vendor: " + info.getVendor(), startX + 16, startY + yOffset + 118, 0xFF00E600);
-            font.drawString(matrixStack, "Version: " + info.getVersion(), startX + 16, startY + yOffset + 134, 0xFF00E600);  
+            font.drawString(matrixStack, "Vendor: " + info.getVendor(), START_X + 16, START_Y + yOffset + 118, 0xFF00E600);
+            font.drawString(matrixStack, "Version: " + info.getVersion(), START_X + 16, START_Y + yOffset + 134, 0xFF00E600);  
         }
         
         return matrixStack;
