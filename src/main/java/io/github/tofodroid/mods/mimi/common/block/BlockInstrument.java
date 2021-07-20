@@ -65,20 +65,20 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
         
 
         if(tileInstrument != null) {
-            UUID instrumentMaestro = ItemInstrumentDataUtil.INSTANCE.getMidiSource(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
+            UUID instrumentSource = ItemInstrumentDataUtil.INSTANCE.getMidiSource(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
 
             // Server-Side: If right clicked with instrument and not currently being used then set maestro, otherwise sit
-            if(instrumentMaestro != null && !InstrumentDataUtil.SYS_SOURCE_ID.equals(instrumentMaestro) && !InstrumentDataUtil.PUBLIC_SOURCE_ID.equals(instrumentMaestro) && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
+            if(instrumentSource != null && !InstrumentDataUtil.SYS_SOURCE_ID.equals(instrumentSource) && !InstrumentDataUtil.PUBLIC_SOURCE_ID.equals(instrumentSource) && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
                 if(!worldIn.isRemote) {
-                    tileInstrument.setMaestro(instrumentMaestro);
+                    tileInstrument.setMaestro(instrumentSource);
                     tileInstrument.markDirty();
                     ((ServerWorld)worldIn).getChunkProvider().markBlockChanged(pos);
                 } else {
-                    String instrumentMaestroName = PlayerNameUtils.getPlayerNameFromUUID(instrumentMaestro, worldIn);
-                    player.sendStatusMessage(new StringTextComponent("Linked " + this.getTranslatedName().getString() + " Maestro: " +  instrumentMaestroName), true);
+                    String instrumentMaestroName = PlayerNameUtils.getPlayerNameFromUUID(instrumentSource, worldIn);
+                    player.sendStatusMessage(new StringTextComponent("Linked " + this.getTranslatedName().getString() + " MIDI Source: " +  instrumentMaestroName), true);
                 }
-            } else if(instrumentMaestro != null && worldIn.isRemote) {
-                player.sendStatusMessage(new StringTextComponent("You can only set the Maestro when the instrument is not being used."), true);
+            } else if(instrumentSource != null && worldIn.isRemote) {
+                player.sendStatusMessage(new StringTextComponent("You can only set the MIDI Source when the instrument is not being used."), true);
             } else if(!worldIn.isRemote) {
                 return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
             } else if(worldIn.isRemote) {
