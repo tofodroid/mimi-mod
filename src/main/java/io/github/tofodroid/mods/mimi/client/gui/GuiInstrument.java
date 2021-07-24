@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.network.InstrumentDataUpdatePacket;
@@ -404,7 +403,7 @@ public class GuiInstrument<T> extends BaseGui {
         
         // Set Min Note String
         Integer octaveNoteNum = visibleNoteShift % 7;
-        Integer minOctave = (visibleNoteShift+2) / 7;
+        Integer minOctave = visibleNoteShift / 7;
         this.minNoteString = noteLetterFromNum(octaveNoteNum) + minOctave.toString();
     }
 
@@ -695,10 +694,5 @@ public class GuiInstrument<T> extends BaseGui {
         if(packet != null) {
             NetworkManager.NET_CHANNEL.sendToServer(packet);
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    private void setAlpha(float alpha) {
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, alpha);
     }
 }

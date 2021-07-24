@@ -1,6 +1,8 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
 import net.minecraft.client.Minecraft;
@@ -44,6 +46,11 @@ public abstract class BaseGui extends Screen {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         matrixStack = renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
         matrixStack = renderText(matrixStack, mouseX, mouseY, partialTicks);
+    }
+    
+    @SuppressWarnings("deprecation")
+    protected void setAlpha(float alpha) {
+        RenderSystem.color4f(1.0f, 1.0f, 1.0f, alpha);
     }
 
     protected abstract MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);

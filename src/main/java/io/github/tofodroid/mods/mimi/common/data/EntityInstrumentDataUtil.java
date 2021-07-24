@@ -8,12 +8,12 @@ public class EntityInstrumentDataUtil extends InstrumentDataUtil<TileInstrument>
     public static final EntityInstrumentDataUtil INSTANCE = new EntityInstrumentDataUtil();
 
     @Override
-    protected void setAcceptedChannelString(TileInstrument instrumentData, String acceptedChannelsString) {
+    public void setAcceptedChannelString(TileInstrument instrumentData, String acceptedChannelsString) {
         instrumentData.setAcceptedChannelsString(acceptedChannelsString);
     }
 
     @Override
-    protected String getAcceptedChannelsString(TileInstrument instrumentData) {
+    public String getAcceptedChannelsString(TileInstrument instrumentData) {
         return instrumentData.getAcceptedChannelsString();
     }
 

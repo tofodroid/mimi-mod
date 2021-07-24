@@ -37,7 +37,7 @@ public class MidiNotePacketHandler {
     public static void handleOnPacketsServer(final List<MidiNoteOnPacket> messages, ServerPlayerEntity sender) {
         if(messages != null && !messages.isEmpty()) {
             // Forward to players
-                PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
+            PacketDistributor.PacketTarget target = PacketDistributor.NEAR.with(() -> 
                 new PacketDistributor.TargetPoint(sender.getPosition().getX(), sender.getPosition().getY(), sender.getPosition().getZ(), 64.0D, sender.getServerWorld().getDimensionKey())
             );
 

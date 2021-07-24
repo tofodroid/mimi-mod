@@ -5,10 +5,10 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
-import io.github.tofodroid.mods.mimi.client.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
+import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.server.ServerGuiWrapper;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;

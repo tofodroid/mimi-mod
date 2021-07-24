@@ -15,8 +15,8 @@ public abstract class CommonDataUtil<T extends Object> {
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
     public static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
 
-    abstract protected void setAcceptedChannelString(T instrumentData, String acceptedChannelsString);
-    abstract protected String getAcceptedChannelsString(T instrumentData);
+    abstract public void setAcceptedChannelString(T instrumentData, String acceptedChannelsString);
+    abstract public String getAcceptedChannelsString(T instrumentData);
     
     abstract public void setMidiSource(T instrumentData, UUID sourceId);
     abstract public UUID getMidiSource(T instrumentData);

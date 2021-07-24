@@ -32,7 +32,7 @@ public class ItemInstrumentDataUtil extends InstrumentDataUtil<ItemStack> {
     }
 
     @Override
-    protected void setAcceptedChannelString(ItemStack stack, String acceptedChannelsString) {
+    public void setAcceptedChannelString(ItemStack stack, String acceptedChannelsString) {
         if (acceptedChannelsString != null && !acceptedChannelsString.trim().isEmpty()) {
             stack.getOrCreateTag().putString(LISTEN_CHANNELS_TAG, acceptedChannelsString);
         } else if (stack.hasTag()) {
