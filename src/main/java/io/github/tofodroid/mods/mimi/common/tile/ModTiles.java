@@ -15,11 +15,14 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid=MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ModTiles {
     public static TileEntityType<TileInstrument> INSTRUMENT = null;
+    public static TileEntityType<TileReceiver> RECEIVER = null;
 
     private static final List<TileEntityType<?>> buildTileTypes() {
         List<TileEntityType<?>> types = new ArrayList<>();
         INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", TileEntityType.Builder.create(TileInstrument::new, ModBlocks.PIANO, ModBlocks.DRUMS));
         types.add(INSTRUMENT);
+        RECEIVER = buildType(MIMIMod.MODID + ":receiver", TileEntityType.Builder.create(TileReceiver::new, ModBlocks.RECEIVER));
+        types.add(RECEIVER);
         return types;
     }
     

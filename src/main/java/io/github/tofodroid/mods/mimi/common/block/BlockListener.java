@@ -2,8 +2,6 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import java.util.Random;
 
-import net.minecraft.block.TargetBlock;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;

@@ -12,6 +12,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModBlocks {
     // Other Blocks
     public static final BlockListener LISTENER = null;
+    public static final BlockReceiver RECEIVER = null;
 
     // Instrument Blocks
     public static final BlockPiano PIANO = null;
@@ -24,6 +25,7 @@ public class ModBlocks {
             event.getRegistry().registerAll(
                 // Other Blocks
                 new BlockListener(),
+                new BlockReceiver(),
 
                 // Instrument Blocks
                 new BlockPiano(),
