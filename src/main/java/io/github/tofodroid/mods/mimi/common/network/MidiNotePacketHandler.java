@@ -3,16 +3,24 @@ package io.github.tofodroid.mods.mimi.common.network;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNoteOnPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -67,11 +75,40 @@ public class MidiNotePacketHandler {
         }
     }
 
+    @SuppressWarnings("resource")
     public static void handleOnPacketClient(final MidiNoteOnPacket message, ServerPlayerEntity sender) {
         MIMIMod.proxy.getMidiSynth().handleNoteOn(message);
+
+        if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(message.player, message.channel)) {
+            ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(message.channel, message.note, message.velocity);
+        }
     }
     
+    @SuppressWarnings("resource")
     public static void handleOffPacketClient(final MidiNoteOffPacket message, ServerPlayerEntity sender) {
         MIMIMod.proxy.getMidiSynth().handleNoteOff(message);
+
+        if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen &&  shouldShowOnGUI(message.player, message.channel)) {
+            ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOff(message.channel, message.note);
+        }
+    }
+
+    @SuppressWarnings("resource")
+    public static Boolean shouldShowOnGUI(UUID messagePlayer, Byte channel) {
+        ClientPlayerEntity thisPlayer = Minecraft.getInstance().player;
+
+        if(messagePlayer.equals(thisPlayer.getUniqueID()) && thisPlayer.openContainer instanceof ContainerInstrument) {
+            ItemStack guiSwitch = ((ContainerInstrument)thisPlayer.openContainer).getSelectedSwitchboard();
+
+            if(channel.equals(MidiNoteOnPacket.NO_CHANNEL) || (ModItems.SWITCHBOARD.equals(guiSwitch.getItem()) && ItemMidiSwitchboard.isChannelEnabled(guiSwitch, channel)) && 
+                ( ItemMidiSwitchboard.getMidiSource(guiSwitch).equals(messagePlayer) 
+                    || ItemMidiSwitchboard.getMidiSource(guiSwitch).equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
