@@ -18,6 +18,7 @@ import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
 public final class ModItems {
     // Other
     public static final ItemTransmitter TRANSMITTER = null;
+    public static final ItemMidiSwitchboard SWITCHBOARD = null;
 
     // Instruments
     public static List<ItemInstrument> INSTRUMENT_ITEMS = null;
@@ -39,6 +40,7 @@ public final class ModItems {
 
             // Other Items
             event.getRegistry().register(new ItemTransmitter());
+            event.getRegistry().register(new ItemMidiSwitchboard());
 
             // Other Blocks
             event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
