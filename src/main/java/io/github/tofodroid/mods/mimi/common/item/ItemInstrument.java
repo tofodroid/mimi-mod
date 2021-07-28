@@ -3,30 +3,32 @@ package io.github.tofodroid.mods.mimi.common.item;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.client.midi.MidiChannelDef.MidiChannelNumber;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.network.InstrumentItemDataUpdatePacket;
+import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
-public class ItemInstrument extends Item {
+public class ItemInstrument extends Item implements INamedContainerProvider {
+    public static final String INVENTORY_TAG = "inventory";
+
     private final Byte instrumentId;
 
     public ItemInstrument(String name, final Byte instrumentId) {
@@ -36,78 +38,76 @@ public class ItemInstrument extends Item {
     }
 
     @Override
-    public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
-        // Server-side only
-        if(!playerIn.getEntityWorld().isRemote()) {  
-            if(target instanceof PlayerEntity) {
-                ItemInstrumentDataUtil.INSTANCE.setMidiSource(stack, target.getUniqueID());
-                playerIn.setHeldItem(hand, stack);
-                playerIn.sendStatusMessage(new StringTextComponent("Linked Maestro: " +  target.getName().getString()), true);
-                return ActionResultType.CONSUME;
-            }
-        } else {
-            // Cancel click event client side
-            if(target instanceof PlayerEntity) {
-                return ActionResultType.SUCCESS;
-            }
-        }
-        
-        return ActionResultType.PASS;
-    }
-
-    @Override
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        final ItemStack heldItem = playerIn.getHeldItem(handIn);
-        if(worldIn.isRemote) {
-            // Regular right click - Open GUI, Sneak right click - cycle input mode
-            if(!playerIn.isSneaking()) {
-                MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, instrumentId, heldItem, handIn);
-                return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
-            }
+        if (!worldIn.isRemote) {
+            NetworkHooks.openGui((ServerPlayerEntity) playerIn, this, buffer -> {
+                buffer.writeByte(this.instrumentId);
+                buffer.writeBoolean(true);
+                buffer.writeBoolean(Hand.MAIN_HAND.equals(handIn));
+            });
+            return new ActionResult<>(ActionResultType.CONSUME, playerIn.getHeldItem(handIn));
         }
-        
-        return new ActionResult<>(ActionResultType.PASS, heldItem);
+
+		return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
     }
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-
-        // Client-side only
-        if(worldIn != null && worldIn.isRemote) {
-            SortedArraySet<Byte> acceptedChannels = ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsSet(stack);
-            
-            tooltip.add(new StringTextComponent("----------------"));
-
-            // MIDI Source
-            UUID maestroId = ItemInstrumentDataUtil.INSTANCE.getMidiSource(stack);
-            if(InstrumentDataUtil.SYS_SOURCE_ID.equals(maestroId)) {
-                tooltip.add(new StringTextComponent("Linked to System MIDI Device"));
-            } else if(InstrumentDataUtil.PUBLIC_SOURCE_ID.equals(maestroId)) {
-                tooltip.add(new StringTextComponent("Linked to Public Transmitters"));
-            } else if(maestroId != null) {
-                tooltip.add(new StringTextComponent("Linked to Player Transmitter"));
-            }
-    
-            // Listen Channels
-            if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
-                if(acceptedChannels.size() == MidiChannelNumber.values().length) {
-                    tooltip.add(new StringTextComponent("Enabled Channels: All"));
-                } else {
-                    tooltip.add(new StringTextComponent("Enabled Channels: " + acceptedChannels.stream().map(c -> new Integer(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
-                }
-            } else {
-                tooltip.add(new StringTextComponent("Enabled Channels: None"));
-            }
-        }
     }
+
+    @Override
+	public Container createMenu(int id, PlayerInventory inv, PlayerEntity player) {
+        ItemStack mainStack = player.getHeldItemMainhand();
+
+        if(mainStack.isEmpty() || !(mainStack.getItem() instanceof ItemInstrument)) {
+		    return new ContainerInstrument(id, inv, instrumentId, Hand.OFF_HAND);
+        } else {
+		    return new ContainerInstrument(id, inv, instrumentId, Hand.MAIN_HAND);
+        }
+	}
+
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TranslationTextComponent(this.getTranslationKey());
+	}
 
     public Byte getInstrumentId() {
         return this.instrumentId;
     }
 
-    // Data Utils    
+    public static Byte getInstrumentId(ItemStack stack) {
+        if (stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemInstrument) {
+            return ((ItemInstrument) stack.getItem()).getInstrumentId();
+        }
+
+        return null;
+    }
+
+    public static String getInstrumentName(ItemStack stack) {
+        if (stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemInstrument) {
+            return stack.getItem().getName().getString();
+        }
+
+        return null;
+    }
+
+    // Data Utils
+	public static ItemStackHandler getInventoryHandler(ItemStack stack) {
+		ItemStackHandler handler = new ItemStackHandler(1);
+
+		if(stack == null || stack.isEmpty()) {
+            return null;
+        }
+
+		if(stack.hasTag() && stack.getTag().contains(INVENTORY_TAG)) {
+            handler.deserializeNBT(stack.getTag().getCompound(INVENTORY_TAG));
+        }
+
+		return handler;
+	}
+
     public static ItemStack getEntityHeldInstrumentStack(LivingEntity entity, Hand handIn) {
         ItemStack heldStack = entity.getHeldItem(handIn);
 
@@ -133,11 +133,28 @@ public class ItemInstrument extends Item {
         return null;
     }
 
-    public static InstrumentItemDataUpdatePacket getSyncPacket(ItemStack stack, Hand handIn) {
-        return new InstrumentItemDataUpdatePacket(
-            ItemInstrumentDataUtil.INSTANCE.getMidiSource(stack), 
-            ItemInstrumentDataUtil.INSTANCE.getAcceptedChannelsString(stack),
-            Hand.MAIN_HAND.equals(handIn)
-        );
+    public static ItemStack getSwitchboardStack(ItemStack stack) {
+        ItemStackHandler handler = getInventoryHandler(stack);
+        if(ModItems.SWITCHBOARD.equals(handler.getStackInSlot(0).getItem())) {
+            return handler.getStackInSlot(0);
+        }
+
+        return ItemStack.EMPTY;
+    }
+    
+    public static Boolean shouldHandleMessage(ItemStack stack, UUID sender, Byte channel, Boolean publicTransmit) {
+        ItemStack switchStack = getSwitchboardStack(stack);
+        if(!switchStack.isEmpty()) {
+            return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && 
+                ( 
+                    (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
+                    || sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack))
+                );
+        }
+        return false;
+    }
+
+    public static Boolean hasSwitchboard(ItemStack stack) {
+        return !getSwitchboardStack(stack).isEmpty();
     }
 }
