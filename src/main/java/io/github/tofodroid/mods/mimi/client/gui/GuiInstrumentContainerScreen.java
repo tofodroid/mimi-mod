@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -13,59 +14,60 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
-import io.github.tofodroid.mods.mimi.common.network.InstrumentDataUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
+import io.github.tofodroid.mods.mimi.common.network.SyncItemInstrumentSwitchboardPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
-
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SortedArraySet;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.world.World;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.text.ITextComponent;
 
 import org.lwjgl.glfw.GLFW;
 
-public class GuiInstrument<T> extends BaseGui {
+import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
+
+public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInstrument> {
     // Texture
     private static final Integer NOTE_WIDTH = 14;
     private static final Integer NOTE_OFFSET_X = 11;
-    private static final Integer NOTE_OFFSET_Y = 109;
+    private static final Integer NOTE_OFFSET_Y = 29;
 
     // GUI
-    private static final Vector2f MAESTRO_MIDI_BUTTON_COORDS = new Vector2f(184,39);
-    private static final Vector2f MAESTRO_SELF_BUTTON_COORDS = new Vector2f(202,39);
-    private static final Vector2f MAESTRO_PUBLIC_BUTTON_COORDS = new Vector2f(220,39);
-    private static final Vector2f MAESTRO_CLEAR_BUTTON_COORDS = new Vector2f(238,39);
-    private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(339,39);
-    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(15,79);
-    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(338,79);
-    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(34,79);
-    private static final Vector2f GEN_SHIFT_BUTTON_COORDS = new Vector2f(327,124);
-    
-    // MIDI
+    private static final Vector2f SOURCE_SYS_BUTTON_COORDS = new Vector2f(37,132);
+    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(56,132);
+    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(75,132);
+    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(94,132);
+    private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(300,31);
+    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(141,101);
+    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(141,126);
+    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(160,101);
+    private static final Vector2f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(14,177);
+    private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(59,177);
+    private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(84,177);
+    private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(129,177);
+    private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(112,219);
+
+    // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
-
-    // Mouse
-    private Byte mouseNote = null;
-
-    //Keyboard
     private static final Integer VISIBLE_NOTES = 44;
     private static final Integer MAX_NOTE_SHIFT = 53;
-    private Integer visibleNoteShift = KEYBOARD_START_NOTE;
-    private String minNoteString = "C3";
-    private ConcurrentHashMap<Byte, Instant> heldNotes = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Byte, Instant> releasedNotes = new ConcurrentHashMap<>();
 
     // MIMI Layout
     private final Integer ACCENT_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S);
@@ -145,26 +147,39 @@ public class GuiInstrument<T> extends BaseGui {
         {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_M), 60}
     }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-    // Data
+    // Input Data
     private final Byte instrumentId;
-    private final T instrumentData;
-    private final InstrumentDataUtil<T> instrumentUtil;
     private final PlayerEntity player;
     private final Hand handIn;
-    private final World world;
-    private String selectedMaestroName = "None";
-    private String instrumentNameString;
+    private final BlockPos tilePos;
 
-    public GuiInstrument(PlayerEntity player, World worldIn, Byte instrumentId, T instrumentData, InstrumentDataUtil<T> instrumentUtil, Hand handIn) {
-        super(368, 246, 530, "textures/gui/gui_instrument.png", "item.MIMIMod.gui_instrument");
-        this.instrumentId = instrumentId;
-        this.instrumentData = instrumentData;
-        this.instrumentUtil = instrumentUtil;
-        this.instrumentNameString = instrumentUtil.getInstrumentName(instrumentData);
-        this.player = player;
-        this.handIn = handIn;
-        this.world = worldIn;
-        this.refreshMaestroName();
+    // Runtime Data
+    private ConcurrentHashMap<Byte, Instant> heldNotes = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Byte, Instant> releasedNotes = new ConcurrentHashMap<>();
+    private String instrumentNameString;
+    private ItemStack selectedSwitchboardStack;
+    private Boolean editMode = false;
+    private Integer visibleNoteShift = KEYBOARD_START_NOTE;
+    private String noteIdString = "C3,F4 | G4,C6";
+    private String selectedSourceName = "None";
+    private Byte mouseNote = null;
+
+    public GuiInstrumentContainerScreen(ContainerInstrument container, PlayerInventory inv, ITextComponent textComponent) {
+        super(container, inv, 328, 250, 530, "textures/gui/container_instrument.png", textComponent);
+        this.player = inv.player;
+        this.instrumentId = container.getInstrumentId();
+
+        if(container.isHandheld()) {
+            this.handIn = container.getHandIn();
+            this.tilePos = null;
+        } else {
+            this.handIn = null;
+            this.tilePos = container.getTilePos();
+        }
+
+        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+            this.selectedSwitchboardStack = container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+        }
     }
 
     @Override
@@ -177,8 +192,14 @@ public class GuiInstrument<T> extends BaseGui {
         super.init();
         this.heldNotes.clear();
         this.releasedNotes.clear();
+
+        if(container.isHandheld()) {
+            this.instrumentNameString = ItemInstrument.getInstrumentName(this.player.getHeldItem(handIn));
+        } else {
+            this.instrumentNameString = ((TileInstrument)this.minecraft.world.getTileEntity(tilePos)).getInstrumentName();
+        }
     }
-    
+
     @Override
     public void closeScreen() {
         super.closeScreen();
@@ -189,109 +210,97 @@ public class GuiInstrument<T> extends BaseGui {
     public boolean mouseClicked(double dmouseX, double dmouseY, int mouseButton) {
         int imouseX = (int)Math.round(dmouseX);
         int imouseY = (int)Math.round(dmouseY);
-        int firstNoteX = START_X + NOTE_OFFSET_X;
-        int firstNoteY = START_Y + NOTE_OFFSET_Y;
+        int firstNoteX = this.guiLeft + NOTE_OFFSET_X;
+        int firstNoteY = this.guiTop + NOTE_OFFSET_Y;
         int relativeMouseX = imouseX - firstNoteX;
         int relativeMouseY = imouseY - firstNoteY;
 
-        // Check if click position is within keyboard
-        if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (START_X + GUI_WIDTH - 51) && imouseY < (START_Y + GUI_HEIGHT - 11)) {
-            Byte midiNote = null;
+        if(clickedBox(imouseX, imouseY, SWITCHBOARD_EDIT_BUTTON_COORDS) && this.selectedSwitchboardStack != null) {
+            editMode = !editMode;
+            this.refreshSourceName();
+        } else if(!editMode) {
+            // Keyboard Layout Hover Box
+            if(imouseX >= 220 && imouseY >= 28 && imouseX < (this.guiLeft + this.xSize) && imouseY < (this.guiTop + 50)) {
+                if(clickedBox(imouseX, imouseY, KEYBOARD_LAYOUT_BUTTON_COORDS)) {
+                    if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
+                        ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
+                    } else {
+                        ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[0]);
+                    }
+                }
+
+                return super.mouseClicked(dmouseX, dmouseY, mouseButton);
+            }
             
-            if(relativeMouseY <= 84) {
-                midiNote = keyNumToMidiNote(2*((relativeMouseX + NOTE_WIDTH/2) / NOTE_WIDTH));
-            }
+            // Note Keys
+            if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (this.guiLeft + this.xSize - 11) && imouseY < (this.guiTop + this.ySize - 95)) {
+                Byte midiNote = null;
+                
+                if(relativeMouseY <= 84) {
+                    midiNote = keyNumToMidiNote(2*((relativeMouseX + NOTE_WIDTH/2) / NOTE_WIDTH));
+                }
 
-            if(midiNote == null) {
-                midiNote = keyNumToMidiNote(2*(relativeMouseX / NOTE_WIDTH)+1);
-            }
-            
-            if(midiNote != null) {
-                this.mouseNote = midiNote;
-                this.onGuiNotePress(midiNote, Byte.MAX_VALUE);
-            }
-        }
-
-        // Shift Buttons
-        for(int i = 0; i < 4; i++) {
-            Vector2f buttonCoords = new Vector2f(
-                GEN_SHIFT_BUTTON_COORDS.x,
-                GEN_SHIFT_BUTTON_COORDS.y + i * 19
-            );
-
-            if(clickedBox(imouseX, imouseY, buttonCoords)) {
-                switch(i) {
-                    case 0:
-                        this.shiftVisibleNotes(true, 1);
-                        break;
-                    case 1:
-                        this.shiftVisibleNotes(false, 1);
-                        break;
-                    case 2:
-                        this.shiftVisibleNotes(true, 7);
-                        break;
-                    case 3:
-                        this.shiftVisibleNotes(false, 7);
-                        break;
+                if(midiNote == null) {
+                    midiNote = keyNumToMidiNote(2*(relativeMouseX / NOTE_WIDTH)+1);
+                }
+                
+                if(midiNote != null) {
+                    this.mouseNote = midiNote;
+                    this.onGuiNotePress(midiNote, Byte.MAX_VALUE);
                 }
             }
-        }
 
-        // Midi Buttons
-        if(instrumentData != null) {
-            if(clickedBox(imouseX, imouseY, MAESTRO_MIDI_BUTTON_COORDS)) {
+            // Keyboard Controls
+            if(clickedBox(imouseX, imouseY, NOTE_SHIFT_UP_BUTTON_COORDS)) {
+                this.shiftVisibleNotes(true, 1);
+            } else if(clickedBox(imouseX, imouseY, NOTE_SHIFT_DOWN_BUTTON_COORDS)) {
+                this.shiftVisibleNotes(false, 1);
+            } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_UP_BUTTON_COORDS)) {
+                this.shiftVisibleNotes(true, 7);
+            } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_DOWN_BUTTON_COORDS)) {
+                this.shiftVisibleNotes(false, 7);
+            } 
+        } else {
+            // Switchboard MIDI Controls
+            if(clickedBox(imouseX, imouseY, SOURCE_SYS_BUTTON_COORDS)) {
                 // Link MIDI Device Button
-                instrumentUtil.setMidiSource(instrumentData, InstrumentDataUtil.SYS_SOURCE_ID);
-                this.syncInstrumentToServer();
-                this.refreshMaestroName();
-                this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, MAESTRO_SELF_BUTTON_COORDS)) {
+                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, ItemMidiSwitchboard.SYS_SOURCE_ID);
+                this.syncSwitchboardToServer();
+                this.refreshSourceName();
+            } else if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
                 // Link Self Button
-                instrumentUtil.setMidiSource(instrumentData, player.getUniqueID());
-                this.syncInstrumentToServer();
-                this.refreshMaestroName();
-                this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, MAESTRO_PUBLIC_BUTTON_COORDS)) {
+                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, player.getUniqueID());
+                this.syncSwitchboardToServer();
+                this.refreshSourceName();
+            } else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
                 // Link Public Button
-                instrumentUtil.setMidiSource(instrumentData,  InstrumentDataUtil.PUBLIC_SOURCE_ID);
-                this.syncInstrumentToServer();
-                this.refreshMaestroName();
-                this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, MAESTRO_CLEAR_BUTTON_COORDS)) {
+                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack,  ItemMidiSwitchboard.PUBLIC_SOURCE_ID);
+                this.syncSwitchboardToServer();
+                this.refreshSourceName();
+            } else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
                 // Link Clear Button
-                instrumentUtil.setMidiSource(instrumentData, null);
-                this.syncInstrumentToServer();
-                this.refreshMaestroName();
-                this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, KEYBOARD_LAYOUT_BUTTON_COORDS)) {
-                // Change Keyboard Layout
-                if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
-                    ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
-                } else {
-                    ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[0]);
-                }
+                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, null);
+                this.syncSwitchboardToServer();
+                this.refreshSourceName();
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 // Clear Midi Channels Button
-                instrumentUtil.clearAcceptedChannels(instrumentData);
-                this.syncInstrumentToServer();
-                this.allNotesOff();
+                ItemMidiSwitchboard.clearEnabledChannels(selectedSwitchboardStack);
+                this.syncSwitchboardToServer();
             } else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
                 // Select All Midi Channels Button
-                instrumentUtil.setAcceptAllChannels(instrumentData);
-                this.syncInstrumentToServer();
-                this.allNotesOff();
+                ItemMidiSwitchboard.setEnableAllChannels(selectedSwitchboardStack);
+                this.syncSwitchboardToServer();
             } else {
                 // Individual Midi Channel Buttons
                 for(int i = 0; i < 16; i++) {
                     Vector2f buttonCoords = new Vector2f(
-                        GEN_MIDI_BUTTON_COORDS.x + i * 19,
-                        GEN_MIDI_BUTTON_COORDS.y
+                        GEN_MIDI_BUTTON_COORDS.x + (i % 8) * 19,
+                        GEN_MIDI_BUTTON_COORDS.y + (i / 8) * 25
                     );
-    
+
                     if(clickedBox(imouseX, imouseY, buttonCoords)) {
-                        instrumentUtil.toggleChannel(instrumentData, new Integer(i).byteValue());
-                        this.syncInstrumentToServer();
-                        this.allNotesOff();
+                        ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(i).byteValue());
+                        this.syncSwitchboardToServer();
                         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
                     }
                 }
@@ -337,7 +346,7 @@ public class GuiInstrument<T> extends BaseGui {
         
         return true;
     }
-    
+
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         super.keyReleased(keyCode, scanCode, modifiers);
@@ -353,8 +362,25 @@ public class GuiInstrument<T> extends BaseGui {
         return true;
     }
 
-    public Byte getInstrumentId() {
-        return this.instrumentUtil.getInstrumentIdFromData(this.instrumentData);
+    @Override
+    public void tick() {
+        super.tick();
+
+        if(this.selectedSwitchboardStack == null && container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().isEmpty()) {
+            return;
+        } else if(this.selectedSwitchboardStack != container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack()) {
+            MIMIMod.LOGGER.info("Stack change!");
+
+            this.allNotesOff();
+            this.syncInstrumentToServer();
+
+            if(!ModItems.SWITCHBOARD.equals(container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+                this.selectedSwitchboardStack = null;
+                this.editMode = false;
+            } else {
+                this.selectedSwitchboardStack = container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+            }
+        }
     }
 
     // Midi Functions
@@ -374,7 +400,7 @@ public class GuiInstrument<T> extends BaseGui {
 
         return result;
     }
-    
+
     private Integer midiNoteToKeyNum(Byte midiNote) {
         if(midiNote == null) {
             return null;
@@ -401,30 +427,17 @@ public class GuiInstrument<T> extends BaseGui {
         // Clamp between 0 and 53
         visibleNoteShift = visibleNoteShift < 0 ? 0 : visibleNoteShift > MAX_NOTE_SHIFT ? MAX_NOTE_SHIFT : visibleNoteShift;
         
-        // Set Min Note String
-        Integer octaveNoteNum = visibleNoteShift % 7;
-        Integer minOctave = visibleNoteShift / 7;
-        this.minNoteString = noteLetterFromNum(octaveNoteNum) + minOctave.toString();
+        this.noteIdString = buildNoteIdString();
     }
 
     public void onMidiNoteOn(Byte channel, Byte midiNote, Byte velocity) {
-        if(instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
-            this.onGuiNotePress(midiNote, velocity);
-        }
-    }
-    
-    public void onMidiNoteOff(Byte channel, Byte midiNote) {
-        if(instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
-            this.onGuiNoteRelease(midiNote);
-        }
+        this.holdNote(midiNote, velocity);
     }
 
-    public void onMidiAllNotesOff(Byte channel) {
-        if(instrumentUtil.doesAcceptChannel(instrumentData, channel)) {
-            this.allNotesOff();
-        }
+    public void onMidiNoteOff(Byte channel, Byte midiNote) {
+        this.releaseNote(midiNote);
     }
-    
+
     private void allNotesOff() {
         // Release all notes
         List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
@@ -433,25 +446,19 @@ public class GuiInstrument<T> extends BaseGui {
         }
 
         // Send all notes off packet
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOffPacket.ALL_NOTES_OFF, instrumentId, player.getUniqueID());
+        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOffPacket.NO_CHANNEL, MidiNoteOffPacket.ALL_NOTES_OFF, instrumentId, player.getUniqueID());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        // hold note
-        this.holdNote(midiNote, velocity);
-
         // send packet
-        MidiNoteOnPacket packet = new MidiNoteOnPacket(midiNote, velocity, instrumentId, player.getUniqueID(), player.getPosition());
+        MidiNoteOnPacket packet = new MidiNoteOnPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
-    
-    private void onGuiNoteRelease(Byte midiNote) {
-        // release note
-        this.releaseNote(midiNote);
 
+    private void onGuiNoteRelease(Byte midiNote) {
         // send packet
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(midiNote, instrumentId, player.getUniqueID());
+        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, instrumentId, player.getUniqueID());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
 
@@ -525,28 +532,28 @@ public class GuiInstrument<T> extends BaseGui {
 
         // Visible Notes
         Integer keyboardTextureShift = (visibleNoteShift % (NOTE_WIDTH/2)) * NOTE_WIDTH;
-        blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 274, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 276, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Labels
         if(ClientConfig.KEYBOARD_LAYOUTS.MIMI.equals(ModConfigs.CLIENT.keyboardLayout.get())) {
-            blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 456, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
             if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
                 Integer widthShift = (V_PIANO_MIN_SHIFT - visibleNoteShift) * NOTE_WIDTH;
-                blit(matrixStack, START_X + NOTE_OFFSET_X - 1 + widthShift, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1 + widthShift, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift >= V_PIANO_MIN_SHIFT && visibleNoteShift <= V_PIANO_MAX_SHIFT) {
-                blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH , 402, 308, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift <= V_PIANO_MAX_NOTE) {
                 Integer widthShift = (V_PIANO_MAX_SHIFT - visibleNoteShift) * -NOTE_WIDTH;
-                blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 402, 308 - widthShift, 54, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
 
         // Note Edges
         if(visibleNoteShift == 0) {
-            blit(matrixStack, START_X + NOTE_OFFSET_X, START_Y + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + NOTE_OFFSET_X, this.guiTop + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         } else if(visibleNoteShift == MAX_NOTE_SHIFT) {
-            blit(matrixStack, START_X + 311, START_Y + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 274, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 311, this.guiTop + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Active Notes
@@ -557,17 +564,26 @@ public class GuiInstrument<T> extends BaseGui {
         setAlpha(1.0f);
 
         // GUI Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, this.guiLeft, this.guiTop, this.getBlitOffset(), 0, 0, this.xSize, this.ySize, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Key Covers
-        blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 247, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 250, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
-        // Channel Output Status Lights
-        SortedArraySet<Byte> acceptedChannels = this.instrumentUtil.getAcceptedChannelsSet(this.instrumentData);
+        // Switchboard Edit Panel
+        if(editMode) {
+            // Switchboard Background Panel
+            matrixStack.push();
+            matrixStack.rotate(new Quaternion(new Vector3f(0,0,1),-90,true));
+            blit(matrixStack, -(this.guiTop + 29 + 126),  this.guiLeft + 11, this.getBlitOffset(), 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
+            matrixStack.pop();
 
-        if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
-            for(Byte channelId : acceptedChannels) {
-                blit(matrixStack, START_X + 40 + 19 * channelId, START_Y + 97, this.getBlitOffset(), 369, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            // Channel Output Status Lights
+            SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(this.selectedSwitchboardStack);
+
+            if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
+                for(Byte channelId : acceptedChannels) {
+                    blit(matrixStack, this.guiLeft + 166 + 19 * (channelId % 8), this.guiTop + 119 + (channelId / 8) * 25, this.getBlitOffset(), 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                }
             }
         }
         
@@ -602,15 +618,15 @@ public class GuiInstrument<T> extends BaseGui {
         if(!held) {
             alpha -= Math.min(Math.abs(ChronoUnit.MILLIS.between(Instant.now(), releaseTime))/1000f, 1.0f);
         }
-
+        
         setAlpha(alpha);
 
         blit(
             matrixStack, 
-            START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
-            START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
+            this.guiLeft + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
+            this.guiTop + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
             this.getBlitOffset(), 
-            382 - (keyNum % 2) * 13, 
+            342 - (keyNum % 2) * 13, 
             0, 12, 41, 
             TEXTURE_SIZE, TEXTURE_SIZE
         );
@@ -619,20 +635,41 @@ public class GuiInstrument<T> extends BaseGui {
     }
 
     @Override
-    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
         // Instrument Name
-        font.drawString(matrixStack, this.instrumentNameString, START_X + 214, START_Y + 17, 0xFF00E600);
+        font.drawString(matrixStack, this.instrumentNameString, 198, 13, 0xFF00E600);
 
-        // Min Note Text
-        font.drawString(matrixStack, this.minNoteString, START_X + 335, START_Y + 224, 0xFF00E600);
+        // Note Text: Left
+        font.drawString(matrixStack, this.noteIdString.split(",")[0], 22, 197, 0xFF00E600);
+
+        // Note Text: Middle
+        font.drawString(matrixStack, this.noteIdString.split(",")[1], 67, 197, 0xFF00E600);
+
+        // Note Text: Right
+        font.drawString(matrixStack, this.noteIdString.split(",")[2], 126, 197, 0xFF00E600);
 
         // MIDI Source Name
-        font.drawString(matrixStack, this.selectedMaestroName.length() <= 22 ? this.selectedMaestroName : this.selectedMaestroName.substring(0,21) + "...", START_X + 80, START_Y + 43, 0xFF00E600);
-        
+        if(editMode) {
+            font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 21, 120, 0xFF00E600);
+        }
+
         // Keyboard Layout
-        font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 303, START_Y + 43, 0xFF00E600);
+        if(editMode) {
+            font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF003600);
+        } else { 
+            font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF00E600);
+        }
 
         return matrixStack;
+    }
+
+    private String buildNoteIdString() {
+        String result = "";    
+        result += noteLetterFromNum(visibleNoteShift % 7) + new Integer(visibleNoteShift / 7).toString();
+        result += "," + noteLetterFromNum((visibleNoteShift+10) % 7) + new Integer((visibleNoteShift+10) / 7).toString();
+        result += " | " + noteLetterFromNum((visibleNoteShift+11) % 7) + new Integer((visibleNoteShift+11) / 7).toString();
+        result += "," + noteLetterFromNum((visibleNoteShift+21) % 7) + new Integer((visibleNoteShift+21) / 7).toString();
+        return result;
     }
 
     private String noteLetterFromNum(Integer octaveNoteNum) {
@@ -656,43 +693,42 @@ public class GuiInstrument<T> extends BaseGui {
         return "";
     }
 
-    private void refreshMaestroName() {
-        UUID linkedMaestro = instrumentUtil.getMidiSource(instrumentData);
-        if(linkedMaestro != null) {
-            if(linkedMaestro.equals(player.getUniqueID())) {
-                this.selectedMaestroName = "My Transmitter";
-            } else if(linkedMaestro.equals(InstrumentDataUtil.SYS_SOURCE_ID)) {
-                this.selectedMaestroName = "MIDI Input Device";
-            } else if(linkedMaestro.equals(InstrumentDataUtil.PUBLIC_SOURCE_ID)) {
-                this.selectedMaestroName = "Public Transmitters";
+    private void refreshSourceName() {
+        UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
+        if(sourceId != null) {
+            if(sourceId.equals(player.getUniqueID())) {
+                this.selectedSourceName = "My Transmitter";
+            } else if(sourceId.equals(ItemMidiSwitchboard.SYS_SOURCE_ID)) {
+                this.selectedSourceName = "MIDI Input Device";
+            } else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
+                this.selectedSourceName = "Public Transmitters";
+            } else if(this.minecraft != null && this.minecraft.world != null) {
+                this.selectedSourceName = PlayerNameUtils.getPlayerNameFromUUID(sourceId, this.minecraft.world);
             } else {
-                this.selectedMaestroName = PlayerNameUtils.getPlayerNameFromUUID(linkedMaestro, world);
+                this.selectedSourceName = "Unknown";
             }
         } else {
-            this.selectedMaestroName = "None";
+            this.selectedSourceName = "None";
         }
     }
 
-    // Data Utils
-    public InstrumentDataUtil<T> getInstrumentDataUtil() {
-        return this.instrumentUtil;
-    }
+    public void syncSwitchboardToServer() {
+        SwitchboardStackUpdatePacket packet = null;
 
-    public T getInsturmentData() {
-        return this.instrumentData;
-    }
-    
-    public void syncInstrumentToServer() {
-        InstrumentDataUpdatePacket packet = null;
-
-        if(instrumentData instanceof ItemStack) {
-            packet = ItemInstrument.getSyncPacket((ItemStack)instrumentData, handIn);
-        } else if(instrumentData instanceof TileInstrument) {
-            packet = TileInstrument.getSyncPacket((TileInstrument)instrumentData);
+        if(selectedSwitchboardStack != null && ModItems.SWITCHBOARD.equals(selectedSwitchboardStack.getItem())) {
+            packet = ItemMidiSwitchboard.getSyncPacket(selectedSwitchboardStack);
         }
         
         if(packet != null) {
             NetworkManager.NET_CHANNEL.sendToServer(packet);
         }
-    }
+    }  
+
+    public void syncInstrumentToServer() {
+        SyncItemInstrumentSwitchboardPacket packet = new SyncItemInstrumentSwitchboardPacket(true);
+        
+        if(packet != null) {
+            NetworkManager.NET_CHANNEL.sendToServer(packet);
+        }
+    }    
 }

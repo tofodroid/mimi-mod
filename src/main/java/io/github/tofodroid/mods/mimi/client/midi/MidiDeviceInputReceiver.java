@@ -25,12 +25,12 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     }
     
     public void sendMidiNoteOnPacket(Byte instrument, Byte midiNote, Byte velocity, PlayerEntity player) {
-        MidiNoteOnPacket packet = new MidiNoteOnPacket(midiNote, velocity, instrument, player.getUniqueID(), player.getPosition());
+        MidiNoteOnPacket packet = new MidiNoteOnPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, velocity, instrument, player.getUniqueID(), player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
     
     public void sendMidiNoteOffPacket(Byte instrument, Byte midiNote, PlayerEntity player) {
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(midiNote, instrument, player.getUniqueID());
+        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOffPacket.NO_CHANNEL, midiNote, instrument, player.getUniqueID());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
     }
 }

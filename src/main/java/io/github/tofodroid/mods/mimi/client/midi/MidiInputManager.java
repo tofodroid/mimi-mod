@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.data.EntityInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.data.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.data.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
@@ -46,17 +44,17 @@ public class MidiInputManager {
     public List<Byte> getLocalInstrumentsToPlay(Byte channel) {
         return localInstrumentToPlay.stream().filter(data -> {
             if(data instanceof ItemStack) {
-                return ItemInstrumentDataUtil.INSTANCE.doesAcceptChannel((ItemStack)data, channel);
+                return ItemInstrument.shouldHandleMessage((ItemStack)data, ItemMidiSwitchboard.SYS_SOURCE_ID, channel, false);
             } else if(data instanceof TileInstrument) {
-                return EntityInstrumentDataUtil.INSTANCE.doesAcceptChannel((TileInstrument)data, channel);
+                return ((TileInstrument)data).shouldHandleMessage(ItemMidiSwitchboard.SYS_SOURCE_ID, channel, false);
             } else {
                 return false;
             }
         }).map(data -> {
             if(data instanceof ItemStack) {
-                return ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData((ItemStack)data);
+                return ItemInstrument.getInstrumentId((ItemStack)data);
             } else {
-                return EntityInstrumentDataUtil.INSTANCE.getInstrumentIdFromData((TileInstrument)data);
+                return ((TileInstrument)data).getInstrumentId();
             }
         }).collect(Collectors.toList());
     }
@@ -108,18 +106,18 @@ public class MidiInputManager {
 
         // Check for seated instrument
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
-        if(instrumentEntity != null && InstrumentDataUtil.SYS_SOURCE_ID.equals(EntityInstrumentDataUtil.INSTANCE.getMidiSource(instrumentEntity))) {
+        if(instrumentEntity != null && instrumentEntity.hasSwitchboard()) {
             result.add(instrumentEntity);
         }
 
         // Check for held instruments
         ItemStack mainHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.MAIN_HAND);
-        if(mainHand != null && InstrumentDataUtil.SYS_SOURCE_ID.equals(ItemInstrumentDataUtil.INSTANCE.getMidiSource(mainHand))) {
+        if(mainHand != null && ItemInstrument.hasSwitchboard(mainHand)) {
             result.add(mainHand);
         }
 
         ItemStack offHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.OFF_HAND);
-        if(offHand != null && InstrumentDataUtil.SYS_SOURCE_ID.equals(ItemInstrumentDataUtil.INSTANCE.getMidiSource(mainHand))) {
+        if(offHand != null &&  ItemInstrument.hasSwitchboard(offHand)) {
             result.add(offHand);
         }
 
