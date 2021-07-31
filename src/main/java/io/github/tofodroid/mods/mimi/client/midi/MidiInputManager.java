@@ -41,22 +41,26 @@ public class MidiInputManager {
         return playlistManager.getTransmitMode();
     }
     
-    public List<Byte> getLocalInstrumentsToPlay(Byte channel) {
-        return localInstrumentToPlay.stream().filter(data -> {
+    public List<Byte> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
+        return localInstrumentToPlay.stream().map(data -> {
+            ItemStack switchStack = ItemStack.EMPTY;
+            Byte instrumentId = null;
+
             if(data instanceof ItemStack) {
-                return ItemInstrument.shouldHandleMessage((ItemStack)data, ItemMidiSwitchboard.SYS_SOURCE_ID, channel, false);
+                switchStack = ItemInstrument.getSwitchboardStack((ItemStack)data);
+                instrumentId = ItemInstrument.getInstrumentId((ItemStack)data);
             } else if(data instanceof TileInstrument) {
-                return ((TileInstrument)data).shouldHandleMessage(ItemMidiSwitchboard.SYS_SOURCE_ID, channel, false);
-            } else {
-                return false;
+                switchStack = ((TileInstrument)data).getSwitchboardStack();
+                instrumentId = ((TileInstrument)data).getInstrumentId();
             }
-        }).map(data -> {
-            if(data instanceof ItemStack) {
-                return ItemInstrument.getInstrumentId((ItemStack)data);
-            } else {
-                return ((TileInstrument)data).getInstrumentId();
+
+            if(ModItems.SWITCHBOARD.equals(switchStack.getItem()) && ItemMidiSwitchboard.getSysInput(switchStack) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
+                return instrumentId;
             }
-        }).collect(Collectors.toList());
+
+            return null;
+        })
+        .filter(b -> b != null).collect(Collectors.toList());
     }
     
     @SubscribeEvent

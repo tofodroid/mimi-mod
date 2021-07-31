@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
@@ -63,7 +62,7 @@ public class MaestroNotePacketHandler {
         // Handle Receivers
         for(TileReceiver receiver : getPotentialReceivers(message.transmitMode, sender)) {
             if(receiver.shouldHandleMessage(sender.getUniqueID(), message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
-                ModBlocks.RECEIVER.powerTarget(sender.getServerWorld(), receiver.getBlockState(), 15, receiver.getPos(), 0);
+                ModBlocks.RECEIVER.powerTarget(sender.getServerWorld(), receiver.getBlockState(), 15, receiver.getPos(), 8);
             }
         }
     }
@@ -154,7 +153,7 @@ public class MaestroNotePacketHandler {
             AxisAlignedBB queryBox = new AxisAlignedBB(maestroPos.getX() - 16, maestroPos.getY() - 16, maestroPos.getZ() - 16, 
                                                     maestroPos.getX() + 16, maestroPos.getY() + 16, maestroPos.getZ() + 16);
             potentialReceivers = BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.RECEIVER.equals(sender.getServerWorld().getBlockState(pos).getBlock()))
-                .map(b -> BlockReceiver.getTileReceiverForBlock(sender.getServerWorld(), b)).filter(t -> t != null).collect(Collectors.toList());
+                .map(b -> ModBlocks.RECEIVER.getTileForBlock(sender.getServerWorld(), b)).filter(t -> t != null).collect(Collectors.toList());
         }
 
         return potentialReceivers;
@@ -166,7 +165,7 @@ public class MaestroNotePacketHandler {
                 List<MidiNoteOnPacket> playerPackets = notePackets.get(player);
 
                 if(playerPackets != null && !playerPackets.isEmpty()) {
-                    MidiNotePacketHandler.handleOnPacketsServer(notePackets.get(player), player);
+                    MidiNotePacketHandler.handleOnPacketsServer(notePackets.get(player), player, true);
                 }
             }
         }
@@ -178,7 +177,7 @@ public class MaestroNotePacketHandler {
                 List<MidiNoteOffPacket> playerPackets = notePackets.get(player);
 
                 if(playerPackets != null && !playerPackets.isEmpty()) {
-                    MidiNotePacketHandler.handleOffPacketsServer(notePackets.get(player), player);
+                    MidiNotePacketHandler.handleOffPacketsServer(notePackets.get(player), player, true);
                 }
             }
         }

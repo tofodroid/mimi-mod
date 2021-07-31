@@ -143,7 +143,7 @@ public class MidiInputDeviceManager extends MidiInputSourceManager {
         if(this.selectedDeviceId != null) {
             MidiDevice device = this.midiDevices.get(this.selectedDeviceId);
             try {
-                String oldVal = System.setProperty("javax.sound.midi.Transmitter", device.getDeviceInfo().getName());
+                String oldVal = System.setProperty("javax.sound.midi.Transmitter", "#" + device.getDeviceInfo().getName());
 
                 activeTransmitter = MidiSystem.getTransmitter();
                 activeTransmitter.setReceiver(new MidiDeviceInputReceiver());
