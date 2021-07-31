@@ -1,15 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
 
 import java.util.Map;
 
@@ -23,16 +19,6 @@ public class BlockPiano extends BlockInstrument {
             MidiInstrument.PIANO.getId()
         );
         this.setRegistryName("piano");
-    }
-
-    @Override
-    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
-        return SHAPES.get(state.get(DIRECTION));
-    }
-
-    @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader reader, BlockPos pos) {
-        return SHAPES.get(state.get(DIRECTION));
     }
 
     @Override

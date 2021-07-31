@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -16,13 +17,16 @@ import net.minecraftforge.fml.common.Mod;
 public class ModTiles {
     public static TileEntityType<TileInstrument> INSTRUMENT = null;
     public static TileEntityType<TileReceiver> RECEIVER = null;
+    public static TileEntityType<TileAdvListener> ADVLISTENER = null;
 
     private static final List<TileEntityType<?>> buildTileTypes() {
         List<TileEntityType<?>> types = new ArrayList<>();
-        INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", TileEntityType.Builder.create(TileInstrument::new, ModBlocks.PIANO, ModBlocks.DRUMS));
+        INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", TileEntityType.Builder.create(TileInstrument::new, ModBlocks.INSTRUMENTS.toArray(new BlockInstrument[ModBlocks.INSTRUMENTS.size()])));
         types.add(INSTRUMENT);
         RECEIVER = buildType(MIMIMod.MODID + ":receiver", TileEntityType.Builder.create(TileReceiver::new, ModBlocks.RECEIVER));
         types.add(RECEIVER);
+        ADVLISTENER = buildType(MIMIMod.MODID + ":advlistener", TileEntityType.Builder.create(TileAdvListener::new, ModBlocks.ADVLISTENER));
+        types.add(ADVLISTENER);
         return types;
     }
     

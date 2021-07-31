@@ -1,9 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,6 +14,7 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -23,11 +22,11 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import java.util.Map;
@@ -37,7 +36,7 @@ import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
-public abstract class BlockInstrument extends ContainerBlock implements IWaterLoggable {
+public abstract class BlockInstrument extends AContainerBlock<TileInstrument> implements IWaterLoggable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -55,10 +54,10 @@ public abstract class BlockInstrument extends ContainerBlock implements IWaterLo
     }
 
     protected abstract Map<Direction, VoxelShape> generateShapes();
-
+    
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        TileInstrument tileInstrument = getTileInstrumentForBlock(worldIn, pos);
+        TileInstrument tileInstrument = getTileForBlock(worldIn, pos);
         
         if(tileInstrument != null) {
            if(!worldIn.isRemote) {
@@ -78,6 +77,11 @@ public abstract class BlockInstrument extends ContainerBlock implements IWaterLo
     }
 
     @Override
+    public TileEntityType<TileInstrument> getTileType() {
+        return ModTiles.INSTRUMENT;
+    }
+
+    @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
         FluidState fluidState = context.getWorld().getFluidState(context.getPos());
         return this.getDefaultState()
@@ -92,6 +96,16 @@ public abstract class BlockInstrument extends ContainerBlock implements IWaterLo
         builder.add(WATERLOGGED);
     }
 
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+        return SHAPES.get(state.get(DIRECTION));
+    }
+
+    @Override
+    public VoxelShape getRenderShape(BlockState state, IBlockReader reader, BlockPos pos) {
+        return SHAPES.get(state.get(DIRECTION));
+    }
+    
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
         return state.with(DIRECTION, rotation.rotate(state.get(DIRECTION)));
@@ -108,36 +122,16 @@ public abstract class BlockInstrument extends ContainerBlock implements IWaterLo
     public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.toRotation(state.get(DIRECTION)));
     }
-    
-    @Override
-    public boolean hasTileEntity(final BlockState state) {
-        return true;
-    }
-    
+
     @Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader reader) {
-		TileInstrument tile = ModTiles.INSTRUMENT.create();
+		TileInstrument tile = (TileInstrument)super.createNewTileEntity(reader);
         tile.setInstrumentId(instrumentId);
         return tile;
 	}
 
-    @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return createTileEntity(null, worldIn);
-    }
-
-    @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
-    }
-
     public Byte getInstrumentId() {
         return instrumentId;
-    }
-
-    public static TileInstrument getTileInstrumentForBlock(World worldIn, BlockPos pos) {
-        TileEntity entity = worldIn.getTileEntity(pos);
-        return entity != null && entity instanceof TileInstrument ? (TileInstrument)entity : null;
     }
 
     protected Vector3d getSeatOffset(BlockState state) {

@@ -19,6 +19,6 @@ public class MIMIModItemGroup extends ItemGroup {
     @Nonnull
     @OnlyIn(Dist.CLIENT)
     public ItemStack createIcon() {
-        return new ItemStack(ModBlocks.PIANO);
+        return new ItemStack(ModBlocks.INSTRUMENTS.get(0));
     }
 }
