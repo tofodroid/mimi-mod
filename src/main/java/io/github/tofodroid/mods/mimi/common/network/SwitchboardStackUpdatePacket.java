@@ -8,34 +8,42 @@ import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.PacketBuffer;
 
 public class SwitchboardStackUpdatePacket {
-    public final String enabledChannelsString;
-    public final String filterNoteString;
     public final UUID midiSource;
+    public final Byte filterOct;
+    public final Byte filterNote;
+    public final String enabledChannelsString;
+    public final Byte instrumentId;
+    public final Boolean sysInput;
 
-    public SwitchboardStackUpdatePacket(UUID midiSource, String enabledChannelsString, String filterNoteString) {
-        this.enabledChannelsString = enabledChannelsString;
+    public SwitchboardStackUpdatePacket(UUID midiSource, Byte filterOct, Byte filterNote, String enabledChannelsString, Byte instrumentId, Boolean sysInput) {
         this.midiSource = midiSource;
-        this.filterNoteString = filterNoteString;
+        this.filterOct = filterOct;
+        this.filterNote = filterNote;
+        this.enabledChannelsString = enabledChannelsString;
+        this.instrumentId = instrumentId;
+        this.sysInput = sysInput;
     }
     
     public static SwitchboardStackUpdatePacket decodePacket(PacketBuffer buf) {
         try {
-            String enabledChannelsString = buf.readString(38);
-            if(enabledChannelsString.trim().isEmpty()) {
-                enabledChannelsString = null;
-            }
-
             UUID midiSource = buf.readUniqueId();
             if(ItemMidiSwitchboard.NONE_SOURCE_ID.equals(midiSource)) {
                 midiSource = null;
             }
 
-            String filterNoteString = buf.readString(47);
-            if(filterNoteString.trim().isEmpty()) {
-                filterNoteString = null;
+            Byte filterOct = buf.readByte();
+            Byte filterNote = buf.readByte();
+
+            String enabledChannelsString = buf.readString(38);
+            if(enabledChannelsString.trim().isEmpty()) {
+                enabledChannelsString = null;
             }
 
-            return new SwitchboardStackUpdatePacket(midiSource, enabledChannelsString, filterNoteString);
+            Byte instrumentId = buf.readByte();
+
+            Boolean sysInput = buf.readBoolean();
+
+            return new SwitchboardStackUpdatePacket(midiSource, filterOct, filterNote, enabledChannelsString, instrumentId, sysInput);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("SwitchboardStackUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -46,8 +54,11 @@ public class SwitchboardStackUpdatePacket {
     }
 
     public static void encodePacket(SwitchboardStackUpdatePacket pkt, PacketBuffer buf) {
-        buf.writeString(pkt.enabledChannelsString != null ? pkt.enabledChannelsString : "", 38);
         buf.writeUniqueId(pkt.midiSource != null ? pkt.midiSource : ItemMidiSwitchboard.NONE_SOURCE_ID);
-        buf.writeString(pkt.filterNoteString != null ? pkt.filterNoteString : "", 47);
+        buf.writeByte(pkt.filterOct);
+        buf.writeByte(pkt.filterNote);
+        buf.writeString(pkt.enabledChannelsString != null ? pkt.enabledChannelsString : "", 38);
+        buf.writeByte(pkt.instrumentId);
+        buf.writeBoolean(pkt.sysInput);
     }
 }

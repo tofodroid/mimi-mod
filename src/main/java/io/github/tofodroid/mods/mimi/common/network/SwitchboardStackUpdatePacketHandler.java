@@ -3,8 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
-import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
+import io.github.tofodroid.mods.mimi.common.container.ASwitchboardContainer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -21,10 +20,8 @@ public class SwitchboardStackUpdatePacketHandler {
     
     public static void handlePacketServer(final SwitchboardStackUpdatePacket message, ServerPlayerEntity sender) {
         if(sender.openContainer != null) {
-            if(sender.openContainer instanceof ContainerInstrument) {
-                ((ContainerInstrument)sender.openContainer).updateSelectedSwitcboard(sender, message.midiSource, message.enabledChannelsString, message.filterNoteString);
-            } else if(sender.openContainer instanceof ContainerReceiver) {
-                ((ContainerReceiver)sender.openContainer).updateSelectedSwitcboard(sender, message.midiSource, message.enabledChannelsString, message.filterNoteString);
+            if(sender.openContainer instanceof ASwitchboardContainer) {
+                ((ASwitchboardContainer)sender.openContainer).updateSelectedSwitcboard(sender, message.midiSource,  message.filterOct, message.filterNote, message.enabledChannelsString, message.instrumentId, message.sysInput);
             }
         }
     }

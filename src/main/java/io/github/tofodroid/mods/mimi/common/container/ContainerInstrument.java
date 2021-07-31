@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.common.container;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -83,10 +84,19 @@ public class ContainerInstrument extends ASwitchboardContainer {
 	protected Integer getPlayerInventoryY() {
 		return INVENTORY_PLAYER_START_Y;
 	}
+	
+    @Override
+	protected Slot buildPlayerSlot(PlayerInventory playerInventory, int slot, int xPos, int yPos) {
+		if(playerInventory.getStackInSlot(slot).getItem() instanceof ItemInstrument) {
+			return new SlotDisabled(playerInventory, slot, xPos, yPos);
+		} else {
+			return new Slot(playerInventory, slot, xPos, yPos);
+		}
+	}
 
 	@Override
-	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, String newChannelString, String newNoteString) {
-		if(super.updateSelectedSwitcboard(player, newSourceId, newChannelString, newNoteString)) {
+	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, Byte newFilterOct, Byte newFilterNote, String newChannelString, Byte newInstrumentId, Boolean newSysInput) {
+		if(super.updateSelectedSwitcboard(player, newSourceId, newFilterOct, newFilterNote, newChannelString, newInstrumentId, newSysInput)) {
 			this.saveToInventory(player);
 			return true;
 		}

@@ -28,25 +28,19 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 
     @Override
 	protected Slot buildPlayerSlot(PlayerInventory playerInventory, int slot, int xPos, int yPos) {
-		if(playerInventory.getStackInSlot(slot).isEmpty() || ModItems.SWITCHBOARD.equals(playerInventory.getStackInSlot(slot).getItem())) {
-			return new Slot(playerInventory, slot, xPos, yPos) {
-				@Override
-				public boolean isItemValid(ItemStack stack) {
-					return ModItems.SWITCHBOARD.equals(stack.getItem());
-				}
-			};
-		} else {
-			return new SlotDisabled(playerInventory, slot, xPos, yPos);
-		}
+		return new Slot(playerInventory, slot, xPos, yPos);
 	}
 
-	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, String newChannelString, String newNoteString) {
+	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, Byte newFilterOct, Byte newFilterNote, String newChannelString, Byte newInstrumentId, Boolean newSysInput) {
 		ItemStack selectedStack = this.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
 
 		if(ModItems.SWITCHBOARD.equals(selectedStack.getItem())) {
 			ItemMidiSwitchboard.setMidiSource(selectedStack, newSourceId);
+			ItemMidiSwitchboard.setFilterOct(selectedStack, newFilterOct.intValue());
+			ItemMidiSwitchboard.setFilterNote(selectedStack, newFilterNote.intValue());
 			ItemMidiSwitchboard.setEnabledChannelsString(selectedStack, newChannelString);
-			ItemMidiSwitchboard.setFilterNoteString(selectedStack, newNoteString);
+			ItemMidiSwitchboard.setInstrument(selectedStack, newInstrumentId);
+			ItemMidiSwitchboard.setSysInput(selectedStack, newSysInput);
 			this.detectAndSendChanges();
             return true;
 		}
@@ -55,6 +49,6 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 	}
 
 	public ItemStack getSelectedSwitchboard() {
-		return this.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+		return this.getSlot(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
 	}
 }
