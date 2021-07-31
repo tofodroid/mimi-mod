@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.SyncItemInstrumentSwitchboardPacket;
@@ -50,10 +51,10 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
     private static final Integer NOTE_OFFSET_Y = 29;
 
     // GUI
-    private static final Vector2f SOURCE_SYS_BUTTON_COORDS = new Vector2f(37,132);
-    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(56,132);
-    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(75,132);
-    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(94,132);
+    private static final Vector2f SYS_DEVICE_BUTTON_COORDS = new Vector2f(105,84);
+    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(47,133);
+    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(66,133);
+    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(85,133);
     private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(300,31);
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(141,101);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(141,126);
@@ -202,8 +203,8 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
 
     @Override
     public void closeScreen() {
-        super.closeScreen();
         this.allNotesOff();
+        super.closeScreen();
     }
 
     @Override
@@ -227,6 +228,7 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
                     } else {
                         ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[0]);
                     }
+                    this.allNotesOff();
                 }
 
                 return super.mouseClicked(dmouseX, dmouseY, mouseButton);
@@ -262,11 +264,10 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
             } 
         } else {
             // Switchboard MIDI Controls
-            if(clickedBox(imouseX, imouseY, SOURCE_SYS_BUTTON_COORDS)) {
-                // Link MIDI Device Button
-                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, ItemMidiSwitchboard.SYS_SOURCE_ID);
+            if(clickedBox(imouseX, imouseY, SYS_DEVICE_BUTTON_COORDS)) {
+                // Toggle Sys Device Button
+                ItemMidiSwitchboard.setSysInput(selectedSwitchboardStack, !ItemMidiSwitchboard.getSysInput(selectedSwitchboardStack));
                 this.syncSwitchboardToServer();
-                this.refreshSourceName();
             } else if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
                 // Link Self Button
                 ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, player.getUniqueID());
@@ -445,21 +446,23 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
             this.releaseNote(note);
         }
 
-        // Send all notes off packet
         MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOffPacket.NO_CHANNEL, MidiNoteOffPacket.ALL_NOTES_OFF, instrumentId, player.getUniqueID());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        MidiNotePacketHandler.handleOffPacketClient(packet, player);
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        // send packet
         MidiNoteOnPacket packet = new MidiNoteOnPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        MIMIMod.proxy.getMidiSynth().handleNoteOn(packet);
+        this.holdNote(midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
-        // send packet
         MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, instrumentId, player.getUniqueID());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        MIMIMod.proxy.getMidiSynth().handleNoteOff(packet);
+        this.releaseNote(midiNote);
     }
 
     private void holdNote(Byte midiNote, Byte velocity) {
@@ -577,6 +580,11 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
             blit(matrixStack, -(this.guiTop + 29 + 126),  this.guiLeft + 11, this.getBlitOffset(), 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
             matrixStack.pop();
 
+            // Sys MIDI Device Status Light
+            if(ItemMidiSwitchboard.getSysInput(selectedSwitchboardStack)) {
+                blit(matrixStack, this.guiLeft + 124, this.guiTop + 90, this.getBlitOffset(), 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
+
             // Channel Output Status Lights
             SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(this.selectedSwitchboardStack);
 
@@ -650,7 +658,7 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
 
         // MIDI Source Name
         if(editMode) {
-            font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 21, 120, 0xFF00E600);
+            font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
         }
 
         // Keyboard Layout
@@ -694,22 +702,24 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
     }
 
     private void refreshSourceName() {
-        UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
-        if(sourceId != null) {
-            if(sourceId.equals(player.getUniqueID())) {
-                this.selectedSourceName = "My Transmitter";
-            } else if(sourceId.equals(ItemMidiSwitchboard.SYS_SOURCE_ID)) {
-                this.selectedSourceName = "MIDI Input Device";
-            } else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
-                this.selectedSourceName = "Public Transmitters";
-            } else if(this.minecraft != null && this.minecraft.world != null) {
-                this.selectedSourceName = PlayerNameUtils.getPlayerNameFromUUID(sourceId, this.minecraft.world);
-            } else {
-                this.selectedSourceName = "Unknown";
-            }
-        } else {
-            this.selectedSourceName = "None";
-        }
+		if(this.selectedSwitchboardStack != null) {
+			UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
+			if(sourceId != null) {
+				if(sourceId.equals(player.getUniqueID())) {
+					this.selectedSourceName = player.getName().getString();
+				} else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
+					this.selectedSourceName = "Public Transmitters";
+				} else if(this.minecraft != null && this.minecraft.world != null) {
+					this.selectedSourceName = PlayerNameUtils.getPlayerNameFromUUID(sourceId, this.minecraft.world);
+				} else {
+					this.selectedSourceName = "Unknown";
+				}
+			} else {
+				this.selectedSourceName = "None";
+			}
+		} else {
+			this.selectedSourceName = "";
+		}
     }
 
     public void syncSwitchboardToServer() {

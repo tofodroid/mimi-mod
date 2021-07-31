@@ -1,11 +1,9 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -62,30 +60,32 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 		if(selectedSwitchboardStack != null) {
 			if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
 				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, this.player.getUniqueID());
-				this.syncReceiverToServer();
+				this.syncSwitchboardToServer();
 				this.refreshSourceName();
 			} else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
 				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, ItemMidiSwitchboard.PUBLIC_SOURCE_ID);
-				this.syncReceiverToServer();
+				this.syncSwitchboardToServer();
 				this.refreshSourceName();
 			} else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
 				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, null);
-				this.syncReceiverToServer();
+				this.syncSwitchboardToServer();
 				this.refreshSourceName();
 			} else if(clickedBox(imouseX, imouseY, NOTE_LETTER_BUTTON_COORDS)) {
 				shiftFilterNoteLetter();
-				ItemMidiSwitchboard.setFilterNoteString(selectedSwitchboardStack, buildFilterNoteString());
-				this.syncReceiverToServer();
+				ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter);
+                this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
+				this.syncSwitchboardToServer();
 			} else if(clickedBox(imouseX, imouseY, NOTE_OCTAVE_BUTTON_COORDS)) {
 				shiftFilterNoteOctave();
-				ItemMidiSwitchboard.setFilterNoteString(selectedSwitchboardStack, buildFilterNoteString());
-				this.syncReceiverToServer();
+				ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave);
+                this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
+				this.syncSwitchboardToServer();
 			} else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
 				ItemMidiSwitchboard.clearEnabledChannels(selectedSwitchboardStack);
-				this.syncReceiverToServer();
+				this.syncSwitchboardToServer();
 			} else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
 				ItemMidiSwitchboard.setEnableAllChannels(selectedSwitchboardStack);
-				this.syncReceiverToServer();
+				this.syncSwitchboardToServer();
 			} else {
 				// Individual Midi Channel Buttons
 				for(int i = 0; i < 16; i++) {
@@ -96,7 +96,7 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 
 					if(clickedBox(imouseX, imouseY, buttonCoords)) {
 						ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(i).byteValue());
-						this.syncReceiverToServer();
+						this.syncSwitchboardToServer();
 						return super.mouseClicked(dmouseX, dmouseY, button);
 					}
 				}
@@ -161,9 +161,7 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 			UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
 			if(sourceId != null) {
 				if(sourceId.equals(player.getUniqueID())) {
-					this.selectedSourceName = "My Transmitter";
-				} else if(sourceId.equals(ItemMidiSwitchboard.SYS_SOURCE_ID)) {
-					this.selectedSourceName = "MIDI Input Device";
+					this.selectedSourceName = player.getName().getString();
 				} else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
 					this.selectedSourceName = "Public Transmitters";
 				} else if(this.minecraft != null && this.minecraft.world != null) {
@@ -182,86 +180,21 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
     public void loadLetterAndOctave() {
 
 		if(this.selectedSwitchboardStack != null) {
-			ArrayList<Byte> filteredNoteList = ItemMidiSwitchboard.getFilterNotes(selectedSwitchboardStack);
-        
-			if(filteredNoteList != null && !filteredNoteList.isEmpty()) {
-				if(filteredNoteList.size() == 1) {
-					// Single Note
-					if(filteredNoteList.get(0) < 0) {
-						filterNoteOctave = 10;
-						filterNoteLetter = (127 - filteredNoteList.get(0).intValue()) % 12;
-						invalidFilterNote = true;
-					} else {
-						filterNoteOctave = (filteredNoteList.get(0).byteValue()) / 12;
-						filterNoteLetter = filteredNoteList.get(0).intValue() % 12;
-					}
-				} else if(filteredNoteList.get(1) - filteredNoteList.get(0) == 1) {
-					// Any Letter
-					filterNoteOctave = (filteredNoteList.get(0).byteValue()) / 12;
-				} else {
-					// Any Octave
-					filterNoteLetter = filteredNoteList.get(0).intValue() % 12;
-				}
-			}
-			this.updateFilterNoteString();
+			this.filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack);
+			this.filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack);
+            this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 		} else {
 			filterNoteOctave = -1;
 			filterNoteLetter = -1;
 			filterNoteString = "";
 		}       
     }
-
-    public String buildFilterNoteString() {
-        String filterString = "";
-        Integer filterNoteLetterMidi = filterNoteLetter >= 0 ? filterNoteLetter % 12 : -1;
-        invalidFilterNote = false;
-
-        if(filterNoteLetterMidi >= 0 && filterNoteOctave >= 0) {
-            Integer midiNote = 12 * filterNoteOctave;
-            midiNote += filterNoteLetterMidi;
-
-            if(midiNote > 127) {
-                invalidFilterNote = true;
-                filterString = new Integer(127 - midiNote).toString();
-            } else {
-                filterString = midiNote.toString();
-            }
-        } else if(filterNoteLetterMidi >= 0) {
-            Integer midiNote = filterNoteLetterMidi;
-            for(int i = 0; i < 11; i++) {
-                Integer note = (midiNote + i * 12);
-                if(note <= Byte.MAX_VALUE) {
-                    filterString += note + ",";
-                }
-            }
-            filterString = filterString.substring(0, filterString.length()-1);
-        } else if(filterNoteOctave >= 0) {
-            Integer midiNote = filterNoteOctave*12;
-            for(int i = 0; i < 12; i++) {
-                Integer note = (midiNote + i);
-                if(note <= Byte.MAX_VALUE) {
-                    filterString += note + ",";
-                }
-            }
-            filterString = filterString.substring(0, filterString.length()-1);
-        }
-        
-        MIMIMod.LOGGER.info("Saved Note String: " + filterString);
-        return filterString;
-    }
-
-    public void updateFilterNoteString() {
-        filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave >= 0 ? filterNoteOctave : "*");
-        filterNoteString = "**".equals(filterNoteString) ? "All" : filterNoteString;
-    }
-
     public void shiftFilterNoteLetter() {
         if(filterNoteLetter < 11) {
             filterNoteLetter++;
         } else {
             filterNoteLetter = -1;
         }
-        updateFilterNoteString();
     }
     
     public void shiftFilterNoteOctave() {
@@ -270,43 +203,9 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
         } else {
             filterNoteOctave = -1;
         }
-        updateFilterNoteString();
     }
 
-    private String noteLetterFromNum(Integer octaveNoteNum) {
-        switch(octaveNoteNum) {
-            case -1:
-                return "*";
-            case 0:
-                return "C";
-            case 1:
-                return "C#";
-            case 2:
-                return "D";
-            case 3:
-                return "D#";
-            case 4:
-                return "E";
-            case 5:
-                return "F";
-            case 6:
-                return "F#";
-            case 7:
-                return "G";
-            case 8:
-                return "G#";
-            case 9:
-                return "A";
-            case 10:
-                return "A#";
-            case 11:
-                return "B";
-        }
-
-        return "";
-    }
-
-    public void syncReceiverToServer() {
+    public void syncSwitchboardToServer() {
         SwitchboardStackUpdatePacket packet = null;
 
         if(selectedSwitchboardStack != null && ModItems.SWITCHBOARD.equals(selectedSwitchboardStack.getItem())) {

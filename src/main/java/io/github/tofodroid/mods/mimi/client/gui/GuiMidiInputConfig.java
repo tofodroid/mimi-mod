@@ -20,7 +20,7 @@ public class GuiMidiInputConfig extends BaseGui {
     private MidiInputManager midiInputManager;
 
     public GuiMidiInputConfig(PlayerEntity player) {
-        super(300, 173, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
+        super(300, 158, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
         this.midiInputManager = MIMIMod.proxy.getMidiInput();
     }
 
@@ -52,7 +52,7 @@ public class GuiMidiInputConfig extends BaseGui {
         if(this.midiInputManager != null && this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null) {
             Integer statusX = START_X + 283;
             Integer statusY = START_Y + 69;
-            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isSelectedDeviceAvailable() ? 0 : 4, 174, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isSelectedDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         return matrixStack;
