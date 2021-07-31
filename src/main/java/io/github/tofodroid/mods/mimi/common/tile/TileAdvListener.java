@@ -35,14 +35,12 @@ public class TileAdvListener extends ATileInventory {
     }
     
     public Boolean shouldAcceptNote(Byte note, Byte instrumentId) {
-        Boolean doAccept = true;
         ItemStack switchStack = getSwitchboardStack();
 
         if(!switchStack.isEmpty()) {
-            doAccept = ItemMidiSwitchboard.isNoteFiltered(switchStack, note);
-            doAccept = doAccept && (ItemMidiSwitchboard.getInstrument(switchStack) == -1 || ItemMidiSwitchboard.getInstrument(switchStack) == instrumentId);
+            return ItemMidiSwitchboard.isNoteFiltered(switchStack, note) && (ItemMidiSwitchboard.getInstrument(switchStack) == -1 || ItemMidiSwitchboard.getInstrument(switchStack) == instrumentId);
         }
 
-        return doAccept;
+        return false;
     }
 }
