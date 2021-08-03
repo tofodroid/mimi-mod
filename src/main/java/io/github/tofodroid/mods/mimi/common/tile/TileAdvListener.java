@@ -38,7 +38,7 @@ public class TileAdvListener extends ATileInventory {
         ItemStack switchStack = getSwitchboardStack();
 
         if(!switchStack.isEmpty()) {
-            return ItemMidiSwitchboard.isNoteFiltered(switchStack, note) && (ItemMidiSwitchboard.getInstrument(switchStack) == -1 || ItemMidiSwitchboard.getInstrument(switchStack) == instrumentId);
+            return ItemMidiSwitchboard.isNoteFiltered(switchStack, note) && ItemMidiSwitchboard.isInstrumentFiltered(switchStack, instrumentId);
         }
 
         return false;

@@ -28,10 +28,14 @@ import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket
 public class ItemMidiSwitchboard extends Item {
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
+    public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
+    public static final Byte FILTER_NOTE_OCT_ALL = Byte.MAX_VALUE;
     public static final String SOURCE_TAG = "source_uuid";
     public static final String SYS_INPUT_TAG = "sys_input";
     public static final String ENABLED_CHANNELS_TAG = "enabled_channels";
     public static final String INSTRUMENT_TAG = "filter_instrument";
+    public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
+    public static final Byte INSTRUMENT_ALL = Byte.MAX_VALUE;
 
     public static final UUID NONE_SOURCE_ID = new UUID(0,0);
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
@@ -176,41 +180,41 @@ public class ItemMidiSwitchboard extends Item {
         return SortedArraySet.newSet(0);
     }
 
-    public static void setFilterOct(ItemStack stack, Integer oct) {
+    public static void setFilterOct(ItemStack stack, Byte oct) {
         if (oct >= 0) {
-            stack.getOrCreateTag().putInt(FILTER_OCT_TAG, oct);
+            stack.getOrCreateTag().putByte(FILTER_OCT_TAG, oct);
         } else if (stack.hasTag()) {
             stack.getTag().remove(FILTER_OCT_TAG);
         }
     }
     
-    public static void setFilterNote(ItemStack stack, Integer note) {
+    public static void setFilterNote(ItemStack stack, Byte note) {
         if (note >= 0) {
-            stack.getOrCreateTag().putInt(FILTER_NOTE_TAG, note);
+            stack.getOrCreateTag().putByte(FILTER_NOTE_TAG, note);
         } else if (stack.hasTag()) {
             stack.getTag().remove(FILTER_NOTE_TAG);
         }
     }
 
-    public static Integer getFilterOct(ItemStack stack) {
+    public static Byte getFilterOct(ItemStack stack) {
         if (stackTagContainsKey(stack, FILTER_OCT_TAG)) {
-            return stack.getTag().getInt(FILTER_OCT_TAG);
+            return stack.getTag().getByte(FILTER_OCT_TAG);
         }
 
-        return -1;
+        return FILTER_NOTE_OCT_ALL;
     }
 
-    public static Integer getFilterNote(ItemStack stack) {
+    public static Byte getFilterNote(ItemStack stack) {
         if (stackTagContainsKey(stack, FILTER_NOTE_TAG)) {
-            return stack.getTag().getInt(FILTER_NOTE_TAG);
+            return stack.getTag().getByte(FILTER_NOTE_TAG);
         }
 
-        return -1;
+        return FILTER_NOTE_OCT_ALL;
     }
     
     public static void setInstrument(ItemStack stack, Byte instrumentId) {
         if (instrumentId >= 0) {
-            stack.getOrCreateTag().putInt(INSTRUMENT_TAG, instrumentId);
+            stack.getOrCreateTag().putByte(INSTRUMENT_TAG, instrumentId);
         } else if (stack.hasTag()) {
             stack.getTag().remove(INSTRUMENT_TAG);
         }
@@ -221,7 +225,7 @@ public class ItemMidiSwitchboard extends Item {
             return stack.getTag().getByte(INSTRUMENT_TAG);
         }
 
-        return -1;
+        return INSTRUMENT_ALL;
     }
     
     public static void setSysInput(ItemStack stack, Boolean sysInput) {
@@ -239,25 +243,57 @@ public class ItemMidiSwitchboard extends Item {
 
         return false;
     }
+    
+    public static void setInvertNoteOct(ItemStack stack, Boolean invert) {
+        if (invert) {
+            stack.getOrCreateTag().putBoolean(INVERT_NOTE_OCT_TAG, invert);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(INVERT_NOTE_OCT_TAG);
+        }
+    }
+
+    public static Boolean getInvertNoteOct(ItemStack stack) {
+        if (stackTagContainsKey(stack, INVERT_NOTE_OCT_TAG)) {
+            return stack.getTag().getBoolean(INVERT_NOTE_OCT_TAG);
+        }
+
+        return false;
+    }
+
+    public static void setInvertInstrument(ItemStack stack, Boolean invert) {
+        if (invert) {
+            stack.getOrCreateTag().putBoolean(INVERT_INSTRUMENT_TAG, invert);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(INVERT_INSTRUMENT_TAG);
+        }
+    }
+
+    public static Boolean getInvertInstrument(ItemStack stack) {
+        if (stackTagContainsKey(stack, INVERT_INSTRUMENT_TAG)) {
+            return stack.getTag().getBoolean(INVERT_INSTRUMENT_TAG);
+        }
+
+        return false;
+    }
 
     public String getInstrumentName(ItemStack stack) {
-        return INSTRUMENT_NAME_MAP.get(ItemMidiSwitchboard.getInstrument(stack));
+        return INSTRUMENT_NAME_MAP.get(new Integer(Math.abs(ItemMidiSwitchboard.getInstrument(stack))).byteValue());
     }
 
     public static List<Byte> getFilterNotes(ItemStack stack) {
         List<Byte> result = new ArrayList<>();
-        Integer oct = getFilterOct(stack);
-        Integer note = getFilterNote(stack);
+        Byte oct = getFilterOct(stack);
+        Byte note = getFilterNote(stack);
 
-        if(oct >= 0 && note >= 0) {
+        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL) {
             result.add(new Integer(oct*12+note).byteValue());
-        } else if(oct >= 0) {
+        } else if(oct != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 12; i++) {
                 if(new Integer(oct*12+i) < Byte.MAX_VALUE) {
                     result.add(new Integer(oct*12+i).byteValue());
                 }
             }
-        } else if(note >= 0) {
+        } else if(note != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 10; i++) {
                 if(new Integer(i*12+note) < Byte.MAX_VALUE) {
                     result.add(new Integer(i*12+note).byteValue());
@@ -269,13 +305,13 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public static String getFilteredNotesAsString(ItemStack stack) {
-        Integer filterNoteLetter = getFilterNote(stack);
-        Integer filterNoteOctave = getFilterOct(stack);
+        Byte filterNoteLetter = getFilterNote(stack);
+        Byte filterNoteOctave = getFilterOct(stack);
         String filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave >= 0 ? filterNoteOctave : "*");
         return "**".equals(filterNoteString) ? "All" : filterNoteString;
     }
 
-    public static String noteLetterFromNum(Integer octaveNoteNum) {
+    public static String noteLetterFromNum(Byte octaveNoteNum) {
         switch(octaveNoteNum) {
             case -1:
                 return "*";
@@ -310,7 +346,12 @@ public class ItemMidiSwitchboard extends Item {
 
     public static Boolean isNoteFiltered(ItemStack stack, Byte note) {
         List<Byte> filteredNotes = getFilterNotes(stack);
-        return filteredNotes.isEmpty() ? true : filteredNotes.contains(note);
+        return filteredNotes.isEmpty() ? true : getInvertNoteOct(stack) ? !filteredNotes.contains(note) : filteredNotes.contains(note);
+    }
+
+    public static Boolean isInstrumentFiltered(ItemStack stack, Byte instrument) {
+        Byte instrumentId = getInstrument(stack);
+        return instrumentId.equals(INSTRUMENT_ALL) ? true : getInvertInstrument(stack) ? instrumentId != instrument : instrumentId == instrument;
     }
 
     protected static Boolean stackTagContainsKey(ItemStack stack, String tag) {
@@ -320,10 +361,12 @@ public class ItemMidiSwitchboard extends Item {
     public static SwitchboardStackUpdatePacket getSyncPacket(ItemStack stack) {
         return new SwitchboardStackUpdatePacket(
             ItemMidiSwitchboard.getMidiSource(stack),
-            ItemMidiSwitchboard.getFilterOct(stack).byteValue(),
-            ItemMidiSwitchboard.getFilterNote(stack).byteValue(),
+            ItemMidiSwitchboard.getFilterOct(stack),
+            ItemMidiSwitchboard.getFilterNote(stack),
+            ItemMidiSwitchboard.getInvertNoteOct(stack),
             ItemMidiSwitchboard.getEnabledChannelsString(stack),
             ItemMidiSwitchboard.getInstrument(stack),
+            ItemMidiSwitchboard.getInvertInstrument(stack),
             ItemMidiSwitchboard.getSysInput(stack)
         );
     }
@@ -338,7 +381,7 @@ public class ItemMidiSwitchboard extends Item {
     
     protected Map<Byte,String> loadInstrumentNames() {
         Map<Byte,String> result = new HashMap<>();
-        result.put(new Integer(-1).byteValue(), "All");
+        result.put(Byte.MAX_VALUE, "All");
         ModItems.INSTRUMENT_ITEMS.forEach(item -> {
             result.put(item.getInstrumentId(), item.getName().getString());
         });

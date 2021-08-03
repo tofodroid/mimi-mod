@@ -17,7 +17,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 
 public class ContainerInstrument extends ASwitchboardContainer {
-    private static final int SWITCHBOARD_SLOT_POS_X = 134;
+    private static final int SWITCHBOARD_SLOT_POS_X = 127;
 	private static final int SWITCHBOARD_SLOT_POS_Y = 219;
 	protected static final int INVENTORY_PLAYER_START_X = 156;
 	protected static final int INVENTORY_PLAYER_START_Y = 182;
@@ -95,8 +95,8 @@ public class ContainerInstrument extends ASwitchboardContainer {
 	}
 
 	@Override
-	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, Byte newFilterOct, Byte newFilterNote, String newChannelString, Byte newInstrumentId, Boolean newSysInput) {
-		if(super.updateSelectedSwitcboard(player, newSourceId, newFilterOct, newFilterNote, newChannelString, newInstrumentId, newSysInput)) {
+	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput) {
+		if(super.updateSelectedSwitcboard(player, newSourceId, newFilterOct, newFilterNote, newInvertNoteOct, newChannelString, newInstrumentId, newInvertInstrument, newSysInput)) {
 			this.saveToInventory(player);
 			return true;
 		}

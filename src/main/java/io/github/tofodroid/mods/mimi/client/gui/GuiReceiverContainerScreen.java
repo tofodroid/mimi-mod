@@ -21,14 +21,15 @@ import net.minecraft.util.text.ITextComponent;
 
 public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiver> {
     // Button Boxes
-    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(40,112);
-    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(59,112);
-    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(78,112);
-    private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(73,59);
-    private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(92,59);
-    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(121,28);
-    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(140,28);
-    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(121,53);
+    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(40,123);
+    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(59,123);
+    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(78,123);
+    private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(61,151);
+    private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(80,151);
+    private static final Vector2f NOTE_INVERT_BUTTON_COORDS = new Vector2f(99,151);
+    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(131,118);
+    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(150,118);
+    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(131,144);
 
 	// Input Data
     private final PlayerEntity player;
@@ -72,12 +73,16 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 				this.refreshSourceName();
 			} else if(clickedBox(imouseX, imouseY, NOTE_LETTER_BUTTON_COORDS)) {
 				shiftFilterNoteLetter();
-				ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter);
+				ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter.byteValue());
                 this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 				this.syncSwitchboardToServer();
 			} else if(clickedBox(imouseX, imouseY, NOTE_OCTAVE_BUTTON_COORDS)) {
 				shiftFilterNoteOctave();
-				ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave);
+				ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave.byteValue());
+                this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
+				this.syncSwitchboardToServer();
+			} else if(clickedBox(imouseX, imouseY, NOTE_INVERT_BUTTON_COORDS)) {
+				ItemMidiSwitchboard.setInvertNoteOct(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack));
                 this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 				this.syncSwitchboardToServer();
 			} else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
@@ -91,7 +96,7 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 				for(int i = 0; i < 16; i++) {
 					Vector2f buttonCoords = new Vector2f(
 						GEN_MIDI_BUTTON_COORDS.x + (i % 8) * 19,
-						GEN_MIDI_BUTTON_COORDS.y + (i / 8) * 25
+						GEN_MIDI_BUTTON_COORDS.y + (i / 8) * 27
 					);
 
 					if(clickedBox(imouseX, imouseY, buttonCoords)) {
@@ -114,14 +119,18 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
         // GUI Background
         blit(matrixStack, this.guiLeft, this.guiTop, this.getBlitOffset(), 0, 0, this.xSize, this.ySize, TEXTURE_SIZE, TEXTURE_SIZE);
 
-        // Channel Output Status Lights
 		if(this.selectedSwitchboardStack != null) {
+			// Channel Output Status Lights
 			SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(this.selectedSwitchboardStack);
-
 			if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
 				for(Byte channelId : acceptedChannels) {
-                    blit(matrixStack, this.guiLeft + 146 + 19 * (channelId % 8), this.guiTop + 46 + (channelId / 8) * 25, this.getBlitOffset(), 0, 172, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                    blit(matrixStack, this.guiLeft + 146 + 19 * (channelId % 8), this.guiTop + 46 + (channelId / 8) * 27, this.getBlitOffset(), 0, 172, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
                 }
+			}
+			
+        	// Invert Status Light
+			if(ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack)) {
+				blit(matrixStack, this.guiLeft + 117, this.guiTop + 157, this.getBlitOffset(), 0, 181, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
 			}
 		}
 
@@ -132,10 +141,10 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
     protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
 		if(this.selectedSwitchboardStack != null) {
 			// MIDI Source Name
-			font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 16, 100, 0xFF00E600);
+			font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 16, 111, 0xFF00E600);
 		
 			// Filter Note
-			font.drawString(matrixStack, this.filterNoteString, 43, 63, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, this.filterNoteString, 41, 155, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
 		}
        
         return matrixStack;
@@ -180,8 +189,8 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
     public void loadLetterAndOctave() {
 
 		if(this.selectedSwitchboardStack != null) {
-			this.filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack);
-			this.filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack);
+			this.filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
+			this.filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
             this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 		} else {
 			filterNoteOctave = -1;

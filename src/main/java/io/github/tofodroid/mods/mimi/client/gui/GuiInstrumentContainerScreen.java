@@ -63,7 +63,7 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
     private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(59,177);
     private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(84,177);
     private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(129,177);
-    private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(112,219);
+    private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(105,219);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;

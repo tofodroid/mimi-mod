@@ -20,9 +20,12 @@ import net.minecraft.util.text.ITextComponent;
 
 public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdvListener> {
     // Button Boxes
-    private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(85,67);
-    private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(104,67);
-    private static final Vector2f CYCLE_INSTRUMENT_BUTTON_COORDS = new Vector2f(274,14);
+    private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(14,107);
+    private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(33,107);
+    private static final Vector2f NOTE_INVERT_BUTTON_COORDS = new Vector2f(109,107);
+    private static final Vector2f DOWN_INSTRUMENT_BUTTON_COORDS = new Vector2f(144,107);
+    private static final Vector2f UP_INSTRUMENT_BUTTON_COORDS = new Vector2f(260,107);
+    private static final Vector2f INVERT_INSTRUMeNT_BUTTON_COORDS = new Vector2f(279,107);
     private final List<Byte> INSTRUMENT_ID_LIST;
     
     // Runtime Data
@@ -53,18 +56,28 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
 		if(selectedSwitchboardStack != null) {
 			if(clickedBox(imouseX, imouseY, NOTE_LETTER_BUTTON_COORDS)) {
 				shiftFilterNoteLetter();
-				ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter);
+				ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter.byteValue());
                 this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 				this.syncSwitchboardToServer();
 			} else if(clickedBox(imouseX, imouseY, NOTE_OCTAVE_BUTTON_COORDS)) {
 				shiftFilterNoteOctave();
-				ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave);
+				ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave.byteValue());
                 this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 				this.syncSwitchboardToServer();
-			} else if(clickedBox(imouseX, imouseY, CYCLE_INSTRUMENT_BUTTON_COORDS)) {
-				shiftInstrumentId();
-				ItemMidiSwitchboard.setInstrument(selectedSwitchboardStack, INSTRUMENT_ID_LIST.get(instrumentIndex));
+			} else if(clickedBox(imouseX, imouseY, NOTE_INVERT_BUTTON_COORDS)) {
+				ItemMidiSwitchboard.setInvertNoteOct(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack));
                 this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
+				this.syncSwitchboardToServer();
+			} else if(clickedBox(imouseX, imouseY, DOWN_INSTRUMENT_BUTTON_COORDS)) {
+				shiftInstrumentId(false);
+				ItemMidiSwitchboard.setInstrument(selectedSwitchboardStack, INSTRUMENT_ID_LIST.get(instrumentIndex));
+				this.syncSwitchboardToServer();
+			} else if(clickedBox(imouseX, imouseY, UP_INSTRUMENT_BUTTON_COORDS)) {
+				shiftInstrumentId(true);
+				ItemMidiSwitchboard.setInstrument(selectedSwitchboardStack, INSTRUMENT_ID_LIST.get(instrumentIndex));
+				this.syncSwitchboardToServer();
+			} else if(clickedBox(imouseX, imouseY, INVERT_INSTRUMeNT_BUTTON_COORDS)) {
+				ItemMidiSwitchboard.setInvertInstrument(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertInstrument(selectedSwitchboardStack));
 				this.syncSwitchboardToServer();
 			}
 		}
@@ -80,6 +93,17 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
         // GUI Background
         blit(matrixStack, this.guiLeft, this.guiTop, this.getBlitOffset(), 0, 0, this.xSize, this.ySize, TEXTURE_SIZE, TEXTURE_SIZE);
 
+        if(selectedSwitchboardStack != null) {
+            // Invert Status Lights
+            if(ItemMidiSwitchboard.getInvertInstrument(selectedSwitchboardStack)) {
+                blit(matrixStack, this.guiLeft + 298, this.guiTop + 113, this.getBlitOffset(), 0, 137, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
+    
+            if(ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack)) {
+                blit(matrixStack, this.guiLeft + 128, this.guiTop + 113, this.getBlitOffset(), 0, 137, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
+        } 
+
         return matrixStack;
     }
 
@@ -87,10 +111,10 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
     protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
 		if(this.selectedSwitchboardStack != null) {
 			// Filter Note
-			font.drawString(matrixStack, this.filterNoteString, 43, 71, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, this.filterNoteString, 54, 111, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
 
 			// Filter Instrument
-			font.drawString(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), 193, 18, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), 165, 111, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
 		}
        
         return matrixStack;
@@ -111,8 +135,8 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
 
     public void loadLetterAndOctave() {
 		if(this.selectedSwitchboardStack != null) {
-			filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack);
-			filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack);
+			filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
+			filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
 			filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 		} else {
 			filterNoteOctave = -1;
@@ -137,11 +161,19 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
         }
     }
 
-    public void shiftInstrumentId() {
-        if(instrumentIndex < INSTRUMENT_ID_LIST.size()-1) {
-            instrumentIndex++;
+    public void shiftInstrumentId(Boolean up) {
+        if(up) {
+            if(instrumentIndex < INSTRUMENT_ID_LIST.size()-1) {
+                instrumentIndex++;
+            } else {
+                instrumentIndex = 0;
+            }
         } else {
-            instrumentIndex = 0;
+            if(instrumentIndex > 0) {
+                instrumentIndex--;
+            } else {
+                instrumentIndex = INSTRUMENT_ID_LIST.size()-1;
+            }
         }
     }
 

@@ -8,10 +8,10 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class ContainerReceiver extends ASwitchboardContainer
 {		
-	private static final int SWITCHBOARD_SLOT_POS_X = 109;
-	private static final int SWITCHBOARD_SLOT_POS_Y = 141;
-	protected static final int INVENTORY_PLAYER_START_X = 131;
-	protected static final int INVENTORY_PLAYER_START_Y = 104;
+	private static final int SWITCHBOARD_SLOT_POS_X = 111;
+	private static final int SWITCHBOARD_SLOT_POS_Y = 70;
+	protected static final int INVENTORY_PLAYER_START_X = 139;
+	protected static final int INVENTORY_PLAYER_START_Y = 31;
 
 	public ContainerReceiver(int id, PlayerInventory playerInventory, PacketBuffer extraData) {
 		super(ModContainers.RECEIVER, id, playerInventory);

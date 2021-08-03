@@ -31,15 +31,17 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 		return new Slot(playerInventory, slot, xPos, yPos);
 	}
 
-	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, Byte newFilterOct, Byte newFilterNote, String newChannelString, Byte newInstrumentId, Boolean newSysInput) {
+	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput) {
 		ItemStack selectedStack = this.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
 
 		if(ModItems.SWITCHBOARD.equals(selectedStack.getItem())) {
 			ItemMidiSwitchboard.setMidiSource(selectedStack, newSourceId);
-			ItemMidiSwitchboard.setFilterOct(selectedStack, newFilterOct.intValue());
-			ItemMidiSwitchboard.setFilterNote(selectedStack, newFilterNote.intValue());
+			ItemMidiSwitchboard.setFilterOct(selectedStack, newFilterOct);
+			ItemMidiSwitchboard.setFilterNote(selectedStack, newFilterNote);
+			ItemMidiSwitchboard.setInvertNoteOct(selectedStack, newInvertNoteOct);
 			ItemMidiSwitchboard.setEnabledChannelsString(selectedStack, newChannelString);
 			ItemMidiSwitchboard.setInstrument(selectedStack, newInstrumentId);
+			ItemMidiSwitchboard.setInvertInstrument(selectedStack, newInvertInstrument);
 			ItemMidiSwitchboard.setSysInput(selectedStack, newSysInput);
 			this.detectAndSendChanges();
             return true;
