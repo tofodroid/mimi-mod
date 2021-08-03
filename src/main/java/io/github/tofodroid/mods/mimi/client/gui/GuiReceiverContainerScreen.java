@@ -43,7 +43,7 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 	private ItemStack selectedSwitchboardStack;
     
     public GuiReceiverContainerScreen(ContainerReceiver container, PlayerInventory inv, ITextComponent textComponent) {
-        super(container, inv, 303, 172, 303, "textures/gui/container_receiver.png", textComponent);
+        super(container, inv, 311, 180, 311, "textures/gui/container_receiver.png", textComponent);
         this.player = inv.player;
 		
         if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {

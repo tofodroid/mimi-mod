@@ -37,7 +37,7 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
 	private ItemStack selectedSwitchboardStack;
     
     public GuiAdvListenerContainerScreen(ContainerAdvListener container, PlayerInventory inv, ITextComponent textComponent) {
-        super(container, inv, 303, 127, 303, "textures/gui/container_advlistener.png", textComponent);
+        super(container, inv, 315, 136, 315, "textures/gui/container_advlistener.png", textComponent);
 
         INSTRUMENT_ID_LIST = ModItems.SWITCHBOARD.INSTRUMENT_NAME_MAP().keySet().stream().sorted().collect(Collectors.toList());
 		

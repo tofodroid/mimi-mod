@@ -12,7 +12,7 @@ public class ContainerAdvListener extends ASwitchboardContainer
 	private static final int SWITCHBOARD_SLOT_POS_X = 114;
 	private static final int SWITCHBOARD_SLOT_POS_Y = 70;
 	protected static final int INVENTORY_PLAYER_START_X = 143;
-	protected static final int INVENTORY_PLAYER_START_Y = 13;
+	protected static final int INVENTORY_PLAYER_START_Y = 31;
 
 	public ContainerAdvListener(int id, PlayerInventory playerInventory, PacketBuffer extraData) {
 		super(ModContainers.ADVLISTENER, id, playerInventory);

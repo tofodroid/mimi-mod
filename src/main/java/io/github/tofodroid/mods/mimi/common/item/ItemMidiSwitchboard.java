@@ -307,13 +307,13 @@ public class ItemMidiSwitchboard extends Item {
     public static String getFilteredNotesAsString(ItemStack stack) {
         Byte filterNoteLetter = getFilterNote(stack);
         Byte filterNoteOctave = getFilterOct(stack);
-        String filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave >= 0 ? filterNoteOctave : "*");
+        String filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave != FILTER_NOTE_OCT_ALL ? filterNoteOctave : "*");
         return "**".equals(filterNoteString) ? "All" : filterNoteString;
     }
 
     public static String noteLetterFromNum(Byte octaveNoteNum) {
         switch(octaveNoteNum) {
-            case -1:
+            case 127:
                 return "*";
             case 0:
                 return "C";
@@ -346,12 +346,12 @@ public class ItemMidiSwitchboard extends Item {
 
     public static Boolean isNoteFiltered(ItemStack stack, Byte note) {
         List<Byte> filteredNotes = getFilterNotes(stack);
-        return filteredNotes.isEmpty() ? true : getInvertNoteOct(stack) ? !filteredNotes.contains(note) : filteredNotes.contains(note);
+        return filteredNotes.isEmpty() ? !getInvertNoteOct(stack) : getInvertNoteOct(stack) ? !filteredNotes.contains(note) : filteredNotes.contains(note);
     }
 
     public static Boolean isInstrumentFiltered(ItemStack stack, Byte instrument) {
         Byte instrumentId = getInstrument(stack);
-        return instrumentId.equals(INSTRUMENT_ALL) ? true : getInvertInstrument(stack) ? instrumentId != instrument : instrumentId == instrument;
+        return instrumentId.equals(INSTRUMENT_ALL) ? !getInvertInstrument(stack) : getInvertInstrument(stack) ? instrumentId != instrument : instrumentId == instrument;
     }
 
     protected static Boolean stackTagContainsKey(ItemStack stack, String tag) {
