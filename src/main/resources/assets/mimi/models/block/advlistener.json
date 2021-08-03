@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_column",
+    "textures": {
+        "end": "mimi:block/advlistener/end",
+        "side": "mimi:block/advlistener/side"
+    }
+}

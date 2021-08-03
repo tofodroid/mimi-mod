@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
@@ -13,6 +14,7 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -20,27 +22,21 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import java.util.Map;
-import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
 
-public abstract class BlockInstrument extends Block implements IWaterLoggable {
+public abstract class BlockInstrument extends AContainerBlock<TileInstrument> implements IWaterLoggable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -58,37 +54,31 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
     }
 
     protected abstract Map<Direction, VoxelShape> generateShapes();
-
+    
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        TileInstrument tileInstrument = getTileInstrumentForBlock(worldIn, pos);
+        TileInstrument tileInstrument = getTileForBlock(worldIn, pos);
         
-
         if(tileInstrument != null) {
-            UUID instrumentMaestro = ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(ItemInstrument.getEntityHeldInstrumentStack(player, hand));
-
-            // Server-Side: If right clicked with instrument and not currently being used then set maestro, otherwise sit
-            if(instrumentMaestro != null && !InstrumentDataUtil.MIDI_MAESTRO_ID.equals(instrumentMaestro) && !InstrumentDataUtil.PUBLIC_MAESTRO_ID.equals(instrumentMaestro) && !EntitySeat.seatExists(worldIn, pos, this.getSeatOffset(state))) {
-                if(!worldIn.isRemote) {
-                    tileInstrument.setMaestro(instrumentMaestro);
-                    tileInstrument.markDirty();
-                    ((ServerWorld)worldIn).getChunkProvider().markBlockChanged(pos);
-                } else {
-                    String instrumentMaestroName = PlayerNameUtils.getPlayerNameFromUUID(instrumentMaestro, worldIn);
-                    player.sendStatusMessage(new StringTextComponent("Linked " + this.getTranslatedName().getString() + " Maestro: " +  instrumentMaestroName), true);
-                }
-            } else if(instrumentMaestro != null && worldIn.isRemote) {
-                player.sendStatusMessage(new StringTextComponent("You can only set the Maestro when the instrument is not being used."), true);
-            } else if(!worldIn.isRemote) {
-                return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
-            } else if(worldIn.isRemote) {
+           if(!worldIn.isRemote) {
                 if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, player, instrumentId, tileInstrument);
+                    NetworkHooks.openGui((ServerPlayerEntity) player, this.getContainer(state, worldIn, pos), buffer -> {
+                        buffer.writeByte(this.instrumentId);
+                        buffer.writeBoolean(false);
+                        buffer.writeBlockPos(pos);
+                    });
+                } else {
+                    return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
                 }
             }
         }
 
         return ActionResultType.SUCCESS;
+    }
+
+    @Override
+    public TileEntityType<TileInstrument> getTileType() {
+        return ModTiles.INSTRUMENT;
     }
 
     @Override
@@ -107,6 +97,16 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
     }
 
     @Override
+    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+        return SHAPES.get(state.get(DIRECTION));
+    }
+
+    @Override
+    public VoxelShape getRenderShape(BlockState state, IBlockReader reader, BlockPos pos) {
+        return SHAPES.get(state.get(DIRECTION));
+    }
+    
+    @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
         return state.with(DIRECTION, rotation.rotate(state.get(DIRECTION)));
     }
@@ -122,26 +122,16 @@ public abstract class BlockInstrument extends Block implements IWaterLoggable {
     public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.toRotation(state.get(DIRECTION)));
     }
-    
-    @Override
-    public boolean hasTileEntity(final BlockState state) {
-        return true;
-    }
-    
+
     @Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader reader) {
-		TileInstrument tile = ModTiles.INSTRUMENT.create();
+		TileInstrument tile = (TileInstrument)super.createNewTileEntity(reader);
         tile.setInstrumentId(instrumentId);
         return tile;
 	}
 
     public Byte getInstrumentId() {
         return instrumentId;
-    }
-
-    public static TileInstrument getTileInstrumentForBlock(World worldIn, BlockPos pos) {
-        TileEntity entity = worldIn.getTileEntity(pos);
-        return entity != null && entity instanceof TileInstrument ? (TileInstrument)entity : null;
     }
 
     protected Vector3d getSeatOffset(BlockState state) {

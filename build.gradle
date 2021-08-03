@@ -20,7 +20,7 @@ repositories {
     maven { url 'https://maven.blamejared.com' }
 }
 
-version = '1.16.5-1.0.3'
+version = '1.16.5-1.1.0'
 group = 'io.github.tofodroid.mods.mimi'
 archivesBaseName = 'mimimod'
 

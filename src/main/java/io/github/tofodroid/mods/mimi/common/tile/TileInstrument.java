@@ -2,24 +2,46 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.network.InstrumentTileDataUpdatePacket;
-
+import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
-public class TileInstrument extends TileEntity {
+public class TileInstrument extends ATileInventory {
     public static final String INSTRUMENT_ID_TAG = "instrument";
 
     private Byte instrumentId;
-    private UUID maestro;
-    private String acceptedChannelsString;
-
+    
     public TileInstrument() {
-        super(ModTiles.INSTRUMENT);
+        super(ModTiles.INSTRUMENT, 1);
+    }
+
+    @Override
+    public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new ContainerInstrument(id, playerInventory, this.getInstrumentId(), this.getPos());
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+		return new TranslationTextComponent(this.getBlockState().getBlock().asItem().getTranslationKey());
+    }
+
+    @Override
+    public CompoundNBT write(CompoundNBT compound) {
+        super.write(compound);
+
+        if(this.instrumentId != null) {
+            compound.putByte(INSTRUMENT_ID_TAG, this.instrumentId);
+        }
+
+        return compound;
     }
 
     @Override
@@ -29,60 +51,7 @@ public class TileInstrument extends TileEntity {
         if(compound.contains(INSTRUMENT_ID_TAG)) {
             this.instrumentId = compound.getByte(INSTRUMENT_ID_TAG);
         }
-
-        if(compound.contains(InstrumentDataUtil.MAESTRO_TAG)) {
-            this.maestro = compound.getUniqueId(InstrumentDataUtil.MAESTRO_TAG);
-        } else {
-            this.maestro = null;
-        }
-
-        if(compound.contains(InstrumentDataUtil.LISTEN_CHANNELS_TAG)) {
-            this.acceptedChannelsString = compound.getString(InstrumentDataUtil.LISTEN_CHANNELS_TAG);
-        } else {
-            this.acceptedChannelsString = null;
-        }
     }
-
-    @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
-        
-        if(this.instrumentId != null) {
-            compound.putByte(INSTRUMENT_ID_TAG, this.instrumentId);
-        }
-
-        if(this.maestro != null) {
-            compound.putUniqueId(InstrumentDataUtil.MAESTRO_TAG, this.maestro);
-        }
-                
-        if(this.acceptedChannelsString != null && !this.acceptedChannelsString.isEmpty()) {
-            compound.putString(InstrumentDataUtil.LISTEN_CHANNELS_TAG, this.acceptedChannelsString);
-        }
-
-        return compound;
-    }
-
-    @Override
-    public CompoundNBT getUpdateTag() {
-        return this.write(new CompoundNBT());
-    }
-
-    @Override
-    public void handleUpdateTag(BlockState state, CompoundNBT nbt) {
-        this.read(state, nbt);
-    }
-    
-    @Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		CompoundNBT nbt = new CompoundNBT();
-		this.write(nbt);
-		return new SUpdateTileEntityPacket(this.getPos(), 0, nbt);
-	}
-    
-	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
-		this.read(this.getWorld().getBlockState(packet.getPos()), packet.getNbtCompound());
-	}
 
     public Byte getInstrumentId() {
         return instrumentId;
@@ -92,27 +61,31 @@ public class TileInstrument extends TileEntity {
         this.instrumentId = instrumentId;
     }
 
-    public String getAcceptedChannelsString() {
-        return acceptedChannelsString;
+    public String getInstrumentName() {
+        return getBlockState().getBlock().asItem().getName().getString();
     }
 
-    public void setAcceptedChannelsString(String acceptedChannelsString) {
-        this.acceptedChannelsString = acceptedChannelsString;
+    public ItemStack getSwitchboardStack() {
+        if(this.inventory.isPresent() && ModItems.SWITCHBOARD.equals(this.inventory.orElse(null).getStackInSlot(0).getItem())) {
+            return this.inventory.orElse(null).getStackInSlot(0);
+        }
+
+        return ItemStack.EMPTY;
     }
 
-    public UUID getMaestro() {
-        return maestro;
+    public Boolean shouldHandleMessage(UUID sender, Byte channel, Boolean publicTransmit) {
+        ItemStack switchStack = getSwitchboardStack();
+        if(!switchStack.isEmpty()) {
+            return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && 
+                ( 
+                    (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
+                    || sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack))
+                );
+        }
+        return false;
     }
 
-    public void setMaestro(UUID maestro) {
-        this.maestro = maestro;
-    }
-
-    public static InstrumentTileDataUpdatePacket getSyncPacket(TileInstrument e) {
-        return new InstrumentTileDataUpdatePacket(
-            e.getPos(),
-            e.getMaestro(), 
-            e.getAcceptedChannelsString()
-        );
+    public Boolean hasSwitchboard() {
+        return !getSwitchboardStack().isEmpty();
     }
 }

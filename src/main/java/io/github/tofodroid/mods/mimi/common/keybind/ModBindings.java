@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.keybind;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
@@ -62,17 +61,17 @@ public class ModBindings {
             } else if(MIDIGUIMAIN.isPressed()) {
                 ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(playerIn, Hand.MAIN_HAND);
                 if(stack != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.MAIN_HAND);
+                    //MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.MAIN_HAND);
                 }
             } else if(MIDIGUIOFF.isPressed()) {
                 ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(playerIn, Hand.OFF_HAND);
                 if(stack != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.OFF_HAND);
+                    //MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.OFF_HAND);
                 }
             } else if(MIDIGUISEAT.isPressed()) {
                 TileInstrument tile = BlockInstrument.getTileInstrumentForEntity(playerIn);
                 if(tile != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, tile.getInstrumentId(), tile);
+                    //MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, tile.getInstrumentId(), tile);
                 }
             } else if(MIDISETTINGS.isPressed()) {
                 MIMIMod.guiWrapper.openConfigGui(worldIn, playerIn);
