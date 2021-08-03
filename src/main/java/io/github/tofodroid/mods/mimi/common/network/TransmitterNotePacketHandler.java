@@ -16,15 +16,15 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNoteOnPacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 
-public class MaestroNotePacketHandler {
-    public static void handlePacket(final MaestroNoteOnPacket message, Supplier<NetworkEvent.Context> ctx) {
+public class TransmitterNotePacketHandler {
+    public static void handlePacket(final TransmitterNoteOnPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
             ctx.get().enqueueWork(() -> handleOnPacketServer(message, ctx.get().getSender()));
         }
@@ -32,7 +32,7 @@ public class MaestroNotePacketHandler {
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacket(final MaestroNoteOffPacket message, Supplier<NetworkEvent.Context> ctx) {
+    public static void handlePacket(final TransmitterNoteOffPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
             ctx.get().enqueueWork(() -> handleOffPacketServer(message, ctx.get().getSender()));
         }
@@ -40,7 +40,7 @@ public class MaestroNotePacketHandler {
         ctx.get().setPacketHandled(true);
     }
 
-    public static void handleOnPacketServer(final MaestroNoteOnPacket message, ServerPlayerEntity sender) {
+    public static void handleOnPacketServer(final TransmitterNoteOnPacket message, ServerPlayerEntity sender) {
         HashMap<ServerPlayerEntity, List<MidiNoteOnPacket>> notePackets = new HashMap<>();
 
         // Handle Players
@@ -67,7 +67,7 @@ public class MaestroNotePacketHandler {
         }
     }
     
-    public static void handleOffPacketServer(final MaestroNoteOffPacket message, ServerPlayerEntity sender) {
+    public static void handleOffPacketServer(final TransmitterNoteOffPacket message, ServerPlayerEntity sender) {
         HashMap<ServerPlayerEntity, List<MidiNoteOffPacket>> notePackets = new HashMap<>();
 
         for(ServerPlayerEntity player : getPotentialPlayers(message.transmitMode, sender)) {
@@ -89,23 +89,23 @@ public class MaestroNotePacketHandler {
     }
     
     // Tile Entity Functions
-    protected static void handleEntityInstrumentRelayNoteOn(ServerPlayerEntity target, UUID maestro, final MaestroNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
+    protected static void handleEntityInstrumentRelayNoteOn(ServerPlayerEntity target, UUID sourceId, final TransmitterNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(target);
 
         if(instrumentEntity != null) { 
             Byte instrumentId = instrumentEntity.getInstrumentId();
-            if(instrumentId != null && instrumentEntity.shouldHandleMessage(maestro, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+            if(instrumentId != null && instrumentEntity.shouldHandleMessage(sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
                 packetList.add(new MidiNoteOnPacket(message.channel, message.note, message.velocity, instrumentId, target.getUniqueID(), target.getPosition()));
             }
         }
     }
     
-    protected static void handleEntityInstrumentRelayNoteOff(ServerPlayerEntity target, UUID maestro, final MaestroNoteOffPacket message, List<MidiNoteOffPacket> packetList) {
+    protected static void handleEntityInstrumentRelayNoteOff(ServerPlayerEntity target, UUID sourceId, final TransmitterNoteOffPacket message, List<MidiNoteOffPacket> packetList) {
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(target);
 
         if(instrumentEntity != null) { 
             Byte instrumentId = instrumentEntity.getInstrumentId();
-            if(instrumentId != null && instrumentEntity.shouldHandleMessage(maestro, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+            if(instrumentId != null && instrumentEntity.shouldHandleMessage(sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
                 packetList.add(new MidiNoteOffPacket(message.channel, message.note, instrumentId, target.getUniqueID()));
             }
         }
@@ -113,18 +113,18 @@ public class MaestroNotePacketHandler {
 
 
     // Item Stack Functions
-    protected static void handleHeldInstrumentRelayNoteOn(ServerPlayerEntity target, UUID maestro, Hand handIn, final MaestroNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
+    protected static void handleHeldInstrumentRelayNoteOn(ServerPlayerEntity target, UUID sourceId, Hand handIn, final TransmitterNoteOnPacket message, List<MidiNoteOnPacket> packetList) {
         ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
         Byte instrumentId = ItemInstrument.getInstrumentId(stack);
-        if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, maestro, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+        if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
             packetList.add(new MidiNoteOnPacket(message.channel, message.note, message.velocity, instrumentId, target.getUniqueID(), target.getPosition()));
         }
     }
     
-    protected static void handleHeldInstrumentRelayNoteOff(ServerPlayerEntity target, UUID maestro, Hand handIn, final MaestroNoteOffPacket message, List<MidiNoteOffPacket> packetList) {
+    protected static void handleHeldInstrumentRelayNoteOff(ServerPlayerEntity target, UUID sourceId, Hand handIn, final TransmitterNoteOffPacket message, List<MidiNoteOffPacket> packetList) {
         ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
         Byte instrumentId = ItemInstrument.getInstrumentId(stack);
-        if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, maestro, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+        if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
             packetList.add(new MidiNoteOffPacket(message.channel, message.note, instrumentId, target.getUniqueID()));
         }
     }
@@ -134,9 +134,9 @@ public class MaestroNotePacketHandler {
         List<ServerPlayerEntity> potentialPlayers = Arrays.asList(sender);
 
         if(transmitMode != TransmitMode.SELF) {
-            BlockPos maestroPos = sender.getPosition();
-            AxisAlignedBB queryBox = new AxisAlignedBB(maestroPos.getX() - 16, maestroPos.getY() - 16, maestroPos.getZ() - 16, 
-                                                    maestroPos.getX() + 16, maestroPos.getY() + 16, maestroPos.getZ() + 16);
+            BlockPos senderPos = sender.getPosition();
+            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - 16, senderPos.getY() - 16, senderPos.getZ() - 16, 
+                                                    senderPos.getX() + 16, senderPos.getY() + 16, senderPos.getZ() + 16);
             potentialPlayers = sender.getServerWorld().getEntitiesWithinAABB(ServerPlayerEntity.class, queryBox, entity -> {
                 return ItemInstrument.isEntityHoldingInstrument(entity) || BlockInstrument.isEntitySittingAtInstrument(entity);
             });
@@ -149,9 +149,9 @@ public class MaestroNotePacketHandler {
         List<TileReceiver> potentialReceivers = new ArrayList<>();
 
         if(transmitMode != TransmitMode.SELF) {
-            BlockPos maestroPos = sender.getPosition();
-            AxisAlignedBB queryBox = new AxisAlignedBB(maestroPos.getX() - 16, maestroPos.getY() - 16, maestroPos.getZ() - 16, 
-                                                    maestroPos.getX() + 16, maestroPos.getY() + 16, maestroPos.getZ() + 16);
+            BlockPos senderPos = sender.getPosition();
+            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - 16, senderPos.getY() - 16, senderPos.getZ() - 16, 
+                                                    senderPos.getX() + 16, senderPos.getY() + 16, senderPos.getZ() + 16);
             potentialReceivers = BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.RECEIVER.equals(sender.getServerWorld().getBlockState(pos).getBlock()))
                 .map(b -> ModBlocks.RECEIVER.getTileForBlock(sender.getServerWorld(), b)).filter(t -> t != null).collect(Collectors.toList());
         }

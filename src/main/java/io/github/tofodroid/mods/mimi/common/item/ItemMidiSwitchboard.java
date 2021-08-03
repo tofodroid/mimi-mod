@@ -78,10 +78,10 @@ public class ItemMidiSwitchboard extends Item {
             tooltip.add(new StringTextComponent("----------------"));
 
             // MIDI Source Filter
-            UUID maestroId = ItemMidiSwitchboard.getMidiSource(stack);
-            if(PUBLIC_SOURCE_ID.equals(maestroId)) {
+            UUID sourceId = ItemMidiSwitchboard.getMidiSource(stack);
+            if(PUBLIC_SOURCE_ID.equals(sourceId)) {
                 tooltip.add(new StringTextComponent("Transmitter: Public"));
-            } else if(maestroId != null) {
+            } else if(sourceId != null) {
                 tooltip.add(new StringTextComponent("Transmitter: Player"));
             } else {
                 tooltip.add(new StringTextComponent("Transmitter: None"));

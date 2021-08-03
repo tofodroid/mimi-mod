@@ -8,7 +8,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNoteOnPacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
