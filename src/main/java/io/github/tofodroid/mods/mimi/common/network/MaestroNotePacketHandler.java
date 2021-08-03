@@ -62,7 +62,7 @@ public class MaestroNotePacketHandler {
         // Handle Receivers
         for(TileReceiver receiver : getPotentialReceivers(message.transmitMode, sender)) {
             if(receiver.shouldHandleMessage(sender.getUniqueID(), message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
-                ModBlocks.RECEIVER.powerTarget(sender.getServerWorld(), receiver.getBlockState(), 15, receiver.getPos(), 8);
+                ModBlocks.RECEIVER.powerTarget(sender.getServerWorld(), receiver.getBlockState(), 15, receiver.getPos());
             }
         }
     }

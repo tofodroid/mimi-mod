@@ -51,10 +51,10 @@ public class BlockListener extends HorizontalBlock  {
         }
     }
 
-    public void powerTarget(IWorld world, BlockState state, int power, BlockPos pos, int waitTime) {
+    public void powerTarget(IWorld world, BlockState state, int power, BlockPos pos) {
         if (!world.getPendingBlockTicks().isTickScheduled(pos, state.getBlock())) {
             world.setBlockState(pos, state.with(POWER, Integer.valueOf(power)), 3);
-            world.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), waitTime);
+            world.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), 4);
         }
     }
 

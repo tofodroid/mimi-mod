@@ -60,13 +60,13 @@ public class MidiNotePacketHandler {
 
             // Check Listeners
             BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.LISTENER.equals(sender.getServerWorld().getBlockState(pos).getBlock())).forEach(pos -> {
-                ModBlocks.LISTENER.powerTarget(sender.getServerWorld(), sender.getServerWorld().getBlockState(pos), 15, pos, 8);
+                ModBlocks.LISTENER.powerTarget(sender.getServerWorld(), sender.getServerWorld().getBlockState(pos), 15, pos);
             });
 
             // Check ADV Listeners
             BlockPos.getAllInBox(queryBox).map(pos -> {TileEntity tile = sender.getServerWorld().getTileEntity(pos); return tile != null && ModTiles.ADVLISTENER.equals(tile.getType()) ? (TileAdvListener)tile : null;}).forEach(tile -> {
                 if(tile != null && messages.stream().anyMatch(message -> tile.shouldAcceptNote(message.note, message.instrumentId))) {
-                    ModBlocks.ADVLISTENER.powerTarget(sender.getServerWorld(), sender.getServerWorld().getBlockState(tile.getPos()), 15, tile.getPos(), 8);
+                    ModBlocks.ADVLISTENER.powerTarget(sender.getServerWorld(), sender.getServerWorld().getBlockState(tile.getPos()), 15, tile.getPos());
                 }
             });
         }
