@@ -124,7 +124,7 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 			SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(this.selectedSwitchboardStack);
 			if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
 				for(Byte channelId : acceptedChannels) {
-                    blit(matrixStack, this.guiLeft + 146 + 19 * (channelId % 8), this.guiTop + 46 + (channelId / 8) * 27, this.getBlitOffset(), 0, 172, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                    blit(matrixStack, this.guiLeft + 156 + 19 * (channelId % 8), this.guiTop + 136 + (channelId / 8) * 26, this.getBlitOffset(), 0, 181, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
                 }
 			}
 			

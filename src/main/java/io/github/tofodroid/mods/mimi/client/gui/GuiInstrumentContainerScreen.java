@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.SyncItemInstrumentSwitchboardPacket;
@@ -370,8 +368,6 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
         if(this.selectedSwitchboardStack == null && container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().isEmpty()) {
             return;
         } else if(this.selectedSwitchboardStack != container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack()) {
-            MIMIMod.LOGGER.info("Stack change!");
-
             this.allNotesOff();
             this.syncInstrumentToServer();
 
@@ -446,22 +442,22 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
             this.releaseNote(note);
         }
 
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOffPacket.NO_CHANNEL, MidiNoteOffPacket.ALL_NOTES_OFF, instrumentId, player.getUniqueID());
+        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MidiNotePacketHandler.handleOffPacketClient(packet, player);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        MidiNoteOnPacket packet = new MidiNoteOnPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleNoteOn(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.holdNote(midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, instrumentId, player.getUniqueID());
+        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleNoteOff(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.releaseNote(midiNote);
     }
 

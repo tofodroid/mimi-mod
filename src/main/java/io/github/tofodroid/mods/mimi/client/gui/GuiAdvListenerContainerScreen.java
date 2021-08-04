@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerAdvListener;
-import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -41,8 +40,8 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
 
         INSTRUMENT_ID_LIST = ModItems.SWITCHBOARD.INSTRUMENT_NAME_MAP().keySet().stream().sorted().collect(Collectors.toList());
 		
-        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+            this.selectedSwitchboardStack = container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
             this.instrumentIndex = INSTRUMENT_ID_LIST.indexOf(ItemMidiSwitchboard.getInstrument(selectedSwitchboardStack));
 			this.loadLetterAndOctave();
         }
@@ -124,10 +123,10 @@ public class GuiAdvListenerContainerScreen extends BaseContainerGui<ContainerAdv
     public void tick() {
         super.tick();
 
-        if(this.selectedSwitchboardStack == null && ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+        if(this.selectedSwitchboardStack == null && ModItems.SWITCHBOARD.equals(container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+            this.selectedSwitchboardStack = container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
 			this.loadLetterAndOctave();
-        } else if(selectedSwitchboardStack != null && !ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+        } else if(selectedSwitchboardStack != null && !ModItems.SWITCHBOARD.equals(container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
             this.selectedSwitchboardStack = null;
 			this.loadLetterAndOctave();
         }
