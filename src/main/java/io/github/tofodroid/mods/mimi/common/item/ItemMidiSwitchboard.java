@@ -41,7 +41,7 @@ public class ItemMidiSwitchboard extends Item {
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
     public static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
 
-    protected Map<Byte,String> INSTRUMENT_NAME_MAP = null;
+    private Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
     public ItemMidiSwitchboard() {
         super(new Properties().group(ModItems.ITEM_GROUP).maxStackSize(1));
@@ -100,7 +100,10 @@ public class ItemMidiSwitchboard extends Item {
             }
 
             // MIDI Note Filter
-            tooltip.add(new StringTextComponent("Note: " + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+            tooltip.add(new StringTextComponent("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+
+            // Instrument Filter
+            tooltip.add(new StringTextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
         }
     }
 
@@ -277,7 +280,7 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public String getInstrumentName(ItemStack stack) {
-        return INSTRUMENT_NAME_MAP.get(new Integer(Math.abs(ItemMidiSwitchboard.getInstrument(stack))).byteValue());
+        return INSTRUMENT_NAME_MAP().get(new Integer(Math.abs(ItemMidiSwitchboard.getInstrument(stack))).byteValue());
     }
 
     public static List<Byte> getFilterNotes(ItemStack stack) {
