@@ -4,8 +4,7 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -23,16 +22,16 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
             } else if(isNoteOffMessage(message)) {
                 handleMidiNoteOff(new Integer(message.getChannel()).byteValue(), instrument, message.getMessage()[1], player);
             } else if(isAllNotesOffMessage(message)) {
-                handleMidiNoteOff(new Integer(message.getChannel()).byteValue(), instrument, MidiNoteOffPacket.ALL_NOTES_OFF, player);
+                handleMidiNoteOff(new Integer(message.getChannel()).byteValue(), instrument, MidiNotePacket.ALL_NOTES_OFF, player);
             }
         });
     }
     
     @SuppressWarnings("resource")
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, PlayerEntity player) {
-        MidiNoteOnPacket packet = new MidiNoteOnPacket(channel, midiNote, velocity, instrument, player.getUniqueID(), player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(channel, midiNote, velocity, instrument, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleNoteOn(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
 
         if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(player, packet.channel, packet.instrumentId)) {
             ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(packet.channel, packet.note, packet.velocity);
@@ -41,9 +40,9 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     
     @SuppressWarnings("resource")
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, PlayerEntity player) {
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(channel, midiNote, instrument, player.getUniqueID());
+        MidiNotePacket packet = new MidiNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleNoteOff(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
 
         if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(player, packet.channel, packet.instrumentId)) {
             ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOff(packet.channel, packet.note);

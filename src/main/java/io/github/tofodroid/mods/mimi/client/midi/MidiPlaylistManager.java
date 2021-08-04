@@ -18,7 +18,7 @@ import com.sun.media.sound.MidiUtils;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNoteOnPacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 
 public class MidiPlaylistManager extends MidiInputSourceManager {
     // Playlist

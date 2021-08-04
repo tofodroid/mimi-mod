@@ -28,8 +28,7 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiChannelDef.MidiChannelNumbe
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -90,12 +89,12 @@ public class MidiSynthManager implements AutoCloseable {
         this.channelAssignmentMap = HashBiMap.create();
     }
 
-    public void handleNoteOn(MidiNoteOnPacket message) {
-        noteOn(message);
-    }
-
-    public void handleNoteOff(MidiNoteOffPacket message) {
-        noteOff(message);
+    public void handlePacket(MidiNotePacket message) {
+        if(message.velocity > 0) {
+            noteOn(message);
+        } else {
+            noteOff(message);
+        }
     }
 
     public void allNotesOff() {
@@ -108,7 +107,7 @@ public class MidiSynthManager implements AutoCloseable {
     
     public void allNotesOff(MidiChannelNumber num) {
         if(midiSynth != null && midiReceiver != null && num != null) {
-            this.midiChannelSet.get(num.ordinal()).noteOff(MidiNoteOffPacket.ALL_NOTES_OFF);
+            this.midiChannelSet.get(num.ordinal()).noteOff(MidiNotePacket.ALL_NOTES_OFF);
         }
     }
 
@@ -170,7 +169,7 @@ public class MidiSynthManager implements AutoCloseable {
         return result;
     }
 
-    protected MidiChannelNumber getChannelForPlayer(UUID playerId, Byte instrumentId, Boolean getNew) {
+    protected MidiChannelNumber getChannelForPlayer(UUID playerId, Boolean mechanical, Byte instrumentId, Boolean getNew) {
         if(playerId == null) {
             return null;
         }
@@ -186,7 +185,7 @@ public class MidiSynthManager implements AutoCloseable {
             for(MidiChannelNumber num : MidiChannelNumber.values()) {
                 if(channelAssignmentMap.get(num) == null) {
                     channelAssignmentMap.put(num, channelIdentifier);
-                    this.midiChannelSet.get(num.ordinal()).assign(playerId, MidiInstrument.getBydId(instrumentId));
+                    this.midiChannelSet.get(num.ordinal()).assign(playerId, mechanical, MidiInstrument.getBydId(instrumentId));
                     MIMIMod.LOGGER.debug("[" + channelIdentifier + "] Assigned to MIDI channel " + num.ordinal());
                     return num;
                 }
@@ -200,25 +199,25 @@ public class MidiSynthManager implements AutoCloseable {
         return playerId.toString() + "-" + instrumentId.toString();
     }
 
-    protected final void noteOn(MidiNoteOnPacket message) {
+    protected final void noteOn(MidiNotePacket message) {
         MidiInstrument instrument = MidiInstrument.getBydId(message.instrumentId);
 
-        if(midiSynth == null || midiReceiver == null || instrument == null || message.velocity == 0) {
+        if(midiSynth == null || midiReceiver == null || instrument == null || message.velocity <= 0) {
             return;
         }
 
-        MidiChannelNumber channelNumber = getChannelForPlayer(message.player, message.instrumentId, true);
+        MidiChannelNumber channelNumber = getChannelForPlayer(message.player, message.mechanical, message.instrumentId, true);
         MidiChannelDef channelDef = channelNumber != null ? this.midiChannelSet.get(channelNumber.ordinal()) : null;
 
         if(channelDef != null) channelDef.noteOn(instrument, message.note, message.velocity, message.pos);
     }
 
-    protected final void noteOff(MidiNoteOffPacket message) {
+    protected final void noteOff(MidiNotePacket message) {
         if(midiSynth == null || midiReceiver == null) {
             return;
         }
 
-        MidiChannelNumber channelNumber = getChannelForPlayer(message.player, message.instrumentId, false);
+        MidiChannelNumber channelNumber = getChannelForPlayer(message.player, message.mechanical, message.instrumentId, false);
         MidiChannelDef channelDef = channelNumber != null ? this.midiChannelSet.get(channelNumber.ordinal()) : null;
 
         if(channelDef != null) channelDef.noteOff(message.note);
