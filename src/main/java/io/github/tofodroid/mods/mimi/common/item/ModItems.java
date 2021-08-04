@@ -67,6 +67,16 @@ public final class ModItems {
         }
         return list;
     }
+
+    public static ItemInstrument getInstrumentItemById(Byte instrumentId) {
+        for(ItemInstrument item : INSTRUMENT_ITEMS) {
+            if(item.getInstrumentId().equals(instrumentId)) {
+                return item;
+            }
+        }
+
+        return null;
+    }
     
     public static List<ItemInstrumentBlock> buildBlockInstruments() {
         List<ItemInstrumentBlock> list = new ArrayList<>();
