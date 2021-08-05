@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class TileMechanicalMaestro extends ATileInventory {
+public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public static final UUID MECH_UUID = new UUID(0,3);
 
     public TileMechanicalMaestro() {
@@ -79,6 +79,11 @@ public class TileMechanicalMaestro extends ATileInventory {
                 );
         }
         return false;
+    }
+
+    @Override
+    protected Boolean shouldHaveEntity() {
+        return !this.getInstrumentStack().isEmpty() && !this.getSwitchboardStack().isEmpty();
     }
 }
 

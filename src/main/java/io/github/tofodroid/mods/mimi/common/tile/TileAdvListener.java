@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class TileAdvListener extends ATileInventory {
+public class TileAdvListener extends ANoteResponsiveTile {
     public TileAdvListener() {
         super(ModTiles.ADVLISTENER, 1);
     }
@@ -42,5 +42,10 @@ public class TileAdvListener extends ATileInventory {
         }
 
         return false;
+    }
+    
+    @Override
+    protected Boolean shouldHaveEntity() {
+        return !this.getSwitchboardStack().isEmpty();
     }
 }

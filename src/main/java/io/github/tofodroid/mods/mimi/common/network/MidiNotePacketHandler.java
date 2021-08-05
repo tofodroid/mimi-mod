@@ -7,24 +7,28 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
+import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.TileAdvListener;
-import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
+import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -38,29 +42,34 @@ public class MidiNotePacketHandler {
     
     protected static void handlePacketsServer(final List<MidiNotePacket> messages, ServerWorld worldIn, ServerPlayerEntity sender) {
         if(messages != null && !messages.isEmpty()) {
+            Instant startTime = Instant.now();
+
             // Forward to players
             for(MidiNotePacket packet : messages) {
-                NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender), packet);
+                NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
             }
 
             // Process Redstone
             for(MidiNotePacket packet : messages) {
                 if(packet.velocity > 0) {
-                    AxisAlignedBB queryBox = new AxisAlignedBB(packet.pos.getX() - 16, packet.pos.getY() - 16, packet.pos.getZ() - 16, 
-                    packet.pos.getX() + 16, packet.pos.getY() + 16, packet.pos.getZ() + 16);
-
-                    // Check Listeners
-                    BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.LISTENER.equals(worldIn.getBlockState(pos).getBlock())).forEach(pos -> {
-                        ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(pos), 15, pos);
+                    List<EntityNoteResponsiveTile> entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
+                    
+                    getPotentialListeners(entities).forEach(listener -> {
+                        ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getPos()), 15, listener.getPos());
                     });
 
-                    // Check ADV Listeners
-                    BlockPos.getAllInBox(queryBox).map(pos -> {TileEntity tile = worldIn.getTileEntity(pos); return tile != null && ModTiles.ADVLISTENER.equals(tile.getType()) ? (TileAdvListener)tile : null;}).forEach(tile -> {
-                        if(tile != null && messages.stream().anyMatch(message -> tile.shouldAcceptNote(message.note, message.instrumentId))) {
-                            ModBlocks.ADVLISTENER.powerTarget(worldIn, worldIn.getBlockState(tile.getPos()), 15, tile.getPos());
+                    getPotentialAdvListeners(entities).forEach(listener -> {
+                        if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
+                            ModBlocks.ADVLISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getPos()), 15, listener.getPos());
                         }
                     });
                 }
+            }
+            
+            // DEBUG
+            Long millis = ChronoUnit.MILLIS.between(startTime, Instant.now());
+            if(millis > 1) {
+                MIMIMod.LOGGER.warn("Processing onfmidinote packet set took " + millis + "ms");
             }
         }
     }
@@ -93,14 +102,38 @@ public class MidiNotePacketHandler {
 
         return false;
     }
+
+    protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerWorld worldIn, BlockPos notePos, Integer range) {
+        List<EntityNoteResponsiveTile> potentialEntites = new ArrayList<>();
+
+        AxisAlignedBB queryBox = new AxisAlignedBB(notePos.getX() - range, notePos.getY() - range, notePos.getZ() - range, 
+                                                    notePos.getX() + range, notePos.getY() + range, notePos.getZ() + range);
+        potentialEntites = worldIn.getEntitiesWithinAABB(EntityNoteResponsiveTile.class, queryBox, entity -> {
+            return entity.getTile() != null;
+        });
+
+        return potentialEntites;
+    }
+
+    protected static List<TileListener> getPotentialListeners(List<EntityNoteResponsiveTile> entities) {
+        return entities.stream().filter(e -> e.getTile() instanceof TileListener).map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
+    }
+
+    protected static List<TileAdvListener> getPotentialAdvListeners(List<EntityNoteResponsiveTile> entities) {
+        return entities.stream().filter(e -> e.getTile() instanceof TileAdvListener).map(e -> (TileAdvListener)e.getTile()).collect(Collectors.toList());
+    }
     
-    protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerWorld worldIn, ServerPlayerEntity excludePlayer) {
+    protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerWorld worldIn, ServerPlayerEntity excludePlayer, Double range) {
         return PacketDistributor.NEAR.with(() -> {
             if(excludePlayer == null) {
-                return new PacketDistributor.TargetPoint(targetPos.getX(), targetPos.getY(), targetPos.getZ(), 64.0D, worldIn.getDimensionKey());
+                return new PacketDistributor.TargetPoint(targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.getDimensionKey());
             } else {
-                return new PacketDistributor.TargetPoint(excludePlayer, targetPos.getX(), targetPos.getY(), targetPos.getZ(), 64.0D, worldIn.getDimensionKey());
+                return new PacketDistributor.TargetPoint(excludePlayer, targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.getDimensionKey());
             }
         });
+    }
+
+    protected static Double getQueryBoxRange(Boolean off) {
+        return off ? 64d : 48d;
     }
 }

@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class TileReceiver extends ATileInventory {
+public class TileReceiver extends ANoteResponsiveTile {
     public TileReceiver() {
         super(ModTiles.RECEIVER, 1);
     }
@@ -50,5 +50,10 @@ public class TileReceiver extends ATileInventory {
     protected Boolean shouldAcceptNote(Byte note) {
         ItemStack switchStack = getSwitchboardStack();
         return !switchStack.isEmpty() ? ItemMidiSwitchboard.isNoteFiltered(switchStack, note) : false;
+    }
+    
+    @Override
+    protected Boolean shouldHaveEntity() {
+        return !this.getSwitchboardStack().isEmpty();
     }
 }

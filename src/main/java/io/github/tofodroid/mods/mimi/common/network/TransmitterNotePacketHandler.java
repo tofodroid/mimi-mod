@@ -8,6 +8,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,8 +19,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
@@ -27,18 +31,19 @@ import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 public class TransmitterNotePacketHandler {
     public static void handlePacket(final TransmitterNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handleOnPacketServer(message, ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
         }
 
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handleOnPacketServer(final TransmitterNotePacket message, ServerPlayerEntity sender) {
+    public static void handlePacketServer(final TransmitterNotePacket message, ServerPlayerEntity sender) {
+        Instant startTime = Instant.now();
         HashMap<ServerPlayerEntity, List<MidiNotePacket>> notePackets = new HashMap<>();
         notePackets.put(sender, new ArrayList<>());
 
         // Handle Players
-        for(ServerPlayerEntity player : getPotentialPlayers(message.transmitMode, sender)) {
+        for(ServerPlayerEntity player : getPotentialPlayers(message.transmitMode, sender, getQueryBoxRange(message.velocity <= 0))) {
             List<MidiNotePacket> playerPackets = new ArrayList<>();
             
             // Held Instruments
@@ -52,7 +57,7 @@ public class TransmitterNotePacketHandler {
         }
 
         // Handle Mechanical Maestros
-        for(TileMechanicalMaestro maestro : getPotentialMechMaestros(message.transmitMode, sender)) {
+        for(TileMechanicalMaestro maestro : getPotentialMechMaestros(getPotentialEntities(message.transmitMode, sender, getQueryBoxRange(message.velocity <= 0)))) {
             if(maestro.shouldHandleMessage(sender.getUniqueID(), message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
                 notePackets.get(sender).add(new MidiNotePacket(message.channel, message.note, message.velocity, maestro.getInstrumentId(), maestro.getMaestroUUID(), true, maestro.getPos()));
             }
@@ -62,11 +67,17 @@ public class TransmitterNotePacketHandler {
 
         // Handle Receivers
         if(message.velocity > 0) {
-            for(TileReceiver receiver : getPotentialReceivers(message.transmitMode, sender)) {
+            for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(message.transmitMode, sender, getQueryBoxRange(false)))) {
                 if(receiver.shouldHandleMessage(sender.getUniqueID(), message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
                     ModBlocks.RECEIVER.powerTarget(sender.getServerWorld(), receiver.getBlockState(), 15, receiver.getPos());
                 }
             }
+        }
+
+        // DEBUG
+        Long millis = ChronoUnit.MILLIS.between(startTime, Instant.now());
+        if(millis > 1) {
+            MIMIMod.LOGGER.warn("Processing transmitter packet set took " + millis + "ms");
         }
     }
     
@@ -92,13 +103,13 @@ public class TransmitterNotePacketHandler {
     }
     
     // Util
-    protected static List<ServerPlayerEntity> getPotentialPlayers(TransmitMode transmitMode, ServerPlayerEntity sender) {
+    protected static List<ServerPlayerEntity> getPotentialPlayers(TransmitMode transmitMode, ServerPlayerEntity sender, Integer range) {
         List<ServerPlayerEntity> potentialPlayers = Arrays.asList(sender);
 
         if(transmitMode != TransmitMode.SELF) {
             BlockPos senderPos = sender.getPosition();
-            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - 16, senderPos.getY() - 16, senderPos.getZ() - 16, 
-                                                    senderPos.getX() + 16, senderPos.getY() + 16, senderPos.getZ() + 16);
+            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - range, senderPos.getY() - range, senderPos.getZ() - range, 
+                                                    senderPos.getX() + range, senderPos.getY() + range, senderPos.getZ() + range);
             potentialPlayers = sender.getServerWorld().getEntitiesWithinAABB(ServerPlayerEntity.class, queryBox, entity -> {
                 return ItemInstrument.isEntityHoldingInstrument(entity) || BlockInstrument.isEntitySittingAtInstrument(entity);
             });
@@ -107,32 +118,27 @@ public class TransmitterNotePacketHandler {
         return potentialPlayers;
     }
 
-    protected static List<TileMechanicalMaestro> getPotentialMechMaestros(TransmitMode transmitMode, ServerPlayerEntity sender) {
-        List<TileMechanicalMaestro> potentialMaestros = new ArrayList<>();
+    protected static List<EntityNoteResponsiveTile> getPotentialEntities(TransmitMode transmitMode, ServerPlayerEntity sender, Integer range) {
+        List<EntityNoteResponsiveTile> potentialEntites = new ArrayList<>();
 
         if(transmitMode != TransmitMode.SELF) {
             BlockPos senderPos = sender.getPosition();
-            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - 16, senderPos.getY() - 16, senderPos.getZ() - 16, 
-                                                    senderPos.getX() + 16, senderPos.getY() + 16, senderPos.getZ() + 16);
-            potentialMaestros = BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.MECHANICALMAESTRO.equals(sender.getServerWorld().getBlockState(pos).getBlock()))
-                .map(b -> ModBlocks.MECHANICALMAESTRO.getTileForBlock(sender.getServerWorld(), b)).filter(t -> t != null).collect(Collectors.toList());
+            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - range, senderPos.getY() - range, senderPos.getZ() - range, 
+                                                    senderPos.getX() + range, senderPos.getY() + range, senderPos.getZ() + range);
+            potentialEntites = sender.getServerWorld().getEntitiesWithinAABB(EntityNoteResponsiveTile.class, queryBox, entity -> {
+                return entity.getTile() != null;
+            });
         }
 
-        return potentialMaestros;
+        return potentialEntites;
     }
 
-    protected static List<TileReceiver> getPotentialReceivers(TransmitMode transmitMode, ServerPlayerEntity sender) {
-        List<TileReceiver> potentialReceivers = new ArrayList<>();
+    protected static List<TileMechanicalMaestro> getPotentialMechMaestros(List<EntityNoteResponsiveTile> entities) {
+        return entities.stream().filter(e -> e.getTile() instanceof TileMechanicalMaestro).map(e -> (TileMechanicalMaestro)e.getTile()).collect(Collectors.toList());
+    }
 
-        if(transmitMode != TransmitMode.SELF) {
-            BlockPos senderPos = sender.getPosition();
-            AxisAlignedBB queryBox = new AxisAlignedBB(senderPos.getX() - 16, senderPos.getY() - 16, senderPos.getZ() - 16, 
-                                                    senderPos.getX() + 16, senderPos.getY() + 16, senderPos.getZ() + 16);
-            potentialReceivers = BlockPos.getAllInBox(queryBox).filter(pos -> ModBlocks.RECEIVER.equals(sender.getServerWorld().getBlockState(pos).getBlock()))
-                .map(b -> ModBlocks.RECEIVER.getTileForBlock(sender.getServerWorld(), b)).filter(t -> t != null).collect(Collectors.toList());
-        }
-
-        return potentialReceivers;
+    protected static List<TileReceiver> getPotentialReceivers(List<EntityNoteResponsiveTile> entities) {
+        return entities.stream().filter(e -> e.getTile() instanceof TileReceiver).map(e -> (TileReceiver)e.getTile()).collect(Collectors.toList());
     }
 
     protected static void sendPlayerOnPackets(HashMap<ServerPlayerEntity, List<MidiNotePacket>> notePackets) {
@@ -145,5 +151,9 @@ public class TransmitterNotePacketHandler {
                 }
             }
         }
+    }
+
+    protected static Integer getQueryBoxRange(Boolean off) {
+        return off ? 32 : 16;
     }
 }
