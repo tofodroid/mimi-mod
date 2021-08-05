@@ -22,7 +22,12 @@ public abstract class ATileInventory extends TileEntity implements INamedContain
     public ATileInventory(TileEntityType<?> type, Integer inventorySize) {
         super(type);
         this.INVENTORY_SIZE = inventorySize;
-        inventory = LazyOptional.of(() -> new ItemStackHandler(INVENTORY_SIZE));
+
+        if(inventorySize > 0) {
+            inventory = LazyOptional.of(() -> new ItemStackHandler(INVENTORY_SIZE));
+        } else {
+            inventory = LazyOptional.empty();
+        }
     }
 
     @Override
