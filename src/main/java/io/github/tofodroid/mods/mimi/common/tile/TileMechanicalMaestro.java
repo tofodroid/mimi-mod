@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.inventory.MechanicalMaestroInventoryStackHandler;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -13,12 +14,19 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public static final UUID MECH_UUID = new UUID(0,3);
 
     public TileMechanicalMaestro() {
         super(ModTiles.MECHANICALMAESTRO, 2);
+    }
+
+    @Override
+    public LazyOptional<? extends ItemStackHandler> buildInventory() {
+        return LazyOptional.of(() -> new MechanicalMaestroInventoryStackHandler(INVENTORY_SIZE));
     }
 
     @Override

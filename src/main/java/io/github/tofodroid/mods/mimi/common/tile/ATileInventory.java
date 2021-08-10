@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import io.github.tofodroid.mods.mimi.common.inventory.SwitchboardInventoryStackHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
@@ -17,17 +18,21 @@ public abstract class ATileInventory extends TileEntity implements INamedContain
     public static final String INVENTORY_TAG = "inv";
 
     protected final Integer INVENTORY_SIZE;
-    protected LazyOptional<ItemStackHandler> inventory;
+    protected LazyOptional<? extends ItemStackHandler> inventory;
     
     public ATileInventory(TileEntityType<?> type, Integer inventorySize) {
         super(type);
         this.INVENTORY_SIZE = inventorySize;
 
         if(inventorySize > 0) {
-            inventory = LazyOptional.of(() -> new ItemStackHandler(INVENTORY_SIZE));
+            inventory = buildInventory();
         } else {
             inventory = LazyOptional.empty();
         }
+    }
+
+    public LazyOptional<? extends ItemStackHandler> buildInventory() {
+        return LazyOptional.of(() -> new SwitchboardInventoryStackHandler(INVENTORY_SIZE));
     }
 
     @Override
