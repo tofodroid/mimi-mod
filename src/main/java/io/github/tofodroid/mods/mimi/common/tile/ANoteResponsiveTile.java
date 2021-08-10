@@ -7,7 +7,7 @@ import net.minecraft.tileentity.TileEntityType;
 public abstract class ANoteResponsiveTile extends ATileInventory implements ITickableTileEntity {
     public static final Integer UPDATE_EVERY_TICKS = 8;
 
-    private Integer tickCount = 0;
+    protected Integer tickCount = 0;
 
     public ANoteResponsiveTile(TileEntityType<?> type, Integer inventorySize) {
         super(type, inventorySize);

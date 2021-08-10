@@ -2,11 +2,8 @@ package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 
@@ -112,10 +109,8 @@ public class GuiMechanicalMaestroContainerScreen extends ASwitchboardGui<Contain
 		TileEntity tile = player.world.getTileEntity(container.getTilePos());
 		TileMechanicalMaestro mechTile = tile != null && ModTiles.MECHANICALMAESTRO.equals(tile.getType()) ? (TileMechanicalMaestro) tile : null;
 
-		if(mechTile != null && mechTile.getInstrumentId() != null) {
-			MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), mechTile.getInstrumentId(), mechTile.getMaestroUUID(), true, mechTile.getPos());
-			NetworkManager.NET_CHANNEL.sendToServer(packet);
-			MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+		if(mechTile != null) {
+			mechTile.allNotesOff();
 		}
     }
 }

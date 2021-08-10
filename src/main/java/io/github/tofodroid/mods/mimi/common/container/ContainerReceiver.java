@@ -9,7 +9,7 @@ import net.minecraftforge.items.ItemStackHandler;
 public class ContainerReceiver extends ASwitchboardContainer
 {		
 	private static final int SWITCHBOARD_SLOT_POS_X = 111;
-	private static final int SWITCHBOARD_SLOT_POS_Y = 70;
+	private static final int SWITCHBOARD_SLOT_POS_Y = 61;
 	protected static final int INVENTORY_PLAYER_START_X = 139;
 	protected static final int INVENTORY_PLAYER_START_Y = 31;
 

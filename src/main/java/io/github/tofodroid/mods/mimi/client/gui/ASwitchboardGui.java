@@ -21,7 +21,6 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
 
     protected Integer filterNoteOctave = -1;
     protected Integer filterNoteLetter = -1;
-    protected Boolean invalidFilterNote = false;
     protected String filterNoteString = "";
     protected String selectedSourceName = "None";
 	protected ItemStack selectedSwitchboardStack;
@@ -67,7 +66,6 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
         this.filterNoteLetter = -1;
         this.filterNoteOctave = -1;
         this.filterNoteString = "";
-        this.invalidFilterNote = false;
         this.selectedSourceName = "None";
     }
 
@@ -182,4 +180,8 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
         ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(channelId).byteValue());
         this.syncSwitchboardToServer();
     }
+    
+	protected Boolean invalidFilterNote() {
+		return new Integer(filterNoteOctave*12+filterNoteLetter) <= Byte.MAX_VALUE;
+	}
 }

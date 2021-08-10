@@ -62,22 +62,26 @@ public class EntityNoteResponsiveTile extends Entity {
         return getAtPos(world, posX, posY, posZ) != null;
     }
     
-    public static void create(World world, BlockPos pos) {
+    public static Boolean create(World world, BlockPos pos) {
         if(!world.isRemote) {
             EntityNoteResponsiveTile newMaestro = new EntityNoteResponsiveTile(world, pos);
             
             if(!entityExists(world, newMaestro.getPosX(), newMaestro.getPosY(), newMaestro.getPosZ())) {
                 world.addEntity(newMaestro);
+                return true;
             }
         }
+        return false;
     }
 
-    public static void remove(World world, BlockPos pos) {
+    public static Boolean remove(World world, BlockPos pos) {
         if(!world.isRemote) {
             EntityNoteResponsiveTile entity = getAtPos(world, new Double(pos.getX()), new Double(pos.getY()), new Double(pos.getZ()));
             if(entity != null) {
                 entity.remove();
+                return true;
             }
         }
+        return false;
     }
 }

@@ -98,10 +98,10 @@ public class GuiAdvListenerContainerScreen extends ASwitchboardGui<ContainerAdvL
     protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
 		if(this.selectedSwitchboardStack != null) {
 			// Filter Note
-			font.drawString(matrixStack, this.filterNoteString, 54, 111, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, this.filterNoteString, 54, 111, invalidFilterNote() ? 0xFFE60000 : 0xFF00E600);
 
 			// Filter Instrument
-			font.drawString(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), 165, 111, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), 165, 111, 0xFF00E600);
 		}
        
         return matrixStack;

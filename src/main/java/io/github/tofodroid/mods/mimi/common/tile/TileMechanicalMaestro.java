@@ -2,12 +2,16 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.inventory.MechanicalMaestroInventoryStackHandler;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -19,6 +23,8 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public static final UUID MECH_UUID = new UUID(0,3);
+
+    public Boolean hasEntity;
 
     public TileMechanicalMaestro() {
         super(ModTiles.MECHANICALMAESTRO, 2);
@@ -88,10 +94,36 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
         }
         return false;
     }
+    
+    @Override
+    public void tick() {
+        if(tickCount >= UPDATE_EVERY_TICKS) {
+            tickCount = 0;
+            if(this.hasWorld() && !this.world.isRemote && !this.isRemoved()) {
+                if(this.shouldHaveEntity()) {
+                    EntityNoteResponsiveTile.create(this.world, this.pos);
+                } else {
+                    if(EntityNoteResponsiveTile.remove(this.world, this.pos)) {
+                        this.allNotesOff();
+                    }
+                }
+            }
+        } else {
+            tickCount ++;
+        }        
+    }
 
     @Override
     protected Boolean shouldHaveEntity() {
-        return !this.getInstrumentStack().isEmpty() && !this.getSwitchboardStack().isEmpty();
+        return !this.getInstrumentStack().isEmpty() && !this.getSwitchboardStack().isEmpty() && this.world.isBlockPowered(this.getPos());
+    }
+    
+    public void allNotesOff() {
+		if(this.getInstrumentId() != null) {
+			MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), this.getMaestroUUID(), true, this.getPos());
+			NetworkManager.NET_CHANNEL.sendToServer(packet);
+			MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+		}
     }
 }
 

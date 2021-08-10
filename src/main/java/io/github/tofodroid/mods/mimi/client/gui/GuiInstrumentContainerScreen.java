@@ -146,8 +146,8 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private final BlockPos tilePos;
 
     // Runtime Data
-    private ConcurrentHashMap<Byte, Instant> heldNotes = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Byte, Instant> releasedNotes = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Byte, Instant> heldNotes;
+    private ConcurrentHashMap<Byte, Instant> releasedNotes;
     private String instrumentNameString;
     private Boolean editMode = false;
     private Integer visibleNoteShift = KEYBOARD_START_NOTE;
@@ -175,8 +175,8 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     @Override
     public void init() {
         super.init();
-        this.heldNotes.clear();
-        this.releasedNotes.clear();
+        this.heldNotes = new ConcurrentHashMap<>();
+        this.releasedNotes = new ConcurrentHashMap<>();
 
         if(container.isHandheld()) {
             this.instrumentNameString = ItemInstrument.getInstrumentName(this.player.getHeldItem(handIn));
@@ -405,14 +405,16 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     private void allNotesOff() {
         // Release all notes
-        List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
-        for(Byte note : notesToRemove) {
-            this.releaseNote(note);
-        }
+        if(this.heldNotes != null && this.instrumentId != null) {
+            List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
+            for(Byte note : notesToRemove) {
+                this.releaseNote(note);
+            }
 
-        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
+            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {

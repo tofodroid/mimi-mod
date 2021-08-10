@@ -79,7 +79,11 @@ public class MidiNotePacketHandler {
         MIMIMod.proxy.getMidiSynth().handlePacket(message);
 
         if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(message.player, message.channel, message.instrumentId)) {
-            ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(message.channel, message.note, message.velocity);
+            if(message.velocity > 0) {
+                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(message.channel, message.note, message.velocity);
+            } else {
+                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOff(message.channel, message.note);
+            }
         }
     }
 

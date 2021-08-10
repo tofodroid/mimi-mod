@@ -288,17 +288,17 @@ public class ItemMidiSwitchboard extends Item {
         Byte oct = getFilterOct(stack);
         Byte note = getFilterNote(stack);
 
-        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL) {
+        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL && new Integer(oct*12+note) <= Byte.MAX_VALUE) {
             result.add(new Integer(oct*12+note).byteValue());
         } else if(oct != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 12; i++) {
-                if(new Integer(oct*12+i) < Byte.MAX_VALUE) {
+                if(new Integer(oct*12+i) <= Byte.MAX_VALUE) {
                     result.add(new Integer(oct*12+i).byteValue());
                 }
             }
         } else if(note != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 10; i++) {
-                if(new Integer(i*12+note) < Byte.MAX_VALUE) {
+                if(new Integer(i*12+note) <= Byte.MAX_VALUE) {
                     result.add(new Integer(i*12+note).byteValue());
                 }
             }
