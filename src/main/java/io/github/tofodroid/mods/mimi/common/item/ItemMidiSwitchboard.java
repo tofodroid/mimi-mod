@@ -29,13 +29,13 @@ public class ItemMidiSwitchboard extends Item {
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
-    public static final Byte FILTER_NOTE_OCT_ALL = Byte.MAX_VALUE;
+    public static final Byte FILTER_NOTE_OCT_ALL = -1;
     public static final String SOURCE_TAG = "source_uuid";
     public static final String SYS_INPUT_TAG = "sys_input";
     public static final String ENABLED_CHANNELS_TAG = "enabled_channels";
     public static final String INSTRUMENT_TAG = "filter_instrument";
     public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
-    public static final Byte INSTRUMENT_ALL = Byte.MAX_VALUE;
+    public static final Byte INSTRUMENT_ALL = -1;
 
     public static final UUID NONE_SOURCE_ID = new UUID(0,0);
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
@@ -280,7 +280,7 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public String getInstrumentName(ItemStack stack) {
-        return INSTRUMENT_NAME_MAP().get(new Integer(Math.abs(ItemMidiSwitchboard.getInstrument(stack))).byteValue());
+        return INSTRUMENT_NAME_MAP().get(new Integer(ItemMidiSwitchboard.getInstrument(stack)).byteValue());
     }
 
     public static List<Byte> getFilterNotes(ItemStack stack) {
@@ -316,7 +316,7 @@ public class ItemMidiSwitchboard extends Item {
 
     public static String noteLetterFromNum(Byte octaveNoteNum) {
         switch(octaveNoteNum) {
-            case 127:
+            case -1:
                 return "*";
             case 0:
                 return "C";
@@ -384,7 +384,7 @@ public class ItemMidiSwitchboard extends Item {
     
     protected Map<Byte,String> loadInstrumentNames() {
         Map<Byte,String> result = new HashMap<>();
-        result.put(Byte.MAX_VALUE, "All");
+        result.put(new Integer(-1).byteValue(), "All");
         ModItems.INSTRUMENT_ITEMS.forEach(item -> {
             result.put(item.getInstrumentId(), item.getName().getString());
         });

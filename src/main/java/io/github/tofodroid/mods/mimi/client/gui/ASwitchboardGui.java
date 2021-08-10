@@ -19,8 +19,8 @@ import net.minecraft.item.ItemStack;
 public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends BaseContainerGui<T> {
     protected final PlayerEntity player;
 
-    protected Integer filterNoteOctave = -1;
-    protected Integer filterNoteLetter = -1;
+    protected Integer filterNoteOctave;
+    protected Integer filterNoteLetter;
     protected String filterNoteString = "";
     protected String selectedSourceName = "None";
 	protected ItemStack selectedSwitchboardStack;
@@ -63,8 +63,8 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
     }
 
     protected void clearSwitchboard() {
-        this.filterNoteLetter = -1;
-        this.filterNoteOctave = -1;
+        this.filterNoteLetter = 127;
+        this.filterNoteOctave = 127;
         this.filterNoteString = "";
         this.selectedSourceName = "None";
     }
@@ -80,8 +80,8 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
 			filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
 			filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
 		} else {
-			filterNoteOctave = -1;
-			filterNoteLetter = -1;
+			filterNoteOctave = 127;
+			filterNoteLetter = 127;
 			filterNoteString = "";
 		}       
     }
@@ -182,6 +182,6 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
     }
     
 	protected Boolean invalidFilterNote() {
-		return new Integer(filterNoteOctave*12+filterNoteLetter) <= Byte.MAX_VALUE;
+		return new Integer(filterNoteOctave*12+filterNoteLetter) > Byte.MAX_VALUE;
 	}
 }
