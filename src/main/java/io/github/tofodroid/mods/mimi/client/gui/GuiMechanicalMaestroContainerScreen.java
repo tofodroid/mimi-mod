@@ -1,30 +1,23 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import java.util.UUID;
-
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
-import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.ITextComponent;
 
-public class GuiMechanicalMaestroContainerScreen extends BaseContainerGui<ContainerMechanicalMaestro> {
+public class GuiMechanicalMaestroContainerScreen extends ASwitchboardGui<ContainerMechanicalMaestro> {
     // Button Boxes
     private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(40,151);
     private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(59,151);
@@ -32,23 +25,22 @@ public class GuiMechanicalMaestroContainerScreen extends BaseContainerGui<Contai
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(131,118);
     private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(150,118);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(131,144);
-
-	// Input Data
-    private final PlayerEntity player;
-
-    // Runtime Data
-    private String selectedSourceName = "";
-	private ItemStack selectedSwitchboardStack;
     
     public GuiMechanicalMaestroContainerScreen(ContainerMechanicalMaestro container, PlayerInventory inv, ITextComponent textComponent) {
         super(container, inv, 311, 180, 311, "textures/gui/container_mech_maestro.png", textComponent);
-        this.player = inv.player;
-		
-        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerMechanicalMaestro.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerMechanicalMaestro.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
-			this.refreshSourceName();
-        }
     }
+
+	@Override
+	public void loadSelectedSwitchboard() {
+		super.loadSelectedSwitchboard();
+		this.allNotesOff();
+	}
+
+	@Override
+	public void clearSwitchboard() {
+		super.clearSwitchboard();
+		this.allNotesOff();
+	}
 
     @Override
     public boolean mouseReleased(double dmouseX, double dmouseY, int button) {
@@ -57,23 +49,15 @@ public class GuiMechanicalMaestroContainerScreen extends BaseContainerGui<Contai
         
 		if(selectedSwitchboardStack != null) {
 			if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, this.player.getUniqueID());
-				this.syncSwitchboardToServer();
-				this.refreshSourceName();
+				this.setSelfSource();
 			} else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, ItemMidiSwitchboard.PUBLIC_SOURCE_ID);
-				this.syncSwitchboardToServer();
-				this.refreshSourceName();
+				this.setPublicSource();
 			} else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, null);
-				this.syncSwitchboardToServer();
-				this.refreshSourceName();
+				this.clearSource();
 			} else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.clearEnabledChannels(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.clearChannels();
 			} else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setEnableAllChannels(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.enableAllChannels();
 			} else {
 				// Individual Midi Channel Buttons
 				for(int i = 0; i < 16; i++) {
@@ -83,8 +67,7 @@ public class GuiMechanicalMaestroContainerScreen extends BaseContainerGui<Contai
 					);
 
 					if(clickedBox(imouseX, imouseY, buttonCoords)) {
-						ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(i).byteValue());
-						this.syncSwitchboardToServer();
+						this.toggleChannel(i);
 						return super.mouseClicked(dmouseX, dmouseY, button);
 					}
 				}
@@ -125,55 +108,6 @@ public class GuiMechanicalMaestroContainerScreen extends BaseContainerGui<Contai
         return matrixStack;
     }
 	
-    @Override
-    public void tick() {
-        super.tick();
-
-        if(this.selectedSwitchboardStack == null && ModItems.SWITCHBOARD.equals(container.getSlot(ContainerMechanicalMaestro.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerMechanicalMaestro.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
-			this.refreshSourceName();
-            this.allNotesOff();
-        } else if(selectedSwitchboardStack != null && !ModItems.SWITCHBOARD.equals(container.getSlot(ContainerMechanicalMaestro.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = null;
-			this.refreshSourceName();
-            this.allNotesOff();
-        }
-    }
-
-    private void refreshSourceName() {
-		if(this.selectedSwitchboardStack != null) {
-			UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
-			if(sourceId != null) {
-				if(sourceId.equals(player.getUniqueID())) {
-					this.selectedSourceName = player.getName().getString();
-				} else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
-					this.selectedSourceName = "Public Transmitters";
-				} else if(this.minecraft != null && this.minecraft.world != null) {
-					this.selectedSourceName = PlayerNameUtils.getPlayerNameFromUUID(sourceId, this.minecraft.world);
-				} else {
-					this.selectedSourceName = "Unknown";
-				}
-			} else {
-				this.selectedSourceName = "None";
-			}
-		} else {
-			this.selectedSourceName = "";
-		}
-    }
-
-    public void syncSwitchboardToServer() {
-        SwitchboardStackUpdatePacket packet = null;
-
-        if(selectedSwitchboardStack != null && ModItems.SWITCHBOARD.equals(selectedSwitchboardStack.getItem())) {
-            packet = ItemMidiSwitchboard.getSyncPacket(selectedSwitchboardStack);
-        }
-
-        if(packet != null) {
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
-            this.allNotesOff();
-        }
-    }
-
     private void allNotesOff() {
 		TileEntity tile = player.world.getTileEntity(container.getTilePos());
 		TileMechanicalMaestro mechTile = tile != null && ModTiles.MECHANICALMAESTRO.equals(tile.getType()) ? (TileMechanicalMaestro) tile : null;
