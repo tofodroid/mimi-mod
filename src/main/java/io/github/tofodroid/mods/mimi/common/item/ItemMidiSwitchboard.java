@@ -29,19 +29,19 @@ public class ItemMidiSwitchboard extends Item {
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
-    public static final Byte FILTER_NOTE_OCT_ALL = Byte.MAX_VALUE;
+    public static final Byte FILTER_NOTE_OCT_ALL = -1;
     public static final String SOURCE_TAG = "source_uuid";
     public static final String SYS_INPUT_TAG = "sys_input";
     public static final String ENABLED_CHANNELS_TAG = "enabled_channels";
     public static final String INSTRUMENT_TAG = "filter_instrument";
     public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
-    public static final Byte INSTRUMENT_ALL = Byte.MAX_VALUE;
+    public static final Byte INSTRUMENT_ALL = -1;
 
     public static final UUID NONE_SOURCE_ID = new UUID(0,0);
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
     public static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
 
-    protected Map<Byte,String> INSTRUMENT_NAME_MAP = null;
+    private Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
     public ItemMidiSwitchboard() {
         super(new Properties().group(ModItems.ITEM_GROUP).maxStackSize(1));
@@ -100,7 +100,10 @@ public class ItemMidiSwitchboard extends Item {
             }
 
             // MIDI Note Filter
-            tooltip.add(new StringTextComponent("Note: " + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+            tooltip.add(new StringTextComponent("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+
+            // Instrument Filter
+            tooltip.add(new StringTextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
         }
     }
 
@@ -277,7 +280,7 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public String getInstrumentName(ItemStack stack) {
-        return INSTRUMENT_NAME_MAP.get(new Integer(Math.abs(ItemMidiSwitchboard.getInstrument(stack))).byteValue());
+        return INSTRUMENT_NAME_MAP().get(new Integer(ItemMidiSwitchboard.getInstrument(stack)).byteValue());
     }
 
     public static List<Byte> getFilterNotes(ItemStack stack) {
@@ -285,17 +288,17 @@ public class ItemMidiSwitchboard extends Item {
         Byte oct = getFilterOct(stack);
         Byte note = getFilterNote(stack);
 
-        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL) {
+        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL && new Integer(oct*12+note) <= Byte.MAX_VALUE) {
             result.add(new Integer(oct*12+note).byteValue());
         } else if(oct != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 12; i++) {
-                if(new Integer(oct*12+i) < Byte.MAX_VALUE) {
+                if(new Integer(oct*12+i) <= Byte.MAX_VALUE) {
                     result.add(new Integer(oct*12+i).byteValue());
                 }
             }
         } else if(note != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 10; i++) {
-                if(new Integer(i*12+note) < Byte.MAX_VALUE) {
+                if(new Integer(i*12+note) <= Byte.MAX_VALUE) {
                     result.add(new Integer(i*12+note).byteValue());
                 }
             }
@@ -313,7 +316,7 @@ public class ItemMidiSwitchboard extends Item {
 
     public static String noteLetterFromNum(Byte octaveNoteNum) {
         switch(octaveNoteNum) {
-            case 127:
+            case -1:
                 return "*";
             case 0:
                 return "C";
@@ -381,7 +384,7 @@ public class ItemMidiSwitchboard extends Item {
     
     protected Map<Byte,String> loadInstrumentNames() {
         Map<Byte,String> result = new HashMap<>();
-        result.put(Byte.MAX_VALUE, "All");
+        result.put(new Integer(-1).byteValue(), "All");
         ModItems.INSTRUMENT_ITEMS.forEach(item -> {
             result.put(item.getInstrumentId(), item.getName().getString());
         });

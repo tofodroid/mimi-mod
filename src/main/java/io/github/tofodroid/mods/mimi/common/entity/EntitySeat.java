@@ -30,14 +30,12 @@ public class EntitySeat extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if(source == null)
-        {
+        if(source == null) {
             source = this.getPosition();
         }
-        if(!this.world.isRemote)
-        {
-            if(this.getPassengers().isEmpty() || this.world.isAirBlock(source))
-            {
+
+        if(!this.world.isRemote) {
+            if(this.getPassengers().isEmpty() || this.world.isAirBlock(source)) {
                 this.remove();
                 world.updateComparatorOutputLevel(getPosition(), world.getBlockState(getPosition()).getBlock());
             }
@@ -59,8 +57,7 @@ public class EntitySeat extends Entity {
     protected void writeAdditional(CompoundNBT compound) {}
 
     @Override
-    protected boolean canBeRidden(Entity entity)
-    {
+    protected boolean canBeRidden(Entity entity) {
         return true;
     }
 

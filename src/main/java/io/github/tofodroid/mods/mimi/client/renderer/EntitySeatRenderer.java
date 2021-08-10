@@ -9,16 +9,13 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public class EntitySeatRenderer extends EntityRenderer<EntitySeat>
-{
-    public EntitySeatRenderer(EntityRendererManager manager)
-    {
+public class EntitySeatRenderer extends EntityRenderer<EntitySeat> {
+    public EntitySeatRenderer(EntityRendererManager manager) {
         super(manager);
     }
 
     @Override
-    public ResourceLocation getEntityTexture(EntitySeat seatEntity)
-    {
+    public ResourceLocation getEntityTexture(EntitySeat seatEntity) {
         return null;
     }
 

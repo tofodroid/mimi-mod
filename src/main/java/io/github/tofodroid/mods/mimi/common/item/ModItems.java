@@ -46,6 +46,7 @@ public final class ModItems {
             event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
             event.getRegistry().register(new BlockItem(ModBlocks.ADVLISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("advlistener"));
             event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("receiver"));
+            event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("mechanicalmaestro"));
 
             // Instrument Items
             INSTRUMENT_ITEMS = buildInstruments();
@@ -65,6 +66,16 @@ public final class ModItems {
             }
         }
         return list;
+    }
+
+    public static ItemInstrument getInstrumentItemById(Byte instrumentId) {
+        for(ItemInstrument item : INSTRUMENT_ITEMS) {
+            if(item.getInstrumentId().equals(instrumentId)) {
+                return item;
+            }
+        }
+
+        return null;
     }
     
     public static List<ItemInstrumentBlock> buildBlockInstruments() {

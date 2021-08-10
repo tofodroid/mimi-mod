@@ -1,56 +1,30 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import java.util.UUID;
-
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
-import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
-import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.ITextComponent;
 
-public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiver> {
+public class GuiReceiverContainerScreen extends ASwitchboardGui<ContainerReceiver> {
     // Button Boxes
-    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(40,123);
-    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(59,123);
-    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(78,123);
-    private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(61,151);
-    private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(80,151);
-    private static final Vector2f NOTE_INVERT_BUTTON_COORDS = new Vector2f(99,151);
+    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(40,114);
+    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(59,114);
+    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(78,114);
+    private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(14,151);
+    private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(33,151);
+    private static final Vector2f NOTE_INVERT_BUTTON_COORDS = new Vector2f(97,151);
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(131,118);
     private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(150,118);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(131,144);
-
-	// Input Data
-    private final PlayerEntity player;
-
-    // Runtime Data
-    private Integer filterNoteOctave = -1;
-    private Integer filterNoteLetter = -1;
-    private Boolean invalidFilterNote = false;
-    private String filterNoteString = "";
-    private String selectedSourceName = "";
-	private ItemStack selectedSwitchboardStack;
     
     public GuiReceiverContainerScreen(ContainerReceiver container, PlayerInventory inv, ITextComponent textComponent) {
         super(container, inv, 311, 180, 311, "textures/gui/container_receiver.png", textComponent);
-        this.player = inv.player;
-		
-        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
-			this.loadLetterAndOctave();
-			this.refreshSourceName();
-        }
     }
 
     @Override
@@ -60,37 +34,21 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
         
 		if(selectedSwitchboardStack != null) {
 			if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, this.player.getUniqueID());
-				this.syncSwitchboardToServer();
-				this.refreshSourceName();
+				this.setSelfSource();
 			} else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, ItemMidiSwitchboard.PUBLIC_SOURCE_ID);
-				this.syncSwitchboardToServer();
-				this.refreshSourceName();
+				this.setPublicSource();
 			} else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, null);
-				this.syncSwitchboardToServer();
-				this.refreshSourceName();
+				this.clearSource();
 			} else if(clickedBox(imouseX, imouseY, NOTE_LETTER_BUTTON_COORDS)) {
-				shiftFilterNoteLetter();
-				ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter.byteValue());
-                this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.shiftFilterNoteLetter();
 			} else if(clickedBox(imouseX, imouseY, NOTE_OCTAVE_BUTTON_COORDS)) {
-				shiftFilterNoteOctave();
-				ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave.byteValue());
-                this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.shiftFilterNoteOctave();
 			} else if(clickedBox(imouseX, imouseY, NOTE_INVERT_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setInvertNoteOct(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack));
-                this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.toggleInvertFilterNote();
 			} else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.clearEnabledChannels(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.clearChannels();
 			} else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
-				ItemMidiSwitchboard.setEnableAllChannels(selectedSwitchboardStack);
-				this.syncSwitchboardToServer();
+				this.enableAllChannels();
 			} else {
 				// Individual Midi Channel Buttons
 				for(int i = 0; i < 16; i++) {
@@ -100,8 +58,7 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 					);
 
 					if(clickedBox(imouseX, imouseY, buttonCoords)) {
-						ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(i).byteValue());
-						this.syncSwitchboardToServer();
+						this.toggleChannel(i);
 						return super.mouseClicked(dmouseX, dmouseY, button);
 					}
 				}
@@ -124,13 +81,13 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
 			SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(this.selectedSwitchboardStack);
 			if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
 				for(Byte channelId : acceptedChannels) {
-                    blit(matrixStack, this.guiLeft + 146 + 19 * (channelId % 8), this.guiTop + 46 + (channelId / 8) * 27, this.getBlitOffset(), 0, 172, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                    blit(matrixStack, this.guiLeft + 156 + 19 * (channelId % 8), this.guiTop + 136 + (channelId / 8) * 26, this.getBlitOffset(), 0, 181, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
                 }
 			}
 			
         	// Invert Status Light
 			if(ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack)) {
-				blit(matrixStack, this.guiLeft + 117, this.guiTop + 157, this.getBlitOffset(), 0, 181, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+				blit(matrixStack, this.guiLeft + 116, this.guiTop + 157, this.getBlitOffset(), 0, 181, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
 			}
 		}
 
@@ -141,87 +98,12 @@ public class GuiReceiverContainerScreen extends BaseContainerGui<ContainerReceiv
     protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
 		if(this.selectedSwitchboardStack != null) {
 			// MIDI Source Name
-			font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 16, 111, 0xFF00E600);
+			font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 16, 102, 0xFF00E600);
 		
 			// Filter Note
-			font.drawString(matrixStack, this.filterNoteString, 41, 155, invalidFilterNote ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, this.filterNoteString, 54, 155, invalidFilterNote() ? 0xFFE60000 : 0xFF00E600);
 		}
        
         return matrixStack;
     }
-	
-    @Override
-    public void tick() {
-        super.tick();
-
-        if(this.selectedSwitchboardStack == null && ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
-			this.loadLetterAndOctave();
-			this.refreshSourceName();
-        } else if(selectedSwitchboardStack != null && !ModItems.SWITCHBOARD.equals(container.getSlot(ContainerReceiver.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = null;
-			this.loadLetterAndOctave();
-			this.refreshSourceName();
-        }
-    }
-
-    private void refreshSourceName() {
-		if(this.selectedSwitchboardStack != null) {
-			UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
-			if(sourceId != null) {
-				if(sourceId.equals(player.getUniqueID())) {
-					this.selectedSourceName = player.getName().getString();
-				} else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
-					this.selectedSourceName = "Public Transmitters";
-				} else if(this.minecraft != null && this.minecraft.world != null) {
-					this.selectedSourceName = PlayerNameUtils.getPlayerNameFromUUID(sourceId, this.minecraft.world);
-				} else {
-					this.selectedSourceName = "Unknown";
-				}
-			} else {
-				this.selectedSourceName = "None";
-			}
-		} else {
-			this.selectedSourceName = "";
-		}
-    }
-
-    public void loadLetterAndOctave() {
-
-		if(this.selectedSwitchboardStack != null) {
-			this.filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
-			this.filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
-            this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-		} else {
-			filterNoteOctave = -1;
-			filterNoteLetter = -1;
-			filterNoteString = "";
-		}       
-    }
-    public void shiftFilterNoteLetter() {
-        if(filterNoteLetter < 11) {
-            filterNoteLetter++;
-        } else {
-            filterNoteLetter = -1;
-        }
-    }
-    
-    public void shiftFilterNoteOctave() {
-        if(filterNoteOctave < 10) {
-            filterNoteOctave++;
-        } else {
-            filterNoteOctave = -1;
-        }
-    }
-
-    public void syncSwitchboardToServer() {
-        SwitchboardStackUpdatePacket packet = null;
-
-        if(selectedSwitchboardStack != null && ModItems.SWITCHBOARD.equals(selectedSwitchboardStack.getItem())) {
-            packet = ItemMidiSwitchboard.getSyncPacket(selectedSwitchboardStack);
-        }        
-        if(packet != null) {
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
-        }
-    }  
 }

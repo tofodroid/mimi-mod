@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.client;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.client.midi.MidiSynthManager;
 import io.github.tofodroid.mods.mimi.client.renderer.EntitySeatRenderer;
+import io.github.tofodroid.mods.mimi.client.renderer.EntityMechanicalMaestroRenderer;
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
@@ -25,6 +26,7 @@ public class ClientProxy implements Proxy {
 
         // Rendering
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.SEAT, EntitySeatRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.NOTERESPONSIVETILE, EntityMechanicalMaestroRenderer::new);
 
         // Keybinds
         ModBindings.register();

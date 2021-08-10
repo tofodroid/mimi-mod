@@ -46,12 +46,17 @@ public abstract class APlayerInventoryContainer extends Container {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 
-			if (index == this.inventorySlots.size()-1) {
-				if (!this.mergeItemStack(itemstack1, 0, this.inventorySlots.size()-1, false)) {
+			// Return Empty Stack if Cannot Merge
+			if (index >= TARGET_CONTAINER_MIN_SLOT_ID) {
+				// Target --> Player
+				if (!this.mergeItemStack(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID-1, false)) {
 					return ItemStack.EMPTY;
 				}
-			} else if (!this.mergeItemStack(itemstack1, this.inventorySlots.size()-1, this.inventorySlots.size(), false)) {
-				return ItemStack.EMPTY;
+			} else {
+				// Player --> Target
+				if (!this.mergeItemStack(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID+targetInventory.getSlots(), false)) {
+					return ItemStack.EMPTY;
+				}
 			}
 
 			if (itemstack1.isEmpty()) {

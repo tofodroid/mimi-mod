@@ -51,10 +51,12 @@ public class BlockReceiver extends AContainerBlock<TileReceiver> {
         }
     }
     
+    @Override
     public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
         return blockState.get(POWER);
     }
     
+    @Override
     public boolean canProvidePower(BlockState state) {
         return true;
     }

@@ -17,6 +17,7 @@ public class ModContainers {
     public static ContainerType<ContainerAdvListener> ADVLISTENER = null;
     public static ContainerType<ContainerReceiver> RECEIVER = null;
     public static ContainerType<ContainerInstrument> INSTRUMENT = null;
+    public static ContainerType<ContainerMechanicalMaestro> MECHANICALMAESTRO = null;
 
     private static final List<ContainerType<?>> buildTileTypes() {
         List<ContainerType<?>> types = new ArrayList<>();
@@ -26,6 +27,8 @@ public class ModContainers {
         types.add(RECEIVER);
         INSTRUMENT = buildType("instrument", ContainerInstrument::new);
         types.add(INSTRUMENT);
+        MECHANICALMAESTRO = buildType("mechanicalmaestro", ContainerMechanicalMaestro::new);
+        types.add(MECHANICALMAESTRO);
         return types;
     }
     

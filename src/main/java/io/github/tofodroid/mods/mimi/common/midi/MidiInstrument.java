@@ -6,39 +6,55 @@ import io.github.tofodroid.mods.mimi.common.block.BlockPiano;
 
 public enum MidiInstrument {
     PIANO       (0,0, BlockPiano.class),
-    //ORGAN       (1,19,null), //TODO CHANGE TO BLOCK
-    ACGUITAR    (2,25,null),
-    ELECGUITAR  (3,30,null),
-    BASSGUITAR  (4,34,null),
-    VIOLIN      (5,48,null),
-    MICROPHONE  (6,53,null),
-    TRUMPET     (7,57,null),
-    FRENCHHORN  (8,60,null),
-    SAXOPHONE   (9,64,null),
-    CLARINET    (10,71,null),
-    FLUTE       (11,73,null),
-    OCARINA     (12,79,null),
-    SYNLEAD     (13,80,null),
-    KALIMBA     (14,108,null),
-    BAGPIPE     (15,109,null),
-    //STEELDRUM   (17,114,null), //TODO CHANGE TO BLOCK
-    DRUMS       (18,15360,0,BlockDrums.class);
+    BANJO       (1,105),
+    ACGUITAR    (2,25),
+    ELECGUITAR  (3,30),
+    BASSGUITAR  (4,34),
+    VIOLIN      (5,48),
+    MICROPHONE  (6,53),
+    TRUMPET     (7,56),
+    FRENCHHORN  (8,60),
+    SAXOPHONE   (9,64),
+    CLARINET    (10,71),
+    FLUTE       (11,73),
+    OCARINA     (12,79),
+    SYNLEAD     (13,80),
+    KALIMBA     (14,108),
+    BAGPIPE     (15,109),
+    OBOE        (16,68),
+    ACCORDION   (17,21),
+    DRUMS       (18,15360,0,BlockDrums.class),
+    HARMONICA   (19,22);
 
     private final Byte id;
     private final Integer bank;
     private final Integer patch;
     private final Class<? extends BlockInstrument> blockClass;
 
-    MidiInstrument(final Integer id, final Integer bank, final Integer patch, final Class<? extends BlockInstrument> blockClass) {
+    MidiInstrument(final Integer id, final Integer patch) {
         this.id = id.byteValue();
-        this.bank = bank;
         this.patch = patch;
-        this.blockClass = blockClass;
+        this.bank = 0;
+        this.blockClass = null;
+    }
+
+    MidiInstrument(final Integer id, final Integer patch, final Integer bank) {
+        this.id = id.byteValue();
+        this.patch = patch;
+        this.bank = bank;
+        this.blockClass = null;
     }
 
     MidiInstrument(final Integer id, final Integer patch, final Class<? extends BlockInstrument> blockClass) {
         this.id = id.byteValue();
         this.bank = 0;
+        this.patch = patch;
+        this.blockClass = blockClass;
+    }
+
+    MidiInstrument(final Integer id, final Integer bank, final Integer patch, final Class<? extends BlockInstrument> blockClass) {
+        this.id = id.byteValue();
+        this.bank = bank;
         this.patch = patch;
         this.blockClass = blockClass;
     }

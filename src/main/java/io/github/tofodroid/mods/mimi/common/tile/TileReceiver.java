@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -13,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class TileReceiver extends ATileInventory {
+public class TileReceiver extends ANoteResponsiveTile {
     public TileReceiver() {
         super(ModTiles.RECEIVER, 1);
     }
@@ -39,9 +38,6 @@ public class TileReceiver extends ATileInventory {
     public Boolean shouldHandleMessage(UUID sender, Byte channel, Byte note, Boolean publicTransmit) {
         ItemStack switchStack = getSwitchboardStack();
         if(!switchStack.isEmpty()) {
-            if(channel == 10) { 
-                MIMIMod.LOGGER.debug(""); 
-            }
             return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && shouldAcceptNote(note) &&
                 ( 
                     (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
@@ -54,5 +50,10 @@ public class TileReceiver extends ATileInventory {
     protected Boolean shouldAcceptNote(Byte note) {
         ItemStack switchStack = getSwitchboardStack();
         return !switchStack.isEmpty() ? ItemMidiSwitchboard.isNoteFiltered(switchStack, note) : false;
+    }
+    
+    @Override
+    protected Boolean shouldHaveEntity() {
+        return !this.getSwitchboardStack().isEmpty();
     }
 }

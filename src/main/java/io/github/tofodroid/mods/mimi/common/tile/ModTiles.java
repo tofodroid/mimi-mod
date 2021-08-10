@@ -17,7 +17,9 @@ import net.minecraftforge.fml.common.Mod;
 public class ModTiles {
     public static TileEntityType<TileInstrument> INSTRUMENT = null;
     public static TileEntityType<TileReceiver> RECEIVER = null;
+    public static TileEntityType<TileListener> LISTENER = null;
     public static TileEntityType<TileAdvListener> ADVLISTENER = null;
+    public static TileEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = null;
 
     private static final List<TileEntityType<?>> buildTileTypes() {
         List<TileEntityType<?>> types = new ArrayList<>();
@@ -25,8 +27,12 @@ public class ModTiles {
         types.add(INSTRUMENT);
         RECEIVER = buildType(MIMIMod.MODID + ":receiver", TileEntityType.Builder.create(TileReceiver::new, ModBlocks.RECEIVER));
         types.add(RECEIVER);
+        LISTENER = buildType(MIMIMod.MODID + ":listener", TileEntityType.Builder.create(TileListener::new, ModBlocks.LISTENER));
+        types.add(LISTENER);
         ADVLISTENER = buildType(MIMIMod.MODID + ":advlistener", TileEntityType.Builder.create(TileAdvListener::new, ModBlocks.ADVLISTENER));
         types.add(ADVLISTENER);
+        MECHANICALMAESTRO = buildType(MIMIMod.MODID + ":mechanicalmaestro", TileEntityType.Builder.create(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO));
+        types.add(MECHANICALMAESTRO);
         return types;
     }
     

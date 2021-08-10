@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -15,23 +14,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOnPacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
-import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.SyncItemInstrumentSwitchboardPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.util.PlayerNameUtils;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.math.BlockPos;
@@ -44,7 +36,7 @@ import org.lwjgl.glfw.GLFW;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
-public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInstrument> {
+public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstrument> {
     // Texture
     private static final Integer NOTE_WIDTH = 14;
     private static final Integer NOTE_OFFSET_X = 11;
@@ -150,24 +142,20 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
 
     // Input Data
     private final Byte instrumentId;
-    private final PlayerEntity player;
     private final Hand handIn;
     private final BlockPos tilePos;
 
     // Runtime Data
-    private ConcurrentHashMap<Byte, Instant> heldNotes = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Byte, Instant> releasedNotes = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Byte, Instant> heldNotes;
+    private ConcurrentHashMap<Byte, Instant> releasedNotes;
     private String instrumentNameString;
-    private ItemStack selectedSwitchboardStack;
     private Boolean editMode = false;
     private Integer visibleNoteShift = KEYBOARD_START_NOTE;
     private String noteIdString = "C3,F4 | G4,C6";
-    private String selectedSourceName = "None";
     private Byte mouseNote = null;
 
     public GuiInstrumentContainerScreen(ContainerInstrument container, PlayerInventory inv, ITextComponent textComponent) {
         super(container, inv, 328, 250, 530, "textures/gui/container_instrument.png", textComponent);
-        this.player = inv.player;
         this.instrumentId = container.getInstrumentId();
 
         if(container.isHandheld()) {
@@ -176,10 +164,6 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
         } else {
             this.handIn = null;
             this.tilePos = container.getTilePos();
-        }
-
-        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
         }
     }
 
@@ -191,8 +175,8 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
     @Override
     public void init() {
         super.init();
-        this.heldNotes.clear();
-        this.releasedNotes.clear();
+        this.heldNotes = new ConcurrentHashMap<>();
+        this.releasedNotes = new ConcurrentHashMap<>();
 
         if(container.isHandheld()) {
             this.instrumentNameString = ItemInstrument.getInstrumentName(this.player.getHeldItem(handIn));
@@ -269,28 +253,15 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
                 ItemMidiSwitchboard.setSysInput(selectedSwitchboardStack, !ItemMidiSwitchboard.getSysInput(selectedSwitchboardStack));
                 this.syncSwitchboardToServer();
             } else if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
-                // Link Self Button
-                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, player.getUniqueID());
-                this.syncSwitchboardToServer();
-                this.refreshSourceName();
+               this.setSelfSource();
             } else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
-                // Link Public Button
-                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack,  ItemMidiSwitchboard.PUBLIC_SOURCE_ID);
-                this.syncSwitchboardToServer();
-                this.refreshSourceName();
+                this.setPublicSource();
             } else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
-                // Link Clear Button
-                ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, null);
-                this.syncSwitchboardToServer();
-                this.refreshSourceName();
+                this.clearSource();
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
-                // Clear Midi Channels Button
-                ItemMidiSwitchboard.clearEnabledChannels(selectedSwitchboardStack);
-                this.syncSwitchboardToServer();
+                this.clearChannels();
             } else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
-                // Select All Midi Channels Button
-                ItemMidiSwitchboard.setEnableAllChannels(selectedSwitchboardStack);
-                this.syncSwitchboardToServer();
+                this.enableAllChannels();
             } else {
                 // Individual Midi Channel Buttons
                 for(int i = 0; i < 16; i++) {
@@ -300,8 +271,7 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
                     );
 
                     if(clickedBox(imouseX, imouseY, buttonCoords)) {
-                        ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(i).byteValue());
-                        this.syncSwitchboardToServer();
+                        this.toggleChannel(i);
                         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
                     }
                 }
@@ -364,24 +334,18 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    public void loadSelectedSwitchboard() {
+        super.loadSelectedSwitchboard();
+        this.allNotesOff();
+        this.syncInstrumentToServer();
+    }
 
-        if(this.selectedSwitchboardStack == null && container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().isEmpty()) {
-            return;
-        } else if(this.selectedSwitchboardStack != container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack()) {
-            MIMIMod.LOGGER.info("Stack change!");
-
-            this.allNotesOff();
-            this.syncInstrumentToServer();
-
-            if(!ModItems.SWITCHBOARD.equals(container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-                this.selectedSwitchboardStack = null;
-                this.editMode = false;
-            } else {
-                this.selectedSwitchboardStack = container.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
-            }
-        }
+    @Override
+    public void clearSwitchboard() {
+        super.clearSwitchboard();
+        this.editMode = false;
+        this.allNotesOff();
+        this.syncInstrumentToServer();
     }
 
     // Midi Functions
@@ -441,27 +405,29 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
 
     private void allNotesOff() {
         // Release all notes
-        List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
-        for(Byte note : notesToRemove) {
-            this.releaseNote(note);
-        }
+        if(this.heldNotes != null && this.instrumentId != null) {
+            List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
+            for(Byte note : notesToRemove) {
+                this.releaseNote(note);
+            }
 
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOffPacket.NO_CHANNEL, MidiNoteOffPacket.ALL_NOTES_OFF, instrumentId, player.getUniqueID());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MidiNotePacketHandler.handleOffPacketClient(packet, player);
+            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
+            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        MidiNoteOnPacket packet = new MidiNoteOnPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleNoteOn(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.holdNote(midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
-        MidiNoteOffPacket packet = new MidiNoteOffPacket(MidiNoteOnPacket.NO_CHANNEL, midiNote, instrumentId, player.getUniqueID());
+        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleNoteOff(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.releaseNote(midiNote);
     }
 
@@ -700,39 +666,6 @@ public class GuiInstrumentContainerScreen extends BaseContainerGui<ContainerInst
 
         return "";
     }
-
-    private void refreshSourceName() {
-		if(this.selectedSwitchboardStack != null) {
-			UUID sourceId = ItemMidiSwitchboard.getMidiSource(selectedSwitchboardStack);
-			if(sourceId != null) {
-				if(sourceId.equals(player.getUniqueID())) {
-					this.selectedSourceName = player.getName().getString();
-				} else if(sourceId.equals(ItemMidiSwitchboard.PUBLIC_SOURCE_ID)) {
-					this.selectedSourceName = "Public Transmitters";
-				} else if(this.minecraft != null && this.minecraft.world != null) {
-					this.selectedSourceName = PlayerNameUtils.getPlayerNameFromUUID(sourceId, this.minecraft.world);
-				} else {
-					this.selectedSourceName = "Unknown";
-				}
-			} else {
-				this.selectedSourceName = "None";
-			}
-		} else {
-			this.selectedSourceName = "";
-		}
-    }
-
-    public void syncSwitchboardToServer() {
-        SwitchboardStackUpdatePacket packet = null;
-
-        if(selectedSwitchboardStack != null && ModItems.SWITCHBOARD.equals(selectedSwitchboardStack.getItem())) {
-            packet = ItemMidiSwitchboard.getSyncPacket(selectedSwitchboardStack);
-        }
-        
-        if(packet != null) {
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
-        }
-    }  
 
     public void syncInstrumentToServer() {
         SyncItemInstrumentSwitchboardPacket packet = new SyncItemInstrumentSwitchboardPacket(true);

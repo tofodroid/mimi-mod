@@ -8,14 +8,16 @@ import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNoteOnPacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
@@ -69,7 +71,14 @@ public class MidiInputManager {
             return;
         }
 
-        this.hasTransmitter = hasTransmitter(event.player);
+        if(hasTransmitter(event.player)) {
+            this.hasTransmitter = true;
+        } else {
+            if(this.hasTransmitter) {
+                this.playlistManager.stop();
+            }
+            this.hasTransmitter = false;
+        }
         this.localInstrumentToPlay = localInstrumentsToPlay(event.player);
     }
     
@@ -79,7 +88,14 @@ public class MidiInputManager {
             this.playlistManager.stop();
         }
     }
-    
+
+    @SubscribeEvent
+    public void onDeathDevent(LivingDeathEvent event) {
+        if(EntityType.PLAYER.equals(event.getEntity().getType()) && ((PlayerEntity)event.getEntity()).isUser()) {
+            this.playlistManager.stop();
+        }
+    }
+        
     protected Boolean hasTransmitter(PlayerEntity player) {
         if(player.inventory != null) {
 
@@ -127,4 +143,13 @@ public class MidiInputManager {
 
         return result;
     }
+
+    /*
+    protected void transmitterAllOff() {
+        for(MidiChannelNumber channel: MidiChannelNumber.values()) {
+            TransmitterNotePacket packet = new TransmitterNotePacket(Integer.valueOf(channel.ordinal()).byteValue(), TransmitterNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), MIMIMod.proxy.getMidiInput().getTransmitMode());
+            NetworkManager.NET_CHANNEL.sendToServer(packet);
+        }
+    }
+    */
 }

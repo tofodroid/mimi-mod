@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
-public class ItemInstrument extends Item implements INamedContainerProvider {
+public class ItemInstrument extends Item {
     public static final String INVENTORY_TAG = "inventory";
 
     private final Byte instrumentId;
@@ -41,7 +41,7 @@ public class ItemInstrument extends Item implements INamedContainerProvider {
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         if (!worldIn.isRemote) {
-            NetworkHooks.openGui((ServerPlayerEntity) playerIn, this, buffer -> {
+            NetworkHooks.openGui((ServerPlayerEntity) playerIn, generateContainerProvider(handIn), buffer -> {
                 buffer.writeByte(this.instrumentId);
                 buffer.writeBoolean(true);
                 buffer.writeBoolean(Hand.MAIN_HAND.equals(handIn));
@@ -57,19 +57,19 @@ public class ItemInstrument extends Item implements INamedContainerProvider {
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
-    @Override
-	public Container createMenu(int id, PlayerInventory inv, PlayerEntity player) {
-        ItemStack mainStack = player.getHeldItemMainhand();
+    public INamedContainerProvider generateContainerProvider(Hand handIn) {
+        return new InstrumentContainerProvider() {
+            @Override
+            public Container createMenu(int p1, PlayerInventory p2,  PlayerEntity p3) {
+                return new ContainerInstrument(p1, p2, instrumentId, handIn);
+            }
+    
+            @Override
+            public ITextComponent getDisplayName() {return getMenuDisplayName();}
+        };
+    }
 
-        if(mainStack.isEmpty() || !(mainStack.getItem() instanceof ItemInstrument)) {
-		    return new ContainerInstrument(id, inv, instrumentId, Hand.OFF_HAND);
-        } else {
-		    return new ContainerInstrument(id, inv, instrumentId, Hand.MAIN_HAND);
-        }
-	}
-
-	@Override
-	public ITextComponent getDisplayName() {
+	public ITextComponent getMenuDisplayName() {
 		return new TranslationTextComponent(this.getTranslationKey());
 	}
 
@@ -156,5 +156,13 @@ public class ItemInstrument extends Item implements INamedContainerProvider {
 
     public static Boolean hasSwitchboard(ItemStack stack) {
         return !getSwitchboardStack(stack).isEmpty();
+    }
+
+    protected class InstrumentContainerProvider implements INamedContainerProvider {
+        @Override
+        public Container createMenu(int p1, PlayerInventory p2,  PlayerEntity p3) {return null;}
+
+        @Override
+        public ITextComponent getDisplayName() {return null;}
     }
 }
