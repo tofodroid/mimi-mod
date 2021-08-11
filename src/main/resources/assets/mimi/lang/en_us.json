@@ -9,6 +9,7 @@
   "itemGroup.mimi.group": "MIMI",
   "item.mimi.bassguitar": "Bass Guitar",
   "item.mimi.acguitar": "Acoustic Guitar",
+  "item.mimi.accordion": "Accordion",
   "item.mimi.bagpipe": "Bagpipes",
   "item.mimi.clarinet": "Clarinet",
   "item.mimi.elecguitar": "Electric Guitar",
@@ -21,7 +22,15 @@
   "item.mimi.synlead": "Synth Lead",
   "item.mimi.trumpet": "Trumpet",
   "item.mimi.violin": "Violin",
+  "item.mimi.banjo": "Banjo",
+  "item.mimi.harmonica": "Harmonica",
+  "item.mimi.oboe": "Oboe",
+  "item.mimi.switchboard": "Switchboard",
   "item.mimi.transmitter": "Transmitter",
+  "block.mimi.listener": "Listener",
+  "block.mimi.advlistener": "Advanced Listener",
+  "block.mimi.receiver": "Receiver",
+  "block.mimi.mechanicalmaestro": "Mechanical Maestro",
   "block.mimi.piano": "Piano",
   "block.mimi.drums": "Drum Kit"
 }

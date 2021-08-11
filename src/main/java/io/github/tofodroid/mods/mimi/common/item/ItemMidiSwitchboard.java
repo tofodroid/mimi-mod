@@ -87,6 +87,12 @@ public class ItemMidiSwitchboard extends Item {
                 tooltip.add(new StringTextComponent("Transmitter: None"));
             }
 
+            if(ItemMidiSwitchboard.getSysInput(stack)) {
+                tooltip.add(new StringTextComponent("System MIDI Device: Enabled"));
+            } else {
+                tooltip.add(new StringTextComponent("System MIDI Device: Disabled"));
+            }
+
             // MIDI Channels Filter
             SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(stack);
             if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
