@@ -13,8 +13,6 @@ import net.minecraft.world.server.ServerWorld;
 
 import java.util.List;
 import java.util.UUID;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -41,8 +39,6 @@ public class MidiNotePacketHandler {
     
     protected static void handlePacketsServer(final List<MidiNotePacket> messages, ServerWorld worldIn, ServerPlayerEntity sender) {
         if(messages != null && !messages.isEmpty()) {
-            Instant startTime = Instant.now();
-
             // Forward to players
             for(MidiNotePacket packet : messages) {
                 NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
@@ -65,12 +61,6 @@ public class MidiNotePacketHandler {
                         }
                     });
                 }
-            }
-            
-            // DEBUG
-            Long millis = ChronoUnit.MILLIS.between(startTime, Instant.now());
-            if(millis > 1) {
-                MIMIMod.LOGGER.warn("Processing onfmidinote packet set took " + millis + "ms");
             }
         }
     }

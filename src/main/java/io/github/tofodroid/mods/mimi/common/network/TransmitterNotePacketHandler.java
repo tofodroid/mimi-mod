@@ -8,8 +8,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,7 +17,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
@@ -38,7 +35,6 @@ public class TransmitterNotePacketHandler {
     }
     
     public static void handlePacketServer(final TransmitterNotePacket message, ServerPlayerEntity sender) {
-        Instant startTime = Instant.now();
         HashMap<ServerPlayerEntity, List<MidiNotePacket>> notePackets = new HashMap<>();
         notePackets.put(sender, new ArrayList<>());
 
@@ -72,12 +68,6 @@ public class TransmitterNotePacketHandler {
                     ModBlocks.RECEIVER.powerTarget(sender.getServerWorld(), receiver.getBlockState(), 15, receiver.getPos());
                 }
             }
-        }
-
-        // DEBUG
-        Long millis = ChronoUnit.MILLIS.between(startTime, Instant.now());
-        if(millis > 1) {
-            MIMIMod.LOGGER.warn("Processing transmitter packet set took " + millis + "ms");
         }
     }
     

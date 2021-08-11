@@ -125,10 +125,6 @@ public class MidiInputDeviceManager extends MidiInputSourceManager {
                 .filter(d -> !d.getClass().getName().contains("com.sun.media.sound.RealTimeSequencer"))
                 .collect(Collectors.toList());
 
-            this.midiDevices.forEach(device -> {
-                MIMIMod.LOGGER.info("Available MIDI Device: " + device.getDeviceInfo().toString());
-            });
-
             if(selectedDevice != null && (this.midiDevices == null || !this.midiDevices.contains(selectedDevice))) { 
                 MIMIMod.LOGGER.warn("Previously selected midi device no longer available. Clearing.");
                 this.clearDeviceSelection();
