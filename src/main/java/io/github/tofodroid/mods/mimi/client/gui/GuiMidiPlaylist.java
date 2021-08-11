@@ -7,9 +7,9 @@ import java.nio.file.Paths;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import io.github.tofodroid.mods.mimi.client.midi.MidiFileInfo;
+import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInputManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,7 +50,7 @@ public class GuiMidiPlaylist extends BaseGui {
     
     public GuiMidiPlaylist(PlayerEntity player) {
         super(368, 300, 400, "textures/gui/gui_midi_playlist.png", "item.MIMIMod.gui_midi_playlist");
-        this.midiInputManager = MIMIMod.proxy.getMidiInput();
+        this.midiInputManager = (MidiInputManager)MIMIMod.proxy.getMidiInput();
         this.folderPathString = this.midiInputManager.playlistManager.getPlaylistFolderPath();
     }
 

@@ -1,12 +1,12 @@
 package io.github.tofodroid.mods.mimi.client;
 
+import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.client.midi.MidiSynthManager;
 import io.github.tofodroid.mods.mimi.client.renderer.EntitySeatRenderer;
 import io.github.tofodroid.mods.mimi.client.renderer.EntityMechanicalMaestroRenderer;
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInputManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;

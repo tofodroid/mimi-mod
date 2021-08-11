@@ -1,15 +1,14 @@
-package io.github.tofodroid.mods.mimi.common.midi;
+package io.github.tofodroid.mods.mimi.client.midi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.client.midi.MidiInputDeviceManager;
-import io.github.tofodroid.mods.mimi.client.midi.MidiPlaylistManager;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiInputManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.entity.EntityType;
@@ -23,7 +22,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
-public class MidiInputManager {
+public class MidiInputManager extends AMidiInputManager {
     public final MidiInputDeviceManager inputDeviceManager;
     public final MidiPlaylistManager playlistManager;
 
