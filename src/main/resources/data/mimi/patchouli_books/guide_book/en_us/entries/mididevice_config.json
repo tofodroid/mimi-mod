@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "The MIDI Input Device Configuration GUI allows you to get a list of MIDI devices currently available on your system and select the one to use for the MIMI System MIDI Input Device MIDI Source on your instruments."
+            "text": "The MIDI Input Device Configuration GUI allows you to get a list of MIDI devices currently available on your system and select the one to use for the MIMI System MIDI Input Device on your instruments."
         },
         {
             "type": "text",

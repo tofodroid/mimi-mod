@@ -14,18 +14,28 @@
         },
         {
             "type": "text",
+            "title": "The Piano Keyboard",
+            "text": "The largest component on the instrument GUI is the piano keyboard. This keyboard allows you to manually play notes on your instrument either by clicking the piano keys or pressing the keyboard keys associated with piano key.$(br2)The keyboard displays three octaves of notes at one time but can be shifted up and down."
+        },
+        {
+            "type": "text",
             "title": "Shifting the Piano",
-            "text": "To shift the piano you can either click the shift buttons on the right side 'Shift' panel, or use the arrow keys on your keyboard that match the arrow on each shift GUI button.$(br2)Shifting +/- 1 moves the keyboard one natural note (white key) while +/- 7 moves the keyboard one full octave.$(br2)The $(l)<| Note$() indicator displays the minimum note on the piano that is currently visible."
+            "text": "The GUI also shows the controls for shifting the displayed piano up and down so that you can play lower or higher notes.$(br2)You can shift up and down either by a single white note or an entire octave."
         },
         {
             "type": "text",
-            "title": "Setting a MIDI Source",
-            "text": "The top left section of the Instrument GUI lets you configure the MIDI Source to use for this instrument."
+            "title": "Note Indicators",
+            "text": "The note indicators display minimum, maximum, and middles notes on the currently visible portion of the piano.$(br2)The color of the labels corresponds to colored lines on the piano keyboard to show which notes are being labeled."
         },
         {
             "type": "text",
-            "title": "MIDI Channel Toggles",
-            "text": "The numbered buttons spanning the full length of the GUI are the MIDI channel toggles. These buttons allow you to toggle each MIDI channel on or off for this instrument when it is playing from a MIDI Source.$(br2)Channel 10 is a special color to indicate that it is primarily used for percussion.$(br2)The X and O buttons allow you to clear and enable all channels, respectively."
+            "title": "Switchboard Slot",
+            "text": "The lower half of the GUI shows your current inventory and includes a slot to insert a $(l:overview_switchboard)Switchboard$() into the current instrument.$(br2)Inserting a Switchboard allows you to connect the instrument to a $(l:overview_transmitter)Transmitter$() or enable input from a System MIDI Input device."
+        },
+        {
+            "type": "text",
+            "title": "Switchboard Panel",
+            "text": "The pencil button next to the Switchboard slot allows you to modify the properties of the current switchboard if one is inserted.$(br2)See the $(l:switchboard_properties)Switchboard Properties$() section of this guide for more information on available Switchboard properties."
         },
         {
             "type": "text",
@@ -38,5 +48,5 @@
             "text": "$(l)VPiano$() is a mode that uses the same layout as virtualpiano.net and is a 'static' mode where keys are assigned to specific notes and do not follow your current view on the keyboard.$(br2)This mode allows you to play notes from C2-C7 and play notes that are not currently visible on your screen. This mode is case-sensitive so in order to play the black keys you will need to hold Shift."
         }
     ],
-    "sortnum": 1
+    "sortnum": 0
 }

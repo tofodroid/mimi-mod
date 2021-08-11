@@ -1,0 +1,24 @@
+{
+    "name": "Redstone-Enabled Blocks",
+    "icon": "mimi:listener",
+    "category": "mimi:recipes",
+    "pages": [
+        {
+            "type": "text",
+            "text": "This section lists the crafting recipe for each redstone-enabled block currently in MIMI."
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:listener"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:receiver"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:mechanicalmaestro"
+        }
+    ],
+    "sortnum": 1
+}

@@ -1,0 +1,33 @@
+{
+    "name": "Using Switchboards",
+    "icon": "mimi:switchboard",
+    "category": "mimi:overview",
+    "pages": [
+        {
+            "type": "text",
+            "text": "In order to connect an instrument or redstone-enabled block to a Transmitter or configure other settings you must insert a Switchboard.$(br2)The Switchboard stores all configured settings and can then be moved between instruments and blocks to quickly transfer settings between them."
+        },
+        {
+            "type": "crafting",
+            "title": "Crafting",
+            "recipe": "mimi:switchboard",
+            "text": "$(br)Once you've crafted a Switchboard open up the Instrument GUI for any instrument and insert the Switchboard into the corresponding slot in the GUI."
+        },
+        {
+            "type": "text",
+            "title": "Properties",
+            "text": "The Switchboard can store several different properties which are used by different blocks and items within MIMI. Hovering your mouse over a Switchboard in your inventory will allow you to see the current properties set on it.$(br2)To see an overview of the different properties that a Switchboard can store go to the Switchboard Properties section of this guide."
+        },
+        {
+            "type": "text",
+            "title": "Modifying Properties",
+            "text": "When the Switchboard is inserted into an instrument or redstone-enabled block the GUI for the instrument or block will allow you to modify the properties of the Switchboard.$(br2)Any changes that you make will be saved to the Switchboard and when it is removed from the instrument or block it will retain its settings."
+        },
+        {
+            "type": "text",
+            "title": "Modifying Properties",
+            "text": "Not all blocks and items that accpet a Switchboard use the same set of properties. For example, a Switchboard in the Listener allows you to configure a specific Note to listen for but this property is not used when the Switchboard is inserted into an instrument.$(br2)Incompatible properties will not be erased when the Switchboard is inserted into a new block or item and will simply be ignored."
+        }
+    ],
+    "sortnum": 3
+}
