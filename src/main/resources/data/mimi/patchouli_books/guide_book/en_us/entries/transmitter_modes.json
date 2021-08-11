@@ -10,17 +10,17 @@
         {
             "type": "text",
             "title": "Public Mode",
-            "text": "Public Mode is the most open of all transmit modes. When you transmit songs using this mode anyone can play along with you if they're within range (16 blocks) and set their instrument MIDI Source to Public Transmitters."
+            "text": "Public Mode is the most open of all transmit modes. When you transmit songs using this mode anyone can play along with you if they're within range (16 blocks) and set their Instrument Switchboard's Linked Transmitter to Public Transmitters."
         },
         {
             "type": "text",
             "title": "Linked Mode",
-            "text": "Linked Mode is a transmit mode intended for bands to be able to play together without letting everyone around join in (such as when performing concerts on larger servers). In this mode instruments within range will only play notes if they have the transmitting player set as their MIDI Source."
+            "text": "Linked Mode is a transmit mode intended for bands to be able to play together without letting everyone around join in (such as when performing concerts on larger servers). In this mode Instruments within range will only play notes if they have the transmitting player set as their Switchboard's Linked Transmitter."
         },
         {
             "type": "text",
             "title": "Self Mode",
-            "text": "Self Mode is the most restrictive transmit mode and is intended to be used when you want to play solo without letting others join in. In this mode only instruments that have you set as their MIDI Source and that are being played by you will play notes from the transmitter."
+            "text": "Self Mode is the most restrictive transmit mode and is intended to be used when you want to play solo without letting others join in. In this mode only Instruments with a Switchboard that have you set as their Linked Transmitter and that are being played by you will play notes from the transmitter."
         }
     ],
     "sortnum": 2

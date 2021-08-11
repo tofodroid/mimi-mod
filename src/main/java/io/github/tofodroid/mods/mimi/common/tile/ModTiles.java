@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -15,11 +16,20 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid=MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ModTiles {
     public static TileEntityType<TileInstrument> INSTRUMENT = null;
+    public static TileEntityType<TileReceiver> RECEIVER = null;
+    public static TileEntityType<TileListener> LISTENER = null;
+    public static TileEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = null;
 
     private static final List<TileEntityType<?>> buildTileTypes() {
         List<TileEntityType<?>> types = new ArrayList<>();
-        INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", TileEntityType.Builder.create(TileInstrument::new, ModBlocks.PIANO, ModBlocks.DRUMS));
+        INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", TileEntityType.Builder.create(TileInstrument::new, ModBlocks.INSTRUMENTS.toArray(new BlockInstrument[ModBlocks.INSTRUMENTS.size()])));
         types.add(INSTRUMENT);
+        RECEIVER = buildType(MIMIMod.MODID + ":receiver", TileEntityType.Builder.create(TileReceiver::new, ModBlocks.RECEIVER));
+        types.add(RECEIVER);
+        LISTENER = buildType(MIMIMod.MODID + ":listener", TileEntityType.Builder.create(TileListener::new, ModBlocks.LISTENER));
+        types.add(LISTENER);
+        MECHANICALMAESTRO = buildType(MIMIMod.MODID + ":mechanicalmaestro", TileEntityType.Builder.create(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO));
+        types.add(MECHANICALMAESTRO);
         return types;
     }
     

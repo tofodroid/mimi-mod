@@ -10,6 +10,7 @@ public abstract class MidiInputSourceManager {
 
     public void close() {
         if(activeTransmitter != null) {
+            activeTransmitter.setReceiver(null);
             activeTransmitter.close();
             activeTransmitter = null;
         }

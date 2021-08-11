@@ -15,7 +15,7 @@
         {
             "type": "text",
             "title": "MIDI Device Config GUI",
-            "text": "Current keybind: $(l)$(k:key.mimi.midi.settings)$()$(br2)Pressing this key opens the $(l:mididevice_config)MIDI Input Device Configuration GUI$(/l). This GUI allows you to select the system MIDI device to use for MIMI instruments that have System MIDI Input Device set for their MIDI Source."
+            "text": "Current keybind: $(l)$(k:key.mimi.midi.settings)$()$(br2)Pressing this key opens the $(l:mididevice_config)MIDI Input Device Configuration GUI$(/l). This GUI allows you to select the system MIDI device to use for MIMI instruments that have a Switchboard with System MIDI Input Device input enabled."
         },
         {
             "type": "text",

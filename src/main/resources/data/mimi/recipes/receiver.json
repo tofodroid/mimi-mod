@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IRI",
+        "RTR",
+        "IRI"
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "T": {
+            "item": "mimi:transmitter"
+        }
+    },
+    "result": {
+        "item": "mimi:receiver"
+    }
+}

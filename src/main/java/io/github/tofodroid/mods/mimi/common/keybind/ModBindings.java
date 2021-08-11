@@ -1,17 +1,14 @@
 package io.github.tofodroid.mods.mimi.common.keybind;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
-import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.common.network.KeybindOpenInstrumentPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.util.Hand;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
@@ -60,20 +57,11 @@ public class ModBindings {
                     MIMIMod.guiWrapper.openPlaylistGui(worldIn, playerIn);
                 }
             } else if(MIDIGUIMAIN.isPressed()) {
-                ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(playerIn, Hand.MAIN_HAND);
-                if(stack != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.MAIN_HAND);
-                }
+                NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, Hand.MAIN_HAND));
             } else if(MIDIGUIOFF.isPressed()) {
-                ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(playerIn, Hand.OFF_HAND);
-                if(stack != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData(stack), stack, Hand.OFF_HAND);
-                }
+                NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, Hand.OFF_HAND));
             } else if(MIDIGUISEAT.isPressed()) {
-                TileInstrument tile = BlockInstrument.getTileInstrumentForEntity(playerIn);
-                if(tile != null) {
-                    MIMIMod.guiWrapper.openInstrumentGui(worldIn, playerIn, tile.getInstrumentId(), tile);
-                }
+                NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(false, null));
             } else if(MIDISETTINGS.isPressed()) {
                 MIMIMod.guiWrapper.openConfigGui(worldIn, playerIn);
             }

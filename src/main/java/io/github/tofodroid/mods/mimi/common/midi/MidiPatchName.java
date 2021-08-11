@@ -4,8 +4,12 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
+// * - Denotes a patch that is used by an in-game instrument
+// + - Denotes a patch that is on the short-list to add next
+// ^ - Denotes a patch that is going to be added next
+
 public enum MidiPatchName {
-	AcousticGrandPiano(0, "Acoustic Grand Piano"),
+	AcousticGrandPiano(0, "Acoustic Grand Piano"), // *
     BrightAcousticPiano(1, "Bright Acoustic Piano"),
     ElectricGrandPiano(2, "Electric Grand Piano"),
     HonkyTonkPiano(3, "Honky-tonk Piano"),
@@ -15,31 +19,31 @@ public enum MidiPatchName {
     Clavi(7, "Clavi"),
     Celesta(8, "Celesta"),
     Glockenspiel(9, "Glockenspiel"),
-    MusicBox(10, "Music Box"),
+    MusicBox(10, "Music Box"), // +
     Vibraphone(11, "Vibraphone"),
     Marimba(12, "Marimba"),
-    Xylophone(13, "Xylophone"),
+    Xylophone(13, "Xylophone"), // +
     TubularBells(14, "Tubular Bells"),
     Dulcimer(15, "Dulcimer"),
     DrawbarOrgan(16, "Drawbar Organ"),
     PercussiveOrgan(17, "Percussive Organ"),
     RockOrgan(18, "Rock Organ"),
-    ChurchOrgan(19, "Church Organ"),
+    ChurchOrgan(19, "Church Organ"), // +
     ReedOrgan(20, "Reed Organ"),
-    Accordion(21, "Accordion"),
-    Harmonica(22, "Harmonica"),
+    Accordion(21, "Accordion"), // ^
+    Harmonica(22, "Harmonica"), // ^
     TangoAccordion(23, "Tango Accordion"),
     AcousticGuitarNylon(24, "Acoustic Guitar (nylon)"),
-    AcousticGuitarSteel(25, "Acoustic Guitar (steel)"),
+    AcousticGuitarSteel(25, "Acoustic Guitar (steel)"), // *
     ElectricGuitarJazz(26, "Electric Guitar (jazz)"),
     ElectricGuitarClean(27, "Electric Guitar (clean)"),
     ElectricGuitarMuted(28, "Electric Guitar (muted)"),
     OverdrivenGuitar(29, "Overdriven Guitar"),
-    DistortionGuitar(30, "Distortion Guitar"),
+    DistortionGuitar(30, "Distortion Guitar"), // *
     Guitarharmonics(31, "Guitar harmonics"),
     AcousticBass(32, "Acoustic Bass"),
     ElectricBassFinger(33, "Electric Bass (finger)"),
-    ElectricBassPick(34, "Electric Bass (pick)"),
+    ElectricBassPick(34, "Electric Bass (pick)"), // *
     FretlessBass(35, "Fretless Bass"),
     SlapBass1(36, "Slap Bass 1"),
     SlapBass2(37, "Slap Bass 2"),
@@ -52,40 +56,40 @@ public enum MidiPatchName {
     TremoloStrings(44, "Tremolo Strings"),
     PizzicatoStrings(45, "Pizzicato Strings"),
     OrchestralHarp(46, "Orchestral Harp"),
-    Timpani(47, "Timpani"),
-    StringEnsemble1(48, "String Ensemble 1"),
+    Timpani(47, "Timpani"), // + 
+    StringEnsemble1(48, "String Ensemble 1"), // *
     StringEnsemble2(49, "String Ensemble 2"),
     SynthStrings1(50, "SynthStrings 1"),
     SynthStrings2(51, "SynthStrings 2"),
     ChoirAahs(52, "Choir Aahs"),
-    VoiceOohs(53, "Voice Oohs"),
+    VoiceOohs(53, "Voice Oohs"), // *
     SynthVoice(54, "Synth Voice"),
     OrchestraHit(55, "Orchestra Hit"),
-    Trumpet(56, "Trumpet"),
+    Trumpet(56, "Trumpet"), // *
     Trombone(57, "Trombone"),
     Tuba(58, "Tuba"),
     MutedTrumpet(59, "Muted Trumpet"),
-    FrenchHorn(60, "French Horn"),
+    FrenchHorn(60, "French Horn"), // *
     BrassSection(61, "Brass Section"),
     SynthBrass1(62, "SynthBrass 1"),
     SynthBrass2(63, "SynthBrass 2"),
-    SopranoSax(64, "Soprano Sax"),
+    SopranoSax(64, "Soprano Sax"), // *
     AltoSax(65, "Alto Sax"),
     TenorSax(66, "Tenor Sax"),
     BaritoneSax(67, "Baritone Sax"),
-    Oboe(68, "Oboe"),
+    Oboe(68, "Oboe"), // ^
     EnglishHorn(69, "English Horn"),
     Bassoon(70, "Bassoon"),
-    Clarinet(71, "Clarinet"),
+    Clarinet(71, "Clarinet"), // *
     Piccolo(72, "Piccolo"),
-    Flute(73, "Flute"),
+    Flute(73, "Flute"), // *
     Recorder(74, "Recorder"),
     PanFlute(75, "Pan Flute"),
     BlownBottle(76, "Blown Bottle"),
     Shakuhachi(77, "Shakuhachi"),
     Whistle(78, "Whistle"),
-    Ocarina(79, "Ocarina"),
-    Lead1Square(80, "Lead 1 (square)"),
+    Ocarina(79, "Ocarina"), // *
+    Lead1Square(80, "Lead 1 (square)"), // *
     Lead2Sawtooth(81, "Lead 2 (sawtooth)"),
     Lead3Calliope(82, "Lead 3 (calliope)"),
     Lead4Chiff(83, "Lead 4 (chiff)"),
@@ -110,16 +114,16 @@ public enum MidiPatchName {
     FX7Echoes(102, "FX 7 (echoes)"),
     FX8SciFi(103, "FX 8 (sci-fi)"),
     Sitar(104, "Sitar"),
-    Banjo(105, "Banjo"),
+    Banjo(105, "Banjo"), // ^
     Shamisen(106, "Shamisen"),
     Koto(107, "Koto"),
-    Kalimba(108, "Kalimba"),
-    Bagpipe(109, "Bag pipe"),
+    Kalimba(108, "Kalimba"), // *
+    Bagpipe(109, "Bag pipe"), // *
     Fiddle(110, "Fiddle"),
     Shanai(111, "Shanai"),
     TinkleBell(112, "Tinkle Bell"),
     Agogo(113, "Agogo"),
-    SteelDrums(114, "Steel Drums"),
+    SteelDrums(114, "Steel Drums"), // +
     Woodblock(115, "Woodblock"),
     TaikoDrum(116, "Taiko Drum"),
     MelodicTom(117, "Melodic Tom"),
@@ -132,7 +136,7 @@ public enum MidiPatchName {
     TelephoneRing(124, "Telephone Ring"),
     Helicopter(125, "Helicopter"),
     Applause(126, "Applause"),
-    Gunshot(127, "Gunshot"),
+    Gunshot(127, "Gunshot"), // NOTE: This ID is used for 'all' in filters so it cannot be used
     UNKNOWN(-1, "Unknown Instrument");
 
     public final String name;

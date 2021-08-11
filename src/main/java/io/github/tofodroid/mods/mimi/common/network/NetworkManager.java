@@ -18,11 +18,10 @@ public class NetworkManager {
             .simpleChannel();
     
     public static void init(final FMLCommonSetupEvent event) {
-        NET_CHANNEL.registerMessage(0, MidiNoteOnPacket.class, MidiNoteOnPacket::encodePacket, MidiNoteOnPacket::decodePacket, MidiNotePacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(1, MidiNoteOffPacket.class, MidiNoteOffPacket::encodePacket, MidiNoteOffPacket::decodePacket, MidiNotePacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(2, MaestroNoteOnPacket.class, MaestroNoteOnPacket::encodePacket, MaestroNoteOnPacket::decodePacket, MaestroNotePacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(3, MaestroNoteOffPacket.class, MaestroNoteOffPacket::encodePacket, MaestroNoteOffPacket::decodePacket, MaestroNotePacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(4, InstrumentItemDataUpdatePacket.class, InstrumentItemDataUpdatePacket::encodePacket, InstrumentItemDataUpdatePacket::decodePacket, InstrumentItemDataUpdatePacketHandler::handlePacket);
-        NET_CHANNEL.registerMessage(5, InstrumentTileDataUpdatePacket.class, InstrumentTileDataUpdatePacket::encodePacket, InstrumentTileDataUpdatePacket::decodePacket, InstrumentTileDataUpdatePacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(0, MidiNotePacket.class, MidiNotePacket::encodePacket, MidiNotePacket::decodePacket, MidiNotePacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(1, TransmitterNotePacket.class, TransmitterNotePacket::encodePacket, TransmitterNotePacket::decodePacket, TransmitterNotePacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(2, SwitchboardStackUpdatePacket.class, SwitchboardStackUpdatePacket::encodePacket, SwitchboardStackUpdatePacket::decodePacket, SwitchboardStackUpdatePacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(3, SyncItemInstrumentSwitchboardPacket.class, SyncItemInstrumentSwitchboardPacket::encodePacket, SyncItemInstrumentSwitchboardPacket::decodePacket, SyncItemInstrumentSwitchboardPacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(4, KeybindOpenInstrumentPacket.class, KeybindOpenInstrumentPacket::encodePacket, KeybindOpenInstrumentPacket::decodePacket, KeybindOpenInstrumentPacketHandler::handlePacket);
     }
 }

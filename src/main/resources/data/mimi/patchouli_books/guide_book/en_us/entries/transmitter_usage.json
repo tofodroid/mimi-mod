@@ -15,7 +15,7 @@
         {
             "type": "text",
             "title": "Loading Songs",
-            "text": "The playlist is not saved when you logout of a world or close the game and the playlist folder must be loadead again each time you join a world$(br2)In the mod $(l:config_file)Config File$(/l) you can set a default folder to load when joining a world so that you don't have to reload the folder every time."
+            "text": "The playlist is not saved when you logout of a world or close the game and the playlist folder must be loaded again each time you join a world$(br2)In the mod $(l:config_file)Config File$(/l) you can set a default folder to load when joining a world so that you don't have to reload the folder every time."
         },
         {
             "type": "text",
@@ -35,7 +35,7 @@
         {
             "type": "text",
             "title": "Transmitting Songs",
-            "text": "When a song is being played it will be transmitted to all nearby instruments (within 16 blocks) using the selected $(l:transmitter_modes)Transmit Mode.$(/l)$(br2)If a nearby instrument is being played and has a compatible MIDI Source configured, all notes from the song will be sent to it and then will be played if the instrument has the corresponding channels enabled."
+            "text": "When a song is being played it will be transmitted to all nearby instruments (within 16 blocks) using the selected $(l:transmitter_modes)Transmit Mode.$(/l)$(br2)If a nearby instrument is being played and has a Switchboard with a compatible Linked Transmitter configured all notes from the song will be sent to it and then will be played if the Switchboard has the corresponding channels enabled."
         }
     ],
     "sortnum": 0

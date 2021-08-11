@@ -10,31 +10,15 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
-public class GuiMidiPlaylist extends Screen {
-    // Texture
-    private static final ResourceLocation guiTexture = new ResourceLocation(MIMIMod.MODID, "textures/gui/gui_midi_playlist.png");
-    private static final Integer GUI_WIDTH = 368;
-    private static final Integer GUI_HEIGHT = 300;
-    private static final Integer TEXTURE_SIZE = 400;
-    private static final Integer BUTTON_SIZE = 15;
-    
+public class GuiMidiPlaylist extends BaseGui {
     // GUI
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
-
-    private Integer startX;
-    private Integer startY;
     private TextFieldWidget folderPathField;
 
     // Data
@@ -65,37 +49,20 @@ public class GuiMidiPlaylist extends Screen {
     private MidiInputManager midiInputManager;
     
     public GuiMidiPlaylist(PlayerEntity player) {
-        super(new TranslationTextComponent("item.MIMIMod.gui_midi_playlist"));
-        this.midiInputManager = MIMIMod.proxy.getMidiInput();
+        super(368, 300, 400, "textures/gui/gui_midi_playlist.png", "item.MIMIMod.gui_midi_playlist");
+        this.midiInputManager = (MidiInputManager)MIMIMod.proxy.getMidiInput();
         this.folderPathString = this.midiInputManager.playlistManager.getPlaylistFolderPath();
     }
 
     @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
-    @Override
     public void init() {
-        startX = (this.width - GUI_WIDTH) / 2;
-        startY = (this.height - GUI_HEIGHT) / 2;
+        super.init();
 
         // Fields
-        folderPathField = this.addListener(new TextFieldWidget(this.font, this.startX + 90, this.startY + 40, 207, 10, StringTextComponent.EMPTY));
+        folderPathField = this.addListener(new TextFieldWidget(this.font, this.START_X + 90, this.START_Y + 40, 207, 10, StringTextComponent.EMPTY));
         folderPathField.setText(folderPathString);
         folderPathField.setMaxStringLength(256);
         folderPathField.setResponder(this::handlePathChange);
-    }
-
-    @Override
-    public void closeScreen() {
-        super.closeScreen();
-    }
-
-    @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        matrixStack = renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
-        matrixStack = renderText(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -153,27 +120,13 @@ public class GuiMidiPlaylist extends Screen {
         return !this.folderPathField.keyPressed(keyCode, scanCode, modifiers) && !this.folderPathField.canWrite() ? super.keyPressed(keyCode, scanCode, modifiers) : true;
     }
 
-    private Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
-        Integer buttonMinX = startX + new Float(buttonPos.x).intValue();
-        Integer buttonMaxX = buttonMinX + BUTTON_SIZE;
-        Integer buttonMinY = startY + new Float(buttonPos.y).intValue();
-        Integer buttonMaxY = buttonMinY + BUTTON_SIZE;
-
-        Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
-
-        if(result) {
-            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-        }
-
-        return result;
-    }
-
-    private MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    @Override
+    protected  MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         Minecraft.getInstance().getTextureManager().bindTexture(guiTexture);
 
         // Background
-        blit(matrixStack, startX, startY, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Selected Song Box
         if(this.midiInputManager.playlistManager.isSongSelected()) {
@@ -188,20 +141,20 @@ public class GuiMidiPlaylist extends Screen {
             }
             
             Integer boxY = 82 + 10 * songOffset;
-            blit(matrixStack, startX + 15, startY + boxY, this.getBlitOffset(), 1, 301, 338, 11, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 15, START_Y + boxY, this.getBlitOffset(), 1, 301, 338, 11, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Play/Pause Button
-        blit(matrixStack, startX + 53, startY + 272, this.getBlitOffset(), 1 + this.midiInputManager.playlistManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + 53, START_Y + 272, this.getBlitOffset(), 1 + this.midiInputManager.playlistManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Loop Screen
-        blit(matrixStack, startX + new Float(LOOP_SCREEN.x).intValue(), startY + new Float(LOOP_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + new Float(LOOP_SCREEN.x).intValue(), START_Y + new Float(LOOP_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Shuffle Screen    
-        blit(matrixStack, startX + new Float(SHUFFLE_SCREEN.x).intValue(), startY + new Float(SHUFFLE_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + new Float(SHUFFLE_SCREEN.x).intValue(), START_Y + new Float(SHUFFLE_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        blit(matrixStack, startX + new Float(TRANSMIT_SCREEN.x).intValue(), startY + new Float(TRANSMIT_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + new Float(TRANSMIT_SCREEN.x).intValue(), START_Y + new Float(TRANSMIT_SCREEN.y).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;
@@ -212,7 +165,7 @@ public class GuiMidiPlaylist extends Screen {
             slideOffset = new Double(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
 
-        blit(matrixStack, startX + SLIDE_MIN_X + slideOffset, startY + SLIDE_Y, this.getBlitOffset(), 43, 313, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 43, 313, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Text Field
         this.folderPathField.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -220,7 +173,8 @@ public class GuiMidiPlaylist extends Screen {
         return matrixStack;
     }
 
-    private MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    @Override
+    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Playlist
         if(this.midiInputManager.playlistManager.getSongCount() > 0) {
             Integer minSong;
@@ -235,7 +189,7 @@ public class GuiMidiPlaylist extends Screen {
             for(int i = 0; i < 6; i++) {
                 if(this.midiInputManager.playlistManager.getSongCount() > (minSong + i)) {
                     MidiFileInfo info = this.midiInputManager.playlistManager.getLoadedPlaylist().get(minSong + i);
-                    this.font.drawString(matrixStack, (minSong + i + 1) + "). " + (info.fileName.length() > 50 ? info.fileName.substring(0,50) + "..." : info.fileName), startX + 18, startY + 84 + i * 10, 0xFF00E600);
+                    this.font.drawString(matrixStack, (minSong + i + 1) + "). " + (info.fileName.length() > 50 ? info.fileName.substring(0,50) + "..." : info.fileName), START_X + 18, START_Y + 84 + i * 10, 0xFF00E600);
                 } else {
                     break;
                 }            
@@ -245,19 +199,19 @@ public class GuiMidiPlaylist extends Screen {
         // Current Song
         MidiFileInfo info = this.midiInputManager.playlistManager.getSelectedSongInfo();
         if(info != null) {
-            this.font.drawString(matrixStack, "Channel Instruments: ", startX + 16, startY + 174, 0xFF00E600);
+            this.font.drawString(matrixStack, "Channel Instruments: ", START_X + 16, START_Y + 174, 0xFF00E600);
             
             Integer index = 0;
             for(Integer i = 0; i < 16; i+=2) {
                 String name = info.instrumentMapping.get(i) == null ? "None" : info.instrumentMapping.get(i);
-                this.font.drawString(matrixStack, (i+1) + ": " + name, startX + 16, startY + 188 + 10*index, 0xFF00E600);
+                this.font.drawString(matrixStack, (i+1) + ": " + name, START_X + 16, START_Y + 188 + 10*index, 0xFF00E600);
                 index++;
             }
 
             index = 0;
             for(Integer i = 1; i < 16; i+=2) {
                 String name = info.instrumentMapping.get(i) == null ? "None" : info.instrumentMapping.get(i);
-                this.font.drawString(matrixStack, (i+1) + ": " + name, startX + 184, startY + 188 + 10*index, 0xFF00E600);
+                this.font.drawString(matrixStack, (i+1) + ": " + name, START_X + 184, START_Y + 188 + 10*index, 0xFF00E600);
                 index++;
             }
         }

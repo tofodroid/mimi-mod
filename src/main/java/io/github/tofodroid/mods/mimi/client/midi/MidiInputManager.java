@@ -5,23 +5,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.instruments.EntityInstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.InstrumentDataUtil;
-import io.github.tofodroid.mods.mimi.common.instruments.ItemInstrumentDataUtil;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.MaestroNoteOnPacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiInputManager;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
-public class MidiInputManager {
+public class MidiInputManager extends AMidiInputManager {
     public final MidiInputDeviceManager inputDeviceManager;
     public final MidiPlaylistManager playlistManager;
 
@@ -43,22 +44,26 @@ public class MidiInputManager {
         return playlistManager.getTransmitMode();
     }
     
-    public List<Byte> getLocalInstrumentsToPlay(Byte channel) {
-        return localInstrumentToPlay.stream().filter(data -> {
+    public List<Byte> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
+        return localInstrumentToPlay.stream().map(data -> {
+            ItemStack switchStack = ItemStack.EMPTY;
+            Byte instrumentId = null;
+
             if(data instanceof ItemStack) {
-                return ItemInstrumentDataUtil.INSTANCE.doesAcceptChannel((ItemStack)data, channel);
+                switchStack = ItemInstrument.getSwitchboardStack((ItemStack)data);
+                instrumentId = ItemInstrument.getInstrumentId((ItemStack)data);
             } else if(data instanceof TileInstrument) {
-                return EntityInstrumentDataUtil.INSTANCE.doesAcceptChannel((TileInstrument)data, channel);
-            } else {
-                return false;
+                switchStack = ((TileInstrument)data).getSwitchboardStack();
+                instrumentId = ((TileInstrument)data).getInstrumentId();
             }
-        }).map(data -> {
-            if(data instanceof ItemStack) {
-                return ItemInstrumentDataUtil.INSTANCE.getInstrumentIdFromData((ItemStack)data);
-            } else {
-                return EntityInstrumentDataUtil.INSTANCE.getInstrumentIdFromData((TileInstrument)data);
+
+            if(ModItems.SWITCHBOARD.equals(switchStack.getItem()) && ItemMidiSwitchboard.getSysInput(switchStack) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
+                return instrumentId;
             }
-        }).collect(Collectors.toList());
+
+            return null;
+        })
+        .filter(b -> b != null).collect(Collectors.toList());
     }
     
     @SubscribeEvent
@@ -67,7 +72,14 @@ public class MidiInputManager {
             return;
         }
 
-        this.hasTransmitter = hasTransmitter(event.player);
+        if(hasTransmitter(event.player)) {
+            this.hasTransmitter = true;
+        } else {
+            if(this.hasTransmitter) {
+                this.playlistManager.stop();
+            }
+            this.hasTransmitter = false;
+        }
         this.localInstrumentToPlay = localInstrumentsToPlay(event.player);
     }
     
@@ -77,7 +89,14 @@ public class MidiInputManager {
             this.playlistManager.stop();
         }
     }
-    
+
+    @SubscribeEvent
+    public void onDeathDevent(LivingDeathEvent event) {
+        if(EntityType.PLAYER.equals(event.getEntity().getType()) && ((PlayerEntity)event.getEntity()).isUser()) {
+            this.playlistManager.stop();
+        }
+    }
+        
     protected Boolean hasTransmitter(PlayerEntity player) {
         if(player.inventory != null) {
 
@@ -108,18 +127,18 @@ public class MidiInputManager {
 
         // Check for seated instrument
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
-        if(instrumentEntity != null && InstrumentDataUtil.MIDI_MAESTRO_ID.equals(EntityInstrumentDataUtil.INSTANCE.getLinkedMaestro(instrumentEntity))) {
+        if(instrumentEntity != null && instrumentEntity.hasSwitchboard()) {
             result.add(instrumentEntity);
         }
 
         // Check for held instruments
         ItemStack mainHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.MAIN_HAND);
-        if(mainHand != null && InstrumentDataUtil.MIDI_MAESTRO_ID.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(mainHand))) {
+        if(mainHand != null && ItemInstrument.hasSwitchboard(mainHand)) {
             result.add(mainHand);
         }
 
         ItemStack offHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.OFF_HAND);
-        if(offHand != null && InstrumentDataUtil.MIDI_MAESTRO_ID.equals(ItemInstrumentDataUtil.INSTANCE.getLinkedMaestro(mainHand))) {
+        if(offHand != null &&  ItemInstrument.hasSwitchboard(offHand)) {
             result.add(offHand);
         }
 

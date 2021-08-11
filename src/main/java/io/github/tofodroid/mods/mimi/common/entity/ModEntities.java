@@ -17,9 +17,10 @@ public class ModEntities {
     private static final List<EntityType<?>> ENTITY_TYPES = new ArrayList<>();
 
     public static final EntityType<EntitySeat> SEAT = buildType(MIMIMod.MODID + ":seat", EntityType.Builder.<EntitySeat>create((type, world) -> new EntitySeat(world), EntityClassification.MISC).size(0.0F, 0.0F).setCustomClientFactory((spawnEntity, world) -> new EntitySeat(world)));
+    public static final EntityType<EntityNoteResponsiveTile> NOTERESPONSIVETILE = buildType(MIMIMod.MODID + ":noteresponsivetile", EntityType.Builder.<EntityNoteResponsiveTile>create((type, world) -> new EntityNoteResponsiveTile(world), EntityClassification.MISC).size(0.0F, 0.0F).setCustomClientFactory((spawnEntity, world) -> new EntityNoteResponsiveTile(world)));
 
     private static <T extends Entity> EntityType<T> buildType(String id, EntityType.Builder<T> builder) {
-        EntityType<T> type = builder.build(id);
+        EntityType<T> type = builder.immuneToFire().disableSummoning().build(id);
         type.setRegistryName(id);
         ENTITY_TYPES.add(type);
         return type;

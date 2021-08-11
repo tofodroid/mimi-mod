@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "Most instruments in MIMI are hand-held instruments which can be played while being held in your hand.$(br2)By using a MIDI Source it is possible to play two hand-held instruments at the same time in your main and off hands."
+            "text": "Most instruments in MIMI are hand-held instruments which can be played while being held in your hand.$(br2)By using a Linked Transmitter or System MIDI Input Device it is possible to play two hand-held instruments at the same time in your main and off hands."
         },
         {
             "type": "text",
@@ -20,12 +20,7 @@
         {
             "type": "text",
             "title": "Playing without GUI",
-            "text": "Hand-held instruments can also be played without the GUI by setting a MIDI Source on the instrument and then holding it in either your main hand or off hand.$(br2)Playing hand-held instruments without the GUI open using a MIDI Source will allow you to move while playing."
-        },
-        {
-            "type": "text",
-            "title": "Setting a Player Source",
-            "text": "If you want to set a player other than yourself as the MIDI Source for a hand-held instrument you can simply hold the instrument in your main hand and right click the player you want or give the instrument to the desired player and have them use the GUI to make themselves the MIDI Source."
+            "text": "Hand-held instruments can also be played without the GUI by setting a Linked Transmitter or System MIDI Input Device on the instrument and then holding it in either your main hand or off hand.$(br2)Playing hand-held instruments without the GUI open will allow you to move while playing."
         }
     ],
     "sortnum": 2

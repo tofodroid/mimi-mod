@@ -10,11 +10,13 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
-import io.github.tofodroid.mods.mimi.common.network.MidiNoteOffPacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-
+import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +31,8 @@ public class MidiChannelDef {
     private BlockPos lastNotePos;
     private Instant lastNoteTime;
     private Byte instrumentId;
-    private UUID playerId;
+    private Boolean mechanical;
+    private UUID entityId;
 
     public MidiChannelDef(Integer channelNum, MidiChannel channel) {
         this.channelNum = channelNum;
@@ -37,15 +40,10 @@ public class MidiChannelDef {
         this.assigned = false;
     }
 
-    public static MidiChannelDef unused(Integer channelNum) {
-        MidiChannelDef unusedDef = new MidiChannelDef(channelNum, null);
-        unusedDef.playerId = new UUID(0,0);
-        return unusedDef;
-    }
-
-    public void assign(UUID playerId, MidiInstrument instrument) {
+    public void assign(UUID entityId, Boolean mechanical, MidiInstrument instrument) {
         this.assigned = true;
-        this.playerId = playerId;
+        this.entityId = entityId;
+        this.mechanical = mechanical;
         this.instrumentId = instrument.getId();
         this.channel.programChange(instrument.getBank(), instrument.getPatch());
         this.channel.controlChange(7, 0);
@@ -53,10 +51,11 @@ public class MidiChannelDef {
 
     public void reset() {
         this.assigned = false;
+        this.mechanical = false;
         this.instrumentId = null;
         this.lastNotePos = null;
         this.lastNoteTime = null;
-        this.playerId = null;
+        this.entityId = null;
         this.channel.allNotesOff();
     }
 
@@ -67,7 +66,7 @@ public class MidiChannelDef {
     }
 
     public void noteOff(Byte note) {
-        if(MidiNoteOffPacket.ALL_NOTES_OFF.equals(note)) {
+        if(MidiNotePacket.ALL_NOTES_OFF.equals(note)) {
             channel.allNotesOff();
         } else { 
             channel.noteOff(note);
@@ -78,28 +77,40 @@ public class MidiChannelDef {
         if(!this.assigned) {
             MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
             return null;
-        }
+        } else if(!mechanical) {
+            // Handle Player Channels
+            Boolean clientChannel = isClientChannel(clientPlayer.getUniqueID());
+            if(!this.isIdle() && isPlayerUsingInstrument(clientPlayer.getEntityWorld())) {
+                setVolume(clientPlayer.getPosition(), clientChannel);
 
-        Boolean clientChannel = isClientChannel(clientPlayer.getUniqueID());
+                if (!clientChannel) {
+                    setLRPan(clientPlayer.getPosition(), clientPlayer.getRotationYawHead());
+                }
 
-        if(isPlayerUsingInstrument(clientPlayer.getEntityWorld()) && !this.isIdle()) {
-            setVolume(clientPlayer.getPosition(), clientChannel);
-
-            if (!clientChannel) {
-                setLRPan(clientPlayer.getPosition(), clientPlayer.getRotationYawHead());
+                return true;
+            } else if(this.lastNoteTime != null) {
+                return false;
+            } else {
+                MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
+                return null;
             }
-
-            return true;
-        } else if(this.lastNoteTime != null) {
-            return false;
         } else {
-            MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
-            return null;
+            // Handle Mechanical Maestro Channels
+            if(!this.isIdle() && isMechanicalMaestroUsingInstrument(clientPlayer.getEntityWorld())) {
+                setVolume(clientPlayer.getPosition(), false);
+                setLRPan(clientPlayer.getPosition(), clientPlayer.getRotationYawHead());
+                return true;
+            } else if(this.lastNoteTime != null) {
+                return false;
+            } else {
+                MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
+                return null;
+            }
         }
     }
 
     public Boolean isPlayerUsingInstrument(World worldIn) {
-        PlayerEntity player = worldIn.getPlayerByUuid(this.playerId);
+        PlayerEntity player = worldIn.getPlayerByUuid(this.entityId);
 
         if(player == null) {
             return false;
@@ -117,23 +128,31 @@ public class MidiChannelDef {
 
         TileInstrument instrumentTile = BlockInstrument.getTileInstrumentForEntity(player);
         checkId = instrumentTile != null ? instrumentTile.getInstrumentId() : null;
-        if(checkId != null && checkId.equals(this.instrumentId)) {
+        if(checkId != null && checkId.equals(this.instrumentId) && (lastNotePos != null ? lastNotePos.equals(player.getPosition()) : true)){
             return true;
         }
 
         return false;
     }
 
-    public Boolean isAssigned() {
-        return this.assigned;
-    }
+    public Boolean isMechanicalMaestroUsingInstrument(World worldIn) {
+        TileEntity tile = worldIn.getTileEntity(this.lastNotePos);
+        TileMechanicalMaestro mech = tile != null && ModTiles.MECHANICALMAESTRO.equals(tile.getType()) ? (TileMechanicalMaestro) tile : null;
 
-    public UUID getPlayerId() {
-        return this.playerId;
-    }
+        if(mech == null) {
+            return false;
+        }
 
-    public Byte getInstrumentId() {
-        return this.instrumentId;
+        Byte mechInstrument = mech.getInstrumentId();
+        if(mechInstrument == null || mechInstrument != this.instrumentId) {
+            return false;
+        }
+
+        if(mech.getSwitchboardStack().isEmpty()) {
+            return false;
+        }
+
+        return true;
     }
     
     public Integer getChannelNumber() {
@@ -141,7 +160,7 @@ public class MidiChannelDef {
     }
 
     private Boolean isClientChannel(UUID clientPlayerId) {
-        return this.assigned && clientPlayerId.equals(this.playerId);
+        return this.assigned && clientPlayerId.equals(this.entityId);
     }
     
     private Boolean isIdle() {
@@ -196,24 +215,5 @@ public class MidiChannelDef {
     protected static Float angleBetween(BlockPos source, BlockPos target) {
         Float angle = (float) Math.toDegrees(Math.atan2(target.getZ() - source.getZ(), target.getX() - source.getX()));
         return (angle < 0 ? angle + 360 : angle) % 360;
-    }
-
-    public static enum MidiChannelNumber {
-        ZERO,
-        ONE,
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT,
-        NINE,
-        TEN,
-        ELEVEN,
-        TWELVE,
-        THIRTEEN,
-        FOURTEEN,
-        FIFTEEN
     }
 }

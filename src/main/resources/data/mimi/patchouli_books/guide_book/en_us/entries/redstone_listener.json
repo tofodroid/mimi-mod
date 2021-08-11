@@ -1,0 +1,22 @@
+{
+    "name": "Listener",
+    "icon": "mimi:listener",
+    "category": "mimi:redstone",
+    "pages": [
+        {
+            "type": "text",
+            "text": "The Listener is a block which, when a Switchboard is inserted, listens for any notes played by instruments within its range (48 blocks) and outputs a redstone signal if the note matches the configured filter criteria."
+        },
+        {
+            "type": "text",
+            "title": "Listener GUI",
+            "text": "Right clicking on a placed Listener allows you to open the Listener GUI and insert a Switchboard into the Switchboard slot. When a Switchboard is inserted you can configure the Switchboard properties using the GUI."
+        },
+        {
+            "type": "text",
+            "title": "Switchboard Properties",
+            "text": "Listeners use the following $(l:switchboard_properties)Switchboard Properties$():$(br2)- Filter Note$(br)- Filter Instrument"
+        }
+    ],
+    "sortnum": 0
+}

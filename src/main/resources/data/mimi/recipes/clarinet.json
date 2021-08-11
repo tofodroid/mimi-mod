@@ -1,9 +1,9 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "P  ",
-        "IPI",
-        "  N"
+        " GP",
+        " P ",
+        "NI "
     ],
     "key": {
         "N": {
@@ -11,6 +11,9 @@
         },
         "I": {
             "item": "minecraft:ink_sac"
+        },
+        "G": {
+            "item": "minecraft:iron_ingot"
         },
         "P": {
             "tag": "minecraft:planks"
