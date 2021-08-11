@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "Opening the GUI",
-            "text": "To play an open Block Instrument first right-click on it while not holding another Instrument to seat yourself at it and then right-click it again to open the $(l:instruments_gui)Instrument GUI$(/l).$(br2)To leave a Block Instrument use the same keybind that you would use to dismount a horse or boat (deafult: Shift)."
+            "text": "To play an open Block Instrument first right-click on it while not holding another Instrument to seat yourself at it and then right-click it again to open the $(l:instruments_gui)Instrument GUI$(/l).$(br2)To leave a Block Instrument use the same keybind that you would use to dismount a horse or boat (default: Shift)."
         },
         {
             "type": "text",

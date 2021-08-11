@@ -26,7 +26,7 @@
         {
             "type": "text",
             "title": "Modifying Properties",
-            "text": "Not all blocks and items that accpet a Switchboard use the same set of properties. For example, a Switchboard in the Listener allows you to configure a specific Note to listen for but this property is not used when the Switchboard is inserted into an instrument.$(br2)Incompatible properties will not be erased when the Switchboard is inserted into a new block or item and will simply be ignored."
+            "text": "Not all blocks and items that accept a Switchboard use the same set of properties. For example, a Switchboard in the Listener allows you to configure a specific Note to listen for but this property is not used when the Switchboard is inserted into an instrument.$(br2)Incompatible properties will not be erased when the Switchboard is inserted into a new block or item and will simply be ignored."
         }
     ],
     "sortnum": 3

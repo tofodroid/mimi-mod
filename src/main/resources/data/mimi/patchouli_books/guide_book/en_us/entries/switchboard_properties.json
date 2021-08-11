@@ -40,7 +40,7 @@
         {
             "type": "text",
             "title": "Filter: Note",
-            "text": "This property stores which note(s) this Switchboard should respond to. You can set it to a specific note, any note from a specific octave, any octave of a speific note, or any note of any octave.$(br2)You can also invert the filter so that the Switchboard will respond to all notes $(i)except$() for the notes configured by the filter."
+            "text": "This property stores which note(s) this Switchboard should respond to. You can set it to a specific note, any note from a specific octave, any octave of a specific note, or any note of any octave.$(br2)You can also invert the filter so that the Switchboard will respond to all notes $(i)except$() for the notes configured by the filter."
         },
         {
             "type": "text",
