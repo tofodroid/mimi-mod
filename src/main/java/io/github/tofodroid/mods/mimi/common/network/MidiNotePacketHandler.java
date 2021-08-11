@@ -27,7 +27,6 @@ import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.tile.TileAdvListener;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 
 public class MidiNotePacketHandler {
@@ -50,17 +49,19 @@ public class MidiNotePacketHandler {
             }
 
             // Process Redstone
+            List<EntityNoteResponsiveTile> entities = new ArrayList<>();
+            BlockPos lastPacketPos = null;
+
             for(MidiNotePacket packet : messages) {
                 if(packet.velocity > 0) {
-                    List<EntityNoteResponsiveTile> entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
+                    if(lastPacketPos != packet.pos) {  
+                        lastPacketPos = packet.pos;
+                        entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
+                    }
                     
                     getPotentialListeners(entities).forEach(listener -> {
-                        ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getPos()), 15, listener.getPos());
-                    });
-
-                    getPotentialAdvListeners(entities).forEach(listener -> {
                         if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
-                            ModBlocks.ADVLISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getPos()), 15, listener.getPos());
+                            ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getPos()), 15, listener.getPos());
                         }
                     });
                 }
@@ -121,10 +122,6 @@ public class MidiNotePacketHandler {
 
     protected static List<TileListener> getPotentialListeners(List<EntityNoteResponsiveTile> entities) {
         return entities.stream().filter(e -> e.getTile() instanceof TileListener).map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
-    }
-
-    protected static List<TileAdvListener> getPotentialAdvListeners(List<EntityNoteResponsiveTile> entities) {
-        return entities.stream().filter(e -> e.getTile() instanceof TileAdvListener).map(e -> (TileAdvListener)e.getTile()).collect(Collectors.toList());
     }
     
     protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerWorld worldIn, ServerPlayerEntity excludePlayer, Double range) {

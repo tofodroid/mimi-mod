@@ -27,7 +27,6 @@ public final class ModItems {
 
     // Blocks - Other
     public static final BlockItem LISTENER = null;
-    public static final BlockItem ADVLISTENER = null;
     public static final BlockItem RECEIVER = null;
 
     public static MIMIModItemGroup ITEM_GROUP;
@@ -44,7 +43,6 @@ public final class ModItems {
 
             // Other Blocks
             event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
-            event.getRegistry().register(new BlockItem(ModBlocks.ADVLISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("advlistener"));
             event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("receiver"));
             event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("mechanicalmaestro"));
 

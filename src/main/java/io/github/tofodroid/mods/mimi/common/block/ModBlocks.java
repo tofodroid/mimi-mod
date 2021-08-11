@@ -15,7 +15,6 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModBlocks {
     // Other Blocks
     public static final BlockListener LISTENER = null;
-    public static final BlockAdvListener ADVLISTENER = null;
     public static final BlockReceiver RECEIVER = null;
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = null;
 
@@ -28,7 +27,6 @@ public class ModBlocks {
         public static void registerBlocks(final RegistryEvent.Register<Block> event) {
             event.getRegistry().registerAll(
                 new BlockListener(),
-                new BlockAdvListener(),
                 new BlockReceiver(),
                 new BlockMechanicalMaestro()
             );

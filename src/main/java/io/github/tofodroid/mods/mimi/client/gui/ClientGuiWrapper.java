@@ -26,7 +26,7 @@ public class ClientGuiWrapper implements GuiWrapper {
     @SubscribeEvent
     public static void registerScreens(FMLClientSetupEvent event) {
         ScreenManager.registerFactory(ModContainers.RECEIVER, GuiReceiverContainerScreen::new);
-        ScreenManager.registerFactory(ModContainers.ADVLISTENER, GuiAdvListenerContainerScreen::new);
+        ScreenManager.registerFactory(ModContainers.LISTENER, GuiListenerContainerScreen::new);
         ScreenManager.registerFactory(ModContainers.INSTRUMENT, GuiInstrumentContainerScreen::new);
         ScreenManager.registerFactory(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
     }
