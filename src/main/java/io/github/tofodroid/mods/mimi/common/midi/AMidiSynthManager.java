@@ -8,24 +8,14 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 
 public abstract class AMidiSynthManager implements AutoCloseable {
-    
-    public abstract void init();
-
     @Override
     public abstract void close();
-
+    public abstract void init();
     public abstract void handlePacket(MidiNotePacket message);
-    
     public abstract Boolean shouldShowOnGUI(UUID messagePlayer, Byte channel, Byte instrument);
-
     public abstract void allNotesOff();
-    
     public abstract void allNotesOff(MidiChannelNumber num);
-
     public abstract void handleTick(PlayerTickEvent event);
-
-    public abstract void handleSelfLogOut(LoggedOutEvent event);
-    
+    public abstract void handleSelfLogOut(LoggedOutEvent event); 
     public abstract void handleOtherLogOut(PlayerLoggedOutEvent event);
-    
 }
