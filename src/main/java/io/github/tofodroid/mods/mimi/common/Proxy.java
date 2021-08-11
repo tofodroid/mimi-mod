@@ -7,5 +7,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 public interface Proxy {
     public AMidiSynthManager getMidiSynth();
     public AMidiInputManager getMidiInput();
+    
     public void init(final FMLCommonSetupEvent event);
 }

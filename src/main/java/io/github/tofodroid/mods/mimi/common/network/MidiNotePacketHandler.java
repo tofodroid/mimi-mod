@@ -29,7 +29,7 @@ public class MidiNotePacketHandler {
         ctx.get().setPacketHandled(true);
     }
     
-    protected static void handlePacketsServer(final List<MidiNotePacket> messages, ServerWorld worldIn, ServerPlayerEntity sender) {
+    public static void handlePacketsServer(final List<MidiNotePacket> messages, ServerWorld worldIn, ServerPlayerEntity sender) {
         if(messages != null && !messages.isEmpty()) {
             // Forward to players
             for(MidiNotePacket packet : messages) {

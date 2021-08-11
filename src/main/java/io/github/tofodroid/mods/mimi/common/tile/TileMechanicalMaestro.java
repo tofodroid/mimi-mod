@@ -1,8 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import java.util.Arrays;
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.inventory.MechanicalMaestroInventoryStackHandler;
@@ -11,13 +11,14 @@ import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -76,7 +77,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
 
     public UUID getMaestroUUID() {
-        String idString = "tile-mech-maestro-" + this.getPos().getCoordinatesAsString().replace(", ", "-");
+        String idString = "tile-mech-maestro-" + this.getPos().getX() + "-" + this.getPos().getY() + "-" + this.getPos().getZ();
         return UUID.nameUUIDFromBytes(idString.getBytes());
     }
 
@@ -116,10 +117,12 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
     
     public void allNotesOff() {
-		if(this.getInstrumentId() != null) {
-			MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), this.getMaestroUUID(), true, this.getPos());
-			NetworkManager.NET_CHANNEL.sendToServer(packet);
-			MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+		if(this.getInstrumentId() != null && this.getWorld() instanceof ServerWorld) {
+			MidiNotePacketHandler.handlePacketsServer(
+                Arrays.asList(new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), this.getMaestroUUID(), true, this.getPos())),
+                (ServerWorld)this.getWorld(),
+                null
+            );
 		}
     }
 }
