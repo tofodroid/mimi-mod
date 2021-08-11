@@ -15,7 +15,7 @@
         {
             "type": "text",
             "title": "Mech. Maestro GUI",
-            "text": "The Mechanical Maestro GUI also allows you to insert an Instrument that the Mechanical Maestro should play. This can be either a hand-held Instrument or a Block Intsrument.$(br2)Note that if the Instrument has a Switchboard inserted into it that Switchboard will not be used."
+            "text": "The Mechanical Maestro GUI also allows you to insert an Instrument that the Mechanical Maestro should play. This can be either a hand-held Instrument or a Block Instrument.$(br2)Note that if the Instrument has a Switchboard inserted into it that Switchboard will not be used."
         },
         {
             "type": "text",

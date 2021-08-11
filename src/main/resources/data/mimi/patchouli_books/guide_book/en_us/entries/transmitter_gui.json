@@ -20,7 +20,7 @@
         {
             "type": "text",
             "title": "Song List",
-            "text": "Once a folder has been loaded the screen below the folder path should populate with a list of available songs in the specified folder. Each song is assigned a track number and the currently selected song will have a green box aruond it.$(br2)The song list will scroll up and down as the selected song changes."
+            "text": "Once a folder has been loaded the screen below the folder path should populate with a list of available songs in the specified folder. Each song is assigned a track number and the currently selected song will have a green box around it.$(br2)The song list will scroll up and down as the selected song changes."
         },
         {
             "type": "text",

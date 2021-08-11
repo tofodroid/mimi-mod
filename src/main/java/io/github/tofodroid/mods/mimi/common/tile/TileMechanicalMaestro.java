@@ -46,11 +46,8 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
 
     public ItemStack getSwitchboardStack() {
-        // Get mech maestro switch stack if present, else get instrument switch stack if present
         if(this.inventory.isPresent() && ModItems.SWITCHBOARD.equals(this.inventory.orElse(null).getStackInSlot(0).getItem())) {
             return this.inventory.orElse(null).getStackInSlot(0);
-        } else if(this.getInstrumentStack().getItem() instanceof ItemInstrument && !ItemInstrument.getSwitchboardStack(this.getInstrumentStack()).isEmpty()) {
-            return ItemInstrument.getSwitchboardStack(this.getInstrumentStack());
         }
 
         return ItemStack.EMPTY;
@@ -85,7 +82,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
 
     public Boolean shouldHandleMessage(UUID sender, Byte channel, Byte note, Boolean publicTransmit) {
         ItemStack switchStack = getSwitchboardStack();
-        if(getInstrumentId() != null && !switchStack.isEmpty()) {
+        if(!switchStack.isEmpty() && getInstrumentId() != null) {
             return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) &&
                 ( 
                     (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 

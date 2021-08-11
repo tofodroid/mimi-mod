@@ -28,7 +28,7 @@
         {
             "type": "text",
             "title": "4. Open the Instrument",
-            "text": "Hold your crafted instrument in your main hand (unless it's a Block Instrument, in which case place it in the world) then right click to open the Intsrument GUI.$(br2)Insert your Switchboard into the corresponding slot in the GUI."
+            "text": "Hold your crafted instrument in your main hand (unless it's a Block Instrument, in which case place it in the world) then right click to open the Instrument GUI.$(br2)Insert your Switchboard into the corresponding slot in the GUI."
         },
         {
             "type": "text",
