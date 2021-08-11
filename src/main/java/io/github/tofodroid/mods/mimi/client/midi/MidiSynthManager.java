@@ -24,11 +24,21 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.gson.Gson;
-import io.github.tofodroid.mods.mimi.client.midi.MidiChannelDef.MidiChannelNumber;
+
+import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
+import io.github.tofodroid.mods.mimi.common.midi.MidiChannelNumber;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiSynthManager;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -36,7 +46,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
-public class MidiSynthManager implements AutoCloseable {
+public class MidiSynthManager extends AMidiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 1;
     private ImmutableList<MidiChannelDef> midiChannelSet;
     private BiMap<MidiChannelNumber,String> channelAssignmentMap;
@@ -89,12 +99,43 @@ public class MidiSynthManager implements AutoCloseable {
         this.channelAssignmentMap = HashBiMap.create();
     }
 
+    @SuppressWarnings("resource")
     public void handlePacket(MidiNotePacket message) {
+        // Show on GUI
+        if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(message.player, message.channel, message.instrumentId)) {
+            if(message.velocity > 0) {
+                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(message.channel, message.note, message.velocity);
+            } else {
+                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOff(message.channel, message.note);
+            }
+        }
+
+        // Play
         if(message.velocity > 0) {
             noteOn(message);
         } else {
             noteOff(message);
         }
+    }
+    
+    @SuppressWarnings("resource")
+    public Boolean shouldShowOnGUI(UUID messagePlayer, Byte channel, Byte instrument) {
+        ClientPlayerEntity thisPlayer = Minecraft.getInstance().player;
+    
+        if(messagePlayer.equals(thisPlayer.getUniqueID()) && thisPlayer.openContainer instanceof ContainerInstrument) {
+            ItemStack switchStack = ((ContainerInstrument)thisPlayer.openContainer).getSelectedSwitchboard();
+            Byte guiInstrument = ((ContainerInstrument)thisPlayer.openContainer).getInstrumentId();
+
+            if(instrument == guiInstrument && ModItems.SWITCHBOARD.equals(switchStack.getItem())) {
+                UUID midiSource = ItemMidiSwitchboard.getMidiSource(switchStack);
+                
+                if((messagePlayer.equals(midiSource) || ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(midiSource)) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
+                    return true;
+                }             
+            }
+        }
+
+        return false;
     }
 
     public void allNotesOff() {

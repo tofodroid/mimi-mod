@@ -1,9 +1,11 @@
-package io.github.tofodroid.mods.mimi.client.midi;
+package io.github.tofodroid.mods.mimi.common.midi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.github.tofodroid.mods.mimi.client.midi.MidiInputDeviceManager;
+import io.github.tofodroid.mods.mimi.client.midi.MidiPlaylistManager;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -143,13 +145,4 @@ public class MidiInputManager {
 
         return result;
     }
-
-    /*
-    protected void transmitterAllOff() {
-        for(MidiChannelNumber channel: MidiChannelNumber.values()) {
-            TransmitterNotePacket packet = new TransmitterNotePacket(Integer.valueOf(channel.ordinal()).byteValue(), TransmitterNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), MIMIMod.proxy.getMidiInput().getTransmitMode());
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
-        }
-    }
-    */
 }

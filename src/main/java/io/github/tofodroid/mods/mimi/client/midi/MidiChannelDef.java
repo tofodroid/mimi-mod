@@ -216,23 +216,4 @@ public class MidiChannelDef {
         Float angle = (float) Math.toDegrees(Math.atan2(target.getZ() - source.getZ(), target.getX() - source.getX()));
         return (angle < 0 ? angle + 360 : angle) % 360;
     }
-
-    public static enum MidiChannelNumber {
-        ZERO,
-        ONE,
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT,
-        NINE,
-        TEN,
-        ELEVEN,
-        TWELVE,
-        THIRTEEN,
-        FOURTEEN,
-        FIFTEEN
-    }
 }

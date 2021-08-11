@@ -7,10 +7,9 @@ import java.nio.file.Paths;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import io.github.tofodroid.mods.mimi.client.midi.MidiFileInfo;
-import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-
+import io.github.tofodroid.mods.mimi.common.midi.MidiInputManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerEntity;

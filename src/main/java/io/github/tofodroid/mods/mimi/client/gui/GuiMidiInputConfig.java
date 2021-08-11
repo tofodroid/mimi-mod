@@ -3,9 +3,9 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import javax.sound.midi.MidiDevice.Info;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.midi.MidiInputManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.vector.Vector2f;

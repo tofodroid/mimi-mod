@@ -3,28 +3,20 @@ package io.github.tofodroid.mods.mimi.common.network;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
-import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 
 public class MidiNotePacketHandler {
@@ -65,37 +57,8 @@ public class MidiNotePacketHandler {
         }
     }
 
-    @SuppressWarnings("resource")
     public static void handlePacketClient(final MidiNotePacket message) {
-        MIMIMod.proxy.getMidiSynth().handlePacket(message);
-
-        if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(message.player, message.channel, message.instrumentId)) {
-            if(message.velocity > 0) {
-                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(message.channel, message.note, message.velocity);
-            } else {
-                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOff(message.channel, message.note);
-            }
-        }
-    }
-
-    @SuppressWarnings("resource")
-    public static Boolean shouldShowOnGUI(UUID messagePlayer, Byte channel, Byte instrument) {
-        ClientPlayerEntity thisPlayer = Minecraft.getInstance().player;
-    
-        if(messagePlayer.equals(thisPlayer.getUniqueID()) && thisPlayer.openContainer instanceof ContainerInstrument) {
-            ItemStack switchStack = ((ContainerInstrument)thisPlayer.openContainer).getSelectedSwitchboard();
-            Byte guiInstrument = ((ContainerInstrument)thisPlayer.openContainer).getInstrumentId();
-
-            if(instrument == guiInstrument && ModItems.SWITCHBOARD.equals(switchStack.getItem())) {
-                UUID midiSource = ItemMidiSwitchboard.getMidiSource(switchStack);
-                
-                if((messagePlayer.equals(midiSource) || ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(midiSource)) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
-                    return true;
-                }             
-            }
-        }
-
-        return false;
+        MIMIMod.proxy.getMidiSynth().handlePacket(message); 
     }
 
     protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerWorld worldIn, BlockPos notePos, Integer range) {

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.client.midi.MidiChannelDef.MidiChannelNumber;
+import io.github.tofodroid.mods.mimi.common.midi.MidiChannelNumber;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 
 public class ItemMidiSwitchboard extends Item {
