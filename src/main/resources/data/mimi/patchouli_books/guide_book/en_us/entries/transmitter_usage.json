@@ -35,7 +35,7 @@
         {
             "type": "text",
             "title": "Transmitting Songs",
-            "text": "When a song is being played it will be transmitted to all nearby instruments (within 16 blocks) using the selected $(l:transmitter_modes)Transmit Mode.$(/l)$(br2)If a nearby instrument is being played and has a compatible MIDI Source configured, all notes from the song will be sent to it and then will be played if the instrument has the corresponding channels enabled."
+            "text": "When a song is being played it will be transmitted to all nearby instruments (within 16 blocks) using the selected $(l:transmitter_modes)Transmit Mode.$(/l)$(br2)If a nearby instrument is being played and has a Switchboard with a compatible Linked Transmitter configured all notes from the song will be sent to it and then will be played if the Switchboard has the corresponding channels enabled."
         }
     ],
     "sortnum": 0

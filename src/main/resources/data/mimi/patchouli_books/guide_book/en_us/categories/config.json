@@ -2,5 +2,5 @@
 	"name": "Configuration",
 	"description": "MIMI provides a number of configuration options both in-game and externally via the mimi-client.toml configuration file.$(br2)Note that these configuration settings apply only to the client and thus do not apply to running MIMI on a dedicated server.",
 	"icon": "minecraft:book",
-	"sortnum": 5
+	"sortnum": 7
 }

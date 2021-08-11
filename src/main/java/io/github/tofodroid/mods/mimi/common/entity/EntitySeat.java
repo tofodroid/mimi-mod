@@ -35,7 +35,8 @@ public class EntitySeat extends Entity {
         }
 
         if(!this.world.isRemote) {
-            if(this.getPassengers().isEmpty() || this.world.isAirBlock(source)) {
+            if(this.getPassengers().isEmpty() || this.world.isAirBlock(source) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive())) {
+                this.removePassengers();
                 this.remove();
                 world.updateComparatorOutputLevel(getPosition(), world.getBlockState(getPosition()).getBlock());
             }

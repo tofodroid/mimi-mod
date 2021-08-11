@@ -1,25 +1,25 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " GP",
-        " P ",
-        "NI "
+        " SP",
+        "SLP",
+        "N  "
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
         },
-        "I": {
-            "item": "minecraft:ink_sac"
-        },
-        "G": {
-            "item": "minecraft:iron_ingot"
+        "S": {
+            "item": "minecraft:string"
         },
         "P": {
             "tag": "minecraft:planks"
+        },
+        "L": {
+            "item": "minecraft:leather"
         }
     },
     "result": {
-        "item": "mimi:clarinet"
+        "item": "mimi:banjo"
     }
 }

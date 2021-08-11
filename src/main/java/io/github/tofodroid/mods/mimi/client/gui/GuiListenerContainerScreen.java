@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import io.github.tofodroid.mods.mimi.common.container.ContainerAdvListener;
+import io.github.tofodroid.mods.mimi.common.container.ContainerListener;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 
@@ -14,7 +14,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.text.ITextComponent;
 
-public class GuiAdvListenerContainerScreen extends ASwitchboardGui<ContainerAdvListener> {
+public class GuiListenerContainerScreen extends ASwitchboardGui<ContainerListener> {
     // Button Boxes
     private static final Vector2f NOTE_LETTER_BUTTON_COORDS = new Vector2f(14,107);
     private static final Vector2f NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(33,107);
@@ -27,8 +27,8 @@ public class GuiAdvListenerContainerScreen extends ASwitchboardGui<ContainerAdvL
     private List<Byte> INSTRUMENT_ID_LIST;
     private Integer instrumentIndex = 0;
     
-    public GuiAdvListenerContainerScreen(ContainerAdvListener container, PlayerInventory inv, ITextComponent textComponent) {
-        super(container, inv, 315, 136, 315, "textures/gui/container_advlistener.png", textComponent);
+    public GuiListenerContainerScreen(ContainerListener container, PlayerInventory inv, ITextComponent textComponent) {
+        super(container, inv, 315, 136, 315, "textures/gui/container_listener.png", textComponent);
     }
 
     @Override

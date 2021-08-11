@@ -7,21 +7,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class ContainerAdvListener extends ASwitchboardContainer
+public class ContainerListener extends ASwitchboardContainer
 {		
 	private static final int SWITCHBOARD_SLOT_POS_X = 114;
 	private static final int SWITCHBOARD_SLOT_POS_Y = 70;
 	protected static final int INVENTORY_PLAYER_START_X = 143;
 	protected static final int INVENTORY_PLAYER_START_Y = 31;
 
-	public ContainerAdvListener(int id, PlayerInventory playerInventory, PacketBuffer extraData) {
-		super(ModContainers.ADVLISTENER, id, playerInventory);
+	public ContainerListener(int id, PlayerInventory playerInventory, PacketBuffer extraData) {
+		super(ModContainers.LISTENER, id, playerInventory);
 		this.targetInventory = (ItemStackHandler) playerInventory.player.world.getTileEntity(extraData.readBlockPos()).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
 	}
 
-	public ContainerAdvListener(int id, PlayerInventory playerInventory, BlockPos pos) {
-		super(ModContainers.ADVLISTENER, id, playerInventory);
+	public ContainerListener(int id, PlayerInventory playerInventory, BlockPos pos) {
+		super(ModContainers.LISTENER, id, playerInventory);
 		this.targetInventory = (ItemStackHandler) playerInventory.player.world.getTileEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
 	}

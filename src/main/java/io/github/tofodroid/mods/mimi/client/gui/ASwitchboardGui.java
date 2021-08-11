@@ -7,7 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
 
-import io.github.tofodroid.mods.mimi.common.container.ContainerAdvListener;
+import io.github.tofodroid.mods.mimi.common.container.ContainerListener;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -30,8 +30,8 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
 
         player = inv.player;
 
-        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerAdvListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+            this.selectedSwitchboardStack = container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
             loadSelectedSwitchboard();
         }
     }

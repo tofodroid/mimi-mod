@@ -1,18 +1,15 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " GP",
-        " P ",
-        "NI "
+        "   ",
+        "IPI",
+        "NPN"
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
         },
         "I": {
-            "item": "minecraft:ink_sac"
-        },
-        "G": {
             "item": "minecraft:iron_ingot"
         },
         "P": {
@@ -20,6 +17,6 @@
         }
     },
     "result": {
-        "item": "mimi:clarinet"
+        "item": "mimi:harmonica"
     }
 }

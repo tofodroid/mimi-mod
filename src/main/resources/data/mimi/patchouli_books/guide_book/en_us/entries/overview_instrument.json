@@ -1,6 +1,6 @@
 {
     "name": "Using Instruments",
-    "icon": "mimi:acguitar",
+    "icon": "mimi:piano",
     "category": "mimi:overview",
     "pages": [
         {
@@ -22,33 +22,23 @@
         {
             "type": "text",
             "title": "The Instrument GUI",
-            "text": "You should now see the instrument GUI on your screen.$(br2)This GUI lets you play the instrument you're holding either by pressing the keys on your keyboard shown on the piano or by simply clicking the note you want to play.$(br2)The right side of the GUI shows the controls for shifting the displayed piano up and down so that you can play lower or higher notes."
+            "text": "You should now see the instrument GUI on your screen.$(br2)This GUI lets you play the instrument you're holding either by pressing the keys on your keyboard shown on the piano or by simply clicking the note you want to play.$(br2)The GUI also shows the controls for shifting the displayed piano up and down so that you can play lower or higher notes."
         },
         {
             "type": "text",
             "title": "The Instrument GUI",
-            "text": "The $(l)<| Note$() indicator displays the minimum note on the piano that is currently visible.$(br2)The top section of the instrument GUI lets you configure the MIDI settings of your instrument which can be used to play notes from a MIDI Transmitter or System MIDI Input Device."
+            "text": "The top right section of the GUI includes a layout toggle which allows you to change the way that piano notes are mapped to keys on your keyboard.$(br2)The note indicators display minimum, maximum, and middles notes on the currently visible portion of the piano."
         },
         {
             "type": "text",
-            "title": "MIDI Source",
-            "text": "The top left section of the Instrument GUI lets you configure the MIDI Source to use for this instrument.$(br2)When the instrument has a MIDI source configured it will play any notes that it receives from the configured MIDI Source automatically."
+            "title": "The Instrument GUI",
+            "text": "The lower half of the GUI shows your current inventory and includes a slot to insert a $(l:overview_switchboard)Switchboard$() into the current instrument.$(br2)Inserting a Switchboard allows you to connect the instrument to a $(l:overview_transmitter)Transmitter$() or enable input from a System MIDI Input device."
         },
         {
             "type": "text",
-            "title": "MIDI Source",
-            "text": "$(l)Public Transmitters$() - The instrument will play notes from any nearby MIDI Transmitters that are set to public mode.$(br2)$(l)Player Transmitter$() - The instrument will play notes from the specified player's MIDI Transmitter if it is set to linked mode (or self mode if linked to your transmitter)."
-        },
-        {
-            "type": "text",
-            "title": "MIDI Source",
-            "text": "To link an instrument to another player right click on them while holding the instrument (hand-held instruments) or right click on the instrument while holding one that is already linked to the desired player (block instruments).$(br2)$(l)System MIDI Device$() - The instrument will play notes from the configured System MIDI Input Device if one is available.$(br2)"
-        },
-        {
-            "type": "text",
-            "title": "MIDI Channels",
-            "text": "A MIDI file is able to play up to 16 different instruments to at a time. Each instrument is assigned a number - called a channel - and notes for that instrument are sent to that channel. Each MIMI instrument can choose which channels it should use using the buttons near the top of the Instrument GUI.$(br2)$(l)Channel 10$() is intended for percussion and doesn't usually work well for any other instrument."
+            "title": "The Instrument GUI",
+            "text": "The pencil button next to the Switchboard slot allows you to modify the properties of the current switchboard if one is inserted.$(br2)See the $(l:switchboard_properties)Switchboard Properties$() section of this guide for more information on available Switchboard properties."
         }
     ],
-    "sortnum": 0
+    "sortnum": 1
 }

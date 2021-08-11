@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "INI",
+        "CIR",
+        "INI"
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "C": {
+            "item": "minecraft:chest"
+        },
+        "R": {
+            "item": "mimi:receiver"
+        }
+    },
+    "result": {
+        "item": "mimi:mechanicalmaestro"
+    }
+}

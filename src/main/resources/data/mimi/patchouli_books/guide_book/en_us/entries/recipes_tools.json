@@ -10,7 +10,11 @@
         {
             "type": "crafting",
             "recipe": "mimi:transmitter"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:switchboard"
         }
     ],
-    "sortnum": 1
+    "sortnum": 2
 }

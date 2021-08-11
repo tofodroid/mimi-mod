@@ -1,22 +1,25 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " WN",
-        " IW",
-        "I  "
+        "ISI",
+        "NLL",
+        "ISI"
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
         },
-        "W": {
-            "tag": "minecraft:wool"
+        "S": {
+            "item": "minecraft:string"
+        },
+        "L": {
+            "item": "minecraft:leather"
         },
         "I": {
             "item": "minecraft:iron_ingot"
         }
     },
     "result": {
-        "item": "mimi:microphone"
+        "item": "mimi:accordion"
     }
 }

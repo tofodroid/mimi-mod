@@ -13,7 +13,15 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:accordion"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:bagpipe"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:banjo"
         },
         {
             "type": "crafting",
@@ -41,11 +49,19 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:harmonica"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:kalimba"
         },
         {
             "type": "crafting",
             "recipe": "mimi:microphone"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:oboe"
         },
         {
             "type": "crafting",

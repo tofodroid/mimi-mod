@@ -14,15 +14,15 @@ import net.minecraftforge.fml.network.IContainerFactory;
 
 @Mod.EventBusSubscriber(modid=MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ModContainers {
-    public static ContainerType<ContainerAdvListener> ADVLISTENER = null;
+    public static ContainerType<ContainerListener> LISTENER = null;
     public static ContainerType<ContainerReceiver> RECEIVER = null;
     public static ContainerType<ContainerInstrument> INSTRUMENT = null;
     public static ContainerType<ContainerMechanicalMaestro> MECHANICALMAESTRO = null;
 
     private static final List<ContainerType<?>> buildTileTypes() {
         List<ContainerType<?>> types = new ArrayList<>();
-        ADVLISTENER = buildType("advlistener", ContainerAdvListener::new);
-        types.add(ADVLISTENER);
+        LISTENER = buildType("listener", ContainerListener::new);
+        types.add(LISTENER);
         RECEIVER = buildType("receiver", ContainerReceiver::new);
         types.add(RECEIVER);
         INSTRUMENT = buildType("instrument", ContainerInstrument::new);
