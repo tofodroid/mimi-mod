@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ISI",
+        "NLL",
+        "ISI"
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "S": {
+            "item": "minecraft:string"
+        },
+        "L": {
+            "item": "minecraft:leather"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        }
+    },
+    "result": {
+        "item": "mimi:accordion"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " GP",
+        "GPG",
+        "NI "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "I": {
+            "item": "minecraft:ink_sac"
+        },
+        "G": {
+            "item": "minecraft:iron_ingot"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:oboe"
+    }
+}
