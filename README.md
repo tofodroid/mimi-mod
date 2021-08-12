@@ -39,10 +39,6 @@ This is a list of features and improvements that I am currently considering addi
 
 - Add instrument variants (piano woods, drum colors via dye, etc.)
 
-- Add uncraftable instruments that can only be found as loot or from villagers
-
-- Add music villagers that sell instruments and possibly songs
-
 - Add multiple voices to existing instruments (I.E: microphone currently uses "dos" but could have a toggle for "ahs")
 
 - Add the ability to apply a banner pattern to the bass drum
