@@ -18,10 +18,6 @@ import net.minecraft.item.ItemStack;
 
 public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends BaseContainerGui<T> {
     protected final PlayerEntity player;
-
-    protected Integer filterNoteOctave;
-    protected Integer filterNoteLetter;
-    protected String filterNoteString = "";
     protected String selectedSourceName = "None";
 	protected ItemStack selectedSwitchboardStack;
 
@@ -62,30 +58,14 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
         }
     }
 
+    protected void loadSelectedSwitchboard() {
+        this.refreshSourceName();
+    }
+
     protected void clearSwitchboard() {
-        this.filterNoteLetter = 127;
-        this.filterNoteOctave = 127;
-        this.filterNoteString = "";
         this.selectedSourceName = "None";
     }
 
-    protected void loadSelectedSwitchboard() {
-        this.refreshSourceName();
-        this.loadLetterAndOctave();
-    }
-
-    protected void loadLetterAndOctave() {
-		if(this.selectedSwitchboardStack != null) {
-			filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
-			filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
-			filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-		} else {
-			filterNoteOctave = 127;
-			filterNoteLetter = 127;
-			filterNoteString = "";
-		}       
-    }
-    
     protected void syncSwitchboardToServer() {
         SwitchboardStackUpdatePacket packet = null;
 
@@ -95,36 +75,6 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
         if(packet != null) {
             NetworkManager.NET_CHANNEL.sendToServer(packet);
         }
-    }
-
-    protected void shiftFilterNoteLetter() {
-        if(filterNoteLetter < 11) {
-            filterNoteLetter++;
-        } else {
-            filterNoteLetter = -1;
-        }
-
-        ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter.byteValue());
-        this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-        this.syncSwitchboardToServer();
-    }
-    
-    protected void shiftFilterNoteOctave() {
-        if(filterNoteOctave < 10) {
-            filterNoteOctave++;
-        } else {
-            filterNoteOctave = -1;
-        }
-        
-        ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave.byteValue());
-        this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-        this.syncSwitchboardToServer();
-    }
-
-    protected void toggleInvertFilterNote() {
-        ItemMidiSwitchboard.setInvertNoteOct(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack));
-        this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-        this.syncSwitchboardToServer();
     }
     
     protected void refreshSourceName() {
@@ -180,8 +130,4 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
         ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(channelId).byteValue());
         this.syncSwitchboardToServer();
     }
-    
-	protected Boolean invalidFilterNote() {
-		return new Integer(filterNoteOctave*12+filterNoteLetter) > Byte.MAX_VALUE;
-	}
 }

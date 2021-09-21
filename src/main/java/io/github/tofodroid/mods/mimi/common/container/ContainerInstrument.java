@@ -50,7 +50,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 			targetInventory = (ItemStackHandler) playerInventory.player.world.getTileEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		}
 		
-		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
+		this.addSlot(buildSwitchboardSlot());
 	}
 	
 	public ContainerInstrument(int id, PlayerInventory playerInventory, Byte instrumentId, Hand handIn) {
@@ -61,7 +61,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 		tilePos = null;
 		targetInventory =  ItemInstrument.getInventoryHandler(playerInventory.player.getHeldItem(handIn));
 
-		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
+		this.addSlot(buildSwitchboardSlot());
 	}
 	
 	public ContainerInstrument(int id, PlayerInventory playerInventory, Byte instrumentId, BlockPos tilPos) {
@@ -72,7 +72,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 		handIn = null;
 		targetInventory = (ItemStackHandler) playerInventory.player.world.getTileEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		
-		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
+		this.addSlot(buildSwitchboardSlot());
 	}
 
 	@Override
@@ -83,6 +83,16 @@ public class ContainerInstrument extends ASwitchboardContainer {
 	@Override
 	protected Integer getPlayerInventoryY() {
 		return INVENTORY_PLAYER_START_Y;
+	}
+
+	@Override
+	protected Integer getSwitchboardSlotX() {
+		return SWITCHBOARD_SLOT_POS_X;
+	}
+
+	@Override
+	protected Integer getSwitchboardSlotY() {
+		return SWITCHBOARD_SLOT_POS_Y;
 	}
 	
     @Override

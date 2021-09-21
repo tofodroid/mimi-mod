@@ -11,14 +11,10 @@ import net.minecraftforge.items.SlotItemHandler;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 
-public class ContainerMechanicalMaestro extends ASwitchboardContainer
-{		
-	private static final int INSTRUMENT_SLOT_POS_X = 103;
-	private static final int INSTRUMENT_SLOT_POS_Y = 70;
-	private static final int SWITCHBOARD_SLOT_POS_X = 103;
-	private static final int SWITCHBOARD_SLOT_POS_Y = 98;
-	protected static final int INVENTORY_PLAYER_START_X = 135;
-	protected static final int INVENTORY_PLAYER_START_Y = 31;
+public class ContainerMechanicalMaestro extends ASwitchboardContainer {
+	private static final int SWITCHBOARD_SLOT_POS_Y = 211;
+	private static final int INSTRUMENT_SLOT_POS_X = 127;
+	private static final int INSTRUMENT_SLOT_POS_Y = 174;
 	
 	private final BlockPos tilePos;
 
@@ -26,7 +22,7 @@ public class ContainerMechanicalMaestro extends ASwitchboardContainer
 		super(ModContainers.MECHANICALMAESTRO, id, playerInventory);
 		tilePos = extraData.readBlockPos();
 		this.targetInventory = (ItemStackHandler) playerInventory.player.world.getTileEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
-		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
+		this.addSlot(buildSwitchboardSlot());
 		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_POS_X, INSTRUMENT_SLOT_POS_Y));
 	}
 
@@ -34,20 +30,15 @@ public class ContainerMechanicalMaestro extends ASwitchboardContainer
 		super(ModContainers.MECHANICALMAESTRO, id, playerInventory);
 		tilePos = pos;
 		this.targetInventory = (ItemStackHandler) playerInventory.player.world.getTileEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
-		this.addSlot(buildSwitchboardSlot(SWITCHBOARD_SLOT_POS_X, SWITCHBOARD_SLOT_POS_Y));
+		this.addSlot(buildSwitchboardSlot());
 		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_POS_X, INSTRUMENT_SLOT_POS_Y));
 	}
 	
 	@Override
-	protected Integer getPlayerInventoryX() {
-		return INVENTORY_PLAYER_START_X;
+	protected Integer getSwitchboardSlotY() {
+		return SWITCHBOARD_SLOT_POS_Y;
 	}
-
-	@Override
-	protected Integer getPlayerInventoryY() {
-		return INVENTORY_PLAYER_START_Y;
-	}
-
+	
 	public BlockPos getTilePos() {
 		return tilePos;
 	}
