@@ -18,6 +18,10 @@
         {
             "type": "crafting",
             "recipe": "mimi:mechanicalmaestro"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:conductor"
         }
     ],
     "sortnum": 1

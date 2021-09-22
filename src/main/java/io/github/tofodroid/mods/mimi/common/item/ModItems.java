@@ -28,6 +28,8 @@ public final class ModItems {
     // Blocks - Other
     public static final BlockItem LISTENER = null;
     public static final BlockItem RECEIVER = null;
+    public static final BlockItem MECHANICALMAESTRO = null;
+    public static final BlockItem CONDUCTOR = null;
 
     public static MIMIModItemGroup ITEM_GROUP;
 
@@ -45,6 +47,7 @@ public final class ModItems {
             event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
             event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("receiver"));
             event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("mechanicalmaestro"));
+            event.getRegistry().register(new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("conductor"));
 
             // Instrument Items
             INSTRUMENT_ITEMS = buildInstruments();

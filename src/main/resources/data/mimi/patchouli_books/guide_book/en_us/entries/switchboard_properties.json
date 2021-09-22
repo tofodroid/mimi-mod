@@ -46,6 +46,16 @@
             "type": "text",
             "title": "Filter: Instrument",
             "text": "This property stores which Instrument(s) this Switchboard should respond to. You can set it to a specific Instrument or any Instrument.$(br2)You can also invert the filter so that the Switchboard will respond to all Instruments $(i)except$() for the Instrument configured by the filter."
+        },
+        {
+            "type": "text",
+            "title": "Broadcast: Mode",
+            "text": "This property stores which $(l:transmitter_modes)Transmitter Mode$() this Switchboard should use when inserted into a block that can transmit notes, such as the $(l:redstone_conductor)Conductor$().$(br2)Note that Switchboards do not support the 'Self' Transmitter Mode."
+        },
+        {
+            "type": "text",
+            "title": "Broadcast: Note",
+            "text": "This property stores which note this Switchboard should broadcast when inserted into a block that block that can transmit notes, such as the $(l:redstone_conductor)Conductor$()."
         }
     ],
     "sortnum": 1

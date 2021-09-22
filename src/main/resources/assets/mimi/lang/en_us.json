@@ -30,6 +30,7 @@
   "block.mimi.listener": "Listener",
   "block.mimi.receiver": "Receiver",
   "block.mimi.mechanicalmaestro": "Mechanical Maestro",
+  "block.mimi.conductor": "Conductor",
   "block.mimi.piano": "Piano",
   "block.mimi.drums": "Drum Kit"
 }

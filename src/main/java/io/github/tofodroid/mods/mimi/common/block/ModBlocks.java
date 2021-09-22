@@ -17,6 +17,7 @@ public class ModBlocks {
     public static final BlockListener LISTENER = null;
     public static final BlockReceiver RECEIVER = null;
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = null;
+    public static final BlockConductor CONDUCTOR = null;
 
     // Instrument Blocks
     public static List<BlockInstrument> INSTRUMENTS = null;
@@ -28,7 +29,8 @@ public class ModBlocks {
             event.getRegistry().registerAll(
                 new BlockListener(),
                 new BlockReceiver(),
-                new BlockMechanicalMaestro()
+                new BlockMechanicalMaestro(),
+                new BlockConductor()
             );
             INSTRUMENTS = buildInstruments();
             event.getRegistry().registerAll(INSTRUMENTS.toArray(new BlockInstrument[INSTRUMENTS.size()]));
