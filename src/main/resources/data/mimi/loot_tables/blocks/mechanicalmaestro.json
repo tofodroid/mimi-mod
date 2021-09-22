@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:block",
+    "pools": [
+        {
+            "name": "mechanicalmaestro",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "mimi:mechanicalmaestro"
+                }
+            ],
+            "conditions": [
+                {
+                    "condition": "minecraft:survives_explosion"
+                }
+            ]
+        }
+    ]
+}

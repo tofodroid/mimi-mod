@@ -18,6 +18,7 @@ public class ModContainers {
     public static ContainerType<ContainerReceiver> RECEIVER = null;
     public static ContainerType<ContainerInstrument> INSTRUMENT = null;
     public static ContainerType<ContainerMechanicalMaestro> MECHANICALMAESTRO = null;
+    public static ContainerType<ContainerConductor> CONDUCTOR = null;
 
     private static final List<ContainerType<?>> buildTileTypes() {
         List<ContainerType<?>> types = new ArrayList<>();
@@ -29,6 +30,8 @@ public class ModContainers {
         types.add(INSTRUMENT);
         MECHANICALMAESTRO = buildType("mechanicalmaestro", ContainerMechanicalMaestro::new);
         types.add(MECHANICALMAESTRO);
+        CONDUCTOR = buildType("conductor", ContainerConductor::new);
+        types.add(CONDUCTOR);
         return types;
     }
     

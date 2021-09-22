@@ -41,7 +41,7 @@ public class TileReceiver extends ANoteResponsiveTile {
             return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && shouldAcceptNote(note) &&
                 ( 
                     (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
-                    || sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack))
+                    || (sender != null && sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack)))
                 );
         }
         return false;

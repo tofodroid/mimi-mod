@@ -19,6 +19,7 @@ public class ModTiles {
     public static TileEntityType<TileReceiver> RECEIVER = null;
     public static TileEntityType<TileListener> LISTENER = null;
     public static TileEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = null;
+    public static TileEntityType<TileConductor> CONDUCTOR = null;
 
     private static final List<TileEntityType<?>> buildTileTypes() {
         List<TileEntityType<?>> types = new ArrayList<>();
@@ -30,6 +31,8 @@ public class ModTiles {
         types.add(LISTENER);
         MECHANICALMAESTRO = buildType(MIMIMod.MODID + ":mechanicalmaestro", TileEntityType.Builder.create(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO));
         types.add(MECHANICALMAESTRO);
+        CONDUCTOR = buildType(MIMIMod.MODID + ":conductor", TileEntityType.Builder.create(TileConductor::new, ModBlocks.CONDUCTOR));
+        types.add(CONDUCTOR);
         return types;
     }
     

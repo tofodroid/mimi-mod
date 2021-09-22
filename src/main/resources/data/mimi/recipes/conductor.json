@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GNG",
+        "RGT",
+        "GNG"
+    ],
+    "key": {
+        "G": {
+            "item": "minecraft:gold_ingot"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "T": {
+            "item": "mimi:transmitter"
+        }
+    },
+    "result": {
+        "item": "mimi:conductor"
+    }
+}
