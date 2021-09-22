@@ -9,16 +9,20 @@ import net.minecraft.network.PacketBuffer;
 
 public class SwitchboardStackUpdatePacket {
     public final UUID midiSource;
+    public final String midiSourceName;
     public final Byte filterOct;
     public final Byte filterNote;
+    public final Byte broadcastNote;
     public final Boolean invertNoteOct;
     public final String enabledChannelsString;
     public final Byte instrumentId;
     public final Boolean invertInstrument;
     public final Boolean sysInput;
+    public final Boolean publicBroadcast;
 
-    public SwitchboardStackUpdatePacket(UUID midiSource, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument, Boolean sysInput) {
+    public SwitchboardStackUpdatePacket(UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument, Boolean sysInput, Boolean publicBroadcast, Byte broadcastNote) {
         this.midiSource = midiSource;
+        this.midiSourceName = midiSourceName;
         this.filterOct = filterOct;
         this.filterNote = filterNote;
         this.invertNoteOct = invertNoteOct;
@@ -26,11 +30,14 @@ public class SwitchboardStackUpdatePacket {
         this.instrumentId = instrumentId;
         this.invertInstrument = invertInstrument;
         this.sysInput = sysInput;
+        this.publicBroadcast = publicBroadcast;
+        this.broadcastNote = broadcastNote;
     }
     
     public static SwitchboardStackUpdatePacket decodePacket(PacketBuffer buf) {
         try {
             UUID midiSource = buf.readUniqueId();
+            String midiSourceName = buf.readString(64);
             if(ItemMidiSwitchboard.NONE_SOURCE_ID.equals(midiSource)) {
                 midiSource = null;
             }
@@ -46,10 +53,12 @@ public class SwitchboardStackUpdatePacket {
 
             Byte instrumentId = buf.readByte();
             Boolean invertInstrument = buf.readBoolean();
-
             Boolean sysInput = buf.readBoolean();
+            
+            Boolean publicBroadcast = buf.readBoolean();
+            Byte broadcastNote = buf.readByte();
 
-            return new SwitchboardStackUpdatePacket(midiSource, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument, sysInput);
+            return new SwitchboardStackUpdatePacket(midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument, sysInput, publicBroadcast, broadcastNote);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("SwitchboardStackUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -61,6 +70,7 @@ public class SwitchboardStackUpdatePacket {
 
     public static void encodePacket(SwitchboardStackUpdatePacket pkt, PacketBuffer buf) {
         buf.writeUniqueId(pkt.midiSource != null ? pkt.midiSource : ItemMidiSwitchboard.NONE_SOURCE_ID);
+        buf.writeString(pkt.midiSourceName, 64);
         buf.writeByte(pkt.filterOct);
         buf.writeByte(pkt.filterNote);
         buf.writeBoolean(pkt.invertNoteOct);
@@ -68,5 +78,7 @@ public class SwitchboardStackUpdatePacket {
         buf.writeByte(pkt.instrumentId);
         buf.writeBoolean(pkt.invertInstrument);
         buf.writeBoolean(pkt.sysInput);
+        buf.writeBoolean(pkt.publicBroadcast);
+        buf.writeByte(pkt.broadcastNote);
     }
 }

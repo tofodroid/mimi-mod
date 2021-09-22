@@ -202,7 +202,6 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
         if(clickedBox(imouseX, imouseY, SWITCHBOARD_EDIT_BUTTON_COORDS) && this.selectedSwitchboardStack != null) {
             editMode = !editMode;
-            this.refreshSourceName();
         } else if(!editMode) {
             // Keyboard Layout Hover Box
             if(imouseX >= 220 && imouseY >= 28 && imouseX < (this.guiLeft + this.xSize) && imouseY < (this.guiTop + 50)) {
@@ -624,7 +623,8 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
         // MIDI Source Name
         if(editMode) {
-            font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
+            String selectedSourceName = ItemMidiSwitchboard.getMidiSourceName(selectedSwitchboardStack);
+            font.drawString(matrixStack, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
         }
 
         // Keyboard Layout

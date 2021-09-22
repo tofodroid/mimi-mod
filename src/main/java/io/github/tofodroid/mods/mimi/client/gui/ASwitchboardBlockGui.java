@@ -48,9 +48,6 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected Integer filterNoteOctave;
     protected Integer filterNoteLetter;
     protected String filterNoteString = "";
-    protected Integer broadcastNoteOctave;
-    protected Integer broadcastNoteLetter;
-    protected String broadcastNoteString = "";
 
     public ASwitchboardBlockGui(T container, PlayerInventory inv, ITextComponent textComponent) {
         super(container, inv, 328, 250, 395, "textures/gui/container_generic_switchboard_block.png", textComponent);
@@ -60,7 +57,6 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     public void loadSelectedSwitchboard() {
         super.loadSelectedSwitchboard();
         this.loadFilterLetterAndOctave();
-        this.loadBroadcastLetterAndOctave();
         this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(ItemMidiSwitchboard.getInstrument(selectedSwitchboardStack));
     }
 
@@ -70,9 +66,6 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         this.filterNoteLetter = 127;
         this.filterNoteOctave = 127;
         this.filterNoteString = "";
-        this.broadcastNoteLetter = 127;
-        this.broadcastNoteOctave = 127;
-        this.broadcastNoteString = "";
         this.filterInstrumentIndex = null;
     }
 
@@ -101,7 +94,14 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 			} else if(instrumentFilterWidgetEnabled() && clickedBox(imouseX, imouseY, FILTER_INSTRUMENT_INVERT_BUTTON_COORDS)) {
 				ItemMidiSwitchboard.setInvertInstrument(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertInstrument(selectedSwitchboardStack));
 				this.syncSwitchboardToServer();
-			} else if(channelWidgetEnabled() && clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
+            } else if(broadcastNoteWidgetEnabled() && clickedBox(imouseX, imouseY, BROADCAST_NOTE_OCTAVE_BUTTON_COORDS)) {
+                this.shiftBroadcastNoteOctave();
+            } else if(broadcastNoteWidgetEnabled() && clickedBox(imouseX, imouseY, BROADCAST_NOTE_LETTER_BUTTON_COORDS)) {
+                this.shiftBroadcastNoteLetter();
+            } else if(broadcastModeWidgetEnabled() && clickedBox(imouseX, imouseY, BROADCAST_MODE_BUTTON_COORDS)) {
+                ItemMidiSwitchboard.setPublicBroadcast(selectedSwitchboardStack, !ItemMidiSwitchboard.getPublicBroadcast(selectedSwitchboardStack));
+				this.syncSwitchboardToServer();
+            } else if(channelWidgetEnabled() && clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
 				this.clearChannels();
 			} else if(channelWidgetEnabled() && clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
 				this.enableAllChannels();
@@ -147,6 +147,13 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
                     blit(matrixStack, this.guiLeft + new Float(MIDI_STATUSBOX_COORDS.x).intValue() + 19 * (channelId % 8), this.guiTop + new Float(MIDI_STATUSBOX_COORDS.y).intValue() + (channelId / 8) * 25, this.getBlitOffset(), 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
                 }
 			}
+
+            // Broadcast Mode
+            if(ItemMidiSwitchboard.getPublicBroadcast(selectedSwitchboardStack)) {
+                blit(matrixStack, this.guiLeft + new Float(BROADCAST_MODE_STATUSBOX_COORDS.x).intValue(), this.guiTop + new Float(BROADCAST_MODE_STATUSBOX_COORDS.y).intValue(), this.getBlitOffset(), 173, 281, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            } else {
+                blit(matrixStack, this.guiLeft + new Float(BROADCAST_MODE_STATUSBOX_COORDS.x).intValue(), this.guiTop + new Float(BROADCAST_MODE_STATUSBOX_COORDS.y).intValue(), this.getBlitOffset(), 186, 281, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
 			
         	// Filter Note Invert Status Light
 			if(ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack)) {
@@ -191,16 +198,17 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
 		if(this.selectedSwitchboardStack != null) {
             // MIDI Source Name
-			font.drawString(matrixStack, this.selectedSourceName.length() <= 22 ? this.selectedSourceName : this.selectedSourceName.substring(0,21) + "...", new Float(LINKED_TRANSMITTER_TEXTBOX_COORDS.x).intValue(), new Float(LINKED_TRANSMITTER_TEXTBOX_COORDS.y).intValue(), 0xFF00E600);
+            String selectedSourceName = ItemMidiSwitchboard.getMidiSourceName(selectedSwitchboardStack);
+			font.drawString(matrixStack, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", new Float(LINKED_TRANSMITTER_TEXTBOX_COORDS.x).intValue(), new Float(LINKED_TRANSMITTER_TEXTBOX_COORDS.y).intValue(), linkedTransmitterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 
 			// Filter Note
-			font.drawString(matrixStack, this.filterNoteString, new Float(FILTER_NOTE_TEXTBOX_COORDS.x).intValue(), new Float(FILTER_NOTE_TEXTBOX_COORDS.y).intValue(), invalidFilterNote() ? 0xFFE60000 : 0xFF00E600);
+			font.drawString(matrixStack, this.filterNoteString, new Float(FILTER_NOTE_TEXTBOX_COORDS.x).intValue(), new Float(FILTER_NOTE_TEXTBOX_COORDS.y).intValue(), noteFilterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 
 			// Filter Instrument
-			font.drawString(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), new Float(FILTER_INSTRUMENT_TEXTBOX_COORDS.x).intValue(), new Float(FILTER_INSTRUMENT_TEXTBOX_COORDS.y).intValue(), 0xFF00E600);
+			font.drawString(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), new Float(FILTER_INSTRUMENT_TEXTBOX_COORDS.x).intValue(), new Float(FILTER_INSTRUMENT_TEXTBOX_COORDS.y).intValue(), instrumentFilterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 
 			// Broadcast Note
-			font.drawString(matrixStack, this.broadcastNoteString, new Float(BROADCAST_NOTE_TEXTBOX_COORDS.x).intValue(), new Float(BROADCAST_NOTE_TEXTBOX_COORDS.y).intValue(), 0xFF00E600);
+			font.drawString(matrixStack, ItemMidiSwitchboard.getBroadcastNoteAsString(selectedSwitchboardStack), new Float(BROADCAST_NOTE_TEXTBOX_COORDS.x).intValue(), new Float(BROADCAST_NOTE_TEXTBOX_COORDS.y).intValue(), broadcastNoteWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 		}
        
         return matrixStack;
@@ -233,46 +241,44 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     }
         
     protected void shiftBroadcastNoteLetter() {
-        if(broadcastNoteLetter < 11) {
-            broadcastNoteLetter++;
+        Byte broadcastNote = ItemMidiSwitchboard.getBroadcastNote(selectedSwitchboardStack);
+
+        if(broadcastNote % 12 < 11) {
+            if(broadcastNote + 1 <= Byte.MAX_VALUE) {
+                broadcastNote++;
+            } else {
+                broadcastNote = new Integer(broadcastNote - (broadcastNote % 12)).byteValue();
+            }
         } else {
-            broadcastNoteLetter = -1;
+            broadcastNote = new Integer(broadcastNote - 11).byteValue();
         }
 
-        // TODO
-        //ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, broadcastNoteLetter.byteValue());
-        this.broadcastNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
+        ItemMidiSwitchboard.setBroadcastNote(selectedSwitchboardStack, broadcastNote);
         this.syncSwitchboardToServer();
     }
     
     protected void shiftBroadcastNoteOctave() {
-        if(broadcastNoteOctave < 10) {
-            broadcastNoteOctave++;
-        } else {
-            broadcastNoteOctave = -1;
-        }
-        
-        // TODO
-        //ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, broadcastNoteOctave.byteValue());
-        this.broadcastNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-        this.syncSwitchboardToServer();
-    }
+        Byte broadcastNote = ItemMidiSwitchboard.getBroadcastNote(selectedSwitchboardStack);
 
-    protected void loadBroadcastLetterAndOctave() {
-		if(this.selectedSwitchboardStack != null) {
-			broadcastNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
-			broadcastNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
-			broadcastNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
-		} else {
-			broadcastNoteOctave = 127;
-			broadcastNoteLetter = 127;
-			broadcastNoteString = "";
-		}       
+        if((broadcastNote / 12)  < 10) {
+            if(broadcastNote + 12 <= Byte.MAX_VALUE) {
+                broadcastNote = new Integer(broadcastNote + 12).byteValue();
+            } else {
+                broadcastNote = new Integer(broadcastNote + - 108).byteValue();
+            }
+        } else {
+            broadcastNote = new Integer(broadcastNote - 120).byteValue();
+        }
+        ItemMidiSwitchboard.setBroadcastNote(selectedSwitchboardStack, broadcastNote);
+        this.syncSwitchboardToServer();
     }
     
     protected void shiftFilterNoteLetter() {
         if(filterNoteLetter < 11) {
             filterNoteLetter++;
+            if(invalidFilterNote()) {
+                filterNoteLetter = -1;
+            }
         } else {
             filterNoteLetter = -1;
         }
@@ -285,6 +291,9 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected void shiftFilterNoteOctave() {
         if(filterNoteOctave < 10) {
             filterNoteOctave++;
+            if(invalidFilterNote()) {
+                filterNoteOctave = -1;
+            }
         } else {
             filterNoteOctave = -1;
         }

@@ -21,7 +21,7 @@ public class SwitchboardStackUpdatePacketHandler {
     public static void handlePacketServer(final SwitchboardStackUpdatePacket message, ServerPlayerEntity sender) {
         if(sender.openContainer != null) {
             if(sender.openContainer instanceof ASwitchboardContainer) {
-                ((ASwitchboardContainer)sender.openContainer).updateSelectedSwitcboard(sender, message.midiSource,  message.filterOct, message.filterNote, message.invertNoteOct, message.enabledChannelsString, message.instrumentId, message.invertInstrument, message.sysInput);
+                ((ASwitchboardContainer)sender.openContainer).updateSelectedSwitcboard(sender, message.midiSource, message.midiSourceName, message.filterOct, message.filterNote, message.invertNoteOct, message.enabledChannelsString, message.instrumentId, message.invertInstrument, message.sysInput, message.publicBroadcast, message.broadcastNote);
             }
         }
     }

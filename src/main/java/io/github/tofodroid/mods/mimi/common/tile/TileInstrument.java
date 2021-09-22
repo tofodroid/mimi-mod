@@ -79,7 +79,7 @@ public class TileInstrument extends ATileInventory {
             return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && 
                 ( 
                     (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
-                    || sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack))
+                    || (sender != null && sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack)))
                 );
         }
         return false;
