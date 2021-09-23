@@ -49,6 +49,10 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:handbell"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:harmonica"
         },
         {
@@ -66,6 +70,10 @@
         {
             "type": "crafting",
             "recipe": "mimi:ocarina"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:organ"
         },
         {
             "type": "crafting",

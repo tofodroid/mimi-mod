@@ -28,10 +28,10 @@ public enum MidiPatchName {
     DrawbarOrgan(16, "Drawbar Organ"),
     PercussiveOrgan(17, "Percussive Organ"),
     RockOrgan(18, "Rock Organ"),
-    ChurchOrgan(19, "Church Organ"), // +
+    ChurchOrgan(19, "Church Organ"), // *
     ReedOrgan(20, "Reed Organ"),
-    Accordion(21, "Accordion"), // ^
-    Harmonica(22, "Harmonica"), // ^
+    Accordion(21, "Accordion"), // * 
+    Harmonica(22, "Harmonica"), // *
     TangoAccordion(23, "Tango Accordion"),
     AcousticGuitarNylon(24, "Acoustic Guitar (nylon)"),
     AcousticGuitarSteel(25, "Acoustic Guitar (steel)"), // *
@@ -77,7 +77,7 @@ public enum MidiPatchName {
     AltoSax(65, "Alto Sax"),
     TenorSax(66, "Tenor Sax"),
     BaritoneSax(67, "Baritone Sax"),
-    Oboe(68, "Oboe"), // ^
+    Oboe(68, "Oboe"), // *
     EnglishHorn(69, "English Horn"),
     Bassoon(70, "Bassoon"),
     Clarinet(71, "Clarinet"), // *
@@ -106,22 +106,22 @@ public enum MidiPatchName {
     Pad7Halo(94, "Pad 7 (halo)"),
     Pad8Sweep(95, "Pad 8 (sweep)"),
     FX1Rain(96, "FX 1 (rain)"),
-    FX2Soundtrack(97, "FX 2 (soundtrack)"),
+    FX2Soundtrack(97, "FX 2 (soundtrack)"), // ^
     FX3Crystal(98, "FX 3 (crystal)"),
     FX4Atmosphere(99, "FX 4 (atmosphere)"),
     FX5Brightness(100, "FX 5 (brightness)"),
-    FX6Goblins(101, "FX 6 (goblins)"),
+    FX6Goblins(101, "FX 6 (goblins)"), // ^
     FX7Echoes(102, "FX 7 (echoes)"),
     FX8SciFi(103, "FX 8 (sci-fi)"),
     Sitar(104, "Sitar"),
-    Banjo(105, "Banjo"), // ^
+    Banjo(105, "Banjo"), // *
     Shamisen(106, "Shamisen"),
     Koto(107, "Koto"),
     Kalimba(108, "Kalimba"), // *
     Bagpipe(109, "Bag pipe"), // *
     Fiddle(110, "Fiddle"),
     Shanai(111, "Shanai"),
-    TinkleBell(112, "Tinkle Bell"),
+    TinkleBell(112, "Tinkle Bell"),  // ^
     Agogo(113, "Agogo"),
     SteelDrums(114, "Steel Drums"), // +
     Woodblock(115, "Woodblock"),
@@ -136,7 +136,7 @@ public enum MidiPatchName {
     TelephoneRing(124, "Telephone Ring"),
     Helicopter(125, "Helicopter"),
     Applause(126, "Applause"),
-    Gunshot(127, "Gunshot"), // NOTE: This ID is used for 'all' in filters so it cannot be used
+    Gunshot(127, "Gunshot"),
     UNKNOWN(-1, "Unknown Instrument");
 
     public final String name;
