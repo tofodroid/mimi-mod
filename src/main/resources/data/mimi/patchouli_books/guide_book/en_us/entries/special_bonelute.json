@@ -1,0 +1,12 @@
+{
+    "name": "Bone Lute",
+    "icon": "mimi:bonelute",
+    "category": "mimi:special",
+    "pages": [
+        {
+            "type": "text",
+            "text": "A lute made of carefully carved bones, it produces a rickety sound that trails off with a chorus of haunting clinks. Only highly skilled skeletal craftsmen can create the Bone Lute and thus the only way to obtain one is by chance when slaying a Skeleton."
+        }
+    ],
+    "sortnum": 2
+}

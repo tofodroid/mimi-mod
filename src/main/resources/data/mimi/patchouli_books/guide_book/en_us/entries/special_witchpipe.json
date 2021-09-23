@@ -1,0 +1,12 @@
+{
+    "name": "Witch Pipe",
+    "icon": "mimi:witchpipe",
+    "category": "mimi:special",
+    "pages": [
+        {
+            "type": "text",
+            "text": "A pipe infused with dark magic, the Witch Pipe creates an eerie and droning sound when played. The spells required to create the pipe are known by only a handful of Witches and thus the only way to obtain one is by chance when slaying a Witch."
+        }
+    ],
+    "sortnum": 1
+}

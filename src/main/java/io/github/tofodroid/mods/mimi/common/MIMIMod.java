@@ -9,6 +9,7 @@ import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
+import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.server.ServerGuiWrapper;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;
@@ -34,6 +35,9 @@ public class MIMIMod
         // Event Listener Registration
         fmlContext.getModEventBus().addListener(NetworkManager::init);
         fmlContext.getModEventBus().addListener(MIMIMod::init);
+
+        // Deferred Registrations
+        ModLootModifiers.REGISTER.register(fmlContext.getModEventBus());
 
         // Other Pre-Init
         ModConfigs.preInit(modContext);

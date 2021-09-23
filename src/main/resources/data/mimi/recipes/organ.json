@@ -1,7 +1,7 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "PPP",
+        "GGG",
         "PNP",
         "BBB"
     ],
@@ -14,9 +14,12 @@
         },
         "B": {
             "item": "minecraft:stone_button"
+        },
+        "G": {
+            "item": "minecraft:gold_ingot"
         }
     },
     "result": {
-        "item": "mimi:piano"
+        "item": "mimi:organ"
     }
 }

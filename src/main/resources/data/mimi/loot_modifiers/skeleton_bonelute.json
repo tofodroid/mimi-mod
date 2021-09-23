@@ -1,0 +1,21 @@
+{
+    "type": "mimi:generic_add_drop",
+    "conditions": [
+        {
+            "condition": "killed_by_player"
+        },
+        {
+            "condition": "minecraft:random_chance_with_looting",
+            "chance": 0.05,
+            "looting_multiplier": 0.05
+        },
+        {
+            "condition": "minecraft:entity_properties",
+            "predicate": {
+                "type": "minecraft:skeleton"
+            },
+            "entity": "this"
+        }
+    ],
+    "item": "mimi:bonelute"
+}

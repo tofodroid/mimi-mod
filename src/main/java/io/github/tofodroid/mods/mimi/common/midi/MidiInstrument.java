@@ -2,10 +2,11 @@ package io.github.tofodroid.mods.mimi.common.midi;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockDrums;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.block.BlockOrgan;
 import io.github.tofodroid.mods.mimi.common.block.BlockPiano;
 
 public enum MidiInstrument {
-    PIANO       (0,0, BlockPiano.class),
+    PIANO       (0,0,BlockPiano.class),
     BANJO       (1,105),
     ACGUITAR    (2,25),
     ELECGUITAR  (3,30),
@@ -24,7 +25,11 @@ public enum MidiInstrument {
     OBOE        (16,68),
     ACCORDION   (17,21),
     DRUMS       (18,15360,0,BlockDrums.class),
-    HARMONICA   (19,22);
+    HARMONICA   (19,22),
+    ORGAN       (20,19,BlockOrgan.class),
+    HANDBELL    (21,112),
+    WITCHPIPE   (22,101),
+    BONELUTE    (23,96);
 
     private final Byte id;
     private final Integer bank;

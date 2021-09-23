@@ -25,6 +25,9 @@
   "item.mimi.banjo": "Banjo",
   "item.mimi.harmonica": "Harmonica",
   "item.mimi.oboe": "Oboe",
+  "item.mimi.handbell": "Hand Bell",
+  "item.mimi.witchpipe": "Witch Pipe",
+  "item.mimi.bonelute": "Bone Lute",
   "item.mimi.switchboard": "Switchboard",
   "item.mimi.transmitter": "Transmitter",
   "block.mimi.listener": "Listener",
@@ -32,5 +35,6 @@
   "block.mimi.mechanicalmaestro": "Mechanical Maestro",
   "block.mimi.conductor": "Conductor",
   "block.mimi.piano": "Piano",
-  "block.mimi.drums": "Drum Kit"
+  "block.mimi.drums": "Drum Kit",
+  "block.mimi.organ": "Organ"
 }
