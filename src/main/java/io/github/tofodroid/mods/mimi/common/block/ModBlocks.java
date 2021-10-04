@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
+import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.block.Block;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,16 +41,9 @@ public class ModBlocks {
 
     public static List<BlockInstrument> buildInstruments()  {
         List<BlockInstrument> result = new ArrayList<>();
-        for(MidiInstrument instrument : MidiInstrument.values()) {
-            if(instrument.isBlock()) {
-                try {
-                    result.add(instrument.getBlockClass().newInstance());
-                } catch(InstantiationException | IllegalAccessException e) {
-                    // TODO
-                }
-            }
+        for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
+                result.add(new BlockInstrument(instrument.instrumentId, instrument.registryName, VoxelShapeUtils.loadFromStrings(instrument.collisionShapes)));
         }
-
         return result;
     }
 }

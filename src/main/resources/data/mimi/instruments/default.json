@@ -1,0 +1,183 @@
+[
+    {
+        "instrumentId": 0,
+        "registryName": "piano",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 0,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,10",
+            "0,0,0,16,6,16"
+        ]
+    },
+    {
+        "instrumentId": 1,
+        "registryName": "banjo",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 105,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 2,
+        "registryName": "acguitar",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 25,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 3,
+        "registryName": "elecguitar",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 30,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 4,
+        "registryName": "bassguitar",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 34,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 5,
+        "registryName": "violin",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 48,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 6,
+        "registryName": "microphone",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 53,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 7,
+        "registryName": "trumpet",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 56,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 8,
+        "registryName": "frenchhorn",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 60,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 9,
+        "registryName": "saxophone",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 64,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 10,
+        "registryName": "clarinet",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 71,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 11,
+        "registryName": "flute",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 73,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 12,
+        "registryName": "ocarina",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 79,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 13,
+        "registryName": "synlead",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 80,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 14,
+        "registryName": "kalimba",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 108,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 15,
+        "registryName": "bagpipe",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 109,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 16,
+        "registryName": "oboe",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 68,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 17,
+        "registryName": "accordion",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 21,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 18,
+        "registryName": "drums",
+        "midiBankNumber": 15360,
+        "midiPatchNumber": 0,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
+    },
+    {
+        "instrumentId": 19,
+        "registryName": "harmonica",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 22,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 20,
+        "registryName": "organ",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 105,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,15,3",
+            "0,0,0,16,10,10",
+            "0,0,0,16,6,16"
+        ]
+    },
+    {
+        "instrumentId": 21,
+        "registryName": "handbell",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 112,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 22,
+        "registryName": "witchpipe",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 101,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 23,
+        "registryName": "bonelute",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 96,
+        "isBlock": false
+    }
+]

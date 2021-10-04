@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GGG",
+        "GNG",
+        "BBB"
+    ],
+    "key": {
+        "G": {
+            "tag": "minecraft:glowstone"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "B": {
+            "item": "minecraft:stone_button"
+        }
+    },
+    "result": {
+        "item": "mimi:epiano"
+    }
+}

@@ -25,12 +25,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.gson.Gson;
 
-import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
 import io.github.tofodroid.mods.mimi.common.midi.MidiChannelNumber;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.midi.AMidiSynthManager;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -99,17 +99,7 @@ public class MidiSynthManager extends AMidiSynthManager {
         this.channelAssignmentMap = HashBiMap.create();
     }
 
-    @SuppressWarnings("resource")
     public void handlePacket(MidiNotePacket message) {
-        // Show on GUI
-        if(Minecraft.getInstance().currentScreen instanceof GuiInstrumentContainerScreen && shouldShowOnGUI(message.player, message.channel, message.instrumentId)) {
-            if(message.velocity > 0) {
-                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOn(message.channel, message.note, message.velocity);
-            } else {
-                ((GuiInstrumentContainerScreen)Minecraft.getInstance().currentScreen).onMidiNoteOff(message.channel, message.note);
-            }
-        }
-
         // Play
         if(message.velocity > 0) {
             noteOn(message);
@@ -225,7 +215,7 @@ public class MidiSynthManager extends AMidiSynthManager {
             for(MidiChannelNumber num : MidiChannelNumber.values()) {
                 if(channelAssignmentMap.get(num) == null) {
                     channelAssignmentMap.put(num, channelIdentifier);
-                    this.midiChannelSet.get(num.ordinal()).assign(playerId, mechanical, MidiInstrument.getBydId(instrumentId));
+                    this.midiChannelSet.get(num.ordinal()).assign(playerId, mechanical, InstrumentConfig.getBydId(instrumentId));
                     return num;
                 }
             }
@@ -239,7 +229,7 @@ public class MidiSynthManager extends AMidiSynthManager {
     }
 
     protected final void noteOn(MidiNotePacket message) {
-        MidiInstrument instrument = MidiInstrument.getBydId(message.instrumentId);
+        InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
 
         if(midiSynth == null || midiReceiver == null || instrument == null || message.velocity <= 0) {
             return;
