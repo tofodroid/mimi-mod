@@ -44,21 +44,18 @@ public class MidiInputManager extends AMidiInputManager {
         return playlistManager.getTransmitMode();
     }
     
-    public List<Byte> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
+    public List<ItemStack> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
         return localInstrumentToPlay.stream().map(data -> {
             ItemStack switchStack = ItemStack.EMPTY;
-            Byte instrumentId = null;
 
             if(data instanceof ItemStack) {
                 switchStack = ItemInstrument.getSwitchboardStack((ItemStack)data);
-                instrumentId = ItemInstrument.getInstrumentId((ItemStack)data);
             } else if(data instanceof TileInstrument) {
                 switchStack = ((TileInstrument)data).getSwitchboardStack();
-                instrumentId = ((TileInstrument)data).getInstrumentId();
             }
 
             if(ModItems.SWITCHBOARD.equals(switchStack.getItem()) && ItemMidiSwitchboard.getSysInput(switchStack) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
-                return instrumentId;
+                return switchStack;
             }
 
             return null;

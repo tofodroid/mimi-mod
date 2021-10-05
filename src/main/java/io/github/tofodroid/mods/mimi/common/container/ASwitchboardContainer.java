@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 
 public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
-	private static final int INVENTORY_PLAYER_START_X = 156;
+	private static final int INVENTORY_PLAYER_START_X = 165;
 	private static final int INVENTORY_PLAYER_START_Y = 182;
 	private static final int SWITCHBOARD_SLOT_POS_X = 127;
 	private static final int SWITCHBOARD_SLOT_POS_Y = 193;
@@ -53,7 +53,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 		return SWITCHBOARD_SLOT_POS_Y;
 	}
 
-	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, String newSourceName, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput, Boolean newPublicBroadcast, Byte newBroadcastNote) {
+	public Boolean updateSelectedSwitchboard(ServerPlayerEntity player, UUID newSourceId, String newSourceName, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput, Boolean newPublicBroadcast, Byte newBroadcastNote, Byte newVolume) {
 		ItemStack selectedStack = this.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
 
 		if(ModItems.SWITCHBOARD.equals(selectedStack.getItem())) {
@@ -67,6 +67,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			ItemMidiSwitchboard.setSysInput(selectedStack, newSysInput);
 			ItemMidiSwitchboard.setPublicBroadcast(selectedStack, newPublicBroadcast);
 			ItemMidiSwitchboard.setBroadcastNote(selectedStack, newBroadcastNote);
+			ItemMidiSwitchboard.setInstrumentVolume(selectedStack, newVolume);
 			this.detectAndSendChanges();
             return true;
 		}

@@ -21,6 +21,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
@@ -56,7 +57,7 @@ public class TransmitterNotePacketHandler {
         notePackets.put(mechUUID, new ArrayList<>());
         for(TileMechanicalMaestro maestro : getPotentialMechMaestros(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(message.velocity <= 0)))) {
             if(maestro.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
-                notePackets.get(mechUUID).add(new MidiNotePacket(message.note, message.velocity, maestro.getInstrumentId(), maestro.getMaestroUUID(), true, maestro.getPos()));
+                notePackets.get(mechUUID).add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(maestro.getSwitchboardStack(), message.velocity), maestro.getInstrumentId(), maestro.getMaestroUUID(), true, maestro.getPos()));
             }
         }
 
@@ -79,7 +80,7 @@ public class TransmitterNotePacketHandler {
         if(instrumentEntity != null) { 
             Byte instrumentId = instrumentEntity.getInstrumentId();
             if(instrumentId != null && instrumentEntity.shouldHandleMessage(sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
-                packetList.add(new MidiNotePacket(message.note, message.velocity, instrumentId, target.getUniqueID(), false, target.getPosition()));
+                packetList.add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(instrumentEntity.getSwitchboardStack(), message.velocity), instrumentId, target.getUniqueID(), false, target.getPosition()));
             }
         }
     }
@@ -89,7 +90,7 @@ public class TransmitterNotePacketHandler {
         ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
         Byte instrumentId = ItemInstrument.getInstrumentId(stack);
         if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
-            packetList.add(new MidiNotePacket(message.note, message.velocity, instrumentId, target.getUniqueID(), false, target.getPosition()));
+            packetList.add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(ItemInstrument.getSwitchboardStack(stack), message.velocity), instrumentId, target.getUniqueID(), false, target.getPosition()));
         }
     }
     

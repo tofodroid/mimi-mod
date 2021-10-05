@@ -62,6 +62,11 @@ public class GuiMechanicalMaestroContainerScreen extends ASwitchboardBlockGui<Co
     }
 
     @Override
+    protected Boolean instrumentVolumeWidgetEnabled() {
+        return true;
+    }
+
+    @Override
     protected MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         matrixStack = super.renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
 

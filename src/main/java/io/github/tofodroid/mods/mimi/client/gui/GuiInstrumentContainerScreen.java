@@ -56,6 +56,8 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(84,177);
     private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(129,177);
     private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(105,219);
+    private static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(202,58);
+    private static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(155,58);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
@@ -257,6 +259,10 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 this.setPublicSource();
             } else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
                 this.clearSource();
+            } else if(clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_UP_BUTTON_COORDS)) {
+                this.changeVolume(1);
+            } else if(clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS)) {
+                this.changeVolume(-1);
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 this.clearChannels();
             } else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
@@ -417,17 +423,17 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrumentId, player.getUniqueID(), false, player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
-        this.holdNote(midiNote, velocity);
+        this.onMidiNoteOn(null, midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
-        this.releaseNote(midiNote);
+        this.onMidiNoteOff(null, midiNote);
     }
 
     private void holdNote(Byte midiNote, Byte velocity) {
@@ -621,10 +627,11 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         // Note Text: Right
         font.drawString(matrixStack, this.noteIdString.split(",")[2], 126, 197, 0xFF00E600);
 
-        // MIDI Source Name
+        // MIDI Source Name & Volume
         if(editMode) {
             String selectedSourceName = ItemMidiSwitchboard.getMidiSourceName(selectedSwitchboardStack);
             font.drawString(matrixStack, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
+            font.drawString(matrixStack, ItemMidiSwitchboard.getInstrumentVolumePercent(selectedSwitchboardStack).toString(), 180, 62, 0xFF00E600);
         }
 
         // Keyboard Layout

@@ -105,8 +105,8 @@ public class ContainerInstrument extends ASwitchboardContainer {
 	}
 
 	@Override
-	public Boolean updateSelectedSwitcboard(ServerPlayerEntity player, UUID newSourceId, String newSourceName, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput, Boolean newPublicBroadcast, Byte newBroadcastNote) {
-		if(super.updateSelectedSwitcboard(player, newSourceId, newSourceName, newFilterOct, newFilterNote, newInvertNoteOct, newChannelString, newInstrumentId, newInvertInstrument, newSysInput, newPublicBroadcast, newBroadcastNote)) {
+	public Boolean updateSelectedSwitchboard(ServerPlayerEntity player, UUID newSourceId, String newSourceName, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput, Boolean newPublicBroadcast, Byte newBroadcastNote, Byte newVolume) {
+		if(super.updateSelectedSwitchboard(player, newSourceId, newSourceName, newFilterOct, newFilterNote, newInvertNoteOct, newChannelString, newInstrumentId, newInvertInstrument, newSysInput, newPublicBroadcast, newBroadcastNote, newVolume)) {
 			this.saveToInventory(player);
 			return true;
 		}
