@@ -14,33 +14,36 @@ import net.minecraft.util.SortedArraySet;
 
 public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> extends ASwitchboardGui<T> {
     // Button Boxes
-    protected static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(23,48);
-    protected static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(42,48);
-    protected static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(23,73);
-    protected static final Vector2f FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(218,48);
-    protected static final Vector2f FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector2f(199,48);
-    protected static final Vector2f FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector2f(282,48);
-    protected static final Vector2f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2f(24,113);
-    protected static final Vector2f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2f(148,113);
-    protected static final Vector2f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2f(167,113);
-    protected static final Vector2f TRANSMIT_SELF_BUTTON_COORDS = new Vector2f(225,97);
-    protected static final Vector2f TRANSMIT_PUBLIC_BUTTON_COORDS = new Vector2f(244,97);
-    protected static final Vector2f TRANSMIT_CLEAR_BUTTON_COORDS = new Vector2f(263,97);
-    protected static final Vector2f BROADCAST_MODE_BUTTON_COORDS = new Vector2f(150,135);
-    protected static final Vector2f BROADCAST_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(218,134);
-    protected static final Vector2f BROADCAST_NOTE_LETTER_BUTTON_COORDS = new Vector2f(199,134);
+    protected static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(16,48);
+    protected static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(35,48);
+    protected static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(16,73);
+    protected static final Vector2f FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(211,48);
+    protected static final Vector2f FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector2f(192,48);
+    protected static final Vector2f FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector2f(275,48);
+    protected static final Vector2f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2f(17,113);
+    protected static final Vector2f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2f(141,113);
+    protected static final Vector2f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2f(160,113);
+    protected static final Vector2f TRANSMIT_SELF_BUTTON_COORDS = new Vector2f(218,97);
+    protected static final Vector2f TRANSMIT_PUBLIC_BUTTON_COORDS = new Vector2f(237,97);
+    protected static final Vector2f TRANSMIT_CLEAR_BUTTON_COORDS = new Vector2f(256,97);
+    protected static final Vector2f BROADCAST_MODE_BUTTON_COORDS = new Vector2f(143,135);
+    protected static final Vector2f BROADCAST_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(211,134);
+    protected static final Vector2f BROADCAST_NOTE_LETTER_BUTTON_COORDS = new Vector2f(192,134);
+    protected static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(306,74);
+    protected static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(306,110);
 
     // Text Boxes
-    protected static final Vector2f FILTER_NOTE_TEXTBOX_COORDS = new Vector2f(239,52);
-    protected static final Vector2f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector2f(45,117);
-    protected static final Vector2f LINKED_TRANSMITTER_TEXTBOX_COORDS = new Vector2f(201,85);
-    protected static final Vector2f BROADCAST_NOTE_TEXTBOX_COORDS = new Vector2f(239,138);
+    protected static final Vector2f FILTER_NOTE_TEXTBOX_COORDS = new Vector2f(232,52);
+    protected static final Vector2f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector2f(38,117);
+    protected static final Vector2f LINKED_TRANSMITTER_TEXTBOX_COORDS = new Vector2f(194,85);
+    protected static final Vector2f BROADCAST_NOTE_TEXTBOX_COORDS = new Vector2f(232,138);
+    protected static final Vector2f INSTRUMENT_VOLUME_TEXTBOX_COORDS = new Vector2f(308,96);
 
     // Status Boxes
-    protected static final Vector2f MIDI_STATUSBOX_COORDS = new Vector2f(48,66);
-    protected static final Vector2f FILTER_NOTE_STATUSBOX_COORDS = new Vector2f(301,54);
-    protected static final Vector2f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector2f(186,119);
-    protected static final Vector2f BROADCAST_MODE_STATUSBOX_COORDS = new Vector2f(168,136);
+    protected static final Vector2f MIDI_STATUSBOX_COORDS = new Vector2f(41,66);
+    protected static final Vector2f FILTER_NOTE_STATUSBOX_COORDS = new Vector2f(294,54);
+    protected static final Vector2f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector2f(179,119);
+    protected static final Vector2f BROADCAST_MODE_STATUSBOX_COORDS = new Vector2f(161,136);
 
     // Runtime Data
     protected List<Byte> INSTRUMENT_ID_LIST;
@@ -50,7 +53,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected String filterNoteString = "";
 
     public ASwitchboardBlockGui(T container, PlayerInventory inv, ITextComponent textComponent) {
-        super(container, inv, 328, 250, 395, "textures/gui/container_generic_switchboard_block.png", textComponent);
+        super(container, inv, 337, 250, 395, "textures/gui/container_generic_switchboard_block.png", textComponent);
     }
 
     @Override
@@ -101,6 +104,10 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
             } else if(broadcastModeWidgetEnabled() && clickedBox(imouseX, imouseY, BROADCAST_MODE_BUTTON_COORDS)) {
                 ItemMidiSwitchboard.setPublicBroadcast(selectedSwitchboardStack, !ItemMidiSwitchboard.getPublicBroadcast(selectedSwitchboardStack));
 				this.syncSwitchboardToServer();
+            } else if(instrumentVolumeWidgetEnabled() && clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_UP_BUTTON_COORDS)) {
+                this.changeVolume(1);
+            } else if(instrumentVolumeWidgetEnabled() && clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS)) {
+                this.changeVolume(-1);
             } else if(channelWidgetEnabled() && clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
 				this.clearChannels();
 			} else if(channelWidgetEnabled() && clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
@@ -168,27 +175,31 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
         // Disabled Widgets
         if(!channelWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 21, this.guiTop + 32, this.getBlitOffset(), 1, 281, 171, 65, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 14, this.guiTop + 32, this.getBlitOffset(), 1, 281, 171, 65, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!noteFilterWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 196, this.guiTop + 32, this.getBlitOffset(), 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 189, this.guiTop + 32, this.getBlitOffset(), 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!instrumentFilterWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 21, this.guiTop + 100, this.getBlitOffset(), 177, 336, 171, 30, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 14, this.guiTop + 100, this.getBlitOffset(), 177, 336, 171, 30, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!linkedTransmitterWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 196, this.guiTop + 69, this.getBlitOffset(), 237, 289, 111, 46, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 189, this.guiTop + 69, this.getBlitOffset(), 237, 289, 111, 46, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!broadcastModeWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 21, this.guiTop + 133, this.getBlitOffset(), 1, 347, 171, 19, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 14, this.guiTop + 133, this.getBlitOffset(), 1, 347, 171, 19, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!broadcastNoteWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 196, this.guiTop + 118, this.getBlitOffset(), 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 189, this.guiTop + 118, this.getBlitOffset(), 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
+        }
+
+        if(!instrumentVolumeWidgetEnabled()) {
+            blit(matrixStack, this.guiLeft + 297, this.guiTop + 58, this.getBlitOffset(), 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         return matrixStack;
@@ -209,6 +220,9 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
 			// Broadcast Note
 			font.drawString(matrixStack, ItemMidiSwitchboard.getBroadcastNoteAsString(selectedSwitchboardStack), new Float(BROADCAST_NOTE_TEXTBOX_COORDS.x).intValue(), new Float(BROADCAST_NOTE_TEXTBOX_COORDS.y).intValue(), broadcastNoteWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
+            
+            // Instrument Volume
+			font.drawString(matrixStack, ItemMidiSwitchboard.getInstrumentVolumePercent(selectedSwitchboardStack).toString(), new Float(INSTRUMENT_VOLUME_TEXTBOX_COORDS.x).intValue(), new Float(INSTRUMENT_VOLUME_TEXTBOX_COORDS.y).intValue(), instrumentVolumeWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 		}
        
         return matrixStack;
@@ -331,6 +345,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected Boolean linkedTransmitterWidgetEnabled() {return false;}
     protected Boolean broadcastModeWidgetEnabled() {return false;}
     protected Boolean broadcastNoteWidgetEnabled() {return false;}
+    protected Boolean instrumentVolumeWidgetEnabled() {return false;}
     protected abstract Vector2f titleBoxPos();
     protected abstract Vector2f titleBoxBlit();
     protected abstract Vector2f titleBoxSize();

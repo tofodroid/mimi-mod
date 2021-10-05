@@ -97,4 +97,9 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
         ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(channelId).byteValue());
         this.syncSwitchboardToServer();
     }
+    
+    protected void changeVolume(Integer changeAmount) {
+        ItemMidiSwitchboard.setInstrumentVolume(selectedSwitchboardStack, new Integer(ItemMidiSwitchboard.getInstrumentVolume(selectedSwitchboardStack) + changeAmount).byteValue());
+        this.syncSwitchboardToServer();
+    }
 }

@@ -38,7 +38,10 @@ public class ItemMidiSwitchboard extends Item {
     public static final String ENABLED_CHANNELS_TAG = "enabled_channels";
     public static final String INSTRUMENT_TAG = "filter_instrument";
     public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
+    public static final String VOLUME_TAG = "instrument_volume";
     public static final Byte INSTRUMENT_ALL = -1;
+    public static final Byte MAX_INSTRUMENT_VOLUME = 5;
+    public static final Byte MIN_INSTRUMENT_VOLUME = 0;
 
     public static final UUID NONE_SOURCE_ID = new UUID(0,0);
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
@@ -106,6 +109,9 @@ public class ItemMidiSwitchboard extends Item {
 
             // Instrument Filter
             tooltip.add(new StringTextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
+
+            // Instrument Volume
+            tooltip.add(new StringTextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolume(stack)));
         }
     }
 
@@ -325,6 +331,43 @@ public class ItemMidiSwitchboard extends Item {
         return false;
     }
 
+    public static void setInstrumentVolume(ItemStack stack, Byte volume) {
+        if(volume > MAX_INSTRUMENT_VOLUME) {
+            volume = MAX_INSTRUMENT_VOLUME;
+        } else if(volume < MIN_INSTRUMENT_VOLUME) {
+            volume = MIN_INSTRUMENT_VOLUME;
+        }
+
+        if (volume < MAX_INSTRUMENT_VOLUME) {
+            stack.getOrCreateTag().putByte(VOLUME_TAG, volume);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(VOLUME_TAG);
+        }
+    }
+
+    public static Byte getInstrumentVolume(ItemStack stack) {
+        if (stackTagContainsKey(stack, VOLUME_TAG)) {
+            return stack.getTag().getByte(VOLUME_TAG);
+        }
+
+        return MAX_INSTRUMENT_VOLUME;
+    }
+
+    public static String getInstrumentVolumePercent(ItemStack stack) {
+        Integer value = new Integer(new Double((new Double(getInstrumentVolume(stack)) / new Double(MAX_INSTRUMENT_VOLUME)) * 10).intValue());
+        return value == 10 ? value.toString() : "0" + value.toString();
+    }
+
+    public static Byte applyVolume(ItemStack stack, Byte sourceVelocity) {
+        Byte result = sourceVelocity;
+
+        if(stack != null && stack.getItem().equals(ModItems.SWITCHBOARD)) {
+            result = new Integer(new Double((new Double(getInstrumentVolume(stack)) / new Double(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
+        }
+
+        return  result;
+    }
+
     public String getInstrumentName(ItemStack stack) {
         return INSTRUMENT_NAME_MAP().get(new Integer(ItemMidiSwitchboard.getInstrument(stack)).byteValue());
     }
@@ -431,7 +474,8 @@ public class ItemMidiSwitchboard extends Item {
             ItemMidiSwitchboard.getInvertInstrument(stack),
             ItemMidiSwitchboard.getSysInput(stack),
             ItemMidiSwitchboard.getPublicBroadcast(stack),
-            ItemMidiSwitchboard.getBroadcastNote(stack)
+            ItemMidiSwitchboard.getBroadcastNote(stack),
+            ItemMidiSwitchboard.getInstrumentVolume(stack)
         );
     }
 

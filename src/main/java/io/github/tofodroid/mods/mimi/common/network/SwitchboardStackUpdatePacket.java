@@ -19,8 +19,9 @@ public class SwitchboardStackUpdatePacket {
     public final Boolean invertInstrument;
     public final Boolean sysInput;
     public final Boolean publicBroadcast;
+    public final Byte volume;
 
-    public SwitchboardStackUpdatePacket(UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument, Boolean sysInput, Boolean publicBroadcast, Byte broadcastNote) {
+    public SwitchboardStackUpdatePacket(UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument, Boolean sysInput, Boolean publicBroadcast, Byte broadcastNote, Byte volume) {
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
         this.filterOct = filterOct;
@@ -32,6 +33,7 @@ public class SwitchboardStackUpdatePacket {
         this.sysInput = sysInput;
         this.publicBroadcast = publicBroadcast;
         this.broadcastNote = broadcastNote;
+        this.volume = volume;
     }
     
     public static SwitchboardStackUpdatePacket decodePacket(PacketBuffer buf) {
@@ -57,8 +59,9 @@ public class SwitchboardStackUpdatePacket {
             
             Boolean publicBroadcast = buf.readBoolean();
             Byte broadcastNote = buf.readByte();
+            Byte volume = buf.readByte();
 
-            return new SwitchboardStackUpdatePacket(midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument, sysInput, publicBroadcast, broadcastNote);
+            return new SwitchboardStackUpdatePacket(midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument, sysInput, publicBroadcast, broadcastNote, volume);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("SwitchboardStackUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -80,5 +83,6 @@ public class SwitchboardStackUpdatePacket {
         buf.writeBoolean(pkt.sysInput);
         buf.writeBoolean(pkt.publicBroadcast);
         buf.writeByte(pkt.broadcastNote);
+        buf.writeByte(pkt.volume);
     }
 }
