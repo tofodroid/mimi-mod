@@ -1,0 +1,18 @@
+[
+    {
+        "registryName": "viola",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 41,
+        "isBlock": false
+    },
+    {
+        "registryName": "epiano",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 4,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,10",
+            "0,0,0,16,6,16"
+        ]
+    }
+]

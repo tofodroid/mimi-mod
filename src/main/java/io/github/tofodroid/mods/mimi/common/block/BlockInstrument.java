@@ -3,6 +3,8 @@ package io.github.tofodroid.mods.mimi.common.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -35,25 +37,29 @@ import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 
-public abstract class BlockInstrument extends AContainerBlock<TileInstrument> implements IWaterLoggable {
+public class BlockInstrument extends AContainerBlock<TileInstrument> implements IWaterLoggable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
     public final Map<Direction, VoxelShape> SHAPES;
     private final Byte instrumentId;
 
-    public BlockInstrument(Properties properties, Byte instrumentId) {
-        super(properties);
+    public BlockInstrument(Byte instrumentId, String registryName, VoxelShape collisionShape) {
+        super(Properties.create(Material.WOOD).hardnessAndResistance(2.f, 6.f).sound(SoundType.WOOD).notSolid());
         this.instrumentId = instrumentId;
         this.setDefaultState(this.getStateContainer().getBaseState()
             .with(WATERLOGGED, false)
             .with(DIRECTION, Direction.NORTH)
         );
-        this.SHAPES = this.generateShapes();
+        this.SHAPES = this.generateShapes(collisionShape);
+        this.setRegistryName(registryName);
     }
 
-    protected abstract Map<Direction, VoxelShape> generateShapes();
+    protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
+        return VoxelShapeUtils.generateFacingShape(shape);
+    }
     
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {

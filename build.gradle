@@ -122,8 +122,8 @@ dependencies {
 
     // Mod Integrations
     //    Patchouli
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.1:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.1")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
 }
 
 jar {

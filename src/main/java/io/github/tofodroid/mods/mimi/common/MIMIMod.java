@@ -8,6 +8,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
 import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -41,6 +42,7 @@ public class MIMIMod
 
         // Other Pre-Init
         ModConfigs.preInit(modContext);
+        InstrumentConfig.preInit();
     }
     
     public static void init(final FMLCommonSetupEvent event) {

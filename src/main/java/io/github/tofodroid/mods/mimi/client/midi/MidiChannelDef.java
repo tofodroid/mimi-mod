@@ -8,8 +8,8 @@ import javax.sound.midi.MidiChannel;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
@@ -40,12 +40,12 @@ public class MidiChannelDef {
         this.assigned = false;
     }
 
-    public void assign(UUID entityId, Boolean mechanical, MidiInstrument instrument) {
+    public void assign(UUID entityId, Boolean mechanical, InstrumentSpec instrument) {
         this.assigned = true;
         this.entityId = entityId;
         this.mechanical = mechanical;
-        this.instrumentId = instrument.getId();
-        this.channel.programChange(instrument.getBank(), instrument.getPatch());
+        this.instrumentId = instrument.instrumentId;
+        this.channel.programChange(instrument.midiBankNumber, instrument.midiPatchNumber);
         this.channel.controlChange(7, 0);
     }
 
@@ -59,7 +59,7 @@ public class MidiChannelDef {
         this.channel.allNotesOff();
     }
 
-    public void noteOn(MidiInstrument instrument, Byte note, Byte velocity, BlockPos notePos) {
+    public void noteOn(InstrumentSpec instrument, Byte note, Byte velocity, BlockPos notePos) {
         channel.noteOn(note, velocity);
         this.lastNotePos = notePos;
         this.lastNoteTime = Instant.now();

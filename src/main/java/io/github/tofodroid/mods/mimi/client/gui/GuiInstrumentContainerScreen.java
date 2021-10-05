@@ -410,21 +410,21 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 this.releaseNote(note);
             }
 
-            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
+            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
             NetworkManager.NET_CHANNEL.sendToServer(packet);
             MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, midiNote, velocity, instrumentId, player.getUniqueID(), false, player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.holdNote(midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
-        MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.NO_CHANNEL, midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.releaseNote(midiNote);

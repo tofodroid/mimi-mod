@@ -1,10 +1,13 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.ArrayList;
@@ -13,7 +16,8 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInstrument;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 
 @ObjectHolder(MIMIMod.MODID)
 public final class ModItems {
@@ -61,28 +65,22 @@ public final class ModItems {
 
     public static List<ItemInstrument> buildInstruments() {
         List<ItemInstrument> list = new ArrayList<>();
-        for(MidiInstrument instrument : MidiInstrument.values()) {
-            if(!instrument.isBlock()) {
-                list.add(new ItemInstrument(instrument.toString().toLowerCase(), instrument.getId()));
-            }
+        for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
+            list.add(new ItemInstrument(instrument.registryName, instrument.instrumentId));
         }
         return list;
     }
 
-    public static ItemInstrument getInstrumentItemById(Byte instrumentId) {
-        for(ItemInstrument item : INSTRUMENT_ITEMS) {
-            if(item.getInstrumentId().equals(instrumentId)) {
-                return item;
-            }
-        }
-
-        return null;
-    }
-    
     public static List<ItemInstrumentBlock> buildBlockInstruments() {
         List<ItemInstrumentBlock> list = new ArrayList<>();
-        for(BlockInstrument instrument : ModBlocks.INSTRUMENTS) {
-            list.add((ItemInstrumentBlock)new ItemInstrumentBlock(instrument, new Item.Properties().group(ITEM_GROUP).maxStackSize(1)).setRegistryName(instrument.getRegistryName()));
+        for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
+            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(MIMIMod.MODID, instrument.registryName));
+
+            if(block instanceof BlockInstrument) {
+                list.add((ItemInstrumentBlock)new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().group(ITEM_GROUP).maxStackSize(1)).setRegistryName(instrument.registryName));
+            } else {
+                MIMIMod.LOGGER.error("Failed to create ItemInstrumentBlock for Instrument: " + instrument.registryName + " - Corresponding Registry Block is not a BlockInstrument!");
+            }            
         }
         return list;
     }
