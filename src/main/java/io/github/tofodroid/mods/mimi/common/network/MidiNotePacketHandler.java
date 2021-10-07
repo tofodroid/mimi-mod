@@ -88,6 +88,6 @@ public class MidiNotePacketHandler {
     }
 
     protected static Double getQueryBoxRange(Boolean off) {
-        return off ? 64d : 48d;
+        return off ? 128d : 64d;
     }
 }

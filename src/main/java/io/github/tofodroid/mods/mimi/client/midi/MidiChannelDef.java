@@ -77,28 +77,16 @@ public class MidiChannelDef {
         if(!this.assigned) {
             MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
             return null;
-        } else if(!mechanical) {
-            // Handle Player Channels
+        } else {
             Boolean clientChannel = isClientChannel(clientPlayer.getUniqueID());
-            if(!this.isIdle() && isPlayerUsingInstrument(clientPlayer.getEntityWorld())) {
-                setVolume(clientPlayer.getPosition(), clientChannel);
-
+            if(!this.isIdle() && !(!clientChannel && Math.sqrt(clientPlayer.getPosition().distanceSq(lastNotePos)) > 72d) && ((!mechanical && isPlayerUsingInstrument(clientPlayer.getEntityWorld()) || (mechanical && isMechanicalMaestroUsingInstrument(clientPlayer.getEntityWorld()))))) {
                 if (!clientChannel) {
+                    setVolume(Math.sqrt(clientPlayer.getPosition().distanceSq(lastNotePos)));
                     setLRPan(clientPlayer.getPosition(), clientPlayer.getRotationYawHead());
+                } else {
+                    setVolume(0d);
                 }
 
-                return true;
-            } else if(this.lastNoteTime != null) {
-                return false;
-            } else {
-                MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
-                return null;
-            }
-        } else {
-            // Handle Mechanical Maestro Channels
-            if(!this.isIdle() && isMechanicalMaestroUsingInstrument(clientPlayer.getEntityWorld())) {
-                setVolume(clientPlayer.getPosition(), false);
-                setLRPan(clientPlayer.getPosition(), clientPlayer.getRotationYawHead());
                 return true;
             } else if(this.lastNoteTime != null) {
                 return false;
@@ -171,13 +159,10 @@ public class MidiChannelDef {
     }
     
     @SuppressWarnings({ "resource" })
-    protected Byte setVolume(BlockPos playerPos, Boolean clientChannel) {
-        Double volume = 127d;
+    protected Byte setVolume(Double distance) {
 
         // 1. Adjust for distance
-        if(!clientChannel) {
-            volume -= 0.033 * playerPos.distanceSq(lastNotePos);
-        }
+        Double volume = 127d - Math.floor((127 * Math.pow(distance,2.5)) / (Math.pow(distance,2.5) + Math.pow(72 - distance,2.5)));
 
         // 2. Adjust for game volume
         Float catVolume = Minecraft.getInstance().gameSettings.getSoundLevel(SoundCategory.PLAYERS);

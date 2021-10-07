@@ -33,6 +33,7 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<Integer> synthSampleRate;
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
+    public ForgeConfigSpec.BooleanValue raytraceSound;
 
     public ClientConfig(ForgeConfigSpec.Builder builder) {
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
@@ -51,6 +52,9 @@ public class ClientConfig {
             .defineInRange("defaultMidiInputDevice", -1, -1, 99);
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
+        raytraceSound = builder.comment("Should MIDI notes that are played take into account any blocks between you and the source and muffle the sound accordingly? Note that enabling this may impact performance on lower-end systems.")
+            .translation(MIMIMod.MODID + ".config.midi.synth.raytracesound")
+            .define("rayTraceSound", false);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
             .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrection")
             .define("synthJitterCorrection", true);
