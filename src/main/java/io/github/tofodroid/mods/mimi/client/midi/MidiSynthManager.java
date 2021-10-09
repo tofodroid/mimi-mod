@@ -35,10 +35,13 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceContext.BlockMode;
+import net.minecraft.util.math.RayTraceContext.FluidMode;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -48,6 +51,7 @@ import net.minecraftforge.fml.LogicalSide;
 
 public class MidiSynthManager extends AMidiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 1;
+    private static final Double BLOCK_MIDI_REDUCTION = 0.5;
     private ImmutableList<MidiChannelDef> midiChannelSet;
     private BiMap<MidiChannelNumber,String> channelAssignmentMap;
     
@@ -228,6 +232,7 @@ public class MidiSynthManager extends AMidiSynthManager {
         return playerId.toString() + "-" + instrumentId.toString();
     }
 
+    @SuppressWarnings("resource")
     protected final void noteOn(MidiNotePacket message) {
         InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
 
@@ -237,8 +242,22 @@ public class MidiSynthManager extends AMidiSynthManager {
 
         MidiChannelNumber channelNumber = getChannelForPlayer(message.player, message.mechanical, message.instrumentId, true);
         MidiChannelDef channelDef = channelNumber != null ? this.midiChannelSet.get(channelNumber.ordinal()) : null;
+        Double modifiedVelocity = new Double(message.velocity);
 
-        if(channelDef != null) channelDef.noteOn(instrument, message.note, message.velocity, message.pos);
+        if(ModConfigs.CLIENT.raytraceSound.get()) {
+            Vector3d messageVec = new Vector3d(message.pos.getX() + 0.5, message.pos.getY() + 0.5, message.pos.getZ() + 0.5);
+            Vector3d playerVec = new Vector3d(Minecraft.getInstance().player.getPosX(),Minecraft.getInstance().player.getPosYEye(),Minecraft.getInstance().player.getPosZ());
+            Vector3d rayVec = Minecraft.getInstance().world.rayTraceBlocks(new RayTraceContext(playerVec, messageVec, BlockMode.VISUAL, FluidMode.NONE, null)).getHitVec();
+
+            if(messageVec.distanceTo(playerVec) - rayVec.distanceTo(playerVec) >= 1) {
+                modifiedVelocity *= BLOCK_MIDI_REDUCTION;
+                MIMIMod.LOGGER.info("Muffling!");
+            }
+        }
+
+        if(modifiedVelocity.intValue() > 0) {
+            if(channelDef != null) channelDef.noteOn(instrument, message.note, new Integer(modifiedVelocity.intValue()).byteValue(), message.pos);
+        }
     }
 
     protected final void noteOff(MidiNotePacket message) {
