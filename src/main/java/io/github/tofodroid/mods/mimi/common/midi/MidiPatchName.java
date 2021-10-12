@@ -34,7 +34,7 @@ public enum MidiPatchName {
     Accordion(21, "Accordion"), // * 
     Harmonica(22, "Harmonica"), // *
     TangoAccordion(23, "Tango Accordion"),
-    AcousticGuitarNylon(24, "Acoustic Guitar (nylon)"),
+    AcousticGuitarNylon(24, "Acoustic Guitar (nylon)"), // ^25
     AcousticGuitarSteel(25, "Acoustic Guitar (steel)"), // *
     ElectricGuitarJazz(26, "Electric Guitar (jazz)"),
     ElectricGuitarClean(27, "Electric Guitar (clean)"),
@@ -42,7 +42,7 @@ public enum MidiPatchName {
     OverdrivenGuitar(29, "Overdriven Guitar"),
     DistortionGuitar(30, "Distortion Guitar"), // *
     Guitarharmonics(31, "Guitar harmonics"),
-    AcousticBass(32, "Acoustic Bass"),
+    AcousticBass(32, "Acoustic Bass"),  // ^25
     ElectricBassFinger(33, "Electric Bass (finger)"), // ^34
     ElectricBassPick(34, "Electric Bass (pick)"), // *
     FretlessBass(35, "Fretless Bass"), // ^34
@@ -62,9 +62,9 @@ public enum MidiPatchName {
     StringEnsemble2(49, "String Ensemble 2"),
     SynthStrings1(50, "SynthStrings 1"),
     SynthStrings2(51, "SynthStrings 2"),
-    ChoirAahs(52, "Choir Aahs"), // ^53
+    ChoirAahs(52, "Choir Aahs"), // *
     VoiceOohs(53, "Voice Oohs"), // *
-    SynthVoice(54, "Synth Voice"), // ^53
+    SynthVoice(54, "Synth Voice"), // *
     OrchestraHit(55, "Orchestra Hit"),
     Trumpet(56, "Trumpet"), // *
     Trombone(57, "Trombone"),
@@ -75,9 +75,9 @@ public enum MidiPatchName {
     SynthBrass1(62, "SynthBrass 1"),
     SynthBrass2(63, "SynthBrass 2"),
     SopranoSax(64, "Soprano Sax"), // *
-    AltoSax(65, "Alto Sax"), // ^64
-    TenorSax(66, "Tenor Sax"), // ^64
-    BaritoneSax(67, "Baritone Sax"), // ^64
+    AltoSax(65, "Alto Sax"), // *
+    TenorSax(66, "Tenor Sax"), // *
+    BaritoneSax(67, "Baritone Sax"), // *
     Oboe(68, "Oboe"), // *
     EnglishHorn(69, "English Horn"),
     Bassoon(70, "Bassoon"),

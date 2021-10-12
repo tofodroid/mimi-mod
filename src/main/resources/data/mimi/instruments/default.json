@@ -54,7 +54,21 @@
         "instrumentId": 2,
         "registryName": "acguitar",
         "midiBankNumber": 0,
+        "midiPatchNumber": 24,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 36,
+        "registryName": "acguitar2",
+        "midiBankNumber": 0,
         "midiPatchNumber": 25,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 37,
+        "registryName": "acguitar3",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 32,
         "isBlock": false
     },
     {
