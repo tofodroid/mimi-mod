@@ -23,7 +23,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.gson.Gson;
 
 import io.github.tofodroid.mods.mimi.common.midi.MidiChannelNumber;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -32,6 +31,7 @@ import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.midi.AMidiSynthManager;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -55,7 +55,7 @@ public class MidiSynthManager extends AMidiSynthManager {
     private ImmutableList<MidiChannelDef> midiChannelSet;
     private BiMap<MidiChannelNumber,String> channelAssignmentMap;
     
-    protected Soundbank soundbank;
+    protected Soundbank soundbank = null;
     protected Synthesizer midiSynth; 
     protected Receiver midiReceiver;
     protected Integer midiTickCounter = 0;
@@ -278,19 +278,19 @@ public class MidiSynthManager extends AMidiSynthManager {
             if(midiSynth.getMaxReceivers() != 0) {
                 midiSynth.open();
                 midiSynth.close();
+
+                Map<String, Object> params = new HashMap<>();
+                params.put("jitter correction", ModConfigs.CLIENT.jitterCorrection.get());
+                params.put("latency", ModConfigs.CLIENT.latency.get() * 1000);
+                params.put("format", new AudioFormat(
+                    ModConfigs.CLIENT.synthSampleRate.get(), 
+                    ModConfigs.CLIENT.synthBitRate.get(), 
+                    2, true, false
+                ));
+
+                DebugUtils.logSynthInfo(midiSynth, params);
                 
                 if (midiSynth instanceof com.sun.media.sound.SoftSynthesizer) {
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("jitter correction", ModConfigs.CLIENT.jitterCorrection.get());
-                    params.put("latency", ModConfigs.CLIENT.latency.get() * 1000);
-                    params.put("format", new AudioFormat(
-                        ModConfigs.CLIENT.synthSampleRate.get(), 
-                        ModConfigs.CLIENT.synthBitRate.get(), 
-                        2, true, false
-                    ));
-
-                    MIMIMod.LOGGER.debug("Applying Gervill settings: " + new Gson().toJson(params));
-
                     ((com.sun.media.sound.SoftSynthesizer) midiSynth).open(null, params);
                 } else {
                     MIMIMod.LOGGER.warn("Synthesizer is not Gervill. Ignoring synth settings.");
@@ -299,10 +299,12 @@ public class MidiSynthManager extends AMidiSynthManager {
 
                 midiSynth.open();
                 
-                if(sounds != null && midiSynth.isSoundbankSupported(sounds)) {
-                    midiSynth.loadAllInstruments(sounds);
-                } else {
-                    MIMIMod.LOGGER.warn("Synthesizer could not load Soundbank. Falling back to default.");
+                if(sounds != null) {
+                    if(midiSynth.isSoundbankSupported(sounds)) {
+                        midiSynth.loadAllInstruments(sounds);
+                    } else {
+                        MIMIMod.LOGGER.error("Synthesizer could not load Soundbank. Falling back to default.");
+                    }
                 }
                 
                 return midiSynth;

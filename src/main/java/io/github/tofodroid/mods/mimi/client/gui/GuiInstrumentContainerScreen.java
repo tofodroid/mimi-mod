@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -18,6 +19,7 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SyncItemInstrumentSwitchboardPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
@@ -314,7 +316,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         } else if(keyCode == GLFW.GLFW_KEY_UP) {
             shiftVisibleNotes(true, 7);
         } else {
-            List<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
+            Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
 
             if(midiNoteNums != null) {
                 for(Byte midiNoteNum : midiNoteNums) {
@@ -332,7 +334,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         super.keyReleased(keyCode, scanCode, modifiers);
 
-        List<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
+        Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
 
         if(midiNoteNums != null) {
             for(Byte midiNoteNum : midiNoteNums) {
@@ -430,6 +432,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrumentId, midiNote, velocity, player.getPosition());
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
@@ -437,6 +440,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        DebugUtils.logNoteTimingInfo(this.getClass(), false, instrumentId, midiNote, null, null);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.onMidiNoteOff(null, midiNote);
     }
@@ -453,14 +457,14 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     }
 
     // Keyboard Input Functions
-    private List<Byte> getMidiNoteFromScanCode(Integer scanCode, Boolean modifier, Boolean ignoreModifier) {
+    private Set<Byte> getMidiNoteFromScanCode(Integer scanCode, Boolean modifier, Boolean ignoreModifier) {
         switch(ModConfigs.CLIENT.keyboardLayout.get()) {
             case MIMI:
                 return Arrays.asList(getMidiNoteFromScanCode_MIMI(scanCode))
-                    .stream().filter(b -> b != null).collect(Collectors.toList());
+                    .stream().filter(b -> b != null).collect(Collectors.toSet());
             case VPiano:
                 return Arrays.asList(getMidiNoteFromScanCode_VPiano(scanCode, modifier), ignoreModifier ? getMidiNoteFromScanCode_VPiano(scanCode, !modifier) : null)
-                    .stream().filter(b -> b != null).collect(Collectors.toList());
+                    .stream().filter(b -> b != null).collect(Collectors.toSet());
             default:
                 MIMIMod.LOGGER.info("Warning: Unknown keyboard layout selected for Instrument GUI.");
                 return null;

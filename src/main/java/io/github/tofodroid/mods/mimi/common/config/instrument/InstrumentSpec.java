@@ -4,8 +4,8 @@ import java.util.List;
 
 public class InstrumentSpec {
     public Byte instrumentId;
-    public Byte midiBankNumber;
-    public Byte midiPatchNumber;
+    public Integer midiBankNumber;
+    public Integer midiPatchNumber;
     public String registryName;
     public Boolean isBlock;
     public List<String> collisionShapes;

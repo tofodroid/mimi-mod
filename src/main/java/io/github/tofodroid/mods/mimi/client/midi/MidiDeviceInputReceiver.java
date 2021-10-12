@@ -6,6 +6,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class MidiDeviceInputReceiver extends MidiInputReceiver {
@@ -25,12 +26,14 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, PlayerEntity player) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrument, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrument, midiNote, velocity, player.getPosition());
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
     }
     
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, PlayerEntity player) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUniqueID(), false, player.getPosition());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
+        DebugUtils.logNoteTimingInfo(this.getClass(), false, instrument, midiNote, null, null);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
     }
 }
