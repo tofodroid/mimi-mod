@@ -63,13 +63,13 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 		IGuiItemStackGroup itemStacks = recipeLayout.getItemStacks();
 
 		// Draw inputs
-		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, true, 2, 2);
+		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, true, 1, 1);
 		itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, Arrays.asList(recipe.getIngredients().get(0).getMatchingStacks()));
-		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+1, true, 35, 2);
+		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+1, true, 34, 1);
 		itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+1, Arrays.asList(recipe.getIngredients().get(1).getMatchingStacks()));
 
         // Draw output
-		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+2, false, 41, 22);
+		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+2, false, 40, 21);
         itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+2, Arrays.asList(recipe.getRecipeOutput()));
 	}
 }

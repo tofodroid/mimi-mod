@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/piano"
+    },
+    "addition": {
+        "item": "minecraft:string"
+    },
+    "result": {
+        "item": "mimi:piano2"
+    }
+}

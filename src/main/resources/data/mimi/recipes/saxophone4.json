@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/saxophone"
+    },
+    "addition": {
+        "item": "minecraft:magma_cream"
+    },
+    "result": {
+        "item": "mimi:saxophone4"
+    }
+}

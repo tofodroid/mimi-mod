@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/piano"
+    },
+    "addition": {
+        "item": "minecraft:glowstone_dust"
+    },
+    "result": {
+        "item": "mimi:piano3"
+    }
+}
