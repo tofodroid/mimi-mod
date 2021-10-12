@@ -41,6 +41,7 @@ public class ItemMidiSwitchboard extends Item {
     public static final String VOLUME_TAG = "instrument_volume";
     public static final Byte INSTRUMENT_ALL = -1;
     public static final Byte MAX_INSTRUMENT_VOLUME = 5;
+    public static final Byte DEFAULT_INSTRUMENT_VOLUME = 3;
     public static final Byte MIN_INSTRUMENT_VOLUME = 0;
 
     public static final UUID NONE_SOURCE_ID = new UUID(0,0);
@@ -338,11 +339,7 @@ public class ItemMidiSwitchboard extends Item {
             volume = MIN_INSTRUMENT_VOLUME;
         }
 
-        if (volume < MAX_INSTRUMENT_VOLUME) {
-            stack.getOrCreateTag().putByte(VOLUME_TAG, volume);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(VOLUME_TAG);
-        }
+        stack.getOrCreateTag().putByte(VOLUME_TAG, volume);
     }
 
     public static Byte getInstrumentVolume(ItemStack stack) {
@@ -350,7 +347,7 @@ public class ItemMidiSwitchboard extends Item {
             return stack.getTag().getByte(VOLUME_TAG);
         }
 
-        return MAX_INSTRUMENT_VOLUME;
+        return DEFAULT_INSTRUMENT_VOLUME;
     }
 
     public static String getInstrumentVolumePercent(ItemStack stack) {

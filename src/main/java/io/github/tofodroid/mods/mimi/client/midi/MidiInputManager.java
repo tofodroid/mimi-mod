@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -44,18 +47,21 @@ public class MidiInputManager extends AMidiInputManager {
         return playlistManager.getTransmitMode();
     }
     
-    public List<ItemStack> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
+    public List<Pair<Byte,ItemStack>> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
         return localInstrumentToPlay.stream().map(data -> {
             ItemStack switchStack = ItemStack.EMPTY;
+            Byte instrumentId = null;
 
             if(data instanceof ItemStack) {
                 switchStack = ItemInstrument.getSwitchboardStack((ItemStack)data);
+                instrumentId = ItemInstrument.getInstrumentId((ItemStack)data);
             } else if(data instanceof TileInstrument) {
                 switchStack = ((TileInstrument)data).getSwitchboardStack();
+                instrumentId = ((TileInstrument)data).getInstrumentId();
             }
 
             if(ModItems.SWITCHBOARD.equals(switchStack.getItem()) && ItemMidiSwitchboard.getSysInput(switchStack) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
-                return switchStack;
+                return new ImmutablePair<>(instrumentId,switchStack);
             }
 
             return null;

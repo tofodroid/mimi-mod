@@ -34,7 +34,7 @@ public enum MidiPatchName {
     Accordion(21, "Accordion"), // * 
     Harmonica(22, "Harmonica"), // *
     TangoAccordion(23, "Tango Accordion"),
-    AcousticGuitarNylon(24, "Acoustic Guitar (nylon)"), // ^25
+    AcousticGuitarNylon(24, "Acoustic Guitar (nylon)"), // *
     AcousticGuitarSteel(25, "Acoustic Guitar (steel)"), // *
     ElectricGuitarJazz(26, "Electric Guitar (jazz)"),
     ElectricGuitarClean(27, "Electric Guitar (clean)"),
@@ -42,7 +42,7 @@ public enum MidiPatchName {
     OverdrivenGuitar(29, "Overdriven Guitar"),
     DistortionGuitar(30, "Distortion Guitar"), // *
     Guitarharmonics(31, "Guitar harmonics"),
-    AcousticBass(32, "Acoustic Bass"),  // ^25
+    AcousticBass(32, "Acoustic Bass"),  // *
     ElectricBassFinger(33, "Electric Bass (finger)"), // ^34
     ElectricBassPick(34, "Electric Bass (pick)"), // *
     FretlessBass(35, "Fretless Bass"), // ^34
