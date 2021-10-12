@@ -11,6 +11,7 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
 import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
+import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.server.ServerGuiWrapper;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;
@@ -39,6 +40,7 @@ public class MIMIMod
 
         // Deferred Registrations
         ModLootModifiers.REGISTER.register(fmlContext.getModEventBus());
+        ModVillagers.preInit(fmlContext);
 
         // Other Pre-Init
         ModConfigs.preInit(modContext);
@@ -47,5 +49,8 @@ public class MIMIMod
     
     public static void init(final FMLCommonSetupEvent event) {
         proxy.init(event);
+
+        // Other Init
+        ModVillagers.init();
     }
 }

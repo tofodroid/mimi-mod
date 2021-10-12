@@ -42,9 +42,16 @@ public abstract class BaseContainerGui<T extends Container> extends ContainerScr
 
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        if(shouldRenderBackground()) {
+            this.renderBackground(matrixStack);
+        }
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
 	}
+
+    protected Boolean shouldRenderBackground() {
+        return true;
+    }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

@@ -14,6 +14,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.container.slot.SlotDisabled;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 
 public class ContainerInstrument extends ASwitchboardContainer {

@@ -17,7 +17,14 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 repositories {
-    maven { url 'https://maven.blamejared.com' }
+    maven { 
+        name = "Patchouli"
+        url 'https://maven.blamejared.com' 
+    }
+    maven {
+        name = "JEI"
+        url "https://dvs1.progwml6.com/files/maven"
+    }
 }
 
 version = '1.16.5-1.1.1'
@@ -49,7 +56,7 @@ minecraft {
     mappings channel: 'snapshot', version: '20201028-1.16.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -121,7 +128,11 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.0'
 
     // Mod Integrations
-    //    Patchouli
+    // JEI
+    compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.124:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.124")
+
+    // Patchouli
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2:api")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16.4-53.2")
 }

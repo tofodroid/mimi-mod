@@ -1,0 +1,34 @@
+{
+    "type": "minecraft:gift",
+    "pools": [
+      {
+        "rolls": 1,
+        "entries": [
+          {
+            "type": "minecraft:item",
+            "name": "mimi:bonelute"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "mimi:witchpipe"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "mimi:trumpet"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "mimi:violin"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "mimi:transmitter"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "minecraft:jukebox"
+          }
+        ]
+      }
+    ]
+  }

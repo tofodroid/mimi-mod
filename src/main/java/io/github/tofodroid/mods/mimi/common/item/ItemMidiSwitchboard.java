@@ -111,7 +111,7 @@ public class ItemMidiSwitchboard extends Item {
             tooltip.add(new StringTextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
 
             // Instrument Volume
-            tooltip.add(new StringTextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolume(stack)));
+            tooltip.add(new StringTextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
         }
     }
 

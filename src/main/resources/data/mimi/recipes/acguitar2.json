@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/acguitar"
+    },
+    "addition": {
+        "item": "minecraft:chain"
+    },
+    "result": {
+        "item": "mimi:acguitar2"
+    }
+}

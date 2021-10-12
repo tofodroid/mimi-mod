@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/organ"
+    },
+    "addition": {
+        "item": "minecraft:sugar_cane"
+    },
+    "result": {
+        "item": "mimi:organ5"
+    }
+}
