@@ -7,6 +7,7 @@
   "key.mimi.midi.gui.off": "Open Instrument GUI for instrument in Off Hand",
   "key.mimi.midi.gui.seat": "Open Instrument GUI for instrument seated at",
   "itemGroup.mimi.group": "MIMI",
+  "entity.minecraft.villager.mimi.instrumentalist": "Instrumentalist",
   "item.mimi.bassguitar": "Bass Guitar",
   "item.mimi.acguitar": "Acoustic Guitar",
   "item.mimi.accordion": "Accordion",
@@ -36,5 +37,6 @@
   "block.mimi.conductor": "Conductor",
   "block.mimi.piano": "Piano",
   "block.mimi.drums": "Drum Kit",
-  "block.mimi.organ": "Organ"
+  "block.mimi.organ": "Organ",
+  "block.mimi.tuningtable": "Tuning Table"
 }

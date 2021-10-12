@@ -188,6 +188,11 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     }
 
     @Override
+    protected Boolean shouldRenderBackground() {
+        return false;
+    }
+
+    @Override
     public void closeScreen() {
         this.allNotesOff();
         super.closeScreen();

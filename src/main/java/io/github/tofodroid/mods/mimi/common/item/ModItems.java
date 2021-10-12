@@ -29,11 +29,14 @@ public final class ModItems {
     public static final ItemTransmitter TRANSMITTER = null;
     public static final ItemMidiSwitchboard SWITCHBOARD = null;
 
-    // Blocks - Other
+    // Blocks - Redstone
     public static final BlockItem LISTENER = null;
     public static final BlockItem RECEIVER = null;
     public static final BlockItem MECHANICALMAESTRO = null;
     public static final BlockItem CONDUCTOR = null;
+
+    // Blocks - Other
+    public static final BlockItem TUNINGTABLE = null;
 
     public static MIMIModItemGroup ITEM_GROUP;
 
@@ -47,11 +50,14 @@ public final class ModItems {
             event.getRegistry().register(new ItemTransmitter());
             event.getRegistry().register(new ItemMidiSwitchboard());
 
-            // Other Blocks
+            // Redstone Blocks
             event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
             event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("receiver"));
             event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("mechanicalmaestro"));
             event.getRegistry().register(new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("conductor"));
+
+            // Village Blocks
+            event.getRegistry().register(new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("tuningtable"));
 
             // Instrument Items
             INSTRUMENT_ITEMS = buildInstruments();

@@ -15,11 +15,14 @@ import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(MIMIMod.MODID)
 public class ModBlocks {
-    // Other Blocks
+    // Redstone Blocks
     public static final BlockListener LISTENER = null;
     public static final BlockReceiver RECEIVER = null;
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = null;
     public static final BlockConductor CONDUCTOR = null;
+
+    // Village Blocks
+    public static final BlockTuningTable TUNINGTABLE = null;
 
     // Instrument Blocks
     public static List<BlockInstrument> INSTRUMENTS = null;
@@ -32,7 +35,8 @@ public class ModBlocks {
                 new BlockListener(),
                 new BlockReceiver(),
                 new BlockMechanicalMaestro(),
-                new BlockConductor()
+                new BlockConductor(),
+                new BlockTuningTable()
             );
             INSTRUMENTS = buildInstruments();
             event.getRegistry().registerAll(INSTRUMENTS.toArray(new BlockInstrument[INSTRUMENTS.size()]));

@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+      "particle": "mimi:block/tuningtable/tuning_table_top",
+      "north": "mimi:block/tuningtable/tuning_table_side1",
+      "south": "mimi:block/tuningtable/tuning_table_side2",
+      "east": "mimi:block/tuningtable/tuning_table_side3",
+      "west": "mimi:block/tuningtable/tuning_table_side3",
+      "up": "mimi:block/tuningtable/tuning_table_top",
+      "down": "mimi:block/tuningtable/tuning_table_bottom"
+    }
+  }

@@ -31,6 +31,7 @@ public class ClientGuiWrapper implements GuiWrapper {
         ScreenManager.registerFactory(ModContainers.INSTRUMENT, GuiInstrumentContainerScreen::new);
         ScreenManager.registerFactory(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
         ScreenManager.registerFactory(ModContainers.CONDUCTOR, GuiConductorContainerScreen::new);
+        ScreenManager.registerFactory(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
     }
     
     private void openGui(World world, Screen screen) {

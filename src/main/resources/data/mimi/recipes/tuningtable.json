@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "SLS",
+        " A "
+    ],
+    "key": {
+        "A": {
+            "item": "minecraft:anvil"
+        },
+        "S": {
+            "item": "minecraft:string"
+        },
+        "L": {
+            "item": "minecraft:leather"
+        }
+    },
+    "result": {
+        "item": "mimi:tuningtable"
+    }
+}

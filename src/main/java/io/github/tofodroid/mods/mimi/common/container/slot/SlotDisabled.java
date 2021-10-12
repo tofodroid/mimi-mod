@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.container;
+package io.github.tofodroid.mods.mimi.common.container.slot;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;

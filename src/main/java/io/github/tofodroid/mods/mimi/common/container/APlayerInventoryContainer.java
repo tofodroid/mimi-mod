@@ -5,8 +5,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
 
 public abstract class APlayerInventoryContainer extends Container {
 	public static final int PLAYER_INVENTORY_MIN_SLOT_ID = 0;
@@ -19,7 +17,6 @@ public abstract class APlayerInventoryContainer extends Container {
 	protected static final int HOTBAR_Y_OFFSET = 40;
 
 	protected PlayerInventory playerInventory;
-	protected ItemStackHandler targetInventory;
 			
 	public APlayerInventoryContainer(ContainerType<?> type, int id, PlayerInventory playerInventory) {
 		super(type, id);
@@ -35,38 +32,6 @@ public abstract class APlayerInventoryContainer extends Container {
 	@Override
 	public boolean canInteractWith(PlayerEntity playerIn) {
 		return true;
-	}
-
-	@Override
-	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-		// Below code taken from Vanilla Chest Container
-		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = this.inventorySlots.get(index);
-		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
-
-			// Return Empty Stack if Cannot Merge
-			if (index >= TARGET_CONTAINER_MIN_SLOT_ID) {
-				// Target --> Player
-				if (!this.mergeItemStack(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID-1, false)) {
-					return ItemStack.EMPTY;
-				}
-			} else {
-				// Player --> Target
-				if (!this.mergeItemStack(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID+targetInventory.getSlots(), false)) {
-					return ItemStack.EMPTY;
-				}
-			}
-
-			if (itemstack1.isEmpty()) {
-				slot.putStack(ItemStack.EMPTY);
-			} else {
-				slot.onSlotChanged();
-			}
-		}
-
-      return itemstack;
 	}
 	
 	protected abstract Integer getPlayerInventoryX();
@@ -97,9 +62,5 @@ public abstract class APlayerInventoryContainer extends Container {
 
 	protected Slot buildPlayerSlot(PlayerInventory playerInventory, int slot, int xPos, int yPos) {
 		return new Slot(playerInventory, slot, xPos, yPos);
-	}
-	
-	public ItemStackHandler getTargetInventory() {
-		return targetInventory;
 	}
 }
