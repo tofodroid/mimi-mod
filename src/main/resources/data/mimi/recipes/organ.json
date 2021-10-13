@@ -1,22 +1,22 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "GGG",
-        "PNP",
-        "BBB"
+        "G G",
+        "LQL",
+        "QNQ"
     ],
     "key": {
-        "P": {
-            "tag": "minecraft:planks"
+        "L": {
+            "tag": "minecraft:logs"
         },
         "N": {
             "item": "minecraft:note_block"
         },
-        "B": {
-            "item": "minecraft:stone_button"
+        "Q": {
+            "item": "minecraft:quartz"
         },
         "G": {
-            "item": "minecraft:gold_ingot"
+            "item": "minecraft:gold_nugget"
         }
     },
     "result": {

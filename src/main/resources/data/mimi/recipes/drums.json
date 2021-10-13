@@ -2,21 +2,21 @@
     "type": "minecraft:crafting_shaped",
     "pattern": [
         "G G",
-        "INI",
-        "NLN"
+        "ILI",
+        "LNL"
     ],
     "key": {
         "G": {
-            "item": "minecraft:gold_ingot"
+            "item": "minecraft:gold_nugget"
         },
         "I": {
-            "item": "minecraft:iron_bars"
+            "item": "minecraft:iron_ingot"
         },
         "N": {
             "item": "minecraft:note_block"
         },
         "L": {
-            "item": "minecraft:leather"
+            "tag": "minecraft:logs"
         }
     },
     "result": {

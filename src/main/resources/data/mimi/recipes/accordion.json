@@ -1,22 +1,22 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "ISI",
-        "NLL",
-        "ISI"
+        "LLL",
+        "EPE",
+        "LNL"
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
         },
-        "S": {
-            "item": "minecraft:string"
+        "P": {
+            "item": "minecraft:paper"
         },
-        "L": {
+        "E": {
             "item": "minecraft:leather"
         },
-        "I": {
-            "item": "minecraft:iron_ingot"
+        "L": {
+            "tag": "minecraft:logs"
         }
     },
     "result": {

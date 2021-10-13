@@ -2,15 +2,15 @@
     "type": "minecraft:crafting_shaped",
     "pattern": [
         "   ",
-        "SLS",
-        " A "
+        "WLW",
+        " I "
     ],
     "key": {
-        "A": {
-            "item": "minecraft:anvil"
+        "I": {
+            "item": "minecraft:iron_block"
         },
-        "S": {
-            "item": "minecraft:string"
+        "W": {
+            "tag": "minecraft:wool"
         },
         "L": {
             "item": "minecraft:leather"

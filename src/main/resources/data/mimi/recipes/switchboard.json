@@ -1,22 +1,19 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "BIB",
+        "III",
         "IRI",
-        "LIL"
+        "IPI"
     ],
     "key": {
         "I": {
-            "item": "minecraft:iron_ingot"
+            "item": "minecraft:iron_nugget"
         },
         "R": {
             "item": "minecraft:redstone"
         },
-        "B": {
-            "item": "minecraft:stone_button"
-        },
-        "L": {
-            "item": "minecraft:lever"
+        "P": {
+            "item": "minecraft:heavy_weighted_pressure_plate"
         }
     },
     "result": {

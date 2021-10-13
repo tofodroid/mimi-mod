@@ -3,7 +3,7 @@
     "pattern": [
         "  L",
         "IRI",
-        "ITI"
+        " I "
     ],
     "key": {
         "I": {
@@ -14,9 +14,6 @@
         },
         "L": {
             "item": "minecraft:redstone_lamp"
-        },
-        "T": {
-            "item": "minecraft:lever"
         }
     },
     "result": {
