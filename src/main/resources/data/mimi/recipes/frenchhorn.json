@@ -1,16 +1,16 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "S G",
+        " SG",
         "GNG",
-        "GGG"
+        " G "
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
         },
         "G": {
-            "item": "minecraft:gold_ingot"
+            "item": "minecraft:gold_nugget"
         },
         "S": {
             "item": "minecraft:stone_button"

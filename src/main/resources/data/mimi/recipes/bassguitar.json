@@ -1,9 +1,9 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " SL",
-        "SL ",
-        "N  "
+        " SI",
+        "SNP",
+        "LPL"
     ],
     "key": {
         "N": {
@@ -12,8 +12,14 @@
         "S": {
             "item": "minecraft:string"
         },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
         "L": {
             "tag": "minecraft:logs"
+        },
+        "P": {
+            "tag": "minecraft:planks"
         }
     },
     "result": {

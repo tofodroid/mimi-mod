@@ -1,9 +1,9 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " SP",
-        "SR ",
-        "N  "
+        " SI",
+        "SNP",
+        "PRP"
     ],
     "key": {
         "N": {
@@ -11,6 +11,9 @@
         },
         "S": {
             "item": "minecraft:string"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
         },
         "P": {
             "tag": "minecraft:planks"

@@ -1,19 +1,22 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "S S",
-        "WNW",
-        "SW "
+        "P P",
+        "LWW",
+        "NLW"
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
         },
-        "S": {
-            "item": "minecraft:stick"
+        "P": {
+            "tag": "minecraft:planks"
         },
         "W": {
             "tag": "minecraft:wool"
+        },
+        "L": {
+            "item": "minecraft:leather"
         }
     },
     "result": {

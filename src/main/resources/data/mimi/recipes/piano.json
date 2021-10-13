@@ -1,19 +1,22 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "PPP",
-        "PNP",
-        "BBB"
+        "LNL",
+        "LSL",
+        "QQQ"
     ],
     "key": {
-        "P": {
-            "tag": "minecraft:planks"
+        "L": {
+            "tag": "minecraft:logs"
+        },
+        "S": {
+            "item": "minecraft:string"
         },
         "N": {
             "item": "minecraft:note_block"
         },
-        "B": {
-            "item": "minecraft:stone_button"
+        "Q": {
+            "item": "minecraft:quartz"
         }
     },
     "result": {

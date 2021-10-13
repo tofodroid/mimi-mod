@@ -1,8 +1,8 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "  G",
-        "NSG",
+        " SG",
+        "N G",
         " GG"
     ],
     "key": {
@@ -10,7 +10,7 @@
             "item": "minecraft:note_block"
         },
         "G": {
-            "item": "minecraft:gold_ingot"
+            "item": "minecraft:gold_nugget"
         },
         "S": {
             "item": "minecraft:stone_button"

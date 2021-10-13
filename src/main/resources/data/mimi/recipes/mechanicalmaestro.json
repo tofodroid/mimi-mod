@@ -1,19 +1,19 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "INI",
-        "CIR",
-        "INI"
+        "ISI",
+        "CRS",
+        "ISI"
     ],
     "key": {
         "I": {
             "item": "minecraft:iron_ingot"
         },
-        "N": {
-            "item": "minecraft:note_block"
-        },
         "C": {
             "item": "minecraft:chest"
+        },
+        "S": {
+            "item": "minecraft:redstone"
         },
         "R": {
             "item": "mimi:receiver"

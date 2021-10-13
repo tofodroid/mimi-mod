@@ -1,7 +1,7 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "ILI",
+        "IGI",
         "INI",
         "BRB"
     ],
@@ -12,14 +12,14 @@
         "R": {
             "item": "minecraft:redstone"
         },
+        "G": {
+            "item": "minecraft:glowstone_dust"
+        },
         "I": {
-            "item": "minecraft:iron_ingot"
+            "item": "minecraft:iron_nugget"
         },
         "B": {
             "item": "minecraft:stone_button"
-        },
-        "L": {
-            "item": "minecraft:redstone_lamp"
         }
     },
     "result": {

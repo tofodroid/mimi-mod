@@ -14,6 +14,7 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -63,6 +64,7 @@ public class MidiChannelDef {
         channel.noteOn(note, velocity);
         this.lastNotePos = notePos;
         this.lastNoteTime = Instant.now();
+        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrumentId, note, velocity, notePos);
     }
 
     public void noteOff(Byte note) {
@@ -71,6 +73,7 @@ public class MidiChannelDef {
         } else { 
             channel.noteOff(note);
         }
+        DebugUtils.logNoteTimingInfo(this.getClass(), false, instrumentId, note, null, null);
     }
 
     public Boolean tick(PlayerEntity clientPlayer) {

@@ -1,5 +1,8 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import java.util.List;
+
+import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiDevice.Info;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -12,16 +15,21 @@ import net.minecraft.util.math.vector.Vector2f;
 
 public class GuiMidiInputConfig extends BaseGui {    
     // Button Boxes
-    private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(268,37);
-    private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(120,63);
-    private static final Vector2f SHIFT_DEVICE_UP_BUTTON = new Vector2f(264,63);
+    private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(271,79);
+    private static final Vector2f CLEAR_DEVICE_BUTTON = new Vector2f(272,36);
+    private static final Vector2f SAVE_DEVICE_BUTTON = new Vector2f(271,129);
+    private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(110,79);
+    private static final Vector2f SHIFT_DEVICE_UP_BUTTON = new Vector2f(252,79);
 
     // MIDI
     private MidiInputManager midiInputManager;
+    private List<MidiDevice> availableDevices;
+    private Integer visibleDeviceId = 0;
 
     public GuiMidiInputConfig(PlayerEntity player) {
         super(300, 158, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
         this.midiInputManager = (MidiInputManager)MIMIMod.proxy.getMidiInput();
+        availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
     }
 
     @Override
@@ -30,11 +38,16 @@ public class GuiMidiInputConfig extends BaseGui {
         int imouseY = (int)Math.round(mouseY);
 
         if(clickedBox(imouseX, imouseY, REFRESH_DEVICES_BUTTON)) {
-            this.midiInputManager.inputDeviceManager.loadMidiDevices();
-        } else if(clickedBox(imouseX, imouseY, SHIFT_DEVICE_UP_BUTTON)) {
-            this.midiInputManager.inputDeviceManager.shiftMidiDevice(true);
-        } else if(clickedBox(imouseX, imouseY, SHIFT_DEVICE_DOWN_BUTTON)) {
-            this.midiInputManager.inputDeviceManager.shiftMidiDevice(false);
+            visibleDeviceId = 0;
+            availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
+        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected() && clickedBox(imouseX, imouseY, CLEAR_DEVICE_BUTTON)) {
+            this.midiInputManager.inputDeviceManager.clearDeviceSelection();
+        } else if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId && clickedBox(imouseX, imouseY, SAVE_DEVICE_BUTTON)) {
+            this.midiInputManager.inputDeviceManager.saveDeviceSelection(availableDevices.get(visibleDeviceId));
+        } else if(this.availableDevices != null && clickedBox(imouseX, imouseY, SHIFT_DEVICE_UP_BUTTON)) {
+            visibleDeviceId = visibleDeviceId < (this.availableDevices.size() - 1) ? visibleDeviceId + 1 : visibleDeviceId;
+        } else if(this.availableDevices != null  && clickedBox(imouseX, imouseY, SHIFT_DEVICE_DOWN_BUTTON)) {
+            visibleDeviceId = visibleDeviceId > 0 ? visibleDeviceId - 1 : visibleDeviceId;
         }
         
         return super.mouseReleased(mouseX, mouseY, button);
@@ -48,11 +61,14 @@ public class GuiMidiInputConfig extends BaseGui {
         // Background
         blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
-        // Device Status Lights
-        if(this.midiInputManager != null && this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null) {
-            Integer statusX = START_X + 283;
-            Integer statusY = START_Y + 69;
-            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isSelectedDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+        // Device Status Light
+        Integer statusX = START_X + 265;
+        Integer statusY = START_Y + 42;
+
+        if(this.midiInputManager.inputDeviceManager.isDirtyStatus()) {
+                blit(matrixStack, statusX, statusY, this.getBlitOffset(), 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
+            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         return matrixStack;
@@ -60,33 +76,32 @@ public class GuiMidiInputConfig extends BaseGui {
 
     @Override
     protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        // Num Devices
-        String numDeviceString = this.midiInputManager.inputDeviceManager.getNumDevices().toString();
-        font.drawString(matrixStack, numDeviceString, START_X + 224, START_Y + 41, 0xFF00E600);
-
         // Selected Device Name
-        String deviceNameString = (this.midiInputManager.inputDeviceManager.getSelectedDeviceId() != null ? 
-            this.midiInputManager.inputDeviceManager.getSelectedDeviceId() + ": " : "")
-            + this.midiInputManager.inputDeviceManager.getSelectedDeviceName();
-        font.drawString(matrixStack, deviceNameString, START_X + 142, START_Y + 67, 0xFF00E600);
-
-        // Selected Device Info
-        Info info = this.midiInputManager.inputDeviceManager.getSelectedDeviceInfo();
-        if(info != null) {
-            String descString = "Description: " + info.getDescription();
-            Integer yOffset = 0;
-
-            if(descString.length() <= 45) {
-                font.drawString(matrixStack, descString, START_X + 16, START_Y + 102, 0xFF00E600);
-            } else {
-                yOffset = 16;
-                font.drawString(matrixStack, descString.substring(0, 45), START_X + 16, START_Y + 102, 0xFF00E600);
-                font.drawString(matrixStack, descString.substring(45), START_X + 16, START_Y + 118, 0xFF00E600);
-            }
-
-            font.drawString(matrixStack, "Vendor: " + info.getVendor(), START_X + 16, START_Y + yOffset + 118, 0xFF00E600);
-            font.drawString(matrixStack, "Version: " + info.getVersion(), START_X + 16, START_Y + yOffset + 134, 0xFF00E600);  
+        if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
+            font.drawString(matrixStack, this.midiInputManager.inputDeviceManager.getSelectedDeviceName(), START_X + 123, START_Y + 40, 0xFF00E600);
         }
+
+        // Available Device Info
+        if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId) {
+            font.drawString(matrixStack, visibleDeviceId + ": " + this.availableDevices.get(visibleDeviceId).getDeviceInfo().getName(), START_X + 131, START_Y + 83, 0xFF00E600);
+            Info info = this.availableDevices.get(visibleDeviceId).getDeviceInfo();
+            if(info != null) {
+                String descString = "Description: " + info.getDescription();
+                Integer yOffset = 0;
+
+                if(descString.length() <= 45) {
+                    font.drawString(matrixStack, descString, START_X + 16, START_Y + 102, 0xFF00E600);
+                } else {
+                    yOffset = 16;
+                    font.drawString(matrixStack, descString.substring(0, 45), START_X + 16, START_Y + 102, 0xFF00E600);
+                    font.drawString(matrixStack, descString.substring(45), START_X + 16, START_Y + 118, 0xFF00E600);
+                }
+
+                font.drawString(matrixStack, "Vendor: " + info.getVendor(), START_X + 16, START_Y + yOffset + 118, 0xFF00E600);
+                font.drawString(matrixStack, "Version: " + info.getVersion(), START_X + 16, START_Y + yOffset + 134, 0xFF00E600);  
+            }
+        }
+        
         
         return matrixStack;
     }
