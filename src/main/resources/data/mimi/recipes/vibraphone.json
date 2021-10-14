@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GGG",
+        "INI",
+        "P P"
+    ],
+    "key": {
+        "P": {
+            "tag": "minecraft:logs"
+        },
+        "G": {
+            "item": "minecraft:gold_nugget"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        }
+    },
+    "result": {
+        "item": "mimi:vibraphone"
+    }
+}

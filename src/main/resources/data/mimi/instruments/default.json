@@ -223,6 +223,50 @@
         ]
     },
     {
+        "instrumentId": 43,
+        "registryName": "drums2",
+        "midiBankNumber": 15360,
+        "midiPatchNumber": 8,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
+    },
+    {
+        "instrumentId": 44,
+        "registryName": "drums3",
+        "midiBankNumber": 15360,
+        "midiPatchNumber": 16,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
+    },
+    {
+        "instrumentId": 45,
+        "registryName": "drums4",
+        "midiBankNumber": 15360,
+        "midiPatchNumber": 32,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
+    },
+    {
+        "instrumentId": 46,
+        "registryName": "drums5",
+        "midiBankNumber": 15360,
+        "midiPatchNumber": 40,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
+    },
+    {
         "instrumentId": 19,
         "registryName": "harmonica",
         "midiBankNumber": 0,
@@ -308,6 +352,53 @@
         "registryName": "bonelute",
         "midiBankNumber": 0,
         "midiPatchNumber": 96,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 38,
+        "registryName": "steeldrum",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 114,
+        "isBlock": true,
+        "collisionShapes": [
+            "1,0,1,15,11,10"
+        ]
+    },
+    {
+        "instrumentId": 39,
+        "registryName": "xylophone",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 13,
+        "isBlock": true,
+        "collisionShapes": [
+            "1,0,1,15,8,11"
+        ]
+    },
+    {
+        "instrumentId": 40,
+        "registryName": "vibraphone",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 11,
+        "isBlock": true,
+        "collisionShapes": [
+            "1,0,1,15,8,11"
+        ]
+    },
+    {
+        "instrumentId": 41,
+        "registryName": "marimba",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 12,
+        "isBlock": true,
+        "collisionShapes": [
+            "1,0,1,15,8,11"
+        ]
+    },
+    {
+        "instrumentId": 42,
+        "registryName": "glockenspiel",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 9,
         "isBlock": false
     }
 ]

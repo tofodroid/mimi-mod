@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/drums"
+    },
+    "addition": {
+        "item": "minecraft:gold_nugget"
+    },
+    "result": {
+        "item": "mimi:drums4"
+    }
+}

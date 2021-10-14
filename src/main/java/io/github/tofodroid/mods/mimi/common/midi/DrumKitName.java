@@ -5,19 +5,19 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public enum DrumKitName {
-	Standard(0, "Standard Drum Kit"),
-	Standard2(0, "Standard Drum Kit"),
-	Room(8, "Room Drum Kit"),
-	Room2(9, "Room Drum Kit"),
-	Power(16, "Power Drum Kit"),
-	Power2(17, "Power Drum Kit"),
+	Standard(0, "Standard Drum Kit"), // *
+	Standard2(0, "Standard Drum Kit"), // *
+	Room(8, "Room Drum Kit"), // *
+	Room2(9, "Room Drum Kit"), // *
+	Power(16, "Power Drum Kit"), // *
+	Power2(17, "Power Drum Kit"), // *
 	Electronic2(24, "Electronic Drum Kit"),
 	TR808(25, "TR-808 Drum Kit"),
 	TR8082(26, "TR-808 Drum Kit"),
-	Jazz(32, "Jazz Drum Kit"),
-	Jazz2(33, "Jazz Drum Kit"),
-	Brush(40, "Brush Drum Kit"),
-	Brush2(41, "Brush Drum Kit"),
+	Jazz(32, "Jazz Drum Kit"), // *
+	Jazz2(33, "Jazz Drum Kit"), // *
+	Brush(40, "Brush Drum Kit"), // *
+	Brush2(41, "Brush Drum Kit"), // *
 	Orchestra(48, "Orchestra Drum Kit"),
 	Orchestra2(49, "Orchestra Drum Kit"),
 	SoundFX(56, "Sound FX Drum Kit"),

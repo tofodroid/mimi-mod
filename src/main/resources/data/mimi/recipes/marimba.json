@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "LLL",
+        "INI",
+        "P P"
+    ],
+    "key": {
+        "P": {
+            "tag": "minecraft:planks"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "L": {
+            "tag": "minecraft:logs"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        }
+    },
+    "result": {
+        "item": "mimi:marimba"
+    }
+}
