@@ -76,7 +76,9 @@
         "registryName": "elecguitar",
         "midiBankNumber": 0,
         "midiPatchNumber": 30,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 10354710
     },
     {
         "instrumentId": 4,
@@ -217,6 +219,8 @@
         "midiBankNumber": 15360,
         "midiPatchNumber": 0,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
         "collisionShapes": [
             "0,0,0,16,12,8",
             "0,0,0,16,4,12"
@@ -228,6 +232,8 @@
         "midiBankNumber": 15360,
         "midiPatchNumber": 8,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
         "collisionShapes": [
             "0,0,0,16,12,8",
             "0,0,0,16,4,12"
@@ -239,6 +245,8 @@
         "midiBankNumber": 15360,
         "midiPatchNumber": 16,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
         "collisionShapes": [
             "0,0,0,16,12,8",
             "0,0,0,16,4,12"
@@ -250,6 +258,8 @@
         "midiBankNumber": 15360,
         "midiPatchNumber": 32,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
         "collisionShapes": [
             "0,0,0,16,12,8",
             "0,0,0,16,4,12"
@@ -261,6 +271,8 @@
         "midiBankNumber": 15360,
         "midiPatchNumber": 40,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
         "collisionShapes": [
             "0,0,0,16,12,8",
             "0,0,0,16,4,12"
