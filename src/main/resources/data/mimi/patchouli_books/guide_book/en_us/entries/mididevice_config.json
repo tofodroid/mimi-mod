@@ -5,17 +5,12 @@
     "pages": [
         {
             "type": "text",
-            "text": "The MIDI Input Device Configuration GUI allows you to get a list of MIDI devices currently available on your system and select the one to use for the MIMI System MIDI Input Device on your instruments."
+            "text": "The MIDI Input Device Configuration GUI allows you to get a list of MIDI devices currently available on your system and select the one to use for the MIMI System MIDI Input Device on your instruments.$(br2)Note that changes to your selected device require a game restart to take affect."
         },
         {
             "type": "text",
             "title": "Accessing the GUI",
             "text": "You can access the MIDI Input Device Configuration GUI by pressing the configured Keybind at any time while loaded into a world.$(br2)The current keybind is: $(l)$(k:key.mimi.midi.settings)$()"
-        },
-        {
-            "type": "text",
-            "title": "Setting a Default",
-            "text": "You can set a default MIDI device to use for MIMI in the $(l:config_file)MIMI config file$(/l). When a default is set it will be selected when Minecraft starts if it is available.$(br2)Note that the default is set by device ID which may not always be consistent between system restarts if you have more than one available device. If you have a default set but don't receive input check the GUI."
         },
         {
             "type": "text",

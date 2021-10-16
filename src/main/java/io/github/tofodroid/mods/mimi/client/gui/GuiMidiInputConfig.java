@@ -15,11 +15,11 @@ import net.minecraft.util.math.vector.Vector2f;
 
 public class GuiMidiInputConfig extends BaseGui {    
     // Button Boxes
-    private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(271,79);
     private static final Vector2f CLEAR_DEVICE_BUTTON = new Vector2f(272,36);
-    private static final Vector2f SAVE_DEVICE_BUTTON = new Vector2f(271,129);
-    private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(110,79);
-    private static final Vector2f SHIFT_DEVICE_UP_BUTTON = new Vector2f(252,79);
+    private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(271,94);
+    private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(110,94);
+    private static final Vector2f SHIFT_DEVICE_UP_BUTTON = new Vector2f(252,94);
+    private static final Vector2f SAVE_DEVICE_BUTTON = new Vector2f(271,144);
 
     // MIDI
     private MidiInputManager midiInputManager;
@@ -27,7 +27,7 @@ public class GuiMidiInputConfig extends BaseGui {
     private Integer visibleDeviceId = 0;
 
     public GuiMidiInputConfig(PlayerEntity player) {
-        super(300, 158, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
+        super(300, 173, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
         this.midiInputManager = (MidiInputManager)MIMIMod.proxy.getMidiInput();
         availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
     }
@@ -83,22 +83,22 @@ public class GuiMidiInputConfig extends BaseGui {
 
         // Available Device Info
         if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId) {
-            font.drawString(matrixStack, visibleDeviceId + ": " + this.availableDevices.get(visibleDeviceId).getDeviceInfo().getName(), START_X + 131, START_Y + 83, 0xFF00E600);
+            font.drawString(matrixStack, visibleDeviceId + ": " + this.availableDevices.get(visibleDeviceId).getDeviceInfo().getName(), START_X + 131, START_Y + 98, 0xFF00E600);
             Info info = this.availableDevices.get(visibleDeviceId).getDeviceInfo();
             if(info != null) {
                 String descString = "Description: " + info.getDescription();
                 Integer yOffset = 0;
 
                 if(descString.length() <= 45) {
-                    font.drawString(matrixStack, descString, START_X + 16, START_Y + 102, 0xFF00E600);
+                    font.drawString(matrixStack, descString, START_X + 16, START_Y + 115, 0xFF00E600);
                 } else {
                     yOffset = 16;
-                    font.drawString(matrixStack, descString.substring(0, 45), START_X + 16, START_Y + 102, 0xFF00E600);
-                    font.drawString(matrixStack, descString.substring(45), START_X + 16, START_Y + 118, 0xFF00E600);
+                    font.drawString(matrixStack, descString.substring(0, 45), START_X + 16, START_Y + 115, 0xFF00E600);
+                    font.drawString(matrixStack, descString.substring(45), START_X + 16, START_Y + 131, 0xFF00E600);
                 }
 
-                font.drawString(matrixStack, "Vendor: " + info.getVendor(), START_X + 16, START_Y + yOffset + 118, 0xFF00E600);
-                font.drawString(matrixStack, "Version: " + info.getVersion(), START_X + 16, START_Y + yOffset + 134, 0xFF00E600);  
+                font.drawString(matrixStack, "Vendor: " + info.getVendor(), START_X + 16, START_Y + yOffset + 131, 0xFF00E600);
+                font.drawString(matrixStack, "Version: " + info.getVersion(), START_X + 16, START_Y + yOffset + 147, 0xFF00E600);  
             }
         }
         
