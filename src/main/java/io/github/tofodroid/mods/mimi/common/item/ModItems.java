@@ -72,7 +72,7 @@ public final class ModItems {
     public static List<ItemInstrument> buildInstruments() {
         List<ItemInstrument> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
-            list.add(new ItemInstrument(instrument.registryName, instrument.instrumentId));
+            list.add(new ItemInstrument(instrument.registryName, instrument.instrumentId, instrument.isDyeable(), instrument.defaultColor()));
         }
         return list;
     }

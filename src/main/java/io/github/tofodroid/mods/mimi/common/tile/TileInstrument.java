@@ -5,6 +5,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -15,10 +16,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class TileInstrument extends ATileInventory {
-    public static final String INSTRUMENT_ID_TAG = "instrument";
+    public static final String COLOR_TAG = "color";
 
-    private Byte instrumentId;
-    
+    protected Integer color;
+
     public TileInstrument() {
         super(ModTiles.INSTRUMENT, 1);
     }
@@ -37,8 +38,8 @@ public class TileInstrument extends ATileInventory {
     public CompoundNBT write(CompoundNBT compound) {
         super.write(compound);
 
-        if(this.instrumentId != null) {
-            compound.putByte(INSTRUMENT_ID_TAG, this.instrumentId);
+        if(this.color != null) {
+            compound.putInt(COLOR_TAG, color);
         }
 
         return compound;
@@ -48,17 +49,31 @@ public class TileInstrument extends ATileInventory {
     public void read(BlockState state, CompoundNBT compound) {
         super.read(state, compound);
 
-        if(compound.contains(INSTRUMENT_ID_TAG)) {
-            this.instrumentId = compound.getByte(INSTRUMENT_ID_TAG);
+        if(compound.contains(COLOR_TAG)) {
+            this.color = compound.getInt(COLOR_TAG);
         }
     }
 
     public Byte getInstrumentId() {
-        return instrumentId;
+        return ((BlockInstrument)getBlockState().getBlock()).getInstrumentId();
     }
 
-    public void setInstrumentId(Byte instrumentId) {
-        this.instrumentId = instrumentId;
+    public void setColor(Integer color) {
+        if(((BlockInstrument)getBlockState().getBlock()).isDyeable()) {
+            this.color = color;
+        }
+    }
+
+    public Boolean hasColor() {
+        return color != null && ((BlockInstrument)getBlockState().getBlock()).isDyeable();
+    }
+
+    public Integer getColor() { 
+        if(!((BlockInstrument)getBlockState().getBlock()).isDyeable()) {
+            return -1;
+        }
+
+        return hasColor() ? color : ((BlockInstrument)getBlockState().getBlock()).getDefaultColor();
     }
 
     public String getInstrumentName() {

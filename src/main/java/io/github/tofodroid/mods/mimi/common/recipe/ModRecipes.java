@@ -13,5 +13,6 @@ public class ModRecipes {
     @SubscribeEvent
     public static void registerTypes(final RegistryEvent.Register<IRecipeSerializer<?>> event) {
         event.getRegistry().register(TuningTableRecipe.SERIALIZER);
+        event.getRegistry().register(DyedInstrumentRecipe.SERIALIZER);
     }
 }

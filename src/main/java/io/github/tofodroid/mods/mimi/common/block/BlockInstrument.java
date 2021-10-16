@@ -10,6 +10,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
@@ -30,25 +33,34 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.util.ResourceLocation;
 
+import java.util.List;
 import java.util.Map;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
+import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 
 public class BlockInstrument extends AContainerBlock<TileInstrument> implements IWaterLoggable {
+    public static final ResourceLocation CONTENTS = new ResourceLocation("contents");
+
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
-    public final Map<Direction, VoxelShape> SHAPES;
-    private final Byte instrumentId;
+    protected final Map<Direction, VoxelShape> SHAPES;
+    protected final Byte instrumentId;
+    protected final Boolean dyeable;
+    protected final Integer defaultColor;
 
-    public BlockInstrument(Byte instrumentId, String registryName, VoxelShape collisionShape) {
+    public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
         super(Properties.create(Material.WOOD).hardnessAndResistance(2.f, 6.f).sound(SoundType.WOOD).notSolid());
         this.instrumentId = instrumentId;
+        this.dyeable = dyeable;
+        this.defaultColor = defaultColor;
         this.setDefaultState(this.getStateContainer().getBaseState()
             .with(WATERLOGGED, false)
             .with(DIRECTION, Direction.NORTH)
@@ -132,9 +144,43 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     @Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader reader) {
 		TileInstrument tile = (TileInstrument)super.createNewTileEntity(reader);
-        tile.setInstrumentId(instrumentId);
         return tile;
 	}
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if(IDyeableInstrumentItem.isDyeableInstrument(stack) && ((IDyeableInstrumentItem)stack.getItem()).hasColor(stack)) {
+            TileEntity tileentity = worldIn.getTileEntity(pos);
+            if (tileentity instanceof TileInstrument) {
+                ((TileInstrument)tileentity).setColor(((IDyeableInstrumentItem)stack.getItem()).getColor(stack));
+            }
+        }
+    }
+    
+    @Override
+    @SuppressWarnings("deprecation")
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        List<ItemStack> drops = super.getDrops(state, builder);
+        TileEntity tileentity = builder.get(LootParameters.BLOCK_ENTITY);
+
+        if(tileentity != null && tileentity instanceof TileInstrument && ((TileInstrument)tileentity).hasColor()) {
+            for(ItemStack stack : drops) {
+                if(this.isDyeable() && stack.getItem() instanceof IDyeableInstrumentItem) {
+                    ((IDyeableInstrumentItem)stack.getItem()).setColor(stack, ((TileInstrument)tileentity).getColor());
+                }
+            }
+        }
+
+        return drops;
+    }
+
+    public Boolean isDyeable() {
+        return this.dyeable;
+    }
+
+    public Integer getDefaultColor() {
+        return this.defaultColor;
+    }
 
     public Byte getInstrumentId() {
         return instrumentId;
