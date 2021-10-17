@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "mimi:block/steeldrum" },
+    "facing=west": { "model": "mimi:block/steeldrum", "y": 90 },
+    "facing=north": { "model": "mimi:block/steeldrum", "y": 180 },
+    "facing=east": { "model": "mimi:block/steeldrum", "y": 270 }
+  }
+}

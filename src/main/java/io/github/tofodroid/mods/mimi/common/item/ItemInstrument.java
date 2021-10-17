@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
+import net.minecraft.block.CauldronBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,6 +9,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -26,15 +28,40 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
-public class ItemInstrument extends Item {
+public class ItemInstrument extends Item implements IDyeableInstrumentItem {
     public static final String INVENTORY_TAG = "inventory";
 
-    private final Byte instrumentId;
+    protected final Byte instrumentId;
+    protected final Boolean dyeable;
+    protected final Integer defaultColor;
 
-    public ItemInstrument(String name, final Byte instrumentId) {
+    public ItemInstrument(String name, Byte instrumentId, Boolean dyeable, Integer defaultColor) {
         super(new Properties().group(ModItems.ITEM_GROUP).maxStackSize(1));
         this.setRegistryName(name);
         this.instrumentId = instrumentId;
+        this.dyeable = dyeable;
+        this.defaultColor = defaultColor;
+    }
+
+    @Override
+    public Boolean isDyeable() {
+        return this.dyeable;
+
+    }
+
+    @Override
+    public Integer getDefaultColor() {
+        return this.defaultColor;
+    }
+
+    @Override
+    @Nonnull
+    public ActionResultType onItemUse(ItemUseContext context) {
+        if(!context.getPlayer().isSneaking() && ((IDyeableInstrumentItem)context.getItem().getItem()).hasColor(context.getItem()) && context.getWorld().getBlockState(context.getPos()).getBlock() instanceof CauldronBlock) {
+            return ActionResultType.SUCCESS;
+        }
+
+        return ActionResultType.PASS;
     }
 
     @Override

@@ -46,7 +46,7 @@ public class ModBlocks {
     public static List<BlockInstrument> buildInstruments()  {
         List<BlockInstrument> result = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
-                result.add(new BlockInstrument(instrument.instrumentId, instrument.registryName, VoxelShapeUtils.loadFromStrings(instrument.collisionShapes)));
+            result.add(new BlockInstrument(instrument.instrumentId, instrument.registryName, instrument.isDyeable(), instrument.defaultColor(), VoxelShapeUtils.loadFromStrings(instrument.collisionShapes)));
         }
         return result;
     }

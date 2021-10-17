@@ -4,7 +4,7 @@
         "tag": "mimi:instrument/organ"
     },
     "addition": {
-        "item": "minecraft:iron_ingot"
+        "item": "minecraft:iron_bars"
     },
     "result": {
         "item": "mimi:organ2"

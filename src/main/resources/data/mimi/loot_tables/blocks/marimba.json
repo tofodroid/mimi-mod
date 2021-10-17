@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:block",
+    "pools": [
+        {
+            "name": "marimba",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "mimi:marimba"
+                }
+            ],
+            "conditions": [
+                {
+                    "condition": "minecraft:survives_explosion"
+                }
+            ]
+        }
+    ]
+}

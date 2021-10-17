@@ -4,7 +4,7 @@
         "tag": "mimi:instrument/piano"
     },
     "addition": {
-        "item": "minecraft:redstone"
+        "item": "minecraft:sea_pickle"
     },
     "result": {
         "item": "mimi:piano4"

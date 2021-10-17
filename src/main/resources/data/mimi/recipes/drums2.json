@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/drums"
+    },
+    "addition": {
+        "tag": "minecraft:planks"
+    },
+    "result": {
+        "item": "mimi:drums2"
+    }
+}

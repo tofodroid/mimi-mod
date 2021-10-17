@@ -1,0 +1,12 @@
+{
+    "name": "The Tuning Table",
+    "icon": "mimi:tuningtable",
+    "category": "mimi:tuning",
+    "pages": [
+        {
+            "type": "text",
+            "text": "To use the Tuning Table right click on it to open up the Tuning Table GUI. In the GUI you can place any instrument in the left slot and any item in the right slot. When you have a proper combination you can remove the re-tuned instrument from the far-right slot."
+        }
+    ],
+    "sortnum": 0
+}

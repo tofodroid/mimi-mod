@@ -4,7 +4,7 @@
         "tag": "mimi:instrument/organ"
     },
     "addition": {
-        "item": "minecraft:cobblestone"
+        "item": "minecraft:granite"
     },
     "result": {
         "item": "mimi:organ4"

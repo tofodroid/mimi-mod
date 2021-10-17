@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/drums"
+    },
+    "addition": {
+        "item": "minecraft:cobblestone"
+    },
+    "result": {
+        "item": "mimi:drums3"
+    }
+}

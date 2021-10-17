@@ -1,0 +1,8 @@
+{
+    "variants": {
+      "facing=south": { "model": "mimi:block/marimba" },
+      "facing=west": { "model": "mimi:block/marimba", "y": 90 },
+      "facing=north": { "model": "mimi:block/marimba", "y": 180 },
+      "facing=east": { "model": "mimi:block/marimba", "y": 270 }
+    }
+  }

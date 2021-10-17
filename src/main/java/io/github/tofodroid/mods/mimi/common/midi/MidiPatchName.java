@@ -19,11 +19,11 @@ public enum MidiPatchName {
     Harpsichord(6, "Harpsichord"),
     Clavi(7, "Clavi"),
     Celesta(8, "Celesta"),
-    Glockenspiel(9, "Glockenspiel"),
+    Glockenspiel(9, "Glockenspiel"), // ^
     MusicBox(10, "Music Box"), // +
-    Vibraphone(11, "Vibraphone"),
-    Marimba(12, "Marimba"),
-    Xylophone(13, "Xylophone"), // +
+    Vibraphone(11, "Vibraphone"), // *
+    Marimba(12, "Marimba"), // *
+    Xylophone(13, "Xylophone"), // *
     TubularBells(14, "Tubular Bells"),
     Dulcimer(15, "Dulcimer"),
     DrawbarOrgan(16, "Drawbar Organ"), // *

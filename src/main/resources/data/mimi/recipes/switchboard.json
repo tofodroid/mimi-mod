@@ -3,7 +3,7 @@
     "pattern": [
         "III",
         "IRI",
-        "IPI"
+        "IBI"
     ],
     "key": {
         "I": {
@@ -12,8 +12,8 @@
         "R": {
             "item": "minecraft:redstone"
         },
-        "P": {
-            "item": "minecraft:heavy_weighted_pressure_plate"
+        "B": {
+            "item": "minecraft:stone_button"
         }
     },
     "result": {

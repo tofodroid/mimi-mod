@@ -1,6 +1,7 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "mimi:item/instruments/kalimba"
+        "layer0": "mimi:item/instruments/kalimba",
+        "layer1": "mimi:item/instruments/kalimba_overlay"
     }
 }

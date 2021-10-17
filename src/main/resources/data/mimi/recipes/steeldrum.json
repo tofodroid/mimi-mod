@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IBI",
+        "INI",
+        "I I"
+    ],
+    "key": {
+        "B": {
+            "item": "minecraft:iron_block"
+        },
+        "I": {
+            "item": "minecraft:iron_bars"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        }
+    },
+    "result": {
+        "item": "mimi:steeldrum"
+    }
+}
