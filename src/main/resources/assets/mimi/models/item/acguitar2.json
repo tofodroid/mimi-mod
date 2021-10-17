@@ -1,6 +1,7 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "mimi:item/instruments/acguitar"
+        "layer0": "mimi:item/instruments/acguitar",
+        "layer1": "mimi:item/instruments/acguitar_overlay"
     }
 }

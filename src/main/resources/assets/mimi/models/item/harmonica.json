@@ -1,6 +1,7 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "mimi:item/instruments/harmonica"
+        "layer0": "mimi:item/instruments/harmonica",
+        "layer1": "mimi:item/instruments/harmonica_overlay"
     }
 }

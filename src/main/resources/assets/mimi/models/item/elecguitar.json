@@ -1,6 +1,7 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "mimi:item/instruments/elecguitar"
+        "layer0": "mimi:item/instruments/elecguitar",
+        "layer1": "mimi:item/instruments/elecguitar_overlay"
     }
 }

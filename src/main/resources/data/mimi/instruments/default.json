@@ -5,6 +5,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 0,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 4203289,
         "collisionShapes": [
             "0,0,0,16,12,10",
             "0,0,0,16,6,16"
@@ -16,6 +18,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 1,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 4203289,
         "collisionShapes": [
             "0,0,0,16,12,10",
             "0,0,0,16,6,16"
@@ -27,6 +31,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 2,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 4203289,
         "collisionShapes": [
             "0,0,0,16,12,10",
             "0,0,0,16,6,16"
@@ -38,6 +44,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 3,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 4203289,
         "collisionShapes": [
             "0,0,0,16,12,10",
             "0,0,0,16,6,16"
@@ -55,21 +63,27 @@
         "registryName": "acguitar",
         "midiBankNumber": 0,
         "midiPatchNumber": 24,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 9065267
     },
     {
         "instrumentId": 36,
         "registryName": "acguitar2",
         "midiBankNumber": 0,
         "midiPatchNumber": 25,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 9065267
     },
     {
         "instrumentId": 37,
         "registryName": "acguitar3",
         "midiBankNumber": 0,
         "midiPatchNumber": 32,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 9065267
     },
     {
         "instrumentId": 3,
@@ -85,7 +99,9 @@
         "registryName": "bassguitar",
         "midiBankNumber": 0,
         "midiPatchNumber": 34,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 3547670
     },
     {
         "instrumentId": 5,
@@ -176,7 +192,9 @@
         "registryName": "ocarina",
         "midiBankNumber": 0,
         "midiPatchNumber": 79,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 8408721
     },
     {
         "instrumentId": 13,
@@ -190,14 +208,18 @@
         "registryName": "kalimba",
         "midiBankNumber": 0,
         "midiPatchNumber": 108,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 8401977
     },
     {
         "instrumentId": 15,
         "registryName": "bagpipe",
         "midiBankNumber": 0,
         "midiPatchNumber": 109,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 3171888
     },
     {
         "instrumentId": 16,
@@ -211,7 +233,9 @@
         "registryName": "accordion",
         "midiBankNumber": 0,
         "midiPatchNumber": 21,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 12397098
     },
     {
         "instrumentId": 18,
@@ -283,7 +307,9 @@
         "registryName": "harmonica",
         "midiBankNumber": 0,
         "midiPatchNumber": 22,
-        "isBlock": false
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 14566760
     },
     {
         "instrumentId": 20,
@@ -291,6 +317,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 19,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 2495501,
         "collisionShapes": [
             "0,0,0,16,15,3",
             "0,0,0,16,10,10",
@@ -303,6 +331,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 16,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 2495501,
         "collisionShapes": [
             "0,0,0,16,15,3",
             "0,0,0,16,10,10",
@@ -315,6 +345,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 17,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 2495501,
         "collisionShapes": [
             "0,0,0,16,15,3",
             "0,0,0,16,10,10",
@@ -327,6 +359,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 18,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 2495501,
         "collisionShapes": [
             "0,0,0,16,15,3",
             "0,0,0,16,10,10",
@@ -339,6 +373,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 20,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 2495501,
         "collisionShapes": [
             "0,0,0,16,15,3",
             "0,0,0,16,10,10",
@@ -372,6 +408,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 114,
         "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 15753807,
         "collisionShapes": [
             "1,0,1,15,11,10"
         ]
