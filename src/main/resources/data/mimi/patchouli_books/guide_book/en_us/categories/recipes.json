@@ -1,6 +1,6 @@
 {
 	"name": "Recipes",
-	"description": "This section provides a reference to all craftable recipes in MIMI.",
+	"description": "This section provides a reference to instrument crafting table recipes in MIMI.",
 	"icon": "minecraft:crafting_table",
-	"sortnum": 6
+	"sortnum": 7
 }

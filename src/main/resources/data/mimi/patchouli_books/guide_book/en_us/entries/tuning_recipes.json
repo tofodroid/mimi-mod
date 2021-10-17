@@ -1,0 +1,42 @@
+{
+    "name": "Tuning Recipes",
+    "icon": "minecraft:crafting_table",
+    "category": "mimi:tuning",
+    "pages": [
+        {
+            "type": "text",
+            "text": "Some instruments in MIMI do not support tuning at all while others have many different tuning options. You can find tuning recipes in this section or by using JEI if it is installed."
+        },
+        {
+            "type": "text",
+            "title": "Acoustic Guitar",
+            "text": "$(br2)$(l)Nylon$() - Stick$(br2)$(l)Steel$() - Chain$(br2)$(l)Bass$() - Lead$(br2)"
+        },
+        {
+            "type": "text",
+            "title": "Drum Kit",
+            "text": "$(br2)$(l)Standard$() - Stick$(br2)$(l)Room$() - Planks$(br2)$(l)Power$() - Cobblestone$(br2)$(l)Jazz$() - Gold Nugget$(br2)$(l)Brushes$() - Feather"
+        },
+        {
+            "type": "text",
+            "title": "Microphone",
+            "text": "$(br2)$(l)Doo$() - Stick$(br2)$(l)Ahh$() - Honeycomb$(br2)$(l)Ooh$() - Phantom Membrane"
+        },
+        {
+            "type": "text",
+            "title": "Organ",
+            "text": "$(br2)$(l)Church$() - Stick$(br2)$(l)Drawbar$() - Iron Bars$(br2)$(l)Percussive$() - Bone$(br2)$(l)Rock$() - Granite$(br2)$(l)Reed$() - Sugar Cane"
+        },
+        {
+            "type": "text",
+            "title": "Piano",
+            "text": "$(br2)$(l)Grand$() - Stick$(br2)$(l)Bright$() - Glowstone Dust$(br2)$(l)Electric$() - Redstone Dust$(br2)$(l)Honky-Tonk$() - Sea Pickle"
+        },
+        {
+            "type": "text",
+            "title": "Saxophone",
+            "text": "$(br2)$(l)Alto$() - Stick$(br2)$(l)Soprano$() - Feather$(br2)$(l)Tenor$() - Slime Ball$(br2)$(l)Baritone$() - Magma Cream"
+        }
+    ],
+    "sortnum": 1
+}

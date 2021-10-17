@@ -1,0 +1,6 @@
+{
+	"name": "Instrument Tuning",
+	"description": "Some instruments support several different kinds of sounds which can be chosen using the Tuning Table.",
+	"icon": "mimi:tuningtable",
+	"sortnum": 4
+}

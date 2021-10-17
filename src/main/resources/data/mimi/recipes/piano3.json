@@ -4,7 +4,7 @@
         "tag": "mimi:instrument/piano"
     },
     "addition": {
-        "item": "minecraft:glowstone_dust"
+        "item": "minecraft:redstone_dust"
     },
     "result": {
         "item": "mimi:piano3"
