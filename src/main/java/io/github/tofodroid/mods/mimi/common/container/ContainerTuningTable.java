@@ -83,10 +83,10 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
                 }
             }
 
-            if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
-            } else {
+            if (!itemstack.isEmpty()) {
                 slot.onTake(playerIn, itemstack1);
+            } else {
+              slot.putStack(ItemStack.EMPTY);  
             }
         }
 
