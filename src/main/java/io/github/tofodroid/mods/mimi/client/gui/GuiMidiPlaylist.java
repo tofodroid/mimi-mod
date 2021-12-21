@@ -132,7 +132,7 @@ public class GuiMidiPlaylist extends BaseGui {
         if(this.midiInputManager.playlistManager.isSongSelected()) {
             Integer songOffset;
 
-            if(this.midiInputManager.playlistManager.getSelectedSongIndex() < 3) {
+            if(this.midiInputManager.playlistManager.getSongCount() <= 6 || this.midiInputManager.playlistManager.getSelectedSongIndex() < 3) {
                 songOffset = this.midiInputManager.playlistManager.getSelectedSongIndex();
             } else if(this.midiInputManager.playlistManager.getSelectedSongIndex() > this.midiInputManager.playlistManager.getSongCount() - 3) {
                 songOffset = 6 - (this.midiInputManager.playlistManager.getSongCount() - this.midiInputManager.playlistManager.getSelectedSongIndex());
@@ -178,7 +178,7 @@ public class GuiMidiPlaylist extends BaseGui {
         // Playlist
         if(this.midiInputManager.playlistManager.getSongCount() > 0) {
             Integer minSong;
-            if(this.midiInputManager.playlistManager.getSelectedSongIndex() < 3) {
+            if(this.midiInputManager.playlistManager.getSongCount() <= 6 || this.midiInputManager.playlistManager.getSelectedSongIndex() < 3) {
                 minSong = 0;
             } else if(this.midiInputManager.playlistManager.getSelectedSongIndex() > this.midiInputManager.playlistManager.getSongCount() - 3) {
                 minSong = this.midiInputManager.playlistManager.getSongCount() - 6;
