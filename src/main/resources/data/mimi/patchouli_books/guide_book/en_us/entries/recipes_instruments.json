@@ -29,7 +29,15 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:bassoon"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:clarinet"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:celesta"
         },
         {
             "type": "crafting",
@@ -65,6 +73,10 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:musicbox"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:oboe"
         },
         {
@@ -93,7 +105,15 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:tubularbells"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:violin"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:woodblock"
         }
     ],
     "sortnum": 0

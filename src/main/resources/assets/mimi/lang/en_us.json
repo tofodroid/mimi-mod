@@ -36,6 +36,9 @@
   "item.mimi.oboe": "Oboe",
   "item.mimi.handbell": "Hand Bell",
   "item.mimi.glockenspiel": "Glockenspiel",
+  "item.mimi.musicbox": "Music Box",
+  "item.mimi.bassoon": "Bassoon",
+  "item.mimi.woodblock": "Wood Block",
   "item.mimi.witchpipe": "Witch Pipe",
   "item.mimi.bonelute": "Bone Lute",
   "item.mimi.switchboard": "Switchboard",
@@ -62,5 +65,7 @@
   "block.mimi.xylophone": "Xylophone",
   "block.mimi.vibraphone": "Vibraphone",
   "block.mimi.marimba": "Marimba",
+  "block.mimi.celesta": "Celesta",
+  "block.mimi.tubularbells": "Tubular Bells",
   "block.mimi.tuningtable": "Tuning Table"
 }

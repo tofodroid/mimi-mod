@@ -450,5 +450,52 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 9,
         "isBlock": false
+    },
+    {
+        "instrumentId": 47,
+        "registryName": "celesta",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 8,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 7820087,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 48,
+        "registryName": "musicbox",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 10,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 2495501
+    },
+    {
+        "instrumentId": 49,
+        "registryName": "tubularbells",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 14,
+        "isBlock": true,
+        "collisionShapes": [
+            "0,0,4,16,16,9"
+        ]
+    },
+    {
+        "instrumentId": 50,
+        "registryName": "bassoon",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 70,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 51,
+        "registryName": "woodblock",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 115,
+        "isBlock": false
     }
 ]

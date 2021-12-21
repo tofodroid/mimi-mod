@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "SI ",
+        "PPP",
+        "PNP"
+    ],
+    "key": {
+        "S": {
+            "item": "minecraft:stick"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:woodblock"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "  P",
+        " PG",
+        "NP "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "G": {
+            "item": "minecraft:iron_ingot"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:bassoon"
+    }
+}

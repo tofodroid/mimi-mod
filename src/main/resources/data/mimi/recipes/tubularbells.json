@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GPG",
+        "GNG",
+        "P P"
+    ],
+    "key": {
+        "P": {
+            "tag": "minecraft:planks"
+        },
+        "G": {
+            "item": "minecraft:gold_nugget"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        }
+    },
+    "result": {
+        "item": "mimi:tubularbells"
+    }
+}

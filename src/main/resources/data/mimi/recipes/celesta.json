@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " N ",
+        "LSL",
+        "QQQ"
+    ],
+    "key": {
+        "L": {
+            "tag": "minecraft:logs"
+        },
+        "S": {
+            "item": "minecraft:iron_ingot"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "Q": {
+            "item": "minecraft:quartz"
+        }
+    },
+    "result": {
+        "item": "mimi:celesta"
+    }
+}
