@@ -1,6 +1,6 @@
 modLoader="javafml"
 license="MIT License"
-loaderVersion="[35,)"
+loaderVersion="[39,)"
 issueTrackerURL=""
 logoFile="logo.png"
 
@@ -16,14 +16,14 @@ MIMI - Musical Instrument Minecraft Interface
 [[dependencies.mimi]]
     modId="forge"
     mandatory=true
-    versionRange="[35.0.0,)"
+    versionRange="[39.0.0,)"
 [[dependencies.mimi]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4,1.17)"
+    versionRange="[1.18.0,1.19)"
     side="BOTH"
 [[dependencies.mimi]]
     modId="patchouli"
     mandatory=true
-    versionRange="[1.16,1.17)"
+    versionRange="[1.18.0,1.19)"
     side="BOTH"

@@ -1,25 +1,24 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
 import com.google.gson.JsonObject;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraft.block.Blocks;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
-public class TuningTableRecipe implements IRecipe<IInventory> {
-	public static IRecipeType<TuningTableRecipe> TYPE = IRecipeType.register(MIMIMod.MODID + ":tuning");
+public class TuningTableRecipe implements Recipe<Inventory> {
+	public static RecipeType<TuningTableRecipe> TYPE = RecipeType.register(MIMIMod.MODID + ":tuning");
 	public static final TuningTableRecipe.Serializer SERIALIZER = new TuningTableRecipe.Serializer();
 
     private final Ingredient instrument;
@@ -34,67 +33,37 @@ public class TuningTableRecipe implements IRecipe<IInventory> {
         this.result = result;
     }
 
-    /**
-     * Used to check if a recipe matches current crafting inventory
-     */
-    public boolean matches(IInventory inv, World worldIn) {
-        return this.instrument.test(inv.getStackInSlot(0)) && this.addition.test(inv.getStackInSlot(1));
+    @Override
+    public boolean matches(Inventory inv, Level worldIn) {
+        return this.instrument.test(inv.getItem(0)) && this.addition.test(inv.getItem(1));
     }
 
-    /**
-     * Returns an Item that is the result of this recipe
-     */
-    public ItemStack getCraftingResult(IInventory inv) {
-        ItemStack itemstack = this.result.copy();
-        CompoundNBT compoundnbt = inv.getStackInSlot(0).getTag();
-        if (compoundnbt != null) {
-            itemstack.setTag(compoundnbt.copy());
-        }
-
-        return itemstack;
-    }
-
-    /**
-     * Used to determine if this recipe can fit in a grid of the given width/height
-     */
-    public boolean canFit(int width, int height) {
-        return width * height >= 2;
-    }
-
-    /**
-     * Get the result of this recipe, usually for display purposes (e.g. recipe book). If your recipe has more than one
-     * possible result (e.g. it's dynamic and depends on its inputs), then return an empty stack.
-     */
-    public ItemStack getRecipeOutput() {
-        return this.result;
-    }
-
-    public boolean isValidAdditionItem(ItemStack addition) {
-        return this.addition.test(addition);
-    }
-
+    // JEI
     public ItemStack getIcon() {
         return new ItemStack(Blocks.SMITHING_TABLE);
     }
 
+    @Override
     public ResourceLocation getId() {
         return this.recipeId;
     }
 
-    public IRecipeSerializer<?> getSerializer() {
+    @Override
+    public RecipeSerializer<?> getSerializer() {
         return TuningTableRecipe.SERIALIZER;
     }
 
-    public IRecipeType<?> getType() {
+    @Override
+    public RecipeType<?> getType() {
         return TuningTableRecipe.TYPE;
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(IInventory inv) {
-        NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(Inventory inv) {
+        NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
   
         for(int i = 0; i < nonnulllist.size(); ++i) {
-           ItemStack item = inv.getStackInSlot(i);
+           ItemStack item = inv.getItem(i);
            if (item.hasContainerItem()) {
               nonnulllist.set(i, item.getContainerItem());
            } else if(item.getCount() > 1) {
@@ -115,29 +84,53 @@ public class TuningTableRecipe implements IRecipe<IInventory> {
         return result;
     }
 
-    public static class Serializer extends net.minecraftforge.registries.ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TuningTableRecipe> {
+    public static class Serializer extends net.minecraftforge.registries.ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<TuningTableRecipe> {
         Serializer() {
 			this.setRegistryName(new ResourceLocation(MIMIMod.MODID, "tuning"));
 		}
         
-        public TuningTableRecipe read(ResourceLocation recipeId, JsonObject json) {
-            Ingredient ingredient = Ingredient.deserialize(JSONUtils.getJsonObject(json, "instrument"));
-            Ingredient ingredient1 = Ingredient.deserialize(JSONUtils.getJsonObject(json, "addition"));
-            ItemStack itemstack = ShapedRecipe.deserializeItem(JSONUtils.getJsonObject(json, "result"));
-            return new TuningTableRecipe(recipeId, ingredient, ingredient1, itemstack);
+        @Override
+        public TuningTableRecipe fromJson(ResourceLocation resource, JsonObject json) {
+            Ingredient ingredient = Ingredient.fromJson(json.get("instrument"));
+            Ingredient ingredient1 = Ingredient.fromJson(json.get("addition"));
+            ItemStack itemstack = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("result"));
+            return new TuningTableRecipe(resource, ingredient, ingredient1, itemstack);
         }
 
-        public TuningTableRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            Ingredient ingredient = Ingredient.read(buffer);
-            Ingredient ingredient1 = Ingredient.read(buffer);
-            ItemStack itemstack = buffer.readItemStack();
-            return new TuningTableRecipe(recipeId, ingredient, ingredient1, itemstack);
+        @Override
+        public TuningTableRecipe fromNetwork(ResourceLocation resource, FriendlyByteBuf buffer) {
+            Ingredient ingredient = Ingredient.fromNetwork(buffer);
+            Ingredient ingredient1 = Ingredient.fromNetwork(buffer);
+            ItemStack itemstack = buffer.readItem();
+            return new TuningTableRecipe(resource, ingredient, ingredient1, itemstack);
         }
 
-        public void write(PacketBuffer buffer, TuningTableRecipe recipe) {
-            recipe.instrument.write(buffer);
-            recipe.addition.write(buffer);
-            buffer.writeItemStack(recipe.result);
+        @Override
+        public void toNetwork(FriendlyByteBuf buffer, TuningTableRecipe recipe) {
+            recipe.instrument.toNetwork(buffer);
+            recipe.addition.toNetwork(buffer);
+            buffer.writeItem(recipe.result);
         }
+    }
+
+    @Override
+    public ItemStack assemble(Inventory inv) {
+        ItemStack itemstack = this.result.copy();
+        CompoundTag compoundnbt = inv.getItem(0).getTag();
+        if (compoundnbt != null) {
+            itemstack.setTag(compoundnbt.copy());
+        }
+
+        return itemstack;
+    }
+
+    @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return width * height >= 2;
+    }
+
+    @Override
+    public ItemStack getResultItem() {
+        return this.result;
     }
 }

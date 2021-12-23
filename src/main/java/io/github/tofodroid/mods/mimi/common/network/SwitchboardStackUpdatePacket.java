@@ -5,7 +5,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.netty.handler.codec.DecoderException;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class SwitchboardStackUpdatePacket {
     public final UUID midiSource;
@@ -36,10 +36,10 @@ public class SwitchboardStackUpdatePacket {
         this.volume = volume;
     }
     
-    public static SwitchboardStackUpdatePacket decodePacket(PacketBuffer buf) {
+    public static SwitchboardStackUpdatePacket decodePacket(FriendlyByteBuf buf) {
         try {
-            UUID midiSource = buf.readUniqueId();
-            String midiSourceName = buf.readString(64);
+            UUID midiSource = buf.readUUID();
+            String midiSourceName = buf.readUtf(64);
             if(ItemMidiSwitchboard.NONE_SOURCE_ID.equals(midiSource)) {
                 midiSource = null;
             }
@@ -48,7 +48,7 @@ public class SwitchboardStackUpdatePacket {
             Byte filterNote = buf.readByte();
             Boolean invertNoteOct = buf.readBoolean();
 
-            String enabledChannelsString = buf.readString(38);
+            String enabledChannelsString = buf.readUtf(38);
             if(enabledChannelsString.trim().isEmpty()) {
                 enabledChannelsString = null;
             }
@@ -71,13 +71,13 @@ public class SwitchboardStackUpdatePacket {
         }
     }
 
-    public static void encodePacket(SwitchboardStackUpdatePacket pkt, PacketBuffer buf) {
-        buf.writeUniqueId(pkt.midiSource != null ? pkt.midiSource : ItemMidiSwitchboard.NONE_SOURCE_ID);
-        buf.writeString(pkt.midiSourceName, 64);
+    public static void encodePacket(SwitchboardStackUpdatePacket pkt, FriendlyByteBuf buf) {
+        buf.writeUUID(pkt.midiSource != null ? pkt.midiSource : ItemMidiSwitchboard.NONE_SOURCE_ID);
+        buf.writeUtf(pkt.midiSourceName, 64);
         buf.writeByte(pkt.filterOct);
         buf.writeByte(pkt.filterNote);
         buf.writeBoolean(pkt.invertNoteOct);
-        buf.writeString(pkt.enabledChannelsString != null ? pkt.enabledChannelsString : "", 38);
+        buf.writeUtf(pkt.enabledChannelsString != null ? pkt.enabledChannelsString : "", 38);
         buf.writeByte(pkt.instrumentId);
         buf.writeBoolean(pkt.invertInstrument);
         buf.writeBoolean(pkt.sysInput);

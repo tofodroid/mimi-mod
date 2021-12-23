@@ -1,44 +1,45 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import io.github.tofodroid.mods.mimi.common.container.ASwitchboardContainer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.text.ITextComponent;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerListener;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
-
-import net.minecraft.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends BaseContainerGui<T> {
-    protected final PlayerEntity player;
+    protected final Player player;
+    protected final T container;
 	protected ItemStack selectedSwitchboardStack;
 
-    public ASwitchboardGui(T container, PlayerInventory inv, Integer width, Integer height, Integer textureSize, String textureResource, ITextComponent textComponent) {
+    public ASwitchboardGui(T container, Inventory inv, Integer width, Integer height, Integer textureSize, String textureResource, Component textComponent) {
         super(container, inv, width, height, textureSize, textureResource, textComponent);
 
-        player = inv.player;
+        this.player = inv.player;
+        this.container = container;
 
-        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
-            this.selectedSwitchboardStack = container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+        if(ModItems.SWITCHBOARD.equals(container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getItem().getItem())) {
+            this.selectedSwitchboardStack = container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getItem();
             loadSelectedSwitchboard();
         }
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    public void containerTick() {
+        super.containerTick();
 
-        if(this.selectedSwitchboardStack == null && container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getStack().isEmpty()) {
+        if(this.selectedSwitchboardStack == null && container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getItem().isEmpty()) {
             return;
-        } else if(this.selectedSwitchboardStack != container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getStack()) {
-            if(!ModItems.SWITCHBOARD.equals(container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getStack().getItem())) {
+        } else if(this.selectedSwitchboardStack != container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getItem()) {
+            if(!ModItems.SWITCHBOARD.equals(container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getItem().getItem())) {
                 this.selectedSwitchboardStack = null;
             } else {
-                this.selectedSwitchboardStack = container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getStack();
+                this.selectedSwitchboardStack = container.getSlot(ASwitchboardContainer.TARGET_CONTAINER_MIN_SLOT_ID).getItem();
             }
             this.onSelectedSwitchboardChange();
         }
@@ -69,7 +70,7 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
     }
     
     protected void setSelfSource() {
-        ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, player.getUniqueID(), player.getName().getString());
+        ItemMidiSwitchboard.setMidiSource(selectedSwitchboardStack, player.getUUID(), player.getName().getString());
         this.syncSwitchboardToServer();
     }
     
@@ -94,12 +95,12 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
     }
 
     protected void toggleChannel(Integer channelId) {
-        ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, new Integer(channelId).byteValue());
+        ItemMidiSwitchboard.toggleChannel(selectedSwitchboardStack, Integer.valueOf(channelId).byteValue());
         this.syncSwitchboardToServer();
     }
     
     protected void changeVolume(Integer changeAmount) {
-        ItemMidiSwitchboard.setInstrumentVolume(selectedSwitchboardStack, new Integer(ItemMidiSwitchboard.getInstrumentVolume(selectedSwitchboardStack) + changeAmount).byteValue());
+        ItemMidiSwitchboard.setInstrumentVolume(selectedSwitchboardStack, Integer.valueOf(ItemMidiSwitchboard.getInstrumentVolume(selectedSwitchboardStack) + changeAmount).byteValue());
         this.syncSwitchboardToServer();
     }
 }

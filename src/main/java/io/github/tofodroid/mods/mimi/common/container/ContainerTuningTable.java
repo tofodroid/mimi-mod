@@ -7,18 +7,17 @@ import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
 
-import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.network.play.server.SSetSlotPacket;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ContainerTuningTable extends APlayerInventoryContainer {
     private static final int INSTRUMENT_SLOT_POS_X = 27;
@@ -28,17 +27,17 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     private static final int RESULT_SLOT_POS_X = 134;
     private static final int RESULT_SLOT_POS_Y = 38;
 
-    private CraftingInventory craftingInventory = new CraftingInventory(this, 1, 2);
-    private CraftResultInventory resultInventory = new CraftResultInventory();
+    private CraftingContainer craftingInventory = new CraftingContainer(this, 1, 2);
+    private ResultContainer resultInventory = new ResultContainer();
 
-    public ContainerTuningTable(ContainerType<?> type, int id, PlayerInventory playerInventory) {
+    public ContainerTuningTable(MenuType<?> type, int id, Inventory playerInventory) {
         super(type, id, playerInventory);
         this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_POS_X, INSTRUMENT_SLOT_POS_Y));
         this.addSlot(buildModifierSlot(MODIFIER_SLOT_POS_X, MODIFiER_SLOT_POS_Y));
         this.addSlot(buildResultSlot(RESULT_SLOT_POS_X, RESULT_SLOT_POS_Y));
     }
 
-    public ContainerTuningTable(int id, PlayerInventory playerInventory, PacketBuffer extraData) {
+    public ContainerTuningTable(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
         super(ModContainers.TUNINGTABLE, id, playerInventory);
         this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_POS_X, INSTRUMENT_SLOT_POS_Y));
         this.addSlot(buildModifierSlot(MODIFIER_SLOT_POS_X, MODIFiER_SLOT_POS_Y));
@@ -56,29 +55,29 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
         // Below code taken from Vanilla Chest Container
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
             // Return Empty Stack if Cannot Merge
             if (index == TARGET_CONTAINER_MIN_SLOT_ID + 2) {
                 // Result --> Player
-                if (!this.mergeItemStack(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
+                if (!this.moveItemStackTo(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (index >= TARGET_CONTAINER_MIN_SLOT_ID) {
                 // Matrix --> Player
-                if (!this.mergeItemStack(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
+                if (!this.moveItemStackTo(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
                     return ItemStack.EMPTY;
                 }
             } else {
                 // Player --> Target
-                if (!this.mergeItemStack(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID,
-                        TARGET_CONTAINER_MIN_SLOT_ID + craftingInventory.getSizeInventory(), false)) {
+                if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID,
+                        TARGET_CONTAINER_MIN_SLOT_ID + craftingInventory.getContainerSize(), false)) {
                     return ItemStack.EMPTY;
                 }
             }
@@ -86,50 +85,54 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
             if (!itemstack.isEmpty()) {
                 slot.onTake(playerIn, itemstack1);
             } else {
-              slot.putStack(ItemStack.EMPTY);  
+              slot.set(ItemStack.EMPTY);  
             }
         }
 
         return itemstack;
     }
 
+    /*
     @Override
-    public void onCraftMatrixChanged(IInventory inventoryIn) {
-        updateCraftingResult(this.windowId, this.playerInventory.player.world, this.playerInventory.player,
+    public void onCraftMatrixChanged(Inventory inventoryIn) {
+        updateCraftingResult(this.windowId, this.playerInventory.player.level, this.playerInventory.player,
                 this.craftingInventory, this.resultInventory);
     }
+    */
 
     public void clear() {
-        this.craftingInventory.clear();
-        this.resultInventory.clear();
+        this.craftingInventory.clearContent();
+        this.resultInventory.clearContent();
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn) {
-        super.onContainerClosed(playerIn);
-        this.clearContainer(playerIn, playerIn.world, this.craftingInventory);
+    public void removed(Player playerIn) {
+        super.removed(playerIn);
+        //'this.clearContainer(playerIn, playerIn.level, this.craftingInventory.clearContent(););
     }
 
-    protected static void updateCraftingResult(int id, World world, PlayerEntity player, CraftingInventory inventory, CraftResultInventory inventoryResult) {
-        if (!world.isRemote) {
-            ServerPlayerEntity serverplayerentity = (ServerPlayerEntity) player;
+    /*
+    protected static void updateCraftingResult(int id, Level world, Player player, CraftingContainer inventory, ResultContainer inventoryResult) {
+        if (!world.isClientSide) {
+            ServerPlayer serverplayerentity = (ServerPlayer) player;
             ItemStack itemstack = ItemStack.EMPTY;
             Optional<TuningTableRecipe> optional = world.getServer().getRecipeManager()
-                    .getRecipe(TuningTableRecipe.TYPE, inventory, world);
+                    .getRecipeFor(TuningTableRecipe.TYPE, inventory, world);
             if (optional.isPresent()) {
                 TuningTableRecipe recipe = optional.get();
-                if (inventoryResult.canUseRecipe(world, serverplayerentity, recipe)) {
-                    itemstack = recipe.getCraftingResult(inventory);
+                if (inventoryResult.stillValid(serverplayerentity)) {
+                    itemstack = recipe.getResultItem();
                 }
             }
 
-            inventoryResult.setInventorySlotContents(0, itemstack);
-            serverplayerentity.connection.sendPacket(new SSetSlotPacket(id, TARGET_CONTAINER_MIN_SLOT_ID + 2, itemstack));
+            inventoryResult.setItem(0, itemstack);
+            serverplayerentity.connection.sendPacket(new Packet(id, TARGET_CONTAINER_MIN_SLOT_ID + 2, itemstack));
         }
     }
+    */
 
     protected Slot buildResultSlot(int xPos, int yPos) {
-        return new SlotTuningResult(this, craftingInventory, resultInventory, 2, xPos, yPos);
+        return new ResultSlot(this.playerInventory.player, craftingInventory, this.resultInventory, 2, xPos, yPos);
     }
 
     protected Slot buildModifierSlot(int xPos, int yPos) {
@@ -139,7 +142,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     protected Slot buildInstrumentSlot(int xPos, int yPos) {
         return new Slot(craftingInventory, 0, xPos, yPos) {
             @Override
-            public boolean isItemValid(ItemStack stack) {
+            public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof ItemInstrument || stack.getItem() instanceof ItemInstrumentBlock;
             }
         };

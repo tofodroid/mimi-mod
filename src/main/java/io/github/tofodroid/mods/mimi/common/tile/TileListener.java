@@ -3,27 +3,28 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import io.github.tofodroid.mods.mimi.common.container.ContainerListener;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileListener extends ANoteResponsiveTile {
-    public TileListener() {
-        super(ModTiles.LISTENER, 1);
+    public TileListener(BlockPos pos, BlockState state) {
+        super(ModTiles.LISTENER, pos, state, 1);
     }
 
     @Override
-    public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new ContainerListener(id, playerInventory, this.getPos());
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
+        return new ContainerListener(id, playerInventory, this.getBlockPos());
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-		return new TranslationTextComponent(this.getBlockState().getBlock().asItem().getTranslationKey());
+    public Component getDisplayName() {
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
     public ItemStack getSwitchboardStack() {

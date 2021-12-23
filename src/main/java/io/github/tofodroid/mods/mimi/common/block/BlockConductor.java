@@ -6,75 +6,88 @@ import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileConductor;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.ticks.ScheduledTick;
 
 public class BlockConductor extends AContainerBlock<TileConductor> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public BlockConductor() {
-        super(Properties.create(Material.IRON).hardnessAndResistance(2.f, 6.f).sound(SoundType.WOOD));
-        this.setDefaultState(this.stateContainer.getBaseState().with(POWERED, false));
+        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, Boolean.valueOf(false)));
         this.setRegistryName("conductor");
     }
     
     @Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        if(!worldIn.isRemote) {
-            boolean flag = worldIn.isBlockPowered(pos);
-            if (flag != state.get(POWERED)) {
+    public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+        if(!worldIn.isClientSide) {
+            boolean flag = worldIn.hasNeighborSignal(pos);
+            if (flag != state.getValue(POWERED)) {
                 if (flag) {
                     TileConductor tile = getTileForBlock(worldIn, pos);
                     
                     if(tile != null) {
-                        if (!worldIn.getPendingBlockTicks().isTickScheduled(pos, state.getBlock())) {
+                        if (!worldIn.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
                             tile.transmitNoteOn(worldIn);
-                            worldIn.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), 8);
+                            worldIn.getBlockTicks().schedule(new ScheduledTick<Block>(this, pos, 8, 0));
                         }
                     }
                 }
-                worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 3);
+                worldIn.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(flag)), 3);
             }
         }
     }
     
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
+        state.add(POWERED);
+    }
+    
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(POWERED, false);
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         TileConductor tile = getTileForBlock(worldIn, pos);
         
         if(tile != null) {
-           if(!worldIn.isRemote) {
-               ItemStack stack = player.getHeldItem(hand);
+           if(!worldIn.isClientSide) {
+               ItemStack stack = player.getItemInHand(hand);
 
                 if(ModItems.SWITCHBOARD.equals(stack.getItem())) {
-                    ItemMidiSwitchboard.setMidiSource(stack, tile.getUniqueId(), "Cond. " + pos.getCoordinatesAsString());
-                    player.setHeldItem(hand, stack);
-                    player.sendStatusMessage(new StringTextComponent("Set MIDI Source to Conductor at: " + pos.getCoordinatesAsString()), true);
-                    return ActionResultType.CONSUME;
+                    ItemMidiSwitchboard.setMidiSource(stack, tile.getUniqueId(), "Cond. " + pos.toShortString());
+                    player.setItemInHand(hand, stack);
+                    player.displayClientMessage(new TextComponent("Set MIDI Source to Conductor at: " + pos.toShortString()), true);
+                    return InteractionResult.CONSUME;
                 }
             }
         }
 
-        return super.onBlockActivated(state, worldIn, pos, player, hand, hit);
+        return super.use(state, worldIn, pos, player, hand, hit);
     }
     
     @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
         TileConductor tile = getTileForBlock(worldIn, pos);
                     
         if(tile != null) {
@@ -83,12 +96,7 @@ public class BlockConductor extends AContainerBlock<TileConductor> {
     }
     
     @Override
-    public TileEntityType<TileConductor> getTileType() {
+    public BlockEntityType<TileConductor> getTileType() {
         return ModTiles.CONDUCTOR;
-    }
-    
-    @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(POWERED);
     }
 }

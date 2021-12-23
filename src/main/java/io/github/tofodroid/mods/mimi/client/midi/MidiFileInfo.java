@@ -28,7 +28,7 @@ public class MidiFileInfo {
                 result.instrumentMapping = getInstrumentMapping(sequence);
                 result.tempo = getTempoBPM(sequence);
                 result.fileName = file.getName();
-                result.songLength = new Long(TimeUnit.MICROSECONDS.convert(sequence.getMicrosecondLength(), TimeUnit.SECONDS)).toString();
+                result.songLength = Long.valueOf(TimeUnit.MICROSECONDS.convert(sequence.getMicrosecondLength(), TimeUnit.SECONDS)).toString();
                 return result;
             } catch(Exception e) {
                 return null;

@@ -1,13 +1,14 @@
 package io.github.tofodroid.mods.mimi.integration.jei;
 
 import mezz.jei.api.gui.handlers.IGuiProperties;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
 public class NoJEIGuiProperties implements IGuiProperties {
-    private final ContainerScreen<?> containerScreen;
 
-    public NoJEIGuiProperties(ContainerScreen<?> containerScreen) {
+    private final AbstractContainerScreen<?> containerScreen;
+
+    public NoJEIGuiProperties(AbstractContainerScreen<?> containerScreen) {
         this.containerScreen = containerScreen;
     }
 
@@ -46,4 +47,3 @@ public class NoJEIGuiProperties implements IGuiProperties {
         return containerScreen.height;
     }
 }
-

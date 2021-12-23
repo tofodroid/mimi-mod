@@ -2,20 +2,20 @@ package io.github.tofodroid.mods.mimi.common.item;
 
 import java.util.List;
 
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.IDyeableArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.ItemStack;
 
 // Clone from net.minecraft.item.IDyeableArmorItem
-public interface IDyeableInstrumentItem extends IDyeableArmorItem {
+public interface IDyeableInstrumentItem extends DyeableLeatherItem {
     public static final Integer DEFAULT_WHITE_COLOR = -1;
 
     public Boolean isDyeable();
     public Integer getDefaultColor();
 
     default boolean hasColor(ItemStack stack) {
-        CompoundNBT compoundnbt = stack.getChildTag("display");
+        CompoundTag compoundnbt = stack.getTagElement("display");
         return isDyeable() && compoundnbt != null && compoundnbt.contains("color", 99);
     }
 
@@ -24,12 +24,12 @@ public interface IDyeableInstrumentItem extends IDyeableArmorItem {
             return -1;
         }
 
-        CompoundNBT compoundnbt = stack.getChildTag("display");
+        CompoundTag compoundnbt = stack.getTagElement("display");
         return compoundnbt != null && compoundnbt.contains("color", 99) ? compoundnbt.getInt("color") : getDefaultColor();
     }
 
     default void removeColor(ItemStack stack) {
-        CompoundNBT compoundnbt = stack.getChildTag("display");
+        CompoundTag compoundnbt = stack.getTagElement("display");
         if (isDyeable() && compoundnbt != null && compoundnbt.contains("color")) {
             compoundnbt.remove("color");
         }
@@ -37,7 +37,7 @@ public interface IDyeableInstrumentItem extends IDyeableArmorItem {
 
     default void setColor(ItemStack stack, int color) {
         if(isDyeable() && color >= 0) {
-            stack.getOrCreateChildTag("display").putInt("color", color);
+            stack.getOrCreateTagElement("display").putInt("color", color);
         }
     }
 
@@ -46,6 +46,6 @@ public interface IDyeableInstrumentItem extends IDyeableArmorItem {
     }
 
     static ItemStack dyeItem(ItemStack stack, List<DyeItem> dyes) {
-        return IDyeableArmorItem.dyeItem(stack, dyes);
+        return DyeableLeatherItem.dyeArmor(stack, dyes);
     }
 }

@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import net.minecraft.item.BlockItem;
+import net.minecraft.world.item.BlockItem;
 
 public class ItemInstrumentBlock extends BlockItem implements IDyeableInstrumentItem {    
     public ItemInstrumentBlock(BlockInstrument blockIn, Properties builder) {

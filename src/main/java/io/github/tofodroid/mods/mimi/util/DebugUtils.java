@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public abstract class DebugUtils {
 

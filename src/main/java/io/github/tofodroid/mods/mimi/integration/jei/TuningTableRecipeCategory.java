@@ -11,9 +11,11 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRecipe> {
@@ -22,7 +24,7 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 	private final IDrawable background;
 
 	public TuningTableRecipeCategory(IGuiHelper helper) {
-        title = new TranslationTextComponent("gui.jei." + MIMIMod.MODID + ".tuning").getString();
+        title = new TranslatableComponent("gui.jei." + MIMIMod.MODID + ".tuning").getString();
 		icon = helper.createDrawableIngredient(new ItemStack(ModItems.TUNINGTABLE));
 		background = helper.createDrawable(new ResourceLocation(MIMIMod.MODID, "textures/jei/tuning.png"), 0, 0, 59, 40);
 	}
@@ -38,8 +40,8 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 	}
 
 	@Override
-	public String getTitle() {
-		return this.title;
+	public Component getTitle() {
+		return new TextComponent(this.title);
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 	@Override
 	public void setIngredients(TuningTableRecipe recipe, IIngredients ingredients) {
 		ingredients.setInputIngredients(recipe.getIngredients());
-		ingredients.setOutputs(VanillaTypes.ITEM, Arrays.asList(recipe.getRecipeOutput()));
+		ingredients.setOutputs(VanillaTypes.ITEM, Arrays.asList(recipe.getResultItem()));
 	}
 
 	@Override
@@ -64,12 +66,12 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 
 		// Draw inputs
 		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, true, 1, 1);
-		itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, Arrays.asList(recipe.getIngredients().get(0).getMatchingStacks()));
+		itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, Arrays.asList(recipe.getIngredients().get(0).getItems()));
 		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+1, true, 34, 1);
-		itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+1, Arrays.asList(recipe.getIngredients().get(1).getMatchingStacks()));
+		itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+1, Arrays.asList(recipe.getIngredients().get(1).getItems()));
 
         // Draw output
 		itemStacks.init(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+2, false, 40, 21);
-        itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+2, Arrays.asList(recipe.getRecipeOutput()));
+        itemStacks.set(ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID+2, Arrays.asList(recipe.getResultItem()));
 	}
 }

@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -14,6 +13,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -25,14 +29,11 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.Hand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.SortedArraySet;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -45,21 +46,21 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private static final Integer NOTE_OFFSET_Y = 29;
 
     // GUI
-    private static final Vector2f SYS_DEVICE_BUTTON_COORDS = new Vector2f(105,84);
-    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(47,133);
-    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(66,133);
-    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(85,133);
-    private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(300,31);
-    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(141,101);
-    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(141,126);
-    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(160,101);
-    private static final Vector2f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(14,177);
-    private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(59,177);
-    private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(84,177);
-    private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(129,177);
-    private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(105,219);
-    private static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(202,58);
-    private static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(155,58);
+    private static final Vector3f SYS_DEVICE_BUTTON_COORDS = new Vector3f(105,84,0);
+    private static final Vector3f SOURCE_SELF_BUTTON_COORDS = new Vector3f(47,133,0);
+    private static final Vector3f SOURCE_PUBLIC_BUTTON_COORDS = new Vector3f(66,133,0);
+    private static final Vector3f SOURCE_CLEAR_BUTTON_COORDS = new Vector3f(85,133,0);
+    private static final Vector3f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector3f(300,31,0);
+    private static final Vector3f ALL_MIDI_BUTTON_COORDS = new Vector3f(141,101,0);
+    private static final Vector3f CLEAR_MIDI_BUTTON_COORDS = new Vector3f(141,126,0);
+    private static final Vector3f GEN_MIDI_BUTTON_COORDS = new Vector3f(160,101,0);
+    private static final Vector3f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector3f(14,177,0);
+    private static final Vector3f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector3f(59,177,0);
+    private static final Vector3f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector3f(84,177,0);
+    private static final Vector3f OCT_SHIFT_UP_BUTTON_COORDS = new Vector3f(129,177,0);
+    private static final Vector3f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector3f(105,219,0);
+    private static final Vector3f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector3f(202,58,0);
+    private static final Vector3f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector3f(155,58,0);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
@@ -146,7 +147,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     // Input Data
     private final Byte instrumentId;
-    private final Hand handIn;
+    private final InteractionHand handIn;
     private final BlockPos tilePos;
 
     // Runtime Data
@@ -158,7 +159,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private String noteIdString = "C3,F4 | G4,C6";
     private Byte mouseNote = null;
 
-    public GuiInstrumentContainerScreen(ContainerInstrument container, PlayerInventory inv, ITextComponent textComponent) {
+    public GuiInstrumentContainerScreen(ContainerInstrument container, Inventory inv, Component textComponent) {
         super(container, inv, 328, 250, 530, "textures/gui/container_instrument.png", textComponent);
         this.instrumentId = container.getInstrumentId();
 
@@ -183,9 +184,9 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         this.releasedNotes = new ConcurrentHashMap<>();
 
         if(container.isHandheld()) {
-            this.instrumentNameString = ItemInstrument.getInstrumentName(this.player.getHeldItem(handIn));
+            this.instrumentNameString = ItemInstrument.getInstrumentName(this.player.getItemInHand(handIn));
         } else {
-            this.instrumentNameString = ((TileInstrument)this.minecraft.world.getTileEntity(tilePos)).getInstrumentName();
+            this.instrumentNameString = ((TileInstrument)this.minecraft.level.getBlockEntity(tilePos)).getInstrumentName();
         }
     }
 
@@ -195,17 +196,17 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     }
 
     @Override
-    public void closeScreen() {
+    public void onClose() {
         this.allNotesOff();
-        super.closeScreen();
+        super.onClose();
     }
 
     @Override
     public boolean mouseClicked(double dmouseX, double dmouseY, int mouseButton) {
         int imouseX = (int)Math.round(dmouseX);
         int imouseY = (int)Math.round(dmouseY);
-        int firstNoteX = this.guiLeft + NOTE_OFFSET_X;
-        int firstNoteY = this.guiTop + NOTE_OFFSET_Y;
+        int firstNoteX = START_X + NOTE_OFFSET_X;
+        int firstNoteY = START_Y + NOTE_OFFSET_Y;
         int relativeMouseX = imouseX - firstNoteX;
         int relativeMouseY = imouseY - firstNoteY;
 
@@ -213,7 +214,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             editMode = !editMode;
         } else if(!editMode) {
             // Keyboard Layout Hover Box
-            if(imouseX >= 220 && imouseY >= 28 && imouseX < (this.guiLeft + this.xSize) && imouseY < (this.guiTop + 50)) {
+            if(imouseX >= 220 && imouseY >= 28 && imouseX < (START_X + this.GUI_WIDTH) && imouseY < (START_Y + 50)) {
                 if(clickedBox(imouseX, imouseY, KEYBOARD_LAYOUT_BUTTON_COORDS)) {
                     if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
                         ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
@@ -227,7 +228,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             }
             
             // Note Keys
-            if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (this.guiLeft + this.xSize - 11) && imouseY < (this.guiTop + this.ySize - 95)) {
+            if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (START_X + this.GUI_WIDTH - 11) && imouseY < (START_Y + this.GUI_HEIGHT - 95)) {
                 Byte midiNote = null;
                 
                 if(relativeMouseY <= 84) {
@@ -277,9 +278,10 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             } else {
                 // Individual Midi Channel Buttons
                 for(int i = 0; i < 16; i++) {
-                    Vector2f buttonCoords = new Vector2f(
-                        GEN_MIDI_BUTTON_COORDS.x + (i % 8) * 19,
-                        GEN_MIDI_BUTTON_COORDS.y + (i / 8) * 25
+                    Vector3f buttonCoords = new Vector3f(
+                        GEN_MIDI_BUTTON_COORDS.x() + (i % 8) * 19,
+                        GEN_MIDI_BUTTON_COORDS.y() + (i / 8) * 25,
+                        0
                     );
 
                     if(clickedBox(imouseX, imouseY, buttonCoords)) {
@@ -372,7 +374,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
         if(octaveNote != 0 && octaveNote != 6) {
             octaveNote -= octaveNote > 6 ? 2 : 1;
-            result = new Integer(octaveNote + 12 * octaveNum).byteValue();
+            result = Integer.valueOf(octaveNote + 12 * octaveNum).byteValue();
         }
 
         return result;
@@ -423,22 +425,22 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 this.releaseNote(note);
             }
 
-            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
+            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), false, player.getOnPos());
             NetworkManager.NET_CHANNEL.sendToServer(packet);
             MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUniqueID(), false, player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), false, player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrumentId, midiNote, velocity, player.getPosition());
+        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrumentId, midiNote, velocity, player.getOnPos());
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUniqueID(), false, player.getPosition());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), false, player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         DebugUtils.logNoteTimingInfo(this.getClass(), false, instrumentId, midiNote, null, null);
         MIMIMod.proxy.getMidiSynth().handlePacket(packet);
@@ -502,41 +504,41 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     private Byte getMidiNoteFromScanCode_VPiano(Integer scanCode, Boolean modifier) {
         Integer midiInt = VPianoMidiMap.get(scanCode * (modifier ? -1 : 1));
-        return midiInt != null ?  new Integer(12 * 2 + midiInt).byteValue() : null;
+        return midiInt != null ?  Integer.valueOf(12 * 2 + midiInt).byteValue() : null;
     }
 
     // Render Functions
     @Override
-    protected MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         setAlpha(1.0f);
 
         // Set Texture
-        Minecraft.getInstance().getTextureManager().bindTexture(guiTexture);
+        RenderSystem.setShaderTexture(0, guiTexture);
 
         // Visible Notes
         Integer keyboardTextureShift = (visibleNoteShift % (NOTE_WIDTH/2)) * NOTE_WIDTH;
-        blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 276, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y - 1, this.getBlitOffset(), keyboardTextureShift, 276, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Labels
         if(ClientConfig.KEYBOARD_LAYOUTS.MIMI.equals(ModConfigs.CLIENT.keyboardLayout.get())) {
-            blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
             if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
                 Integer widthShift = (V_PIANO_MIN_SHIFT - visibleNoteShift) * NOTE_WIDTH;
-                blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1 + widthShift, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + NOTE_OFFSET_X - 1 + widthShift, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), 0, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift >= V_PIANO_MIN_SHIFT && visibleNoteShift <= V_PIANO_MAX_SHIFT) {
-                blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift <= V_PIANO_MAX_NOTE) {
                 Integer widthShift = (V_PIANO_MAX_SHIFT - visibleNoteShift) * -NOTE_WIDTH;
-                blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, this.getBlitOffset(), (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
 
         // Note Edges
         if(visibleNoteShift == 0) {
-            blit(matrixStack, this.guiLeft + NOTE_OFFSET_X, this.guiTop + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + NOTE_OFFSET_X, START_Y + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         } else if(visibleNoteShift == MAX_NOTE_SHIFT) {
-            blit(matrixStack, this.guiLeft + 311, this.guiTop + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 311, START_Y + NOTE_OFFSET_Y, this.getBlitOffset(), 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Active Notes
@@ -547,22 +549,22 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         setAlpha(1.0f);
 
         // GUI Background
-        blit(matrixStack, this.guiLeft, this.guiTop, this.getBlitOffset(), 0, 0, this.xSize, this.ySize, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Key Covers
-        blit(matrixStack, this.guiLeft + NOTE_OFFSET_X - 1, this.guiTop + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 250, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 55, this.getBlitOffset(), keyboardTextureShift, 250, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Switchboard Edit Panel
         if(editMode) {
             // Switchboard Background Panel
-            matrixStack.push();
-            matrixStack.rotate(new Quaternion(new Vector3f(0,0,1),-90,true));
-            blit(matrixStack, -(this.guiTop + 29 + 126),  this.guiLeft + 11, this.getBlitOffset(), 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
-            matrixStack.pop();
+            matrixStack.pushPose();
+            matrixStack.mulPose(new Quaternion(new Vector3f(0,0,1),-90,true));
+            blit(matrixStack, -(START_Y + 29 + 126),  START_X + 11, this.getBlitOffset(), 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
+            matrixStack.popPose();
 
             // Sys MIDI Device Status Light
             if(ItemMidiSwitchboard.getSysInput(selectedSwitchboardStack)) {
-                blit(matrixStack, this.guiLeft + 124, this.guiTop + 90, this.getBlitOffset(), 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + 124, START_Y + 90, this.getBlitOffset(), 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
 
             // Channel Output Status Lights
@@ -570,7 +572,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
             if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
                 for(Byte channelId : acceptedChannels) {
-                    blit(matrixStack, this.guiLeft + 166 + 19 * (channelId % 8), this.guiTop + 119 + (channelId / 8) * 25, this.getBlitOffset(), 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                    blit(matrixStack, START_X + 166 + 19 * (channelId % 8), START_Y + 119 + (channelId / 8) * 25, this.getBlitOffset(), 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
                 }
             }
         }
@@ -578,7 +580,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         return matrixStack;
     }
 
-    private MatrixStack renderAndCleanNoteSet(MatrixStack matrixStack, ConcurrentHashMap<Byte,Instant> noteMap, Integer sustainMillis, Boolean held, Consumer<Entry<Byte,Instant>> removeHandler) {
+    private PoseStack renderAndCleanNoteSet(PoseStack matrixStack, ConcurrentHashMap<Byte,Instant> noteMap, Integer sustainMillis, Boolean held, Consumer<Entry<Byte,Instant>> removeHandler) {
         List<Entry<Byte,Instant>> notesToRemove = new ArrayList<>();
         if(!noteMap.isEmpty()) {
             for(Entry<Byte,Instant> entry : noteMap.entrySet()) {
@@ -594,7 +596,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         return matrixStack;
     }
 
-    private MatrixStack renderNote(MatrixStack matrixStack, Byte note, Boolean held, Instant releaseTime) {
+    private PoseStack renderNote(PoseStack matrixStack, Byte note, Boolean held, Instant releaseTime) {
         Float alpha = 1.0f;
         Integer keyNum = midiNoteToKeyNum(note);
 
@@ -611,8 +613,8 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
         blit(
             matrixStack, 
-            this.guiLeft + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
-            this.guiTop + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
+            START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
+            START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
             this.getBlitOffset(), 
             342 - (keyNum % 2) * 13, 
             0, 12, 41, 
@@ -623,31 +625,31 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     }
 
     @Override
-    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY) {
         // Instrument Name
-        font.drawString(matrixStack, this.instrumentNameString, 198, 13, 0xFF00E600);
+        font.draw(matrixStack, this.instrumentNameString, 198, 13, 0xFF00E600);
 
         // Note Text: Left
-        font.drawString(matrixStack, this.noteIdString.split(",")[0], 22, 197, 0xFF00E600);
+        font.draw(matrixStack, this.noteIdString.split(",")[0], 22, 197, 0xFF00E600);
 
         // Note Text: Middle
-        font.drawString(matrixStack, this.noteIdString.split(",")[1], 67, 197, 0xFF00E600);
+        font.draw(matrixStack, this.noteIdString.split(",")[1], 67, 197, 0xFF00E600);
 
         // Note Text: Right
-        font.drawString(matrixStack, this.noteIdString.split(",")[2], 126, 197, 0xFF00E600);
+        font.draw(matrixStack, this.noteIdString.split(",")[2], 126, 197, 0xFF00E600);
 
         // MIDI Source Name & Volume
         if(editMode) {
             String selectedSourceName = ItemMidiSwitchboard.getMidiSourceName(selectedSwitchboardStack);
-            font.drawString(matrixStack, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
-            font.drawString(matrixStack, ItemMidiSwitchboard.getInstrumentVolumePercent(selectedSwitchboardStack).toString(), 180, 62, 0xFF00E600);
+            font.draw(matrixStack, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
+            font.draw(matrixStack, ItemMidiSwitchboard.getInstrumentVolumePercent(selectedSwitchboardStack).toString(), 180, 62, 0xFF00E600);
         }
 
         // Keyboard Layout
         if(editMode) {
-            font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF003600);
+            font.draw(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF003600);
         } else { 
-            font.drawString(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF00E600);
+            font.draw(matrixStack, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF00E600);
         }
 
         return matrixStack;
@@ -655,10 +657,10 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     private String buildNoteIdString() {
         String result = "";    
-        result += noteLetterFromNum(visibleNoteShift % 7) + new Integer(visibleNoteShift / 7).toString();
-        result += "," + noteLetterFromNum((visibleNoteShift+10) % 7) + new Integer((visibleNoteShift+10) / 7).toString();
-        result += " | " + noteLetterFromNum((visibleNoteShift+11) % 7) + new Integer((visibleNoteShift+11) / 7).toString();
-        result += "," + noteLetterFromNum((visibleNoteShift+21) % 7) + new Integer((visibleNoteShift+21) / 7).toString();
+        result += noteLetterFromNum(visibleNoteShift % 7) + Integer.valueOf(visibleNoteShift / 7).toString();
+        result += "," + noteLetterFromNum((visibleNoteShift+10) % 7) + Integer.valueOf((visibleNoteShift+10) / 7).toString();
+        result += " | " + noteLetterFromNum((visibleNoteShift+11) % 7) + Integer.valueOf((visibleNoteShift+11) / 7).toString();
+        result += "," + noteLetterFromNum((visibleNoteShift+21) % 7) + Integer.valueOf((visibleNoteShift+21) / 7).toString();
         return result;
     }
 

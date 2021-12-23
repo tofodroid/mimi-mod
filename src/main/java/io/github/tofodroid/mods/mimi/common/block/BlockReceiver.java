@@ -4,53 +4,50 @@ import java.util.Random;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.block.SoundType;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Material;
 
 public class BlockReceiver extends AContainerBlock<TileReceiver> {
-    private static final IntegerProperty POWER = BlockStateProperties.POWER_0_15;
+    private static final IntegerProperty POWER = BlockStateProperties.POWER;
 
     public BlockReceiver() {
-        super(Properties.create(Material.IRON).hardnessAndResistance(2.f, 6.f).sound(SoundType.WOOD));
-        this.setDefaultState(this.stateContainer.getBaseState().with(POWER, Integer.valueOf(0)));
+        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
         this.setRegistryName("receiver");
     }
     
     @Override
-    public TileEntityType<TileReceiver> getTileType() {
+    public BlockEntityType<TileReceiver> getTileType() {
         return ModTiles.RECEIVER;
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(POWER, Integer.valueOf(0));
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(POWER, Integer.valueOf(0));
     }
     
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(POWER);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
+        state.add(POWER);
     }
 
     @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-        if (state.get(POWER) != 0) {
-           worldIn.setBlockState(pos, state.with(POWER, Integer.valueOf(0)), 3);
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
+        if (state.getValue(POWER) != 0) {
+           worldIn.setBlock(pos, state.setValue(POWER, Integer.valueOf(0)), 3);
         }
     }
     
+    /*
     @Override
     public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
         return blockState.get(POWER);
@@ -67,4 +64,5 @@ public class BlockReceiver extends AContainerBlock<TileReceiver> {
             world.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), 4);
         }
     }
+    */
 }

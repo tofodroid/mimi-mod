@@ -1,49 +1,46 @@
 package io.github.tofodroid.mods.mimi.common.container.slot;
 
-import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotTuningResult extends Slot {
     private final Container container;
-    private final IInventory matrix;
+    public final Inventory craftingContainer;
 
-    public SlotTuningResult(Container container, IInventory matrix, IInventory inventory, int index, int xPosition, int yPosition) {
+    public SlotTuningResult(Container container, Inventory craftingContainer, Inventory inventory, int index, int xPosition, int yPosition) {
         super(inventory, index, xPosition, yPosition);
         this.container = container;
-        this.matrix = matrix;
+        this.craftingContainer = craftingContainer;
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return false;
     }
 
+    /*
     @Override
-    public ItemStack onTake(PlayerEntity player, ItemStack stack) {
+    public void onTake(Player player, ItemStack stack) {
         NonNullList<ItemStack> remaining;
 
-        remaining = player.world.getRecipeManager().getRecipeNonNull(TuningTableRecipe.TYPE, this.matrix, player.world);
+        remaining = player.level.getRecipeManager().getRemainingItemsFor(TuningTableRecipe.TYPE, this.craftingContainer, player.level);
 
         for (int i = 0; i < remaining.size(); i++) {
-            ItemStack slotStack = this.matrix.getStackInSlot(i);
+            ItemStack slotStack = this.craftingContainer.getItem(i);
             ItemStack remainingStack = remaining.get(i);
 
             if (!slotStack.isEmpty()) {
-                this.matrix.removeStackFromSlot(i);
+                this.craftingContainer.removeItem(i, 1);
             }
 
             if (!remainingStack.isEmpty()) {
-                this.matrix.setInventorySlotContents(i, remainingStack);
+                this.craftingContainer.setItem(i, remainingStack);
             }
         }
 
-        this.container.onCraftMatrixChanged(this.matrix);
-
-        return stack;
+        this.container.setChanged();
     }
+    */
 }

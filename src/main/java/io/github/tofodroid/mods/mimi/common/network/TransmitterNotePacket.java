@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class TransmitterNotePacket {
     public static final Byte NO_CHANNEL = Byte.MAX_VALUE;
@@ -26,12 +26,12 @@ public class TransmitterNotePacket {
         this.transmitMode = transmitMode;
     }
 
-    public static TransmitterNotePacket decodePacket(PacketBuffer buf) {
+    public static TransmitterNotePacket decodePacket(FriendlyByteBuf buf) {
         try {
             byte channel = buf.readByte();
             byte note = buf.readByte();
             byte velocity = buf.readByte();
-            TransmitMode transmitMode = TransmitMode.values()[new Byte(buf.readByte()).intValue()];
+            TransmitMode transmitMode = TransmitMode.values()[Byte.valueOf(buf.readByte()).intValue()];
             return new TransmitterNotePacket(channel, note, velocity, transmitMode);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("SpeakerNoteOnPacket did not contain enough bytes. Exception: " + e);
@@ -39,10 +39,10 @@ public class TransmitterNotePacket {
         }
     }
 
-    public static void encodePacket(TransmitterNotePacket pkt, PacketBuffer buf) {
+    public static void encodePacket(TransmitterNotePacket pkt, FriendlyByteBuf buf) {
         buf.writeByte(pkt.channel);
         buf.writeByte(pkt.note);
         buf.writeByte(pkt.velocity);
-        buf.writeByte(new Integer(pkt.transmitMode.ordinal()).byteValue());
+        buf.writeByte(Integer.valueOf(pkt.transmitMode.ordinal()).byteValue());
     }
 }

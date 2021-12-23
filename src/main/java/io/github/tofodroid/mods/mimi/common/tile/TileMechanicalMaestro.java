@@ -12,13 +12,16 @@ import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -27,8 +30,8 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
 
     public Boolean hasEntity;
 
-    public TileMechanicalMaestro() {
-        super(ModTiles.MECHANICALMAESTRO, 2);
+    public TileMechanicalMaestro(BlockPos pos, BlockState state) {
+        super(ModTiles.MECHANICALMAESTRO, pos, state, 2);
     }
 
     @Override
@@ -37,13 +40,13 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
 
     @Override
-    public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new ContainerMechanicalMaestro(id, playerInventory, this.getPos());
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
+        return new ContainerMechanicalMaestro(id, playerInventory, this.getBlockPos());
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-		return new TranslationTextComponent(this.getBlockState().getBlock().asItem().getTranslationKey());
+    public Component getDisplayName() {
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
     public ItemStack getSwitchboardStack() {
@@ -77,7 +80,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
 
     public UUID getMaestroUUID() {
-        String idString = "tile-mech-maestro-" + this.getPos().getX() + "-" + this.getPos().getY() + "-" + this.getPos().getZ();
+        String idString = "tile-mech-maestro-" + this.getBlockPos().getX() + "-" + this.getBlockPos().getY() + "-" + this.getBlockPos().getZ();
         return UUID.nameUUIDFromBytes(idString.getBytes());
     }
 
@@ -94,14 +97,14 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
     
     @Override
-    public void tick() {
+    public void tick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {
         if(tickCount >= UPDATE_EVERY_TICKS) {
             tickCount = 0;
-            if(this.hasWorld() && !this.world.isRemote && !this.isRemoved()) {
+            if(this.hasLevel() && !this.level.isClientSide && !this.isRemoved()) {
                 if(this.shouldHaveEntity()) {
-                    EntityNoteResponsiveTile.create(this.world, this.pos);
+                    EntityNoteResponsiveTile.create(this.level, this.getBlockPos());
                 } else {
-                    if(EntityNoteResponsiveTile.remove(this.world, this.pos)) {
+                    if(EntityNoteResponsiveTile.remove(this.level, this.getBlockPos())) {
                         this.allNotesOff();
                     }
                 }
@@ -113,14 +116,14 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
 
     @Override
     protected Boolean shouldHaveEntity() {
-        return !this.getInstrumentStack().isEmpty() && !this.getSwitchboardStack().isEmpty() && this.world.isBlockPowered(this.getPos());
+        return !this.getInstrumentStack().isEmpty() && !this.getSwitchboardStack().isEmpty() && this.level.hasNeighborSignal(this.getBlockPos());
     }
     
     public void allNotesOff() {
-		if(this.getInstrumentId() != null && this.getWorld() instanceof ServerWorld) {
+		if(this.getInstrumentId() != null && this.getLevel() instanceof ServerLevel) {
 			MidiNotePacketHandler.handlePacketsServer(
-                Arrays.asList(new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), this.getMaestroUUID(), true, this.getPos())),
-                (ServerWorld)this.getWorld(),
+                Arrays.asList(new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), this.getMaestroUUID(), true, this.getBlockPos())),
+                (ServerLevel)this.getLevel(),
                 null
             );
 		}

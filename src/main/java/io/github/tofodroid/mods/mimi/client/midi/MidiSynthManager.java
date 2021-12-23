@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,12 +37,8 @@ import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceContext.BlockMode;
-import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -114,11 +111,11 @@ public class MidiSynthManager extends AMidiSynthManager {
     
     @SuppressWarnings("resource")
     public Boolean shouldShowOnGUI(UUID messagePlayer, Byte channel, Byte instrument) {
-        ClientPlayerEntity thisPlayer = Minecraft.getInstance().player;
+        LocalPlayer thisPlayer = Minecraft.getInstance().player;
     
-        if(messagePlayer.equals(thisPlayer.getUniqueID()) && thisPlayer.openContainer instanceof ContainerInstrument) {
-            ItemStack switchStack = ((ContainerInstrument)thisPlayer.openContainer).getSelectedSwitchboard();
-            Byte guiInstrument = ((ContainerInstrument)thisPlayer.openContainer).getInstrumentId();
+        if(messagePlayer.equals(thisPlayer.getUUID()) && thisPlayer.containerMenu instanceof ContainerInstrument) {
+            ItemStack switchStack = ((ContainerInstrument)thisPlayer.containerMenu).getSelectedSwitchboard();
+            Byte guiInstrument = ((ContainerInstrument)thisPlayer.containerMenu).getInstrumentId();
 
             if(instrument == guiInstrument && ModItems.SWITCHBOARD.equals(switchStack.getItem())) {
                 UUID midiSource = ItemMidiSwitchboard.getMidiSource(switchStack);
@@ -148,7 +145,7 @@ public class MidiSynthManager extends AMidiSynthManager {
 
     @SubscribeEvent
     public void handleTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isUser()) {
+        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isLocalPlayer()) {
             return;
         }
 
@@ -176,15 +173,15 @@ public class MidiSynthManager extends AMidiSynthManager {
 
     @SubscribeEvent
     public void handleSelfLogOut(LoggedOutEvent event) {
-        if(event.getPlayer() != null && event.getPlayer().isUser()) {
+        if(event.getPlayer() != null && event.getPlayer().isLocalPlayer()) {
             this.allNotesOff();
         }
     }
     
     @SubscribeEvent
     public void handleOtherLogOut(PlayerLoggedOutEvent event) {
-        if(!event.getPlayer().isUser()) {
-            List<MidiChannelNumber> channelsToStop = getAllChannelsForPlayer(event.getPlayer().getUniqueID());
+        if(!event.getPlayer().isLocalPlayer()) {
+            List<MidiChannelNumber> channelsToStop = getAllChannelsForPlayer(event.getPlayer().getUUID());
             for(MidiChannelNumber num : channelsToStop) {
                 this.allNotesOff(num);
             }
@@ -242,21 +239,23 @@ public class MidiSynthManager extends AMidiSynthManager {
 
         MidiChannelNumber channelNumber = getChannelForPlayer(message.player, message.mechanical, message.instrumentId, true);
         MidiChannelDef channelDef = channelNumber != null ? this.midiChannelSet.get(channelNumber.ordinal()) : null;
-        Double modifiedVelocity = new Double(message.velocity);
+        Double modifiedVelocity = Double.valueOf(message.velocity);
 
         if(ModConfigs.CLIENT.raytraceSound.get()) {
+            /*
             Vector3d messageVec = new Vector3d(message.pos.getX() + 0.5, message.pos.getY() + 0.5, message.pos.getZ() + 0.5);
-            Vector3d playerVec = new Vector3d(Minecraft.getInstance().player.getPosX(),Minecraft.getInstance().player.getPosYEye(),Minecraft.getInstance().player.getPosZ());
-            Vector3d rayVec = Minecraft.getInstance().world.rayTraceBlocks(new RayTraceContext(playerVec, messageVec, BlockMode.VISUAL, FluidMode.NONE, null)).getHitVec();
+            Vector3d playerVec = new Vector3d(Minecraft.getInstance().player.getX(),Minecraft.getInstance().player.getEyeY(),Minecraft.getInstance().player.getZ());
+            Vector3d rayVec = Minecraft.getInstance().level.rayTraceBlocks(new RayTraceContext(playerVec, messageVec, BlockMode.VISUAL, FluidMode.NONE, null)).getHitVec();
 
             if(messageVec.distanceTo(playerVec) - rayVec.distanceTo(playerVec) >= 1) {
                 modifiedVelocity *= BLOCK_MIDI_REDUCTION;
                 MIMIMod.LOGGER.info("Muffling!");
             }
+            */
         }
 
         if(modifiedVelocity.intValue() > 0) {
-            if(channelDef != null) channelDef.noteOn(instrument, message.note, new Integer(modifiedVelocity.intValue()).byteValue(), message.pos);
+            if(channelDef != null) channelDef.noteOn(instrument, message.note, Integer.valueOf(modifiedVelocity.intValue()).byteValue(), message.pos);
         }
     }
 
@@ -290,10 +289,16 @@ public class MidiSynthManager extends AMidiSynthManager {
 
                 DebugUtils.logSynthInfo(midiSynth, params);
                 
-                if (midiSynth instanceof com.sun.media.sound.SoftSynthesizer) {
-                    ((com.sun.media.sound.SoftSynthesizer) midiSynth).open(null, params);
+                if (midiSynth.getClass().getName().toLowerCase().contains("com.sun.media.sound.softsynthesizer")) {
+                    try {
+                        Method method = midiSynth.getClass().getDeclaredMethod("open");
+                        method.invoke(null, params);
+                    } catch(Exception e) {
+                        MIMIMod.LOGGER.warn("Failed to find expected methods in Gervill SoftSynthesizer. Ignoring synth settings.");
+                        midiSynth.open();
+                    }                    
                 } else {
-                    MIMIMod.LOGGER.warn("Synthesizer is not Gervill. Ignoring synth settings.");
+                    MIMIMod.LOGGER.warn("Synthesizer is not Gervill. Got: '" + midiSynth.getClass().getName().toLowerCase() + "'. Ignoring synth settings.");
                     midiSynth.open();
                 }
 

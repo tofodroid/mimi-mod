@@ -4,24 +4,24 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ASwitchboardContainer;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SwitchboardStackUpdatePacketHandler {
     public static void handlePacket(final SwitchboardStackUpdatePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
             ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
         } else {
-            MIMIMod.LOGGER.warn("Client recevied unexpected SwitchboardStackUpdatePacket!");
+            MIMIMod.LOGGER.warn("Client received unexpected SwitchboardStackUpdatePacket!");
         }
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacketServer(final SwitchboardStackUpdatePacket message, ServerPlayerEntity sender) {
-        if(sender.openContainer != null) {
-            if(sender.openContainer instanceof ASwitchboardContainer) {
-                ((ASwitchboardContainer)sender.openContainer).updateSelectedSwitchboard(sender, message.midiSource, message.midiSourceName, message.filterOct, message.filterNote, message.invertNoteOct, message.enabledChannelsString, message.instrumentId, message.invertInstrument, message.sysInput, message.publicBroadcast, message.broadcastNote, message.volume);
+    public static void handlePacketServer(final SwitchboardStackUpdatePacket message, ServerPlayer sender) {
+        if(sender.containerMenu != null) {
+            if(sender.containerMenu instanceof ASwitchboardContainer) {
+                ((ASwitchboardContainer)sender.containerMenu).updateSelectedSwitchboard(sender, message.midiSource, message.midiSourceName, message.filterOct, message.filterNote, message.invertNoteOct, message.enabledChannelsString, message.instrumentId, message.invertInstrument, message.sysInput, message.publicBroadcast, message.broadcastNote, message.volume);
             }
         }
     }

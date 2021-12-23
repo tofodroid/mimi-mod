@@ -1,31 +1,38 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
 public class GuiTuningTableContainerScreen extends BaseContainerGui<ContainerTuningTable> {
 
-    public GuiTuningTableContainerScreen(ContainerTuningTable container, PlayerInventory inv, ITextComponent textComponent) {
+    public GuiTuningTableContainerScreen(ContainerTuningTable container, Inventory inv, Component textComponent) {
         super(container, inv, 176, 157, 176, "textures/gui/container_tuning.png", textComponent);
     }
 
     @Override
-    protected MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
-        Minecraft.getInstance().getTextureManager().bindTexture(guiTexture);
+        RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        blit(matrixStack, this.guiLeft, this.guiTop, this.getBlitOffset(), 0, 0, this.xSize, this.ySize, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return matrixStack;
     }
 
     @Override
-    protected MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY) {
         return matrixStack;
+    }
+
+    @Override
+    protected void renderBg(PoseStack p_97787_, float p_97788_, int p_97789_, int p_97790_) {
+        // TODO Auto-generated method stub
+        
     }
 }

@@ -4,22 +4,21 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
+import net.minecraft.world.entity.player.Player;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
-
-import net.minecraft.entity.player.PlayerEntity;
 
 // Receiver
 public class MidiSequenceInputReceiver extends MidiInputReceiver {
 
     @Override
-    protected void handleMessage(ShortMessage message, PlayerEntity player) {
+    protected void handleMessage(ShortMessage message, Player player) {
         if(MIMIMod.proxy.getMidiInput().hasTransmitter()) {
             if(isNoteOnMessage(message)) {
-                this.sendTransmitterNoteOnPacket(new Integer(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
+                this.sendTransmitterNoteOnPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
             } else if(isNoteOffMessage(message)) {
-                this.sendTransmitterNoteOffPacket(new Integer(message.getChannel()).byteValue(), message.getMessage()[1]);
+                this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);
             } else if(isAllNotesOffMessage(message)) {
-                this.sendTransmitterNoteOffPacket(new Integer(message.getChannel()).byteValue(), TransmitterNotePacket.ALL_NOTES_OFF);
+                this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), TransmitterNotePacket.ALL_NOTES_OFF);
             }
         }
     }

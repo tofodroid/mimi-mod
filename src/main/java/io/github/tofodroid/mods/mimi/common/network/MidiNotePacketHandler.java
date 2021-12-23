@@ -1,13 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,21 +7,27 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketsServer(Arrays.asList(message),ctx.get().getSender().getServerWorld(), ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handlePacketsServer(Arrays.asList(message),ctx.get().getSender().getLevel(), ctx.get().getSender()));
         } else {
             ctx.get().enqueueWork(() -> handlePacketClient(message));
         }
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacketsServer(final List<MidiNotePacket> messages, ServerWorld worldIn, ServerPlayerEntity sender) {
+    public static void handlePacketsServer(final List<MidiNotePacket> messages, ServerLevel worldIn, ServerPlayer sender) {
         if(messages != null && !messages.isEmpty()) {
             // Forward to players
             for(MidiNotePacket packet : messages) {
@@ -49,7 +47,7 @@ public class MidiNotePacketHandler {
                     
                     getPotentialListeners(entities).forEach(listener -> {
                         if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
-                            ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getPos()), 15, listener.getPos());
+                            //ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
                         }
                     });
                 }
@@ -61,12 +59,12 @@ public class MidiNotePacketHandler {
         MIMIMod.proxy.getMidiSynth().handlePacket(message); 
     }
 
-    protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerWorld worldIn, BlockPos notePos, Integer range) {
+    protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerLevel worldIn, BlockPos notePos, Integer range) {
         List<EntityNoteResponsiveTile> potentialEntites = new ArrayList<>();
 
-        AxisAlignedBB queryBox = new AxisAlignedBB(notePos.getX() - range, notePos.getY() - range, notePos.getZ() - range, 
+        AABB queryBox = new AABB(notePos.getX() - range, notePos.getY() - range, notePos.getZ() - range, 
                                                     notePos.getX() + range, notePos.getY() + range, notePos.getZ() + range);
-        potentialEntites = worldIn.getEntitiesWithinAABB(EntityNoteResponsiveTile.class, queryBox, entity -> {
+        potentialEntites = worldIn.getEntitiesOfClass(EntityNoteResponsiveTile.class, queryBox, entity -> {
             return entity.getTile() != null;
         });
 
@@ -77,12 +75,12 @@ public class MidiNotePacketHandler {
         return entities.stream().filter(e -> e.getTile() instanceof TileListener).map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
     }
     
-    protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerWorld worldIn, ServerPlayerEntity excludePlayer, Double range) {
+    protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerLevel worldIn, ServerPlayer excludePlayer, Double range) {
         return PacketDistributor.NEAR.with(() -> {
             if(excludePlayer == null) {
-                return new PacketDistributor.TargetPoint(targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.getDimensionKey());
+                return new PacketDistributor.TargetPoint(targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.dimension());
             } else {
-                return new PacketDistributor.TargetPoint(excludePlayer, targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.getDimensionKey());
+                return new PacketDistributor.TargetPoint(excludePlayer, targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.dimension());
             }
         });
     }

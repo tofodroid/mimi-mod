@@ -3,13 +3,14 @@ package io.github.tofodroid.mods.mimi.common.mob.villager;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.merchant.villager.VillagerTrades;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.MerchantOffer;
-import net.minecraft.item.Item;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.entity.npc.VillagerTrades;
 
-public class ItemsForItemsTrade implements VillagerTrades.ITrade {
+
+public class ItemsForItemsTrade implements VillagerTrades.ItemListing {
    private final List<? extends Item> sellItems;
    private final int sellCount;
    private final List<? extends Item> buyItems;

@@ -1,17 +1,17 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class GuiMechanicalMaestroContainerScreen extends ASwitchboardBlockGui<ContainerMechanicalMaestro> {
-    public GuiMechanicalMaestroContainerScreen(ContainerMechanicalMaestro container, PlayerInventory inv, ITextComponent textComponent) {
+    public GuiMechanicalMaestroContainerScreen(ContainerMechanicalMaestro container, Inventory inv, Component textComponent) {
         super(container, inv, textComponent);
     }
 
@@ -28,27 +28,27 @@ public class GuiMechanicalMaestroContainerScreen extends ASwitchboardBlockGui<Co
 	}
     
     @Override
-    protected Vector2f titleBoxPos() {
-        return new Vector2f(78,8);
+    protected Vector3f titleBoxPos() {
+        return new Vector3f(78,8,0);
 	}
 
     @Override
-    protected Vector2f titleBoxBlit() {
-        return new Vector2f(0,265);
+    protected Vector3f titleBoxBlit() {
+        return new Vector3f(0,265,0);
     }
 
     @Override
-    protected Vector2f titleBoxSize() {
-        return new Vector2f(171,16);
+    protected Vector3f titleBoxSize() {
+        return new Vector3f(171,16,0);
     }
     
     @Override
-    protected Vector2f switchboardSlotPos() {
-        return new Vector2f(9,205);
+    protected Vector3f switchboardSlotPos() {
+        return new Vector3f(9,205,0);
     }
 
-    protected Vector2f instrumentSlotPos() {
-        return new Vector2f(9,168);
+    protected Vector3f instrumentSlotPos() {
+        return new Vector3f(9,168,0);
     }
     
     @Override
@@ -67,17 +67,17 @@ public class GuiMechanicalMaestroContainerScreen extends ASwitchboardBlockGui<Co
     }
 
     @Override
-    protected MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         matrixStack = super.renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
 
         // Instrument Slot
-        blit(matrixStack, this.guiLeft + new Float(instrumentSlotPos().x).intValue(), this.guiTop + new Float(instrumentSlotPos().y).intValue(), this.getBlitOffset(), 1, 367, 140, 28, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(instrumentSlotPos().x()).intValue(), START_Y + Float.valueOf(instrumentSlotPos().y()).intValue(), this.getBlitOffset(), 1, 367, 140, 28, TEXTURE_SIZE, TEXTURE_SIZE);
 
         return matrixStack;
     }
 
     private void allNotesOff() {
-		TileEntity tile = player.world.getTileEntity(container.getTilePos());
+		BlockEntity tile = player.level.getBlockEntity(container.getTilePos());
 		TileMechanicalMaestro mechTile = tile != null && ModTiles.MECHANICALMAESTRO.equals(tile.getType()) ? (TileMechanicalMaestro) tile : null;
 
 		if(mechTile != null) {

@@ -1,24 +1,25 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
-import net.minecraft.block.CauldronBlock;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.network.NetworkHooks;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
     protected final Integer defaultColor;
 
     public ItemInstrument(String name, Byte instrumentId, Boolean dyeable, Integer defaultColor) {
-        super(new Properties().group(ModItems.ITEM_GROUP).maxStackSize(1));
+        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
         this.setRegistryName(name);
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
@@ -56,49 +57,40 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
 
     @Override
     @Nonnull
-    public ActionResultType onItemUse(ItemUseContext context) {
-        if(!context.getPlayer().isSneaking() && ((IDyeableInstrumentItem)context.getItem().getItem()).hasColor(context.getItem()) && context.getWorld().getBlockState(context.getPos()).getBlock() instanceof CauldronBlock) {
-            return ActionResultType.SUCCESS;
+    public InteractionResult useOn(UseOnContext context) {
+        if(!context.getPlayer().isCrouching() && ((IDyeableInstrumentItem)context.getItemInHand().getItem()).hasColor(context.getItemInHand()) && context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof CauldronBlock) {
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
     @Nonnull
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        if (!worldIn.isRemote) {
-            NetworkHooks.openGui((ServerPlayerEntity) playerIn, generateContainerProvider(handIn), buffer -> {
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+        if (!worldIn.isClientSide) {
+            NetworkHooks.openGui((ServerPlayer) playerIn, generateContainerProvider(handIn), buffer -> {
                 buffer.writeByte(this.instrumentId);
                 buffer.writeBoolean(true);
-                buffer.writeBoolean(Hand.MAIN_HAND.equals(handIn));
+                buffer.writeBoolean(InteractionHand.MAIN_HAND.equals(handIn));
             });
-            return new ActionResult<>(ActionResultType.CONSUME, playerIn.getHeldItem(handIn));
+            return new InteractionResultHolder<>(InteractionResult.CONSUME, playerIn.getItemInHand(handIn));
         }
 
-		return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
+		return new InteractionResultHolder<>(InteractionResult.SUCCESS, playerIn.getItemInHand(handIn));
     }
 
-    @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-    }
-
-    public INamedContainerProvider generateContainerProvider(Hand handIn) {
-        return new InstrumentContainerProvider() {
+    public MenuProvider generateContainerProvider(InteractionHand handIn) {
+        return new InstrumentMenuProvider() {
             @Override
-            public Container createMenu(int p1, PlayerInventory p2,  PlayerEntity p3) {
+            public AbstractContainerMenu createMenu(int p1, Inventory p2,  Player p3) {
                 return new ContainerInstrument(p1, p2, instrumentId, handIn);
             }
     
             @Override
-            public ITextComponent getDisplayName() {return getMenuDisplayName();}
+            public TextComponent getDisplayName() {return new TextComponent("");}
         };
     }
-
-	public ITextComponent getMenuDisplayName() {
-		return new TranslationTextComponent(this.getTranslationKey());
-	}
 
     public Byte getInstrumentId() {
         return this.instrumentId;
@@ -114,7 +106,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
 
     public static String getInstrumentName(ItemStack stack) {
         if (stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemInstrument) {
-            return stack.getItem().getName().getString();
+            return stack.getItem().getDescription().getString();
         }
 
         return null;
@@ -135,8 +127,8 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
 		return handler;
 	}
 
-    public static ItemStack getEntityHeldInstrumentStack(LivingEntity entity, Hand handIn) {
-        ItemStack heldStack = entity.getHeldItem(handIn);
+    public static ItemStack getEntityHeldInstrumentStack(LivingEntity entity, InteractionHand handIn) {
+        ItemStack heldStack = entity.getItemInHand(handIn);
 
         if(heldStack != null && heldStack.getItem() instanceof ItemInstrument) {
             return heldStack;
@@ -146,11 +138,11 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
     }
     
     public static Boolean isEntityHoldingInstrument(LivingEntity entity) {
-        return getEntityHeldInstrumentStack(entity, Hand.MAIN_HAND) != null 
-            || getEntityHeldInstrumentStack(entity, Hand.OFF_HAND) != null;
+        return getEntityHeldInstrumentStack(entity, InteractionHand.MAIN_HAND) != null 
+            || getEntityHeldInstrumentStack(entity, InteractionHand.OFF_HAND) != null;
     }
 
-    public static Byte getEntityHeldInstrumentId(LivingEntity entity, Hand handIn) {
+    public static Byte getEntityHeldInstrumentId(LivingEntity entity, InteractionHand handIn) {
         ItemStack instrumentStack = getEntityHeldInstrumentStack(entity, handIn);
 
         if(instrumentStack != null) {
@@ -185,11 +177,11 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
         return !getSwitchboardStack(stack).isEmpty();
     }
 
-    protected class InstrumentContainerProvider implements INamedContainerProvider {
+    protected class InstrumentMenuProvider implements MenuProvider {
         @Override
-        public Container createMenu(int p1, PlayerInventory p2,  PlayerEntity p3) {return null;}
+        public AbstractContainerMenu createMenu(int p1, Inventory p2,  Player p3) {return null;}
 
         @Override
-        public ITextComponent getDisplayName() {return null;}
+        public TextComponent getDisplayName() {return null;}
     }
 }

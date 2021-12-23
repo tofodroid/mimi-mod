@@ -1,11 +1,10 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetworkManager {
     private static final String NET_PROTOCOL = "1";

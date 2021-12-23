@@ -16,12 +16,12 @@ import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class MidiChannelDef {
     public static final Integer MIDI_CHANNEL_IDLE_SECONDS = 8;
@@ -76,16 +76,16 @@ public class MidiChannelDef {
         DebugUtils.logNoteTimingInfo(this.getClass(), false, instrumentId, note, null, null);
     }
 
-    public Boolean tick(PlayerEntity clientPlayer) {
+    public Boolean tick(Player clientPlayer) {
         if(!this.assigned) {
             MIMIMod.LOGGER.warn("Attempted to tick unassigned channel: " + this.channel.toString());
             return null;
         } else {
-            Boolean clientChannel = isClientChannel(clientPlayer.getUniqueID());
-            if(!this.isIdle() && !(!clientChannel && Math.sqrt(clientPlayer.getPosition().distanceSq(lastNotePos)) > 72d) && ((!mechanical && isPlayerUsingInstrument(clientPlayer.getEntityWorld()) || (mechanical && isMechanicalMaestroUsingInstrument(clientPlayer.getEntityWorld()))))) {
+            Boolean clientChannel = isClientChannel(clientPlayer.getUUID());
+            if(!this.isIdle() && !(!clientChannel && Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)) > 72d) && ((!mechanical && isPlayerUsingInstrument(clientPlayer.getLevel()) || (mechanical && isMechanicalMaestroUsingInstrument(clientPlayer.getLevel()))))) {
                 if (!clientChannel) {
-                    setVolume(Math.sqrt(clientPlayer.getPosition().distanceSq(lastNotePos)));
-                    setLRPan(clientPlayer.getPosition(), clientPlayer.getRotationYawHead());
+                    setVolume(Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)));
+                    setLRPan(clientPlayer.getOnPos(), clientPlayer.getYHeadRot());
                 } else {
                     setVolume(0d);
                 }
@@ -100,34 +100,34 @@ public class MidiChannelDef {
         }
     }
 
-    public Boolean isPlayerUsingInstrument(World worldIn) {
-        PlayerEntity player = worldIn.getPlayerByUuid(this.entityId);
+    public Boolean isPlayerUsingInstrument(Level worldIn) {
+        Player player = worldIn.getPlayerByUUID(this.entityId);
 
         if(player == null) {
             return false;
         }
 
-        Byte checkId = ItemInstrument.getEntityHeldInstrumentId(player, Hand.MAIN_HAND);
+        Byte checkId = ItemInstrument.getEntityHeldInstrumentId(player, InteractionHand.MAIN_HAND);
         if(checkId != null && checkId.equals(this.instrumentId)) {
             return true;
         }
 
-        checkId = ItemInstrument.getEntityHeldInstrumentId(player, Hand.OFF_HAND);
+        checkId = ItemInstrument.getEntityHeldInstrumentId(player, InteractionHand.OFF_HAND);
         if(checkId != null && checkId.equals(this.instrumentId)) {
             return true;
         }
 
         TileInstrument instrumentTile = BlockInstrument.getTileInstrumentForEntity(player);
         checkId = instrumentTile != null ? instrumentTile.getInstrumentId() : null;
-        if(checkId != null && checkId.equals(this.instrumentId) && (lastNotePos != null ? lastNotePos.equals(player.getPosition()) : true)){
+        if(checkId != null && checkId.equals(this.instrumentId) && (lastNotePos != null ? lastNotePos.equals(player.getOnPos()) : true)){
             return true;
         }
 
         return false;
     }
 
-    public Boolean isMechanicalMaestroUsingInstrument(World worldIn) {
-        TileEntity tile = worldIn.getTileEntity(this.lastNotePos);
+    public Boolean isMechanicalMaestroUsingInstrument(Level worldIn) {
+        BlockEntity tile = worldIn.getBlockEntity(this.lastNotePos);
         TileMechanicalMaestro mech = tile != null && ModTiles.MECHANICALMAESTRO.equals(tile.getType()) ? (TileMechanicalMaestro) tile : null;
 
         if(mech == null) {
@@ -168,8 +168,8 @@ public class MidiChannelDef {
         Double volume = 127d - Math.floor((127 * Math.pow(distance,2.5)) / (Math.pow(distance,2.5) + Math.pow(72 - distance,2.5)));
 
         // 2. Adjust for game volume
-        Float catVolume = Minecraft.getInstance().gameSettings.getSoundLevel(SoundCategory.PLAYERS);
-              catVolume *= Minecraft.getInstance().gameSettings.getSoundLevel(SoundCategory.MASTER);
+        Float catVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.PLAYERS);
+              catVolume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
               volume *= catVolume.doubleValue();
 
         // Clamp

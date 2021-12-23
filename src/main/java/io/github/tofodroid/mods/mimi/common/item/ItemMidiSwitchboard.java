@@ -1,16 +1,16 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.SortedArraySet;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,75 +51,75 @@ public class ItemMidiSwitchboard extends Item {
     private Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
     public ItemMidiSwitchboard() {
-        super(new Properties().group(ModItems.ITEM_GROUP).maxStackSize(1));
+        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
         this.setRegistryName("switchboard");
     }
 
     @Override
-    public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+    public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
         // Server-side only
-        if(!playerIn.getEntityWorld().isRemote()) {  
-            if(target instanceof PlayerEntity) {
-                ItemMidiSwitchboard.setMidiSource(stack, target.getUniqueID(), target.getName().getString());
-                playerIn.setHeldItem(hand, stack);
-                playerIn.sendStatusMessage(new StringTextComponent("Set MIDI Source to: " +  target.getName().getString()), true);
-                return ActionResultType.CONSUME;
+        if(!playerIn.getLevel().isClientSide()) {  
+            if(target instanceof Player) {
+                ItemMidiSwitchboard.setMidiSource(stack, target.getUUID(), target.getName().getString());
+                playerIn.setItemInHand(hand, stack);
+                playerIn.sendMessage(new TextComponent("Set MIDI Source to: " +  target.getName().getString()), playerIn.getUUID());
+                return InteractionResult.CONSUME;
             }
         } else {
             // Cancel click event client side
-            if(target instanceof PlayerEntity) {
-                return ActionResultType.SUCCESS;
+            if(target instanceof Player) {
+                return InteractionResult.SUCCESS;
             }
         }
         
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         // Client-side only
-        if(worldIn != null && worldIn.isRemote) {
+        if(worldIn != null && worldIn.isClientSide) {
             
-            tooltip.add(new StringTextComponent("----------------"));
+            tooltip.add(new TextComponent("----------------"));
 
             // MIDI Source Filter
-            tooltip.add(new StringTextComponent("Transmitter: " + ItemMidiSwitchboard.getMidiSourceName(stack)));
+            tooltip.add(new TextComponent("Transmitter: " + ItemMidiSwitchboard.getMidiSourceName(stack)));
 
             if(ItemMidiSwitchboard.getSysInput(stack)) {
-                tooltip.add(new StringTextComponent("System MIDI Device: Enabled"));
+                tooltip.add(new TextComponent("System MIDI Device: Enabled"));
             } else {
-                tooltip.add(new StringTextComponent("System MIDI Device: Disabled"));
+                tooltip.add(new TextComponent("System MIDI Device: Disabled"));
             }
 
             // MIDI Channels Filter
             SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(stack);
             if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
                 if(acceptedChannels.size() == MidiChannelNumber.values().length) {
-                    tooltip.add(new StringTextComponent("Channels: All"));
+                    tooltip.add(new TextComponent("Channels: All"));
                 } else {
-                    tooltip.add(new StringTextComponent("Channels: " + acceptedChannels.stream().map(c -> new Integer(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
+                    tooltip.add(new TextComponent("Channels: " + acceptedChannels.stream().map(c -> Integer.valueOf(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
                 }
             } else {
-                tooltip.add(new StringTextComponent("Channels: None"));
+                tooltip.add(new TextComponent("Channels: None"));
             }
 
             // MIDI Note Filter
-            tooltip.add(new StringTextComponent("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+            tooltip.add(new TextComponent("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
 
             // Instrument Filter
-            tooltip.add(new StringTextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
+            tooltip.add(new TextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
 
             // Instrument Volume
-            tooltip.add(new StringTextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
+            tooltip.add(new TextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
         }
     }
 
     // DATA FUNCTIONS
     public static void setMidiSource(ItemStack stack, UUID sourceId, String sourceName) {
         if (sourceId != null && sourceName != null) {
-            stack.getOrCreateTag().putUniqueId(SOURCE_TAG, sourceId);
+            stack.getOrCreateTag().putUUID(SOURCE_TAG, sourceId);
             stack.getOrCreateTag().putString(SOURCE_NAME_TAG, sourceName);
         } else if (stack.hasTag()) {
             stack.getTag().remove(SOURCE_TAG);
@@ -129,7 +129,7 @@ public class ItemMidiSwitchboard extends Item {
 
     public static UUID getMidiSource(ItemStack stack) {
         if (stackTagContainsKey(stack, SOURCE_TAG)) {
-            return stack.getTag().getUniqueId(SOURCE_TAG);
+            return stack.getTag().getUUID(SOURCE_TAG);
         }
 
         return null;
@@ -166,7 +166,7 @@ public class ItemMidiSwitchboard extends Item {
             SortedArraySet<Byte> acceptedChannels = getEnabledChannelsSet(switchStack);
 
             if(acceptedChannels == null) {
-                acceptedChannels = SortedArraySet.newSet(16);
+                acceptedChannels = SortedArraySet.create(16);
             }
 
             if(isChannelEnabled(switchStack, channelId)) {
@@ -175,7 +175,7 @@ public class ItemMidiSwitchboard extends Item {
                 acceptedChannels.add(channelId);
             }
 
-            String acceptedChannelsString = acceptedChannels.stream().map(b -> new Integer(b + 1).toString()).collect(Collectors.joining(","));
+            String acceptedChannelsString = acceptedChannels.stream().map(b -> Integer.valueOf(b + 1).toString()).collect(Collectors.joining(","));
             setEnabledChannelsString(switchStack, acceptedChannelsString);
         }
     }
@@ -196,12 +196,12 @@ public class ItemMidiSwitchboard extends Item {
         String acceptedChannelString = getEnabledChannelsString(switchStack);
 
         if(acceptedChannelString != null && !acceptedChannelString.isEmpty()) {
-            SortedArraySet<Byte> result = SortedArraySet.newSet(16);
-            result.addAll(Arrays.asList(acceptedChannelString.split(",", -1)).stream().map(b -> new Integer(Byte.valueOf(b) - 1).byteValue()).collect(Collectors.toSet()));
+            SortedArraySet<Byte> result = SortedArraySet.create(16);
+            result.addAll(Arrays.asList(acceptedChannelString.split(",", -1)).stream().map(b -> Integer.valueOf(Byte.valueOf(b) - 1).byteValue()).collect(Collectors.toSet()));
             return result;
         }
 
-        return SortedArraySet.newSet(0);
+        return SortedArraySet.create(0);
     }
 
     public static void setFilterOct(ItemStack stack, Byte oct) {
@@ -351,7 +351,7 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public static String getInstrumentVolumePercent(ItemStack stack) {
-        Integer value = new Integer(new Double((new Double(getInstrumentVolume(stack)) / new Double(MAX_INSTRUMENT_VOLUME)) * 10).intValue());
+        Integer value = Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * 10).intValue());
         return value == 10 ? value.toString() : "0" + value.toString();
     }
 
@@ -359,14 +359,14 @@ public class ItemMidiSwitchboard extends Item {
         Byte result = sourceVelocity;
 
         if(stack != null && stack.getItem().equals(ModItems.SWITCHBOARD)) {
-            result = new Integer(new Double((new Double(getInstrumentVolume(stack)) / new Double(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
+            result = Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
         }
 
         return  result;
     }
 
     public String getInstrumentName(ItemStack stack) {
-        return INSTRUMENT_NAME_MAP().get(new Integer(ItemMidiSwitchboard.getInstrument(stack)).byteValue());
+        return INSTRUMENT_NAME_MAP().get(Integer.valueOf(ItemMidiSwitchboard.getInstrument(stack)).byteValue());
     }
 
     public static List<Byte> getFilterNotes(ItemStack stack) {
@@ -374,18 +374,18 @@ public class ItemMidiSwitchboard extends Item {
         Byte oct = getFilterOct(stack);
         Byte note = getFilterNote(stack);
 
-        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL && new Integer(oct*12+note) <= Byte.MAX_VALUE) {
-            result.add(new Integer(oct*12+note).byteValue());
+        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL && Integer.valueOf(oct*12+note) <= Byte.MAX_VALUE) {
+            result.add(Integer.valueOf(oct*12+note).byteValue());
         } else if(oct != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 12; i++) {
-                if(new Integer(oct*12+i) <= Byte.MAX_VALUE) {
-                    result.add(new Integer(oct*12+i).byteValue());
+                if(Integer.valueOf(oct*12+i) <= Byte.MAX_VALUE) {
+                    result.add(Integer.valueOf(oct*12+i).byteValue());
                 }
             }
         } else if(note != FILTER_NOTE_OCT_ALL) {
             for(int i = 0; i < 10; i++) {
-                if(new Integer(i*12+note) <= Byte.MAX_VALUE) {
-                    result.add(new Integer(i*12+note).byteValue());
+                if(Integer.valueOf(i*12+note) <= Byte.MAX_VALUE) {
+                    result.add(Integer.valueOf(i*12+note).byteValue());
                 }
             }
         }
@@ -404,8 +404,8 @@ public class ItemMidiSwitchboard extends Item {
         String result = "None";
 
         if(getBroadcastNote(stack) != null) {
-            Byte filterNoteLetter = new Integer(getBroadcastNote(stack) % 12).byteValue();
-            Byte filterNoteOctave = new Integer(getBroadcastNote(stack) / 12).byteValue();
+            Byte filterNoteLetter = Integer.valueOf(getBroadcastNote(stack) % 12).byteValue();
+            Byte filterNoteOctave = Integer.valueOf(getBroadcastNote(stack) / 12).byteValue();
             result = noteLetterFromNum(filterNoteLetter) + filterNoteOctave;
         }
 
@@ -486,12 +486,12 @@ public class ItemMidiSwitchboard extends Item {
     
     protected Map<Byte,String> loadInstrumentNames() {
         Map<Byte,String> result = new HashMap<>();
-        result.put(new Integer(-1).byteValue(), "All");
+        result.put(Integer.valueOf(-1).byteValue(), "All");
         ModItems.INSTRUMENT_ITEMS.forEach(item -> {
-            result.put(item.getInstrumentId(), item.getName().getString());
+            result.put(item.getInstrumentId(), item.getDescription().getString());
         });
         ModItems.BLOCK_INSTRUMENT_ITEMS.forEach(item -> {
-            result.put(item.getInstrumentId(), item.getBlock().getTranslatedName().getString());
+            result.put(item.getInstrumentId(), item.getBlock().getName().getString());
         });
         return result;
     }

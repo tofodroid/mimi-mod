@@ -5,38 +5,39 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
 public class TileInstrument extends ATileInventory {
     public static final String COLOR_TAG = "color";
 
     protected Integer color;
 
-    public TileInstrument() {
-        super(ModTiles.INSTRUMENT, 1);
+    public TileInstrument(BlockPos pos, BlockState state) {
+        super(ModTiles.INSTRUMENT, pos, state, 1);
     }
 
     @Override
-    public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new ContainerInstrument(id, playerInventory, this.getInstrumentId(), this.getPos());
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
+        return new ContainerInstrument(id, playerInventory, this.getInstrumentId(), this.getBlockPos());
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-		return new TranslationTextComponent(this.getBlockState().getBlock().asItem().getTranslationKey());
+    public Component getDisplayName() {
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundTag save(CompoundTag compound) {
+        super.save(compound);
 
         if(this.color != null) {
             compound.putInt(COLOR_TAG, color);
@@ -46,8 +47,8 @@ public class TileInstrument extends ATileInventory {
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
 
         if(compound.contains(COLOR_TAG)) {
             this.color = compound.getInt(COLOR_TAG);
@@ -77,7 +78,7 @@ public class TileInstrument extends ATileInventory {
     }
 
     public String getInstrumentName() {
-        return getBlockState().getBlock().asItem().getName().getString();
+        return getBlockState().getBlock().asItem().getDescription().getString();
     }
 
     public ItemStack getSwitchboardStack() {

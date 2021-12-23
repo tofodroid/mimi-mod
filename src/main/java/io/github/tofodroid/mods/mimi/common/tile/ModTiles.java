@@ -6,45 +6,44 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid=MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ModTiles {
-    public static TileEntityType<TileInstrument> INSTRUMENT = null;
-    public static TileEntityType<TileReceiver> RECEIVER = null;
-    public static TileEntityType<TileListener> LISTENER = null;
-    public static TileEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = null;
-    public static TileEntityType<TileConductor> CONDUCTOR = null;
+    public static BlockEntityType<TileInstrument> INSTRUMENT = null;
+    public static BlockEntityType<TileReceiver> RECEIVER = null;
+    public static BlockEntityType<TileListener> LISTENER = null;
+    public static BlockEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = null;
+    public static BlockEntityType<TileConductor> CONDUCTOR = null;
 
-    private static final List<TileEntityType<?>> buildTileTypes() {
-        List<TileEntityType<?>> types = new ArrayList<>();
-        INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", TileEntityType.Builder.create(TileInstrument::new, ModBlocks.INSTRUMENTS.toArray(new BlockInstrument[ModBlocks.INSTRUMENTS.size()])));
+    private static final List<BlockEntityType<?>> buildTileTypes() {
+        List<BlockEntityType<?>> types = new ArrayList<>();
+        INSTRUMENT = buildType(MIMIMod.MODID + ":instrument", BlockEntityType.Builder.of(TileInstrument::new, ModBlocks.INSTRUMENTS.toArray(new BlockInstrument[ModBlocks.INSTRUMENTS.size()])));
         types.add(INSTRUMENT);
-        RECEIVER = buildType(MIMIMod.MODID + ":receiver", TileEntityType.Builder.create(TileReceiver::new, ModBlocks.RECEIVER));
+        RECEIVER = buildType(MIMIMod.MODID + ":receiver", BlockEntityType.Builder.of(TileReceiver::new, ModBlocks.RECEIVER));
         types.add(RECEIVER);
-        LISTENER = buildType(MIMIMod.MODID + ":listener", TileEntityType.Builder.create(TileListener::new, ModBlocks.LISTENER));
+        LISTENER = buildType(MIMIMod.MODID + ":listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER));
         types.add(LISTENER);
-        MECHANICALMAESTRO = buildType(MIMIMod.MODID + ":mechanicalmaestro", TileEntityType.Builder.create(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO));
+        MECHANICALMAESTRO = buildType(MIMIMod.MODID + ":mechanicalmaestro", BlockEntityType.Builder.of(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO));
         types.add(MECHANICALMAESTRO);
-        CONDUCTOR = buildType(MIMIMod.MODID + ":conductor", TileEntityType.Builder.create(TileConductor::new, ModBlocks.CONDUCTOR));
+        CONDUCTOR = buildType(MIMIMod.MODID + ":conductor", BlockEntityType.Builder.of(TileConductor::new, ModBlocks.CONDUCTOR));
         types.add(CONDUCTOR);
         return types;
     }
     
-    private static <T extends TileEntity> TileEntityType<T> buildType(String id, TileEntityType.Builder<T> builder) {
-        TileEntityType<T> type = builder.build(null);
+    private static <T extends BlockEntity> BlockEntityType<T> buildType(String id, BlockEntityType.Builder<T> builder) {
+        BlockEntityType<T> type = builder.build(null);
         type.setRegistryName(id);
         return type;
     }
 
     @SubscribeEvent
-    public static void registerTypes(final RegistryEvent.Register<TileEntityType<?>> event) {
-        List<TileEntityType<?>> types = buildTileTypes();
+    public static void registerTypes(final RegistryEvent.Register<BlockEntityType<?>> event) {
+        List<BlockEntityType<?>> types = buildTileTypes();
         types.forEach(type -> event.getRegistry().register(type));
     }
 }

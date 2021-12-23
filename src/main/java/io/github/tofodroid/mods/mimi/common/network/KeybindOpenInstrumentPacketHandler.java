@@ -6,11 +6,11 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraft.util.Hand;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 
 public class KeybindOpenInstrumentPacketHandler {
     public static void handlePacket(final KeybindOpenInstrumentPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -22,7 +22,7 @@ public class KeybindOpenInstrumentPacketHandler {
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacketServer(final KeybindOpenInstrumentPacket message, ServerPlayerEntity sender) {
+    public static void handlePacketServer(final KeybindOpenInstrumentPacket message, ServerPlayer sender) {
         if(message.handheld) {
             Byte instrumentId = ItemInstrument.getEntityHeldInstrumentId(sender, message.handIn);
 
@@ -31,7 +31,7 @@ public class KeybindOpenInstrumentPacketHandler {
                 NetworkHooks.openGui(sender, heldInstrument.generateContainerProvider(message.handIn), buffer -> {
                     buffer.writeByte(instrumentId);
                     buffer.writeBoolean(true);
-                    buffer.writeBoolean(Hand.MAIN_HAND.equals(message.handIn));
+                    buffer.writeBoolean(InteractionHand.MAIN_HAND.equals(message.handIn));
                 });
             }
         } else {
@@ -41,7 +41,7 @@ public class KeybindOpenInstrumentPacketHandler {
                 NetworkHooks.openGui(sender, tile, buffer -> {
                     buffer.writeByte(tile.getInstrumentId());
                     buffer.writeBoolean(false);
-                    buffer.writeBlockPos(tile.getPos());
+                    buffer.writeBlockPos(tile.getBlockPos());
                 });
             }
         }

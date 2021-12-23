@@ -1,12 +1,12 @@
 package io.github.tofodroid.mods.mimi.common.container;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
 
-public abstract class APlayerInventoryContainer extends Container {
+public abstract class APlayerInventoryContainer extends AbstractContainerMenu {
 	public static final int PLAYER_INVENTORY_MIN_SLOT_ID = 0;
 	public static final int PLAYER_HOTBAR_MIN_SLOT_ID = 27;
 	public static final int TARGET_CONTAINER_MIN_SLOT_ID = 36;
@@ -16,28 +16,18 @@ public abstract class APlayerInventoryContainer extends Container {
 	protected static final int HOTBAR_SLOT_COUNT = 9;
 	protected static final int HOTBAR_Y_OFFSET = 40;
 
-	protected PlayerInventory playerInventory;
+	protected Inventory playerInventory;
 			
-	public APlayerInventoryContainer(ContainerType<?> type, int id, PlayerInventory playerInventory) {
-		super(type, id);
+	public APlayerInventoryContainer(MenuType<?> menuType, int id, Inventory playerInventory) {
+		super(menuType,id);
 		this.playerInventory = playerInventory;
         this.buildPlayerSlots(playerInventory);
 	}	
 
-	@Override
-	public void onContainerClosed(PlayerEntity playerIn) {
-		super.onContainerClosed(playerIn);
-	}
-
-	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
-		return true;
-	}
-	
 	protected abstract Integer getPlayerInventoryX();
 	protected abstract Integer getPlayerInventoryY();
 	
-    protected void buildPlayerSlots(PlayerInventory playerInventory) {
+    protected void buildPlayerSlots(Inventory playerInventory) {
  		// Build player inventory
  	    for (int row = 0; row < INVENTORY_PLAYER_ROW_COUNT; row++) {
  	    	for(int col = 0; col < INVENTORY_PLAYER_COLUMN_COUNT; col++) {
@@ -56,11 +46,16 @@ public abstract class APlayerInventoryContainer extends Container {
  	    }
     }
 
-	protected Slot buildHotbarSlot(PlayerInventory playerInventory, int slot, int xPos, int yPos) {
+	protected Slot buildHotbarSlot(Inventory playerInventory, int slot, int xPos, int yPos) {
 		return buildPlayerSlot(playerInventory, slot, xPos, yPos);
 	}
 
-	protected Slot buildPlayerSlot(PlayerInventory playerInventory, int slot, int xPos, int yPos) {
+	protected Slot buildPlayerSlot(Inventory playerInventory, int slot, int xPos, int yPos) {
 		return new Slot(playerInventory, slot, xPos, yPos);
+	}
+	
+	@Override
+	public boolean stillValid(Player p_38874_) {
+		return p_38874_.isAlive();
 	}
 }

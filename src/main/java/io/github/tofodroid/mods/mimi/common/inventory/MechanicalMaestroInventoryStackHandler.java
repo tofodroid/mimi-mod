@@ -5,8 +5,7 @@ import javax.annotation.Nonnull;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class MechanicalMaestroInventoryStackHandler extends ItemStackHandler {

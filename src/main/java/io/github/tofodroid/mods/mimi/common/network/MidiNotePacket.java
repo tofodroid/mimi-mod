@@ -3,9 +3,8 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class MidiNotePacket {
     public static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
@@ -26,12 +25,12 @@ public class MidiNotePacket {
         this.pos = pos;
     }
 
-    public static MidiNotePacket decodePacket(PacketBuffer buf) {
+    public static MidiNotePacket decodePacket(FriendlyByteBuf buf) {
         try {
             byte note = buf.readByte();
             byte velocity = buf.readByte();
             byte instrumentId = buf.readByte();
-            UUID player = buf.readUniqueId();
+            UUID player = buf.readUUID();
             Boolean mechanical = buf.readBoolean();
             BlockPos pos = buf.readBlockPos();
             return new MidiNotePacket(note, velocity, instrumentId, player, mechanical, pos);
@@ -41,11 +40,11 @@ public class MidiNotePacket {
         }
     }
 
-    public static void encodePacket(MidiNotePacket pkt, PacketBuffer buf) {
+    public static void encodePacket(MidiNotePacket pkt, FriendlyByteBuf buf) {
         buf.writeByte(pkt.note);
         buf.writeByte(pkt.velocity);
         buf.writeByte(pkt.instrumentId);
-        buf.writeUniqueId(pkt.player);
+        buf.writeUUID(pkt.player);
         buf.writeBoolean(pkt.mechanical);
         buf.writeBlockPos(pkt.pos);
     }

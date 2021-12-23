@@ -1,27 +1,23 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
 import io.github.tofodroid.mods.mimi.common.inventory.SwitchboardInventoryStackHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public abstract class ATileInventory extends TileEntity implements INamedContainerProvider {
+public abstract class ATileInventory extends BlockEntity implements MenuProvider {
     public static final String INVENTORY_TAG = "inv";
 
     protected final Integer INVENTORY_SIZE;
     protected LazyOptional<? extends ItemStackHandler> inventory;
     
-    public ATileInventory(TileEntityType<?> type, Integer inventorySize) {
-        super(type);
+    public ATileInventory(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
+        super(type, pos, state);
         this.INVENTORY_SIZE = inventorySize;
 
         if(inventorySize > 0) {
@@ -36,37 +32,20 @@ public abstract class ATileInventory extends TileEntity implements INamedContain
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return inventory.cast();
-        }
-
+    public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> cap, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+        if (cap == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY )
+           return inventory.cast();
         return super.getCapability(cap, side);
+     }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        return save(super.getUpdateTag());
     }
 
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(getPos(), 0, this.write(new CompoundNBT()));
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        this.read(world.getBlockState(pkt.getPos()), pkt.getNbtCompound());
-    }
-
-    @Override
-    public CompoundNBT getUpdateTag() {
-        return write(super.getUpdateTag());
-    }
-
-    @Override
-    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
-        read(world.getBlockState(pos), tag);
-    }
-
-    @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundTag save(CompoundTag compound) {
+        super.save(compound);
 
         this.inventory.ifPresent(inv -> compound.put(INVENTORY_TAG, inv.serializeNBT()));
 
@@ -74,8 +53,8 @@ public abstract class ATileInventory extends TileEntity implements INamedContain
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
 
         this.inventory.ifPresent(inv -> inv.deserializeNBT(nbt.getCompound(INVENTORY_TAG)));
 

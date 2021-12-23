@@ -1,8 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
-import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ModRecipes {
     
     @SubscribeEvent
-    public static void registerTypes(final RegistryEvent.Register<IRecipeSerializer<?>> event) {
+    public static void registerTypes(final RegistryEvent.Register<RecipeSerializer<?>> event) {
         event.getRegistry().register(TuningTableRecipe.SERIALIZER);
         event.getRegistry().register(DyedInstrumentRecipe.SERIALIZER);
     }

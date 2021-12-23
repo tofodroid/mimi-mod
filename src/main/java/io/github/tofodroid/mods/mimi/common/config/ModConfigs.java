@@ -9,8 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.Type;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ModConfigs {
@@ -28,7 +28,7 @@ public class ModConfigs {
     }
     
     @SubscribeEvent
-    public static void onFileChange(final ModConfig.Reloading event) {
+    public static void onFileChange(final ModConfigEvent.Reloading event) {
         if(event.getConfig().getSpec() == CLIENTSPEC && MIMIMod.proxy.getMidiSynth() != null) {
             MIMIMod.proxy.getMidiSynth().close();
             MIMIMod.proxy.getMidiSynth().init();

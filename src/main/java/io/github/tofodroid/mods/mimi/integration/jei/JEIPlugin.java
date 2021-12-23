@@ -10,10 +10,10 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +23,8 @@ public class JEIPlugin implements IModPlugin {
 	private static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, "jeiplugin");
 	private static final Minecraft MC = Minecraft.getInstance();
 
-	private static List<IRecipe<?>> findRecipesByType(IRecipeType<?> type) {
-		return MC.world
+	private static List<Recipe<?>> findRecipesByType(RecipeType<?> type) {
+		return MC.level
 				.getRecipeManager()
 				.getRecipes()
 				.stream()

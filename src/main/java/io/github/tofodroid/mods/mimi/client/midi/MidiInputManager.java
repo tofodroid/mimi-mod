@@ -14,10 +14,10 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.midi.AMidiInputManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -47,7 +47,7 @@ public class MidiInputManager extends AMidiInputManager {
         return playlistManager.getTransmitMode();
     }
     
-    public List<Pair<Byte,ItemStack>> getLocalInstrumentsForMidiDevice(PlayerEntity player, Byte channel) {
+    public List<Pair<Byte,ItemStack>> getLocalInstrumentsForMidiDevice(Player player, Byte channel) {
         return localInstrumentToPlay.stream().map(data -> {
             ItemStack switchStack = ItemStack.EMPTY;
             Byte instrumentId = null;
@@ -71,7 +71,7 @@ public class MidiInputManager extends AMidiInputManager {
     
     @SubscribeEvent
     public void handleTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isUser()) {
+        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isLocalPlayer()) {
             return;
         }
 
@@ -88,36 +88,36 @@ public class MidiInputManager extends AMidiInputManager {
     
     @SubscribeEvent
     public void handleSelfLogOut(LoggedOutEvent event) {
-        if(event.getPlayer() != null && event.getPlayer().isUser()) {
+        if(event.getPlayer() != null && event.getPlayer().isLocalPlayer()) {
             this.playlistManager.stop();
         }
     }
 
     @SubscribeEvent
     public void onDeathDevent(LivingDeathEvent event) {
-        if(EntityType.PLAYER.equals(event.getEntity().getType()) && ((PlayerEntity)event.getEntity()).isUser()) {
+        if(EntityType.PLAYER.equals(event.getEntity().getType()) && ((Player)event.getEntity()).isLocalPlayer()) {
             this.playlistManager.stop();
         }
     }
         
-    protected Boolean hasTransmitter(PlayerEntity player) {
-        if(player.inventory != null) {
+    protected Boolean hasTransmitter(Player player) {
+        if(player.getInventory() != null) {
 
             // Off-hand isn't part of hotbar, so check it explicitly
-            if(ModItems.TRANSMITTER.equals(player.getHeldItemOffhand().getItem())) {
+            if(ModItems.TRANSMITTER.equals(player.getItemInHand(InteractionHand.OFF_HAND).getItem())) {
                 return true;
             }
 
             // check hotbar
             for(int i = 0; i < 9; i++) {
-                ItemStack invStack = player.inventory.getStackInSlot(i);
+                ItemStack invStack = player.getInventory().getItem(i);
                 if(invStack != null && ModItems.TRANSMITTER.equals(invStack.getItem())) {
                     return true;
                 }
             }
 
             // check mouse item
-            if(player.inventory.getItemStack() != null && ModItems.TRANSMITTER.equals(player.inventory.getItemStack().getItem())) {
+            if(player.getInventory().getSelected() != null && ModItems.TRANSMITTER.equals(player.getInventory().getSelected().getItem())) {
                 return hasTransmitter;
             }
         }
@@ -125,7 +125,7 @@ public class MidiInputManager extends AMidiInputManager {
         return false;
     }
 
-    protected List<Object> localInstrumentsToPlay(PlayerEntity player) {
+    protected List<Object> localInstrumentsToPlay(Player player) {
         List<Object> result = new ArrayList<>();
 
         // Check for seated instrument
@@ -135,12 +135,12 @@ public class MidiInputManager extends AMidiInputManager {
         }
 
         // Check for held instruments
-        ItemStack mainHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.MAIN_HAND);
+        ItemStack mainHand = ItemInstrument.getEntityHeldInstrumentStack(player, InteractionHand.MAIN_HAND);
         if(mainHand != null && ItemInstrument.hasSwitchboard(mainHand)) {
             result.add(mainHand);
         }
 
-        ItemStack offHand = ItemInstrument.getEntityHeldInstrumentStack(player, Hand.OFF_HAND);
+        ItemStack offHand = ItemInstrument.getEntityHeldInstrumentStack(player, InteractionHand.OFF_HAND);
         if(offHand != null &&  ItemInstrument.hasSwitchboard(offHand)) {
             result.add(offHand);
         }

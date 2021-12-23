@@ -3,85 +3,84 @@ package io.github.tofodroid.mods.mimi.common.entity;
 import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.tile.ANoteResponsiveTile;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.network.NetworkHooks;
 
 public class EntityNoteResponsiveTile extends Entity {
-    public EntityNoteResponsiveTile(World world) {
+    public EntityNoteResponsiveTile(Level world) {
         super(ModEntities.NOTERESPONSIVETILE, world);
-        this.noClip = true;
+        this.noPhysics = true;
     }
 
-    private EntityNoteResponsiveTile(World world, BlockPos pos) {
+    private EntityNoteResponsiveTile(Level world, BlockPos pos) {
         this(world);
-        this.setPosition(pos.getX(), pos.getY(), pos.getZ());
+        this.setPos(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void tick() {
         super.tick();
-        if(!this.world.isRemote && !this.removed) {
-            if(this.world.isAirBlock(this.getPosition())) {
-                this.remove();
+        if(!this.level.isClientSide && !this.isRemoved()) {
+            if(this.level.isEmptyBlock(this.getOnPos())) {
+                this.remove(RemovalReason.DISCARDED);
             }
         }
-    }
-
-    @Override
-    protected void registerData() {}
-    
-    @Override
-    protected void readAdditional(CompoundNBT compound) {}
-
-    @Override
-    protected void writeAdditional(CompoundNBT compound) {}
-
-    @Override
-    public IPacket<?> createSpawnPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     public ANoteResponsiveTile getTile() {
-        TileEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getEntityWorld().getTileEntity(this.getPosition()) : null;
+        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.getOnPos()) : null;
         return tile != null && tile instanceof ANoteResponsiveTile ? (ANoteResponsiveTile) tile : null;
     }
     
-    protected static EntityNoteResponsiveTile getAtPos(World world, Double posX, Double posY, Double posZ) {
-        List<EntityNoteResponsiveTile> entities = world.getEntitiesWithinAABB(EntityNoteResponsiveTile.class, new AxisAlignedBB(posX - 0.05, posY - 0.05, posZ - 0.05, posX + 0.05, posY + 0.05, posZ + 0.05));
+    protected static EntityNoteResponsiveTile getAtPos(Level world, Double posX, Double posY, Double posZ) {
+        List<EntityNoteResponsiveTile> entities = world.getEntitiesOfClass(EntityNoteResponsiveTile.class, new AABB(posX - 0.05, posY - 0.05, posZ - 0.05, posX + 0.05, posY + 0.05, posZ + 0.05));
         return !entities.isEmpty() ? entities.get(0) : null;
     }
 
-    private static Boolean entityExists(World world, Double posX, Double posY, Double posZ) {
+    private static Boolean entityExists(Level world, Double posX, Double posY, Double posZ) {
         return getAtPos(world, posX, posY, posZ) != null;
     }
     
-    public static Boolean create(World world, BlockPos pos) {
-        if(!world.isRemote) {
+    public static Boolean create(Level world, BlockPos pos) {
+        if(!world.isClientSide) {
             EntityNoteResponsiveTile newMaestro = new EntityNoteResponsiveTile(world, pos);
             
-            if(!entityExists(world, newMaestro.getPosX(), newMaestro.getPosY(), newMaestro.getPosZ())) {
-                world.addEntity(newMaestro);
+            if(!entityExists(world, newMaestro.getX(), newMaestro.getY(), newMaestro.getZ())) {
+                world.addFreshEntity(newMaestro);
                 return true;
             }
         }
         return false;
     }
 
-    public static Boolean remove(World world, BlockPos pos) {
-        if(!world.isRemote) {
-            EntityNoteResponsiveTile entity = getAtPos(world, new Double(pos.getX()), new Double(pos.getY()), new Double(pos.getZ()));
+    public static Boolean remove(Level world, BlockPos pos) {
+        if(!world.isClientSide) {
+            EntityNoteResponsiveTile entity = getAtPos(world, Double.valueOf(pos.getX()), Double.valueOf(pos.getY()), Double.valueOf(pos.getZ()));
             if(entity != null) {
-                entity.remove();
+                entity.remove(RemovalReason.DISCARDED);
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    protected void defineSynchedData() { }
+
+    @Override
+    protected void readAdditionalSaveData(CompoundTag p_20052_) { }
+
+    @Override
+    protected void addAdditionalSaveData(CompoundTag p_20139_) { }
+
+    @Override
+    public Packet<?> getAddEntityPacket() {
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

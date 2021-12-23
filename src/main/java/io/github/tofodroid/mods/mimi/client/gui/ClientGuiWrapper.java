@@ -1,12 +1,14 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import com.mojang.blaze3d.platform.ScreenManager;
+
 import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -15,29 +17,29 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(value=Dist.CLIENT, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ClientGuiWrapper implements GuiWrapper {
     @Override
-    public void openPlaylistGui(World world, PlayerEntity player) {
+    public void openPlaylistGui(Level world, Player player) {
         openGui(world, new GuiMidiPlaylist(player));
     }
 
     @Override
-    public void openConfigGui(World world, PlayerEntity player) {
+    public void openConfigGui(Level world, Player player) {
         openGui(world, new GuiMidiInputConfig(player));
     }
 
     @SubscribeEvent
     public static void registerScreens(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory(ModContainers.RECEIVER, GuiReceiverContainerScreen::new);
-        ScreenManager.registerFactory(ModContainers.LISTENER, GuiListenerContainerScreen::new);
-        ScreenManager.registerFactory(ModContainers.INSTRUMENT, GuiInstrumentContainerScreen::new);
-        ScreenManager.registerFactory(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
-        ScreenManager.registerFactory(ModContainers.CONDUCTOR, GuiConductorContainerScreen::new);
-        ScreenManager.registerFactory(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
+        MenuScreens.register(ModContainers.RECEIVER, GuiReceiverContainerScreen::new);
+        MenuScreens.register(ModContainers.LISTENER, GuiListenerContainerScreen::new);
+        MenuScreens.register(ModContainers.INSTRUMENT, GuiInstrumentContainerScreen::new);
+        MenuScreens.register(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
+        MenuScreens.register(ModContainers.CONDUCTOR, GuiConductorContainerScreen::new);
+        MenuScreens.register(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
     }
     
-    private void openGui(World world, Screen screen) {
+    private void openGui(Level world, Screen screen) {
         // Only open screen on client thread
-        if(world.isRemote) {
-            Minecraft.getInstance().displayGuiScreen(screen);
+        if(world.isClientSide) {
+            Minecraft.getInstance().setScreen(screen);
         }
     }
 }

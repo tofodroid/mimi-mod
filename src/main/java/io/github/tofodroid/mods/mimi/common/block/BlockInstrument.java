@@ -1,42 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraft.util.ResourceLocation;
-
 import java.util.List;
 import java.util.Map;
+
+import com.mojang.math.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
@@ -44,8 +11,38 @@ import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.NetworkHooks;
 
-public class BlockInstrument extends AContainerBlock<TileInstrument> implements IWaterLoggable {
+public class BlockInstrument extends AContainerBlock<TileInstrument> {
     public static final ResourceLocation CONTENTS = new ResourceLocation("contents");
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -57,14 +54,11 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected final Integer defaultColor;
 
     public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
-        super(Properties.create(Material.WOOD).hardnessAndResistance(2.f, 6.f).sound(SoundType.WOOD).notSolid());
+        super(Properties.of(Material.WOOD).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
         this.defaultColor = defaultColor;
-        this.setDefaultState(this.getStateContainer().getBaseState()
-            .with(WATERLOGGED, false)
-            .with(DIRECTION, Direction.NORTH)
-        );
+        this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
         this.SHAPES = this.generateShapes(collisionShape);
         this.setRegistryName(registryName);
     }
@@ -74,13 +68,13 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
     
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         TileInstrument tileInstrument = getTileForBlock(worldIn, pos);
         
         if(tileInstrument != null) {
-           if(!worldIn.isRemote) {
+           if(!worldIn.isClientSide) {
                 if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    NetworkHooks.openGui((ServerPlayerEntity) player, this.getContainer(state, worldIn, pos), buffer -> {
+                    NetworkHooks.openGui((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {
                         buffer.writeByte(this.instrumentId);
                         buffer.writeBoolean(false);
                         buffer.writeBlockPos(pos);
@@ -91,31 +85,17 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
             }
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public TileEntityType<TileInstrument> getTileType() {
+    public BlockEntityType<TileInstrument> getTileType() {
         return ModTiles.INSTRUMENT;
     }
 
+    /*    
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        FluidState fluidState = context.getWorld().getFluidState(context.getPos());
-        return this.getDefaultState()
-            .with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER)
-            .with(DIRECTION, context.getPlacementHorizontalFacing().getOpposite());
-    }
-
-    @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
-        builder.add(DIRECTION);
-        builder.add(WATERLOGGED);
-    }
-
-    @Override
-    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter reader, BlockPos pos, ISelectionContext context) {
         return SHAPES.get(state.get(DIRECTION));
     }
 
@@ -123,34 +103,52 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public VoxelShape getRenderShape(BlockState state, IBlockReader reader, BlockPos pos) {
         return SHAPES.get(state.get(DIRECTION));
     }
+    */
     
     @Override
-    public BlockState rotate(BlockState state, Rotation rotation) {
-        return state.with(DIRECTION, rotation.rotate(state.get(DIRECTION)));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
+        state.add(DIRECTION, WATERLOGGED);
+    }
+    
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, false);
     }
 
     @Override
+    public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
+       return SHAPES.get(state.getValue(DIRECTION));
+    }
+     
+    @Override
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(DIRECTION, rotation.rotate(state.getValue(DIRECTION)));
+    }
+
+    /*
+    @Override
     @SuppressWarnings("deprecation")
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
     }
+    */
 
     @Override
     @SuppressWarnings("deprecation")
     public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.toRotation(state.get(DIRECTION)));
+        return state.rotate(mirror.getRotation(state.getValue(DIRECTION)));
     }
 
     @Override
-	public TileEntity createTileEntity(final BlockState state, final IBlockReader reader) {
-		TileInstrument tile = (TileInstrument)super.createNewTileEntity(reader);
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		TileInstrument tile = (TileInstrument)super.newBlockEntity(pos, state);
         return tile;
 	}
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         if(IDyeableInstrumentItem.isDyeableInstrument(stack) && ((IDyeableInstrumentItem)stack.getItem()).hasColor(stack)) {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            BlockEntity tileentity = worldIn.getBlockEntity(pos);
             if (tileentity instanceof TileInstrument) {
                 ((TileInstrument)tileentity).setColor(((IDyeableInstrumentItem)stack.getItem()).getColor(stack));
             }
@@ -161,7 +159,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     @SuppressWarnings("deprecation")
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         List<ItemStack> drops = super.getDrops(state, builder);
-        TileEntity tileentity = builder.get(LootParameters.BLOCK_ENTITY);
+        BlockEntity tileentity = builder.getParameter(LootContextParams.BLOCK_ENTITY);
 
         if(tileentity != null && tileentity instanceof TileInstrument && ((TileInstrument)tileentity).hasColor()) {
             for(ItemStack stack : drops) {
@@ -187,7 +185,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     protected Vector3d getSeatOffset(BlockState state) {
-        switch(state.get(DIRECTION)) {
+        switch(state.getValue(DIRECTION)) {
             case NORTH:
                 return new Vector3d(0.5, 0, 0.05);
             case SOUTH:
@@ -202,12 +200,12 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
-        return entity.isPassenger() && ModEntities.SEAT.equals(entity.getRidingEntity().getType());
+        return entity.isPassenger() && ModEntities.SEAT.equals(entity.getVehicle().getType());
     }
     
     public static EntitySeat getSeatForEntity(LivingEntity entity) {
         if(isEntitySittingAtInstrument(entity)) {
-            return (EntitySeat) entity.getRidingEntity();
+            return (EntitySeat) entity.getVehicle();
         }
 
         return null;
@@ -217,8 +215,8 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         if(entity.isAlive() && isEntitySittingAtInstrument(entity)) {
             BlockPos pos = getSeatForEntity(entity).getSource();
 
-            if(pos != null && !World.isOutsideBuildHeight(pos)) {
-                TileEntity sourceEntity = entity.getEntityWorld().getTileEntity(getSeatForEntity(entity).getSource());
+            if(pos != null && Level.isInSpawnableBounds(pos)) {
+                BlockEntity sourceEntity = entity.getLevel().getBlockEntity(getSeatForEntity(entity).getSource());
                 return sourceEntity != null && sourceEntity instanceof TileInstrument ? (TileInstrument) sourceEntity : null;
             }
         }

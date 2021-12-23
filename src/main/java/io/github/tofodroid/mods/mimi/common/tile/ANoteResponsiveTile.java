@@ -1,38 +1,35 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class ANoteResponsiveTile extends ATileInventory implements ITickableTileEntity {
+public abstract class ANoteResponsiveTile extends ATileInventory implements BlockEntityTicker<ANoteResponsiveTile> {
     public static final Integer UPDATE_EVERY_TICKS = 8;
 
     protected Integer tickCount = 0;
 
-    public ANoteResponsiveTile(TileEntityType<?> type, Integer inventorySize) {
-        super(type, inventorySize);
+    public ANoteResponsiveTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
+        super(type, pos, state, inventorySize);
     }
 
     @Override
-    public void tick() {
+    public void tick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {
         if(tickCount >= UPDATE_EVERY_TICKS) {
             tickCount = 0;
-            if(this.hasWorld() && !this.world.isRemote && !this.isRemoved()) {
+            if(!world.isClientSide && !this.isRemoved()) {
                 if(this.shouldHaveEntity()) {
-                    EntityNoteResponsiveTile.create(this.world, this.pos);
+                    EntityNoteResponsiveTile.create(world, pos);
                 } else {
-                    EntityNoteResponsiveTile.remove(this.world, this.pos);
+                    EntityNoteResponsiveTile.remove(world, pos);
                 }
             }
         } else {
             tickCount ++;
         }        
-    }
-
-    @Override
-    public void remove() {
-        super.remove();
-        EntityNoteResponsiveTile.remove(this.world, this.pos);
     }
 
     protected abstract Boolean shouldHaveEntity();

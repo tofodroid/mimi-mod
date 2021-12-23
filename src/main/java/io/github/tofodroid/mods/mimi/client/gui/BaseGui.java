@@ -1,17 +1,17 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 
 public abstract class BaseGui extends Screen {
     protected static final Integer STANDARD_BUTTON_SIZE = 15;
@@ -23,12 +23,12 @@ public abstract class BaseGui extends Screen {
     protected Integer START_X;
     protected Integer START_Y;
 
-    public BaseGui(Integer width, Integer height, Integer textureSize, String textureResource, String translastionKey) {
-        super(new TranslationTextComponent(translastionKey));
+    public BaseGui(Integer gWidth, Integer gHeight, Integer textureSize, String textureResource, String translationKey) {
+        super(new TranslatableComponent(translationKey));
         this.guiTexture = new ResourceLocation(MIMIMod.MODID, textureResource);
         this.TEXTURE_SIZE = textureSize;
-        this.GUI_HEIGHT = height;
-        this.GUI_WIDTH = width;
+        this.GUI_HEIGHT = gHeight;
+        this.GUI_WIDTH = gWidth;
     }
 
     @Override
@@ -43,29 +43,28 @@ public abstract class BaseGui extends Screen {
     }
     
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        matrixStack = renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
-        matrixStack = renderText(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
+        stack = renderGraphics(stack, mouseX, mouseY, partialTicks);
+        stack = renderText(stack, mouseX, mouseY, partialTicks);
     }
     
-    @SuppressWarnings("deprecation")
     protected void setAlpha(float alpha) {
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, alpha);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
     }
 
-    protected abstract MatrixStack renderGraphics(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
-    protected abstract MatrixStack renderText(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
+    protected abstract PoseStack renderGraphics(PoseStack stack, int mouseX, int mouseY, float partialTicks);
+    protected abstract PoseStack renderText(PoseStack stack, int mouseX, int mouseY, float partialTicks);
 
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
-        Integer buttonMinX = START_X + new Float(buttonPos.x).intValue();
+    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector3f buttonPos) {
+        Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
         Integer buttonMaxX = buttonMinX + STANDARD_BUTTON_SIZE;
-        Integer buttonMinY = START_Y + new Float(buttonPos.y).intValue();
+        Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();
         Integer buttonMaxY = buttonMinY + STANDARD_BUTTON_SIZE;
 
         Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
 
         if(result) {
-            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         }
 
         return result;

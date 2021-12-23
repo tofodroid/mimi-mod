@@ -9,38 +9,35 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileConductor extends ATileInventory {
     public Byte lastNote = null;
     public Boolean lastBroadcastPublic = null;
     public ArrayList<Byte> lastChannels = new ArrayList<>();
 
-    public TileConductor() {
-        super(ModTiles.CONDUCTOR, 1);
+    public TileConductor(BlockPos pos, BlockState state) {
+        super(ModTiles.CONDUCTOR, pos, state, 1);
     }
 
     @Override
-    public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new ContainerConductor(id, playerInventory, this.getPos());
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
+        return new ContainerConductor(id, playerInventory, this.getBlockPos());
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-		return new TranslationTextComponent(this.getBlockState().getBlock().asItem().getTranslationKey());
-    }
-
-    @Override
-    public void remove() {
-        super.remove();
-        transmitNoteOff(this.getWorld());
+    public void setRemoved() {
+        super.setRemoved();
+        transmitNoteOff(this.getLevel());
     }
 
     public ItemStack getSwitchboardStack() {
@@ -55,8 +52,8 @@ public class TileConductor extends ATileInventory {
         return !getSwitchboardStack().isEmpty();
     }
 
-    public void transmitNoteOn(World worldIn) {
-        if(!world.isRemote && world instanceof ServerWorld && lastNote == null) {
+    public void transmitNoteOn(Level worldIn) {
+        if(!worldIn.isClientSide && worldIn instanceof ServerLevel && lastNote == null) {
             ItemStack switchStack = getSwitchboardStack();
 
             if(!switchStack.isEmpty()) {
@@ -66,18 +63,18 @@ public class TileConductor extends ATileInventory {
                 for(Byte channel : ItemMidiSwitchboard.getEnabledChannelsSet(switchStack)) {
                     lastChannels.add(channel);
                     TransmitterNotePacket packet =  new TransmitterNotePacket(channel, lastNote, Byte.MAX_VALUE, lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
-                    TransmitterNotePacketHandler.handlePacketServer(packet, this.getPos(), (ServerWorld)worldIn, getUniqueId(), null);
+                    TransmitterNotePacketHandler.handlePacketServer(packet, this.getBlockPos(), (ServerLevel)worldIn, getUniqueId(), null);
                 }
             }
         }
     }
 
-    public void transmitNoteOff(World worldIn) {
-        if(!world.isRemote && world instanceof ServerWorld) {
+    public void transmitNoteOff(Level worldIn) {
+        if(!worldIn.isClientSide && worldIn instanceof ServerLevel) {
             if(!lastChannels.isEmpty() && lastNote != null) {
                 for(Byte channel : lastChannels) {
-                    TransmitterNotePacket packet =  new TransmitterNotePacket(channel, lastNote, new Integer(-1).byteValue(), lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
-                    TransmitterNotePacketHandler.handlePacketServer(packet, this.getPos(), (ServerWorld)worldIn, getUniqueId(), null);
+                    TransmitterNotePacket packet =  new TransmitterNotePacket(channel, lastNote, Integer.valueOf(-1).byteValue(), lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
+                    TransmitterNotePacketHandler.handlePacketServer(packet, this.getBlockPos(), (ServerLevel)worldIn, getUniqueId(), null);
                 }
             }
             lastChannels = new ArrayList<>();
@@ -87,7 +84,12 @@ public class TileConductor extends ATileInventory {
     }
 
     public UUID getUniqueId() {
-        String posString = "con" + this.getPos().getX() + this.getPos().getY() + this.getPos().getZ();
+        String posString = "con" + this.getBlockPos().getX() + this.getBlockPos().getY() + this.getBlockPos().getZ();
         return UUID.nameUUIDFromBytes(posString.getBytes());
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 }

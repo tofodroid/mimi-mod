@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.netty.handler.codec.DecoderException;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class SyncItemInstrumentSwitchboardPacket {
     public final Boolean doRemove;
@@ -11,7 +11,7 @@ public class SyncItemInstrumentSwitchboardPacket {
         this.doRemove = doRemove;
     }
     
-    public static SyncItemInstrumentSwitchboardPacket decodePacket(PacketBuffer buf) {
+    public static SyncItemInstrumentSwitchboardPacket decodePacket(FriendlyByteBuf buf) {
         try {
             return new SyncItemInstrumentSwitchboardPacket(buf.readBoolean());
         } catch(IndexOutOfBoundsException e) {
@@ -23,7 +23,7 @@ public class SyncItemInstrumentSwitchboardPacket {
         }
     }
 
-    public static void encodePacket(SyncItemInstrumentSwitchboardPacket pkt, PacketBuffer buf) {
+    public static void encodePacket(SyncItemInstrumentSwitchboardPacket pkt, FriendlyByteBuf buf) {
         buf.writeBoolean(pkt.doRemove);
     }
 }

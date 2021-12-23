@@ -43,9 +43,9 @@ public enum MidiPatchName {
     DistortionGuitar(30, "Distortion Guitar"), // *
     Guitarharmonics(31, "Guitar harmonics"),
     AcousticBass(32, "Acoustic Bass"),  // *
-    ElectricBassFinger(33, "Electric Bass (finger)"), // ^34
+    ElectricBassFinger(33, "Electric Bass (finger)"), // *^34
     ElectricBassPick(34, "Electric Bass (pick)"), // *
-    FretlessBass(35, "Fretless Bass"), // ^34
+    FretlessBass(35, "Fretless Bass"), // *^34
     SlapBass1(36, "Slap Bass 1"),
     SlapBass2(37, "Slap Bass 2"),
     SynthBass1(38, "Synth Bass 1"),
@@ -80,7 +80,7 @@ public enum MidiPatchName {
     BaritoneSax(67, "Baritone Sax"), // *
     Oboe(68, "Oboe"), // *
     EnglishHorn(69, "English Horn"),
-    Bassoon(70, "Bassoon"),
+    Bassoon(70, "Bassoon"), // *
     Clarinet(71, "Clarinet"), // *
     Piccolo(72, "Piccolo"),
     Flute(73, "Flute"), // *
@@ -107,11 +107,11 @@ public enum MidiPatchName {
     Pad7Halo(94, "Pad 7 (halo)"),
     Pad8Sweep(95, "Pad 8 (sweep)"),
     FX1Rain(96, "FX 1 (rain)"),
-    FX2Soundtrack(97, "FX 2 (soundtrack)"), // ^
+    FX2Soundtrack(97, "FX 2 (soundtrack)"),
     FX3Crystal(98, "FX 3 (crystal)"),
     FX4Atmosphere(99, "FX 4 (atmosphere)"),
     FX5Brightness(100, "FX 5 (brightness)"),
-    FX6Goblins(101, "FX 6 (goblins)"), // ^
+    FX6Goblins(101, "FX 6 (goblins)"), // *
     FX7Echoes(102, "FX 7 (echoes)"),
     FX8SciFi(103, "FX 8 (sci-fi)"),
     Sitar(104, "Sitar"),
@@ -122,9 +122,9 @@ public enum MidiPatchName {
     Bagpipe(109, "Bag pipe"), // *
     Fiddle(110, "Fiddle"),
     Shanai(111, "Shanai"),
-    TinkleBell(112, "Tinkle Bell"),  // ^
+    TinkleBell(112, "Tinkle Bell"), //*
     Agogo(113, "Agogo"),
-    SteelDrums(114, "Steel Drums"), // +
+    SteelDrums(114, "Steel Drums"), // *
     Woodblock(115, "Woodblock"),
     TaikoDrum(116, "Taiko Drum"),
     MelodicTom(117, "Melodic Tom"),

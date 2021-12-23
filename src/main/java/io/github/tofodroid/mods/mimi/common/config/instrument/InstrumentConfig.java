@@ -76,8 +76,8 @@ public abstract class InstrumentConfig {
             List<InstrumentSpec> customInstruments = gson.fromJson(getCustomInstrumentJsonStream(FMLPaths.CONFIGDIR.get()), listType);
             if(!customInstruments.isEmpty() && customInstruments != null) {
                 for(int i = 0; i < customInstruments.size(); i++) {
-                    if(new Integer(instrumentSpecs.size() + i).byteValue() <= Byte.MAX_VALUE) {
-                        customInstruments.get(i).instrumentId = new Integer(instrumentSpecs.size() + i).byteValue();
+                    if(Integer.valueOf(instrumentSpecs.size() + i).byteValue() <= Byte.MAX_VALUE) {
+                        customInstruments.get(i).instrumentId = Integer.valueOf(instrumentSpecs.size() + i).byteValue();
                     } else {
                         throw new IllegalStateException("Failed to load custom instrument specs! Instrument limit of 128 reached!");
                     }

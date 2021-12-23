@@ -1,9 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -51,13 +51,13 @@ public final class ModItems {
             event.getRegistry().register(new ItemMidiSwitchboard());
 
             // Redstone Blocks
-            event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("listener"));
-            event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("receiver"));
-            event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("mechanicalmaestro"));
-            event.getRegistry().register(new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("conductor"));
+            event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("listener"));
+            event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("receiver"));
+            event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("mechanicalmaestro"));
+            event.getRegistry().register(new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("conductor"));
 
             // Village Blocks
-            event.getRegistry().register(new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().group(ITEM_GROUP).maxStackSize(64)).setRegistryName("tuningtable"));
+            event.getRegistry().register(new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("tuningtable"));
 
             // Instrument Items
             INSTRUMENT_ITEMS = buildInstruments();
@@ -83,7 +83,7 @@ public final class ModItems {
             Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(MIMIMod.MODID, instrument.registryName));
 
             if(block instanceof BlockInstrument) {
-                list.add((ItemInstrumentBlock)new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().group(ITEM_GROUP).maxStackSize(1)).setRegistryName(instrument.registryName));
+                list.add((ItemInstrumentBlock)new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().tab(ITEM_GROUP).stacksTo(1)).setRegistryName(instrument.registryName));
             } else {
                 MIMIMod.LOGGER.error("Failed to create ItemInstrumentBlock for Instrument: " + instrument.registryName + " - Corresponding Registry Block is not a BlockInstrument!");
             }            
