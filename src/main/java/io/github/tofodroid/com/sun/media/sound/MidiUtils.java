@@ -1,7 +1,5 @@
-package io.github.tofodroid.mods.mimi.client.midi;
-
 /*
- * Copyright (c) 2003, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,8 +23,20 @@ package io.github.tofodroid.mods.mimi.client.midi;
  * questions.
  */
 
-import javax.sound.midi.*;
+package io.github.tofodroid.com.sun.media.sound;
+
 import java.util.ArrayList;
+
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MetaMessage;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiEvent;
+import javax.sound.midi.MidiMessage;
+import javax.sound.midi.Sequence;
+import javax.sound.midi.Track;
+
+import static javax.sound.midi.SysexMessage.SPECIAL_SYSTEM_EXCLUSIVE;
+import static javax.sound.midi.SysexMessage.SYSTEM_EXCLUSIVE;
 
 // TODO:
 // - define and use a global symbolic constant for 60000000 (see convertTempo)
@@ -36,17 +46,58 @@ import java.util.ArrayList;
  *
  * @author Florian Bomers
  */
-@SuppressWarnings({"unused","rawtypes","unchecked"})
 public final class MidiUtils {
 
-    public final static int DEFAULT_TEMPO_MPQ = 500000; // 120bpm
-    public final static int META_END_OF_TRACK_TYPE = 0x2F;
-    public final static int META_TEMPO_TYPE = 0x51;
+    public static final int DEFAULT_TEMPO_MPQ = 500000; // 120bpm
+    public static final int META_END_OF_TRACK_TYPE = 0x2F;
+    public static final int META_TEMPO_TYPE = 0x51;
 
     /**
      * Suppresses default constructor, ensuring non-instantiability.
      */
     private MidiUtils() {
+    }
+
+    /**
+     * Returns an exception which should be thrown if MidiDevice is unsupported.
+     *
+     * @param  info an info object that describes the desired device
+     * @return an exception instance
+     */
+    static RuntimeException unsupportedDevice(final MidiDevice.Info info) {
+        return new IllegalArgumentException(String.format(
+                "MidiDevice %s not supported by this provider", info));
+    }
+
+    /**
+     * Checks the status byte for the system exclusive message.
+     *
+     * @param  data the system exclusive message data
+     * @param  length the length of the valid message data in the array
+     * @throws InvalidMidiDataException if the status byte is invalid for a
+     *         system exclusive message
+     */
+    public static void checkSysexStatus(final byte[] data, final int length)
+            throws InvalidMidiDataException {
+        if (data.length == 0 || length == 0) {
+            throw new InvalidMidiDataException("Status byte is missing");
+        }
+        checkSysexStatus(data[0] & 0xFF);
+    }
+
+    /**
+     * Checks the status byte for the system exclusive message.
+     *
+     * @param  status the status byte for the message (0xF0 or 0xF7)
+     * @throws InvalidMidiDataException if the status byte is invalid for a
+     *         system exclusive message
+     */
+    public static void checkSysexStatus(final int status)
+            throws InvalidMidiDataException {
+        if (status != SYSTEM_EXCLUSIVE && status != SPECIAL_SYSTEM_EXCLUSIVE) {
+            throw new InvalidMidiDataException(String.format(
+                    "Invalid status byte for sysex message: 0x%X", status));
+        }
     }
 
     /** return true if the passed message is Meta End Of Track */
@@ -61,7 +112,6 @@ public final class MidiUtils {
         return ((msg[1] & 0xFF) == META_END_OF_TRACK_TYPE) && (msg[2] == 0);
     }
 
-
     /** return if the given message is a meta tempo message */
     public static boolean isMetaTempo(MidiMessage midiMsg) {
         // first check if it is a META message at all
@@ -74,7 +124,6 @@ public final class MidiUtils {
         // meta type must be 0x51, and data length must be 3
         return ((msg[1] & 0xFF) == META_TEMPO_TYPE) && (msg[2] == 3);
     }
-
 
     /** parses this message for a META tempo message and returns
      * the tempo in MPQ, or -1 if this isn't a tempo message
@@ -95,7 +144,6 @@ public final class MidiUtils {
         return tempo;
     }
 
-
     /**
      * converts<br>
      * 1 - MPQ-Tempo to BPM tempo<br>
@@ -107,7 +155,6 @@ public final class MidiUtils {
         }
         return ((double) 60000000l) / tempo;
     }
-
 
     /**
      * convert tick to microsecond with given tempo.
@@ -128,7 +175,6 @@ public final class MidiUtils {
         //return (long) Math.round((((double)us) * resolution) / tempoMPQ);
         return (long) ((((double)us) * resolution) / tempoMPQ);
     }
-
 
     /**
      * Given a tick, convert to microsecond
@@ -207,7 +253,7 @@ public final class MidiUtils {
 
         int resolution = seq.getResolution();
 
-        long us = 0; long tick = 0; int newReadPos = 0; int i = 1;
+        long us = 0; long tick = 0; int i = 1; //int newReadPos = 0; 
 
         // walk through all tempo changes and add time for the respective blocks
         // to find the right tick
@@ -228,11 +274,10 @@ public final class MidiUtils {
         return tick;
     }
 
-
     /**
      * Binary search for the event indexes of the track
      *
-     * @param tick - tick number of index to be found in array
+     * @param tick  tick number of index to be found in array
      * @return index in track which is on or after "tick".
      *   if no entries are found that follow after tick, track.size() is returned
      */
@@ -265,7 +310,6 @@ public final class MidiUtils {
         return ret;
     }
 
-
     public static final class TempoCache {
         long[] ticks;
         int[] tempos; // in MPQ
@@ -292,9 +336,8 @@ public final class MidiUtils {
             refresh(seq);
         }
 
-
         public synchronized void refresh(Sequence seq) {
-            ArrayList list = new ArrayList();
+            ArrayList<MidiEvent> list = new ArrayList<>();
             Track[] tracks = seq.getTracks();
             if (tracks.length > 0) {
                 // tempo events only occur in track 0
@@ -312,7 +355,7 @@ public final class MidiUtils {
             int size = list.size() + 1;
             firstTempoIsFake = true;
             if ((size > 1)
-                && (((MidiEvent) list.get(0)).getTick() == 0)) {
+                && (list.get(0).getTick() == 0)) {
                 // do not need to add an initial tempo event at the beginning
                 size--;
                 firstTempoIsFake = false;
@@ -327,7 +370,7 @@ public final class MidiUtils {
                 e++;
             }
             for (int i = 0; i < list.size(); i++, e++) {
-                MidiEvent evt = (MidiEvent) list.get(i);
+                MidiEvent evt = list.get(i);
                 ticks[e] = evt.getTick();
                 tempos[e] = getTempoMPQ(evt.getMessage());
             }
@@ -355,6 +398,5 @@ public final class MidiUtils {
             }
             return tempos[tempos.length - 1];
         }
-
     }
 }

@@ -4,16 +4,17 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.github.tofodroid.com.sun.media.sound.SF2SoundbankReader;
+import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
+
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Soundbank;
@@ -36,6 +37,7 @@ import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +50,7 @@ import net.minecraftforge.fml.LogicalSide;
 
 public class MidiSynthManager extends AMidiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 1;
-    private static final Double BLOCK_MIDI_REDUCTION = 0.5;
+    //private static final Double BLOCK_MIDI_REDUCTION = 0.5;
     private ImmutableList<MidiChannelDef> midiChannelSet;
     private BiMap<MidiChannelNumber,String> channelAssignmentMap;
     
@@ -241,19 +243,6 @@ public class MidiSynthManager extends AMidiSynthManager {
         MidiChannelDef channelDef = channelNumber != null ? this.midiChannelSet.get(channelNumber.ordinal()) : null;
         Double modifiedVelocity = Double.valueOf(message.velocity);
 
-        if(ModConfigs.CLIENT.raytraceSound.get()) {
-            /*
-            Vector3d messageVec = new Vector3d(message.pos.getX() + 0.5, message.pos.getY() + 0.5, message.pos.getZ() + 0.5);
-            Vector3d playerVec = new Vector3d(Minecraft.getInstance().player.getX(),Minecraft.getInstance().player.getEyeY(),Minecraft.getInstance().player.getZ());
-            Vector3d rayVec = Minecraft.getInstance().level.rayTraceBlocks(new RayTraceContext(playerVec, messageVec, BlockMode.VISUAL, FluidMode.NONE, null)).getHitVec();
-
-            if(messageVec.distanceTo(playerVec) - rayVec.distanceTo(playerVec) >= 1) {
-                modifiedVelocity *= BLOCK_MIDI_REDUCTION;
-                MIMIMod.LOGGER.info("Muffling!");
-            }
-            */
-        }
-
         if(modifiedVelocity.intValue() > 0) {
             if(channelDef != null) channelDef.noteOn(instrument, message.note, Integer.valueOf(modifiedVelocity.intValue()).byteValue(), message.pos);
         }
@@ -272,7 +261,7 @@ public class MidiSynthManager extends AMidiSynthManager {
 
     protected Synthesizer openNewSynth(Soundbank sounds) {
         try {
-            Synthesizer midiSynth = MidiSystem.getSynthesizer();
+            SoftSynthesizer midiSynth = new SoftSynthesizer();
 
             if(midiSynth.getMaxReceivers() != 0) {
                 midiSynth.open();
@@ -289,20 +278,8 @@ public class MidiSynthManager extends AMidiSynthManager {
 
                 DebugUtils.logSynthInfo(midiSynth, params);
                 
-                if (midiSynth.getClass().getName().toLowerCase().contains("com.sun.media.sound.softsynthesizer")) {
-                    try {
-                        Method method = midiSynth.getClass().getDeclaredMethod("open");
-                        method.invoke(null, params);
-                    } catch(Exception e) {
-                        MIMIMod.LOGGER.warn("Failed to find expected methods in Gervill SoftSynthesizer. Ignoring synth settings.");
-                        midiSynth.open();
-                    }                    
-                } else {
-                    MIMIMod.LOGGER.warn("Synthesizer is not Gervill. Got: '" + midiSynth.getClass().getName().toLowerCase() + "'. Ignoring synth settings.");
-                    midiSynth.open();
-                }
-
-                midiSynth.open();
+                // TODO - Figure out how to apply params to Gervill Synth in JDK 17
+                midiSynth.open(null, params);
                 
                 if(sounds != null) {
                     if(midiSynth.isSoundbankSupported(sounds)) {
@@ -338,7 +315,7 @@ public class MidiSynthManager extends AMidiSynthManager {
     protected Soundbank openSoundbank(String resourcePath) {
         if(resourcePath != null && !resourcePath.trim().isEmpty()) {
             try {
-                return MidiSystem.getSoundbank(new BufferedInputStream(new FileInputStream(new File(resourcePath.trim()))));
+                return new SF2SoundbankReader().getSoundbank(new BufferedInputStream(new FileInputStream(new File(resourcePath.trim()))));
             } catch(NullPointerException | IOException | InvalidMidiDataException e) {
                 MIMIMod.LOGGER.error("Failed to load SoundFont. Error: ", e);
             }
