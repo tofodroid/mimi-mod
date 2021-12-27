@@ -12,10 +12,8 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
 public class GuiMidiPlaylist extends BaseGui {

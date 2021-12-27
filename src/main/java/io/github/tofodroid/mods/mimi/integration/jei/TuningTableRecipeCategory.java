@@ -25,7 +25,7 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 
 	public TuningTableRecipeCategory(IGuiHelper helper) {
         title = new TranslatableComponent("gui.jei." + MIMIMod.MODID + ".tuning").getString();
-		icon = helper.createDrawableIngredient(new ItemStack(ModItems.TUNINGTABLE));
+		icon = helper.createDrawableIngredient(VanillaTypes.ITEM, new ItemStack(ModItems.TUNINGTABLE));
 		background = helper.createDrawable(new ResourceLocation(MIMIMod.MODID, "textures/jei/tuning.png"), 0, 0, 59, 40);
 	}
 

@@ -7,7 +7,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -17,7 +17,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-public class TuningTableRecipe implements Recipe<Inventory> {
+public class TuningTableRecipe implements Recipe<CraftingContainer> {
 	public static RecipeType<TuningTableRecipe> TYPE = RecipeType.register(MIMIMod.MODID + ":tuning");
 	public static final TuningTableRecipe.Serializer SERIALIZER = new TuningTableRecipe.Serializer();
 
@@ -34,7 +34,7 @@ public class TuningTableRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public boolean matches(Inventory inv, Level worldIn) {
+    public boolean matches(CraftingContainer inv, Level worldIn) {
         return this.instrument.test(inv.getItem(0)) && this.addition.test(inv.getItem(1));
     }
 
@@ -59,21 +59,8 @@ public class TuningTableRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(Inventory inv) {
-        NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
-  
-        for(int i = 0; i < nonnulllist.size(); ++i) {
-           ItemStack item = inv.getItem(i);
-           if (item.hasContainerItem()) {
-              nonnulllist.set(i, item.getContainerItem());
-           } else if(item.getCount() > 1) {
-                ItemStack remaining = item.copy();
-                remaining.setCount(item.getCount()-1);
-                nonnulllist.set(i, remaining);
-           }
-        }
-  
-        return nonnulllist;
+    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
+        return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
     }
 
     @Override
@@ -114,7 +101,7 @@ public class TuningTableRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public ItemStack assemble(Inventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack itemstack = this.result.copy();
         CompoundTag compoundnbt = inv.getItem(0).getTag();
         if (compoundnbt != null) {

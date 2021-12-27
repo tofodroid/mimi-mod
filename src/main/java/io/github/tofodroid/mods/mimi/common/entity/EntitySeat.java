@@ -15,7 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.NetworkHooks;
 
 public class EntitySeat extends Entity {
-    private BlockPos source;
+    protected BlockPos source;
 
     public EntitySeat(Level world) {
         super(ModEntities.SEAT, world);
@@ -37,7 +37,7 @@ public class EntitySeat extends Entity {
     public void tick() {
         super.tick();
         if(source == null) {
-            source = this.getOnPos();
+            this.source = this.blockPosition();
         }
 
         if(!this.level.isClientSide) {

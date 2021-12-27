@@ -1,46 +1,83 @@
 package io.github.tofodroid.mods.mimi.common.container.slot;
 
+import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.RecipeHolder;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class SlotTuningResult extends Slot {
-    private final Container container;
-    public final Inventory craftingContainer;
+    private final CraftingContainer craftSlots;
+    private final Player player;
+    private int removeCount;
 
-    public SlotTuningResult(Container container, Inventory craftingContainer, Inventory inventory, int index, int xPosition, int yPosition) {
-        super(inventory, index, xPosition, yPosition);
-        this.container = container;
-        this.craftingContainer = craftingContainer;
+    public SlotTuningResult(Player p_40166_, CraftingContainer p_40167_, Container p_40168_, int p_40169_, int p_40170_, int p_40171_) {
+        super(p_40168_, p_40169_, p_40170_, p_40171_);
+        this.player = p_40166_;
+        this.craftSlots = p_40167_;
     }
 
-    @Override
-    public boolean mayPlace(ItemStack stack) {
+    public boolean mayPlace(ItemStack p_40178_) {
         return false;
     }
 
-    /*
-    @Override
-    public void onTake(Player player, ItemStack stack) {
-        NonNullList<ItemStack> remaining;
+    public ItemStack remove(int p_40173_) {
+        if (this.hasItem()) {
+            this.removeCount += Math.min(p_40173_, this.getItem().getCount());
+        }
+        return super.remove(p_40173_);
+    }
 
-        remaining = player.level.getRecipeManager().getRemainingItemsFor(TuningTableRecipe.TYPE, this.craftingContainer, player.level);
+    protected void onQuickCraft(ItemStack p_40180_, int p_40181_) {
+        this.removeCount += p_40181_;
+        this.checkTakeAchievements(p_40180_);
+    }
 
-        for (int i = 0; i < remaining.size(); i++) {
-            ItemStack slotStack = this.craftingContainer.getItem(i);
-            ItemStack remainingStack = remaining.get(i);
+    protected void onSwapCraft(int p_40183_) {
+        this.removeCount += p_40183_;
+    }
 
-            if (!slotStack.isEmpty()) {
-                this.craftingContainer.removeItem(i, 1);
-            }
-
-            if (!remainingStack.isEmpty()) {
-                this.craftingContainer.setItem(i, remainingStack);
-            }
+    protected void checkTakeAchievements(ItemStack p_40185_) {
+        if (this.removeCount > 0) {
+            p_40185_.onCraftedBy(this.player.level, this.player, this.removeCount);
+            net.minecraftforge.event.ForgeEventFactory.firePlayerCraftingEvent(this.player, p_40185_, this.craftSlots);
         }
 
-        this.container.setChanged();
+        if (this.container instanceof RecipeHolder) {
+            ((RecipeHolder)this.container).awardUsedRecipes(this.player);
+        }
+
+        this.removeCount = 0;
     }
-    */
+
+    public void onTake(Player p_150638_, ItemStack p_150639_) {
+        this.checkTakeAchievements(p_150639_);
+        net.minecraftforge.common.ForgeHooks.setCraftingPlayer(p_150638_);
+        NonNullList<ItemStack> nonnulllist = p_150638_.level.getRecipeManager().getRemainingItemsFor(TuningTableRecipe.TYPE, this.craftSlots, p_150638_.level);
+        net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
+        
+        for(int i = 0; i < nonnulllist.size(); ++i) {
+            ItemStack itemstack = this.craftSlots.getItem(i);
+            ItemStack itemstack1 = nonnulllist.get(i);
+            
+            if (!itemstack.isEmpty()) {
+                this.craftSlots.removeItem(i, 1);
+                itemstack = this.craftSlots.getItem(i);
+            }
+
+            if (!itemstack1.isEmpty()) {
+                if (itemstack.isEmpty()) {
+                    
+                } else if (ItemStack.isSame(itemstack, itemstack1) && ItemStack.tagMatches(itemstack, itemstack1)) {
+                    itemstack1.grow(itemstack.getCount());
+                    this.craftSlots.setItem(i, itemstack1);
+                } else if (!this.player.getInventory().add(itemstack1)) {
+                    this.player.drop(itemstack1, false);
+                }
+            }
+        }
+    }
 }

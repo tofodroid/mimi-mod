@@ -14,6 +14,7 @@ import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;
 
+import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;

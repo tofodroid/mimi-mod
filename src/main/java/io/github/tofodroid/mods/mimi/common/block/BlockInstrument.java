@@ -23,9 +23,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -34,6 +36,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -42,7 +46,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 
-public class BlockInstrument extends AContainerBlock<TileInstrument> {
+public class BlockInstrument extends AContainerBlock<TileInstrument> implements SimpleWaterloggedBlock {
     public static final ResourceLocation CONTENTS = new ResourceLocation("contents");
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -54,7 +58,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> {
     protected final Integer defaultColor;
 
     public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
-        super(Properties.of(Material.WOOD).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        super(Properties.of(Material.WOOD).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
         this.defaultColor = defaultColor;
@@ -87,23 +91,16 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> {
 
         return InteractionResult.SUCCESS;
     }
+    
+    @Override
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter getter, BlockPos pos) {
+        return true;
+    }
 
     @Override
     public BlockEntityType<TileInstrument> getTileType() {
         return ModTiles.INSTRUMENT;
     }
-
-    /*    
-    @Override
-    public VoxelShape getShape(BlockState state, BlockGetter reader, BlockPos pos, ISelectionContext context) {
-        return SHAPES.get(state.get(DIRECTION));
-    }
-
-    @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader reader, BlockPos pos) {
-        return SHAPES.get(state.get(DIRECTION));
-    }
-    */
     
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
@@ -112,30 +109,32 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> {
     
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, false);
+        Direction direction = context.getHorizontalDirection().getOpposite();
+        FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
+
+        return this.defaultBlockState().setValue(DIRECTION, direction).setValue(WATERLOGGED, Boolean.valueOf(fluidstate.getType() == Fluids.WATER));
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
        return SHAPES.get(state.getValue(DIRECTION));
     }
-     
+
+    @SuppressWarnings("deprecation")
+    public FluidState getFluidState(BlockState p_51581_) {
+        return p_51581_.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(p_51581_);
+    }
+
     @Override
-    public BlockState rotate(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation)
+    {
         return state.setValue(DIRECTION, rotation.rotate(state.getValue(DIRECTION)));
     }
 
-    /*
     @Override
     @SuppressWarnings("deprecation")
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
-    }
-    */
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public BlockState mirror(BlockState state, Mirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror)
+    {
         return state.rotate(mirror.getRotation(state.getValue(DIRECTION)));
     }
 

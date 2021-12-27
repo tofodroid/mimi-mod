@@ -10,7 +10,6 @@ import com.mojang.math.Vector3f;
 import io.github.tofodroid.mods.mimi.common.container.ASwitchboardContainer;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.entity.player.Inventory;

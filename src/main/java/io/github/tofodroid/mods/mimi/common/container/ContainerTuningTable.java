@@ -6,18 +6,17 @@ import io.github.tofodroid.mods.mimi.common.container.slot.SlotTuningResult;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
-
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
-import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class ContainerTuningTable extends APlayerInventoryContainer {
     private static final int INSTRUMENT_SLOT_POS_X = 27;
@@ -56,19 +55,19 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
-        // Below code taken from Vanilla Chest Container
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
+
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
-            // Return Empty Stack if Cannot Merge
             if (index == TARGET_CONTAINER_MIN_SLOT_ID + 2) {
-                // Result --> Player
+                itemstack1.getItem().onCraftedBy(itemstack1, playerIn.level, playerIn);
                 if (!this.moveItemStackTo(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
                     return ItemStack.EMPTY;
                 }
+                slot.onQuickCraft(itemstack1, itemstack);
             } else if (index >= TARGET_CONTAINER_MIN_SLOT_ID) {
                 // Matrix --> Player
                 if (!this.moveItemStackTo(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
@@ -76,63 +75,58 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
                 }
             } else {
                 // Player --> Target
-                if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID,
-                        TARGET_CONTAINER_MIN_SLOT_ID + craftingInventory.getContainerSize(), false)) {
+                if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID + craftingInventory.getContainerSize(), false)) {
                     return ItemStack.EMPTY;
                 }
             }
 
-            if (!itemstack.isEmpty()) {
-                slot.onTake(playerIn, itemstack1);
+            if (itemstack1.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
             } else {
-              slot.set(ItemStack.EMPTY);  
+                slot.setChanged();
+            }
+
+            if (itemstack1.getCount() == itemstack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(playerIn, itemstack1);
+            if (index == TARGET_CONTAINER_MIN_SLOT_ID + 2) {
+                playerIn.drop(itemstack1, false);
             }
         }
 
         return itemstack;
     }
-
-    /*
+  
     @Override
-    public void onCraftMatrixChanged(Inventory inventoryIn) {
-        updateCraftingResult(this.windowId, this.playerInventory.player.level, this.playerInventory.player,
-                this.craftingInventory, this.resultInventory);
-    }
-    */
-
-    public void clear() {
-        this.craftingInventory.clearContent();
-        this.resultInventory.clearContent();
-    }
-
-    @Override
-    public void removed(Player playerIn) {
-        super.removed(playerIn);
-        //'this.clearContainer(playerIn, playerIn.level, this.craftingInventory.clearContent(););
-    }
-
-    /*
-    protected static void updateCraftingResult(int id, Level world, Player player, CraftingContainer inventory, ResultContainer inventoryResult) {
-        if (!world.isClientSide) {
-            ServerPlayer serverplayerentity = (ServerPlayer) player;
+    public void slotsChanged(Container container) {
+        if (container == craftingInventory && !this.playerInventory.player.level.isClientSide) {
+            ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
-            Optional<TuningTableRecipe> optional = world.getServer().getRecipeManager()
-                    .getRecipeFor(TuningTableRecipe.TYPE, inventory, world);
+            Optional<TuningTableRecipe> optional = serverplayer.level.getServer().getRecipeManager().getRecipeFor(TuningTableRecipe.TYPE, this.craftingInventory, serverplayer.level);
+            
             if (optional.isPresent()) {
                 TuningTableRecipe recipe = optional.get();
-                if (inventoryResult.stillValid(serverplayerentity)) {
-                    itemstack = recipe.getResultItem();
-                }
+               if (this.resultInventory.setRecipeUsed(serverplayer.level, serverplayer, recipe)) {
+                  itemstack = recipe.assemble(this.craftingInventory);
+               }
             }
-
-            inventoryResult.setItem(0, itemstack);
-            serverplayerentity.connection.sendPacket(new Packet(id, TARGET_CONTAINER_MIN_SLOT_ID + 2, itemstack));
+   
+            this.resultInventory.setItem(0, itemstack);
+            this.setRemoteSlot(TARGET_CONTAINER_MIN_SLOT_ID + 2, itemstack);
+            serverplayer.connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), TARGET_CONTAINER_MIN_SLOT_ID + 2, itemstack));
         }
     }
-    */
+
+    @Override
+    public void removed(Player p_39389_) {
+        super.removed(p_39389_);
+        this.clearContainer(p_39389_, this.craftingInventory);
+    }
 
     protected Slot buildResultSlot(int xPos, int yPos) {
-        return new ResultSlot(this.playerInventory.player, craftingInventory, this.resultInventory, 2, xPos, yPos);
+        return new SlotTuningResult(this.playerInventory.player, craftingInventory, this.resultInventory, 2, xPos, yPos);
     }
 
     protected Slot buildModifierSlot(int xPos, int yPos) {

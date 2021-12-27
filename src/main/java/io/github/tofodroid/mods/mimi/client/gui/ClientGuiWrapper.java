@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.platform.ScreenManager;
-
 import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
 import net.minecraft.client.Minecraft;

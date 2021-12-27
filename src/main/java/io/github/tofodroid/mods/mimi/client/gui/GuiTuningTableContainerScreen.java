@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -28,11 +27,5 @@ public class GuiTuningTableContainerScreen extends BaseContainerGui<ContainerTun
     @Override
     protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY) {
         return matrixStack;
-    }
-
-    @Override
-    protected void renderBg(PoseStack p_97787_, float p_97788_, int p_97789_, int p_97790_) {
-        // TODO Auto-generated method stub
-        
     }
 }

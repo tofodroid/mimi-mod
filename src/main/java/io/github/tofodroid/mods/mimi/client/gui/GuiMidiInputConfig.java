@@ -11,7 +11,6 @@ import com.mojang.math.Vector3f;
 
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public class GuiMidiInputConfig extends BaseGui {    

@@ -7,6 +7,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
@@ -26,6 +27,7 @@ public abstract class AContainerBlock<T extends ATileInventory> extends BaseEnti
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
 			return;
@@ -70,6 +72,11 @@ public abstract class AContainerBlock<T extends ATileInventory> extends BaseEnti
     public T getTileForBlock(Level worldIn, BlockPos pos) {
         BlockEntity entity = worldIn.getBlockEntity(pos);
         return entity != null && entity instanceof ATileInventory ? (T)entity : null;
+    }
+    
+    @Override
+    public RenderShape getRenderShape(BlockState p_49232_) {
+       return RenderShape.MODEL;
     }
     
     public void dropInventoryItems(Level worldIn, BlockPos pos, IItemHandler inventory) {
