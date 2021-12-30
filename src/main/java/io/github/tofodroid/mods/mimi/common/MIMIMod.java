@@ -40,7 +40,6 @@ public class MIMIMod
 
         // Deferred Registrations
         ModLootModifiers.REGISTER.register(fmlContext.getModEventBus());
-        ModVillagers.preInit(fmlContext);
 
         // Other Pre-Init
         ModConfigs.preInit(modContext);
@@ -51,6 +50,6 @@ public class MIMIMod
         proxy.init(event);
 
         // Other Init
-        ModVillagers.init();
+        event.enqueueWork(() -> ModVillagers.injectStructures());
     }
 }
