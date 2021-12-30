@@ -34,7 +34,7 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     public ANoteResponsiveTile getTile() {
-        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.getOnPos()) : null;
+        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.blockPosition()) : null;
         return tile != null && tile instanceof ANoteResponsiveTile ? (ANoteResponsiveTile) tile : null;
     }
     

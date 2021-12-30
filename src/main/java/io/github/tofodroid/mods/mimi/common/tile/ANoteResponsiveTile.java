@@ -7,13 +7,17 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class ANoteResponsiveTile extends ATileInventory implements BlockEntityTicker<ANoteResponsiveTile> {
+public abstract class ANoteResponsiveTile extends ASwitchboardContainerEntity implements BlockEntityTicker<ANoteResponsiveTile> {
     public static final Integer UPDATE_EVERY_TICKS = 8;
 
     protected Integer tickCount = 0;
 
     public ANoteResponsiveTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
         super(type, pos, state, inventorySize);
+    }
+
+    public static void doTick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {
+        self.tick(world, pos, state, self);
     }
 
     @Override

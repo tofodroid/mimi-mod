@@ -5,11 +5,9 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.common.inventory.MechanicalMaestroInventoryStackHandler;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import net.minecraft.core.BlockPos;
@@ -17,13 +15,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.ItemStackHandler;
 
 public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public static final UUID MECH_UUID = new UUID(0,3);
@@ -35,34 +30,17 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     }
 
     @Override
-    public LazyOptional<? extends ItemStackHandler> buildInventory() {
-        return LazyOptional.of(() -> new MechanicalMaestroInventoryStackHandler(INVENTORY_SIZE));
-    }
-
-    @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
         return new ContainerMechanicalMaestro(id, playerInventory, this.getBlockPos());
     }
 
     @Override
-    public Component getDisplayName() {
+    public Component getDefaultName() {
 		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
-    public ItemStack getSwitchboardStack() {
-        if(this.inventory.isPresent() && ModItems.SWITCHBOARD.equals(this.inventory.orElse(null).getStackInSlot(0).getItem())) {
-            return this.inventory.orElse(null).getStackInSlot(0);
-        }
-
-        return ItemStack.EMPTY;
-    }
-
     public ItemStack getInstrumentStack() {
-        if(this.inventory.isPresent() && this.inventory.orElse(null).getStackInSlot(1).getItem() instanceof ItemInstrument || this.inventory.orElse(null).getStackInSlot(1).getItem() instanceof ItemInstrumentBlock) {
-            return this.inventory.orElse(null).getStackInSlot(1);
-        }
-
-        return ItemStack.EMPTY;
+        return items.isEmpty() ? ItemStack.EMPTY : items.get(1);
     }
 
     public Byte getInstrumentId() {

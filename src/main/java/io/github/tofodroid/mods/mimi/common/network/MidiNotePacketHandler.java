@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import net.minecraft.core.BlockPos;
@@ -47,7 +48,7 @@ public class MidiNotePacketHandler {
                     
                     getPotentialListeners(entities).forEach(listener -> {
                         if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
-                            //ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
+                            ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
                         }
                     });
                 }

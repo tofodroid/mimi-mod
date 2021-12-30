@@ -202,7 +202,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         }
 
         if(!instrumentVolumeWidgetEnabled()) {
-            blit(matrixStack, START_X + 297, START_Y + 58, this.getBlitOffset(), 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 304, START_Y + 58, this.getBlitOffset(), 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         return matrixStack;

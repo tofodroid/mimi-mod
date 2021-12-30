@@ -1,10 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import io.github.tofodroid.mods.mimi.common.tile.ATileInventory;
+import io.github.tofodroid.mods.mimi.common.tile.ASwitchboardContainerEntity;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -13,15 +12,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 
-public abstract class AContainerBlock<T extends ATileInventory> extends BaseEntityBlock {
+public abstract class AContainerBlock<T extends ASwitchboardContainerEntity> extends BaseEntityBlock {
     protected AContainerBlock(Properties builder) {
         super(builder);
     }
@@ -33,8 +30,8 @@ public abstract class AContainerBlock<T extends ATileInventory> extends BaseEnti
 			return;
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
         
-        if (blockEntity instanceof ATileInventory) {
-            dropInventoryItems(worldIn, pos, ((ATileInventory)blockEntity).getInventory());
+        if (blockEntity instanceof ASwitchboardContainerEntity) {
+            ((ASwitchboardContainerEntity)blockEntity).clearContent();
             worldIn.updateNeighbourForOutputSignal(pos, this);
         }
 
@@ -71,20 +68,11 @@ public abstract class AContainerBlock<T extends ATileInventory> extends BaseEnti
     @SuppressWarnings("unchecked")
     public T getTileForBlock(Level worldIn, BlockPos pos) {
         BlockEntity entity = worldIn.getBlockEntity(pos);
-        return entity != null && entity instanceof ATileInventory ? (T)entity : null;
+        return entity != null && entity instanceof ASwitchboardContainerEntity ? (T)entity : null;
     }
     
     @Override
     public RenderShape getRenderShape(BlockState p_49232_) {
        return RenderShape.MODEL;
-    }
-    
-    public void dropInventoryItems(Level worldIn, BlockPos pos, IItemHandler inventory) {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            ItemStack itemstack = inventory.getStackInSlot(i);
-            if (!itemstack.isEmpty()) {
-                Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemstack);
-            }
-        }
     }
 }

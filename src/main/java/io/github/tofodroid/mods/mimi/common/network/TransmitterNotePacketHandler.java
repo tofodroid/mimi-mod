@@ -18,6 +18,7 @@ import net.minecraftforge.network.NetworkEvent;
 
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -66,7 +67,7 @@ public class TransmitterNotePacketHandler {
         if(message.velocity > 0) {
             for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(false)))) {
                 if(receiver.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
-                    //ModBlocks.RECEIVER.powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos()));
+                    ModBlocks.RECEIVER.powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos());
                 }
             }
         }

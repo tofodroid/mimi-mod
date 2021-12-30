@@ -5,10 +5,15 @@ import java.util.Random;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -39,30 +44,45 @@ public class BlockListener extends AContainerBlock<TileListener> {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
         state.add(POWER);
     }
-
+    
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, ModTiles.LISTENER, TileListener::doTick);
+    }
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
         if (state.getValue(POWER) != 0) {
            worldIn.setBlock(pos, state.setValue(POWER, Integer.valueOf(0)), 3);
+
+           for(Direction direction : Direction.values()) {
+               worldIn.updateNeighborsAt(pos.relative(direction), this);
+           }
         }
     }
 
-    /*
     @Override
-    public int getWeakPower(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
-        return blockState.getValue(POWER);
+    public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
+        return state.getValue(POWER);
     }
     
     @Override
-    public boolean canProvidePower(BlockState state) {
+    public int getDirectSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
+        return state.getValue(POWER);
+    }
+
+    @Override
+    public boolean isSignalSource(BlockState p_55730_) {
         return true;
     }
 
-    public void powerTarget(IWorld world, BlockState state, int power, BlockPos pos) {
-        if (!world.getPendingBlockTicks().isTickScheduled(pos, state.getBlock())) {
-            world.setBlockState(pos, state.with(POWER, Integer.valueOf(power)), 3);
-            world.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), 4);
+    public void powerTarget(Level world, BlockState state, int power, BlockPos pos) {
+        if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
+            world.setBlock(pos, state.setValue(POWER, Integer.valueOf(power)), 3);
+            
+            for(Direction direction : Direction.values()) {
+                world.updateNeighborsAt(pos.relative(direction), this);
+            }
+            world.scheduleTick(pos, this, 4);
         }
     }
-    */
 }

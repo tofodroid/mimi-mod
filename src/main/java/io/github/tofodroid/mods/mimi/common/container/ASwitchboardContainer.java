@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -19,7 +19,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 	private static final int SWITCHBOARD_SLOT_POS_X = 127;
 	private static final int SWITCHBOARD_SLOT_POS_Y = 193;
 
-	protected ItemStackHandler targetInventory;
+	protected IItemHandler targetInventory;
 
 	public ASwitchboardContainer(MenuType<?> type, int id, Inventory playerInventory) {
         super(type, id, playerInventory);
@@ -58,7 +58,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 	}
 
 	public Boolean updateSelectedSwitchboard(ServerPlayer player, UUID newSourceId, String newSourceName, Byte newFilterOct, Byte newFilterNote, Boolean newInvertNoteOct, String newChannelString, Byte newInstrumentId, Boolean newInvertInstrument, Boolean newSysInput, Boolean newPublicBroadcast, Byte newBroadcastNote, Byte newVolume) {
-		ItemStack selectedStack = this.getSlot(ContainerInstrument.TARGET_CONTAINER_MIN_SLOT_ID).getItem();
+		ItemStack selectedStack = this.getSlot(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID).getItem();
 
 		if(ModItems.SWITCHBOARD.equals(selectedStack.getItem())) {
 			ItemMidiSwitchboard.setMidiSource(selectedStack, newSourceId, newSourceName);
@@ -72,6 +72,8 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			ItemMidiSwitchboard.setPublicBroadcast(selectedStack, newPublicBroadcast);
 			ItemMidiSwitchboard.setBroadcastNote(selectedStack, newBroadcastNote);
 			ItemMidiSwitchboard.setInstrumentVolume(selectedStack, newVolume);
+			this.setItem(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID, this.getStateId()+1, selectedStack);
+			this.setRemoteSlot(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID, selectedStack);
 			this.sendAllDataToRemote();
             return true;
 		}
@@ -115,7 +117,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
       return itemstack;
 	}
 	
-	public ItemStackHandler getTargetInventory() {
+	public IItemHandler getTargetInventory() {
 		return targetInventory;
 	}
 }

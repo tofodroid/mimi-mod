@@ -4,19 +4,17 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 
-public class TileInstrument extends ATileInventory {
+public class TileInstrument extends ASwitchboardContainerEntity {
     public static final String COLOR_TAG = "color";
 
     protected Integer color;
@@ -26,24 +24,12 @@ public class TileInstrument extends ATileInventory {
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
-        return new ContainerInstrument(id, playerInventory, this.getInstrumentId(), this.getBlockPos());
-    }
-
-    @Override
-    public Component getDisplayName() {
-		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
-    }
-
-    @Override
-    public CompoundTag save(CompoundTag compound) {
-        super.save(compound);
+    public void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
 
         if(this.color != null) {
             compound.putInt(COLOR_TAG, color);
         }
-
-        return compound;
     }
 
     @Override
@@ -81,14 +67,6 @@ public class TileInstrument extends ATileInventory {
         return getBlockState().getBlock().asItem().getDescription().getString();
     }
 
-    public ItemStack getSwitchboardStack() {
-        if(this.inventory.isPresent() && ModItems.SWITCHBOARD.equals(this.inventory.orElse(null).getStackInSlot(0).getItem())) {
-            return this.inventory.orElse(null).getStackInSlot(0);
-        }
-
-        return ItemStack.EMPTY;
-    }
-
     public Boolean shouldHandleMessage(UUID sender, Byte channel, Boolean publicTransmit) {
         ItemStack switchStack = getSwitchboardStack();
         if(!switchStack.isEmpty()) {
@@ -101,7 +79,13 @@ public class TileInstrument extends ATileInventory {
         return false;
     }
 
-    public Boolean hasSwitchboard() {
-        return !getSwitchboardStack().isEmpty();
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
+        return new ContainerInstrument(id, playerInventory, this.getInstrumentId(), this.getBlockPos());
+    }
+
+    @Override
+    public Component getDefaultName() {
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 }

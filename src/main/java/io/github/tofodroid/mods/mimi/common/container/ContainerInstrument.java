@@ -48,7 +48,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 		} else {
 			handIn = null;
 			tilePos = extraData.readBlockPos();
-			targetInventory = (ItemStackHandler) playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
+			targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		}
 		
 		this.addSlot(buildSwitchboardSlot());
@@ -71,7 +71,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 		this.instrumentId = instrumentId;
 		this.tilePos = tilPos;
 		handIn = null;
-		targetInventory = (ItemStackHandler) playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
+		targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		
 		this.addSlot(buildSwitchboardSlot());
 	}
@@ -122,11 +122,11 @@ public class ContainerInstrument extends ASwitchboardContainer {
 	}
 
 	public void saveToInventory(Player player) {
-		if(handheld && handIn != null) {
+		if(handheld && handIn != null && targetInventory instanceof ItemStackHandler) {
 			ItemStack instrumentStack = player.getItemInHand(handIn);
 			if(instrumentStack.getItem() instanceof ItemInstrument) {
 				CompoundTag tag = instrumentStack.getOrCreateTag();
-				tag.put(ItemInstrument.INVENTORY_TAG, targetInventory.serializeNBT());
+				tag.put(ItemInstrument.INVENTORY_TAG, ((ItemStackHandler)targetInventory).serializeNBT());
 			}
 		}
 	}

@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerConductor;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
@@ -20,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileConductor extends ATileInventory {
+public class TileConductor extends ASwitchboardContainerEntity {
     public Byte lastNote = null;
     public Boolean lastBroadcastPublic = null;
     public ArrayList<Byte> lastChannels = new ArrayList<>();
@@ -38,18 +37,6 @@ public class TileConductor extends ATileInventory {
     public void setRemoved() {
         super.setRemoved();
         transmitNoteOff(this.getLevel());
-    }
-
-    public ItemStack getSwitchboardStack() {
-        if(this.inventory.isPresent() && ModItems.SWITCHBOARD.equals(this.inventory.orElse(null).getStackInSlot(0).getItem())) {
-            return this.inventory.orElse(null).getStackInSlot(0);
-        }
-
-        return ItemStack.EMPTY;
-    }
-
-    public Boolean hasSwitchboard() {
-        return !getSwitchboardStack().isEmpty();
     }
 
     public void transmitNoteOn(Level worldIn) {
@@ -89,7 +76,12 @@ public class TileConductor extends ATileInventory {
     }
 
     @Override
-    public Component getDisplayName() {
+    public Component getDefaultName() {
         return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
+    }
+
+    @Override
+    protected AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
+        return new ContainerConductor(id, playerInventory, this.getBlockPos());
     }
 }
