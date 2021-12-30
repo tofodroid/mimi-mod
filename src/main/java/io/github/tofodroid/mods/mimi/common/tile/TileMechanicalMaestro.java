@@ -8,9 +8,11 @@ import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -95,6 +97,11 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     @Override
     protected Boolean shouldHaveEntity() {
         return !this.getInstrumentStack().isEmpty() && !this.getSwitchboardStack().isEmpty() && this.level.hasNeighborSignal(this.getBlockPos());
+    }
+    
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) {
+        return (slot == 0 && stack.getItem().equals(ModItems.SWITCHBOARD)) || (slot == 1 && stack.getItem() instanceof ItemInstrument);
     }
     
     public void allNotesOff() {

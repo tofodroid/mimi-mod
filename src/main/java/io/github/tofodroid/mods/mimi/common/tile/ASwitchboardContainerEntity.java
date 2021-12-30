@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -136,12 +137,12 @@ public abstract class ASwitchboardContainerEntity extends BaseContainerBlockEnti
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int p_19235_, ItemStack p_19236_, Direction p_19237_) {
-        return true;
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) {
+        return stack.getItem().equals(ModItems.SWITCHBOARD);
     }
 
     @Override
-    public boolean canTakeItemThroughFace(int p_19239_, ItemStack p_19240_, Direction p_19241_) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
         return true;
     }
 
