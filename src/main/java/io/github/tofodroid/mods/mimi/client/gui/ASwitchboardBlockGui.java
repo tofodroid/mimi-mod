@@ -22,9 +22,9 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected static final Vector3f FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector3f(211,48,0);
     protected static final Vector3f FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector3f(192,48,0);
     protected static final Vector3f FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector3f(275,48,0);
-    protected static final Vector3f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector3f(17,113,0);
-    protected static final Vector3f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector3f(141,113,0);
-    protected static final Vector3f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector3f(160,113,0);
+    protected static final Vector3f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector3f(16,113,0);
+    protected static final Vector3f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector3f(150,113,0);
+    protected static final Vector3f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector3f(168,113,0);
     protected static final Vector3f TRANSMIT_SELF_BUTTON_COORDS = new Vector3f(218,97,0);
     protected static final Vector3f TRANSMIT_PUBLIC_BUTTON_COORDS = new Vector3f(237,97,0);
     protected static final Vector3f TRANSMIT_CLEAR_BUTTON_COORDS = new Vector3f(256,97,0);
@@ -36,7 +36,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
     // Text Boxes
     protected static final Vector3f FILTER_NOTE_TEXTBOX_COORDS = new Vector3f(232,52,0);
-    protected static final Vector3f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector3f(38,117,0);
+    protected static final Vector3f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector3f(35,117,0);
     protected static final Vector3f LINKED_TRANSMITTER_TEXTBOX_COORDS = new Vector3f(194,85,0);
     protected static final Vector3f BROADCAST_NOTE_TEXTBOX_COORDS = new Vector3f(232,138,0);
     protected static final Vector3f INSTRUMENT_VOLUME_TEXTBOX_COORDS = new Vector3f(308,96,0);
@@ -44,7 +44,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     // Status Boxes
     protected static final Vector3f MIDI_STATUSBOX_COORDS = new Vector3f(41,66,0);
     protected static final Vector3f FILTER_NOTE_STATUSBOX_COORDS = new Vector3f(294,54,0);
-    protected static final Vector3f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector3f(179,119,0);
+    protected static final Vector3f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector3f(174,107,0);
     protected static final Vector3f BROADCAST_MODE_STATUSBOX_COORDS = new Vector3f(161,136,0);
 
     // Runtime Data
