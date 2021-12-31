@@ -5,6 +5,7 @@ import java.util.Optional;
 import io.github.tofodroid.mods.mimi.common.container.slot.SlotTuningResult;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
+import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
@@ -104,7 +105,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
         if (container == craftingInventory && !this.playerInventory.player.level.isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
-            Optional<TuningTableRecipe> optional = serverplayer.level.getServer().getRecipeManager().getRecipeFor(TuningTableRecipe.TYPE, this.craftingInventory, serverplayer.level);
+            Optional<TuningTableRecipe> optional = serverplayer.level.getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING.get(), this.craftingInventory, serverplayer.level);
             
             if (optional.isPresent()) {
                 TuningTableRecipe recipe = optional.get();

@@ -5,7 +5,7 @@ import io.github.tofodroid.mods.mimi.client.gui.GuiTuningTableContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
+import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.*;
@@ -39,7 +39,7 @@ public class JEIPlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		registration.addRecipes(findRecipesByType(TuningTableRecipe.TYPE), new ResourceLocation(MIMIMod.MODID, "tuning"));
+		registration.addRecipes(findRecipesByType(ModRecipes.TUNING.get()), new ResourceLocation(MIMIMod.MODID, "tuning"));
 	}
 
 	@Override

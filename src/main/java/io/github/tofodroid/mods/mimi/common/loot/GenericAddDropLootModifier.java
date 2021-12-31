@@ -35,7 +35,7 @@ public class GenericAddDropLootModifier extends LootModifier {
     public static class Serializer extends GlobalLootModifierSerializer<GenericAddDropLootModifier> {
         @Override
         public GenericAddDropLootModifier read(ResourceLocation location, JsonObject object, LootItemCondition[] conditions) {
-            Item toAdd = ShapedRecipe.itemFromJson(object.getAsJsonObject("item"));
+            Item toAdd = ShapedRecipe.itemFromJson(object);
             return new GenericAddDropLootModifier(conditions, new ItemStack(toAdd,1));
         }
 

@@ -17,8 +17,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-public class TuningTableRecipe implements Recipe<CraftingContainer> {
-	public static RecipeType<TuningTableRecipe> TYPE = RecipeType.register(MIMIMod.MODID + ":tuning");
+public class TuningTableRecipe implements Recipe<CraftingContainer>{
 	public static final TuningTableRecipe.Serializer SERIALIZER = new TuningTableRecipe.Serializer();
 
     private final Ingredient instrument;
@@ -49,13 +48,18 @@ public class TuningTableRecipe implements Recipe<CraftingContainer> {
     }
 
     @Override
+    public String getGroup() {
+        return "";
+    }
+
+    @Override
     public RecipeSerializer<?> getSerializer() {
         return TuningTableRecipe.SERIALIZER;
     }
 
     @Override
     public RecipeType<?> getType() {
-        return TuningTableRecipe.TYPE;
+        return ModRecipes.TUNING.get();
     }
 
     @Override
