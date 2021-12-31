@@ -80,18 +80,43 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public void tick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {
         if(tickCount >= UPDATE_EVERY_TICKS) {
             tickCount = 0;
-            if(this.hasLevel() && !this.level.isClientSide && !this.isRemoved()) {
-                if(this.shouldHaveEntity()) {
+            if(this.hasLevel() && !this.level.isClientSide) {
+                if(this.shouldHaveEntity() && !this.isRemoved()) {
                     EntityNoteResponsiveTile.create(this.level, this.getBlockPos());
-                } else {
-                    if(EntityNoteResponsiveTile.remove(this.level, this.getBlockPos())) {
-                        this.allNotesOff();
-                    }
+                } else if(EntityNoteResponsiveTile.entityExists(this.level, Double.valueOf(this.getBlockPos().getX()), Double.valueOf(this.getBlockPos().getY()), Double.valueOf(this.getBlockPos().getZ()))) {
+                    EntityNoteResponsiveTile.remove(this.level, this.getBlockPos());
+                    this.allNotesOff();
                 }
             }
         } else {
             tickCount ++;
         }        
+    }
+    
+    @Override
+    public void setItem(int i, ItemStack item) {
+        super.setItem(i, item);
+        this.allNotesOff();
+    }
+
+    @Override
+    public ItemStack removeItem(int i, int count) {
+        ItemStack result = super.removeItem(i, count);
+        this.allNotesOff();
+        return result;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int i) {
+        ItemStack result = super.removeItemNoUpdate(i);
+        this.allNotesOff();
+        return result;
+    }
+    
+    @Override
+    public void clearContent() {
+        super.clearContent();
+        this.allNotesOff();
     }
 
     @Override
@@ -101,7 +126,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     
     @Override
     public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return (slot == 0 && stack.getItem().equals(ModItems.SWITCHBOARD)) || (slot == 1 && stack.getItem() instanceof ItemInstrument);
+        return (slot == 0 && stack.getItem().equals(ModItems.SWITCHBOARD)) || (slot == 1 && (stack.getItem() instanceof ItemInstrument || stack.getItem() instanceof ItemInstrumentBlock));
     }
     
     public void allNotesOff() {

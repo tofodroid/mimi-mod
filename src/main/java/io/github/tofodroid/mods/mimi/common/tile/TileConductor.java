@@ -33,12 +33,6 @@ public class TileConductor extends ASwitchboardContainerEntity {
         return new ContainerConductor(id, playerInventory, this.getBlockPos());
     }
 
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-        transmitNoteOff(this.getLevel());
-    }
-
     public void transmitNoteOn(Level worldIn) {
         if(!worldIn.isClientSide && worldIn instanceof ServerLevel && lastNote == null) {
             ItemStack switchStack = getSwitchboardStack();
@@ -68,6 +62,33 @@ public class TileConductor extends ASwitchboardContainerEntity {
             lastNote = null;
             lastBroadcastPublic = null;
         }
+    }
+
+    @Override
+    public void setItem(int i, ItemStack item) {
+        super.setItem(i, item);
+        this.transmitNoteOff(this.level);
+        this.transmitNoteOn(this.level);
+    }
+
+    @Override
+    public ItemStack removeItem(int i, int count) {
+        ItemStack result = super.removeItem(i, count);
+        this.transmitNoteOff(this.level);
+        return result;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int i) {
+        ItemStack result = super.removeItemNoUpdate(i);
+        this.transmitNoteOff(this.level);
+        return result;
+    }
+    
+    @Override
+    public void clearContent() {
+        super.clearContent();
+        this.transmitNoteOff(this.level);
     }
 
     public UUID getUniqueId() {

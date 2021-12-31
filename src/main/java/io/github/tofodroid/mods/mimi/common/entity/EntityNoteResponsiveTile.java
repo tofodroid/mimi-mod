@@ -13,6 +13,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.NetworkHooks;
 
 public class EntityNoteResponsiveTile extends Entity {
+    public BlockPos source;
+
     public EntityNoteResponsiveTile(Level world) {
         super(ModEntities.NOTERESPONSIVETILE, world);
         this.noPhysics = true;
@@ -20,21 +22,32 @@ public class EntityNoteResponsiveTile extends Entity {
 
     private EntityNoteResponsiveTile(Level world, BlockPos pos) {
         this(world);
+        this.source = pos;
         this.setPos(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return false;
     }
 
     @Override
     public void tick() {
         super.tick();
+
         if(!this.level.isClientSide && !this.isRemoved()) {
-            if(this.level.isEmptyBlock(this.getOnPos())) {
+            if(source == null || this.level.getBlockEntity(this.source) == null || !(this.level.getBlockEntity(this.source) instanceof ANoteResponsiveTile)) {
                 this.remove(RemovalReason.DISCARDED);
             }
+        }
+
+        if(source == null) {
+            this.source = this.blockPosition();
         }
     }
 
     public ANoteResponsiveTile getTile() {
-        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.blockPosition()) : null;
+        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.source) : null;
         return tile != null && tile instanceof ANoteResponsiveTile ? (ANoteResponsiveTile) tile : null;
     }
     
@@ -43,7 +56,7 @@ public class EntityNoteResponsiveTile extends Entity {
         return !entities.isEmpty() ? entities.get(0) : null;
     }
 
-    private static Boolean entityExists(Level world, Double posX, Double posY, Double posZ) {
+    public static Boolean entityExists(Level world, Double posX, Double posY, Double posZ) {
         return getAtPos(world, posX, posY, posZ) != null;
     }
     
@@ -74,10 +87,18 @@ public class EntityNoteResponsiveTile extends Entity {
     protected void defineSynchedData() { }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag p_20052_) { }
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        this.source = new BlockPos(tag.getInt("source_x"), tag.getInt("source_y"), tag.getInt("source_z"));
+    }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag p_20139_) { }
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        if(this.source != null) {
+            tag.putInt("source_x", source.getX());
+            tag.putInt("source_y", source.getY());
+            tag.putInt("source_z", source.getY());
+        }
+    }
 
     @Override
     public Packet<?> getAddEntityPacket() {

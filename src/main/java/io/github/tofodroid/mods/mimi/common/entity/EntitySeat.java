@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mojang.math.Vector3d;
 
+import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -36,16 +37,17 @@ public class EntitySeat extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if(source == null) {
-            this.source = this.blockPosition();
-        }
 
         if(!this.level.isClientSide) {
-            if(this.getPassengers().isEmpty() || this.level.isEmptyBlock(source) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive())) {
+            if(source == null || this.getPassengers().isEmpty() || this.level.getBlockEntity(this.source) == null || !(this.level.getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.ejectPassengers();
                 this.remove(RemovalReason.DISCARDED);
-                level.updateNeighbourForOutputSignal(getOnPos(), level.getBlockState(getOnPos()).getBlock());
+                level.updateNeighbourForOutputSignal(source, level.getBlockState(source).getBlock());
             }
+        }
+
+        if(source == null) {
+            this.source = this.blockPosition();
         }
     }
 
@@ -81,16 +83,24 @@ public class EntitySeat extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() { }
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        this.source = new BlockPos(tag.getInt("source_x"), tag.getInt("source_y"), tag.getInt("source_z"));
+    }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag p_20052_) { }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag p_20139_) { }
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        if(this.source != null) {
+            tag.putInt("source_x", source.getX());
+            tag.putInt("source_y", source.getY());
+            tag.putInt("source_z", source.getY());
+        }
+    }
 
     @Override
     public Packet<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
+
+    @Override
+    protected void defineSynchedData() { }
 }

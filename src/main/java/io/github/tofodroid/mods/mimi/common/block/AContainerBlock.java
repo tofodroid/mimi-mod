@@ -31,7 +31,7 @@ public abstract class AContainerBlock<T extends ASwitchboardContainerEntity> ext
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
         
         if (blockEntity instanceof ASwitchboardContainerEntity) {
-            ((ASwitchboardContainerEntity)blockEntity).clearContent();
+            ((ASwitchboardContainerEntity)blockEntity).dropContent();
             worldIn.updateNeighbourForOutputSignal(pos, this);
         }
 

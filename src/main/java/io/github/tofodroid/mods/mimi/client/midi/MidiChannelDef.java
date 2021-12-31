@@ -9,6 +9,7 @@ import javax.sound.midi.MidiChannel;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
+import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -82,7 +83,7 @@ public class MidiChannelDef {
             return null;
         } else {
             Boolean clientChannel = isClientChannel(clientPlayer.getUUID());
-            if(!this.isIdle() && !(!clientChannel && Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)) > 72d) && ((!mechanical && isPlayerUsingInstrument(clientPlayer.getLevel()) || (mechanical && isMechanicalMaestroUsingInstrument(clientPlayer.getLevel()))))) {
+            if(!this.isIdle() && !(!clientChannel && Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)) > 72d) && ((!mechanical && isPlayerUsingInstrument(clientPlayer.getLevel()) || (mechanical/* && isMechanicalMaestroExisting(clientPlayer.getLevel())*/)))) {
                 if (!clientChannel) {
                     setVolume(Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)));
                     setLRPan(clientPlayer.getOnPos(), clientPlayer.getYHeadRot());
@@ -126,24 +127,11 @@ public class MidiChannelDef {
         return false;
     }
 
-    public Boolean isMechanicalMaestroUsingInstrument(Level worldIn) {
+    public Boolean isMechanicalMaestroExisting(Level worldIn) {
         BlockEntity tile = worldIn.getBlockEntity(this.lastNotePos);
         TileMechanicalMaestro mech = tile != null && ModTiles.MECHANICALMAESTRO.equals(tile.getType()) ? (TileMechanicalMaestro) tile : null;
 
-        if(mech == null) {
-            return false;
-        }
-
-        Byte mechInstrument = mech.getInstrumentId();
-        if(mechInstrument == null || mechInstrument != this.instrumentId) {
-            return false;
-        }
-
-        if(mech.getSwitchboardStack().isEmpty()) {
-            return false;
-        }
-
-        return true;
+        return mech != null && EntityNoteResponsiveTile.entityExists(worldIn, Double.valueOf(this.lastNotePos.getX()), Double.valueOf(this.lastNotePos.getY()), Double.valueOf(this.lastNotePos.getZ()));
     }
     
     public Integer getChannelNumber() {
