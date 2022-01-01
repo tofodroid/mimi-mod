@@ -27,7 +27,7 @@ repositories {
     }
 }
 
-version = '1.18.1-2.0.0'
+version = '1.18.1-2.0.1'
 group = 'io.github.tofodroid.mods.mimi'
 archivesBaseName = 'mimimod'
 
