@@ -66,7 +66,7 @@ public class GuiMidiPlaylist extends BaseGui {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
@@ -108,7 +108,7 @@ public class GuiMidiPlaylist extends BaseGui {
             this.midiInputManager.playlistManager.shiftTransmitMode();
         }
         
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

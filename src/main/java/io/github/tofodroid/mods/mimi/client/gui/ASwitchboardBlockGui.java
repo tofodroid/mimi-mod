@@ -75,7 +75,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     }
 
     @Override
-    public boolean mouseReleased(double dmouseX, double dmouseY, int button) {
+    public boolean mouseClicked(double dmouseX, double dmouseY, int button) {
         int imouseX = (int)Math.round(dmouseX);
         int imouseY = (int)Math.round(dmouseY);
         
@@ -131,7 +131,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 			}
 		}
 
-        return super.mouseReleased(dmouseX, dmouseY, button);
+        return super.mouseClicked(dmouseX, dmouseY, button);
     }
 
     @Override
