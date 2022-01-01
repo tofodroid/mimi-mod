@@ -20,9 +20,9 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected static final Vector2f FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(211,48);
     protected static final Vector2f FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector2f(192,48);
     protected static final Vector2f FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector2f(275,48);
-    protected static final Vector2f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2f(17,113);
-    protected static final Vector2f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2f(141,113);
-    protected static final Vector2f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2f(160,113);
+    protected static final Vector2f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2f(16,113);
+    protected static final Vector2f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2f(150,113);
+    protected static final Vector2f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2f(168,113);
     protected static final Vector2f TRANSMIT_SELF_BUTTON_COORDS = new Vector2f(218,97);
     protected static final Vector2f TRANSMIT_PUBLIC_BUTTON_COORDS = new Vector2f(237,97);
     protected static final Vector2f TRANSMIT_CLEAR_BUTTON_COORDS = new Vector2f(256,97);
@@ -34,7 +34,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
     // Text Boxes
     protected static final Vector2f FILTER_NOTE_TEXTBOX_COORDS = new Vector2f(232,52);
-    protected static final Vector2f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector2f(38,117);
+    protected static final Vector2f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector2f(35,117);
     protected static final Vector2f LINKED_TRANSMITTER_TEXTBOX_COORDS = new Vector2f(194,85);
     protected static final Vector2f BROADCAST_NOTE_TEXTBOX_COORDS = new Vector2f(232,138);
     protected static final Vector2f INSTRUMENT_VOLUME_TEXTBOX_COORDS = new Vector2f(308,96);
@@ -42,7 +42,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     // Status Boxes
     protected static final Vector2f MIDI_STATUSBOX_COORDS = new Vector2f(41,66);
     protected static final Vector2f FILTER_NOTE_STATUSBOX_COORDS = new Vector2f(294,54);
-    protected static final Vector2f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector2f(179,119);
+    protected static final Vector2f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector2f(174,107);
     protected static final Vector2f BROADCAST_MODE_STATUSBOX_COORDS = new Vector2f(161,136);
 
     // Runtime Data
@@ -73,7 +73,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     }
 
     @Override
-    public boolean mouseReleased(double dmouseX, double dmouseY, int button) {
+    public boolean mouseClicked(double dmouseX, double dmouseY, int button) {
         int imouseX = (int)Math.round(dmouseX);
         int imouseY = (int)Math.round(dmouseY);
         
@@ -128,7 +128,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 			}
 		}
 
-        return super.mouseReleased(dmouseX, dmouseY, button);
+        return super.mouseClicked(dmouseX, dmouseY, button);
     }
 
     @Override
@@ -199,7 +199,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         }
 
         if(!instrumentVolumeWidgetEnabled()) {
-            blit(matrixStack, this.guiLeft + 297, this.guiTop + 58, this.getBlitOffset(), 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, this.guiLeft + 304, this.guiTop + 58, this.getBlitOffset(), 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         return matrixStack;

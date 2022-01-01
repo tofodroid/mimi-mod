@@ -33,7 +33,7 @@ public class GuiMidiInputConfig extends BaseGui {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
@@ -50,7 +50,7 @@ public class GuiMidiInputConfig extends BaseGui {
             visibleDeviceId = visibleDeviceId > 0 ? visibleDeviceId - 1 : visibleDeviceId;
         }
         
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

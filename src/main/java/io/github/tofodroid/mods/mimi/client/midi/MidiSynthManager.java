@@ -74,10 +74,7 @@ public class MidiSynthManager extends AMidiSynthManager {
             // Setup channel map
             Builder<MidiChannelDef> builder = ImmutableList.builder();
             for(MidiChannelNumber num : MidiChannelNumber.values()) {
-                // Don't use channel nine because it's only for percussion
-                if(num != MidiChannelNumber.NINE) {
-                    builder.add(new MidiChannelDef(num.ordinal(), this.midiSynth.getChannels()[num.ordinal()]));
-                }
+                builder.add(new MidiChannelDef(num.ordinal(), this.midiSynth.getChannels()[num.ordinal()]));
             }
             this.midiChannelSet = builder.build();
         } else {
@@ -217,7 +214,7 @@ public class MidiSynthManager extends AMidiSynthManager {
             return assignedChannelNum;
         } else if(getNew) {
             for(MidiChannelNumber num : MidiChannelNumber.values()) {
-                if(channelAssignmentMap.get(num) == null) {
+                if(channelAssignmentMap.get(num) == null && num != MidiChannelNumber.NINE) {
                     channelAssignmentMap.put(num, channelIdentifier);
                     this.midiChannelSet.get(num.ordinal()).assign(playerId, mechanical, InstrumentConfig.getBydId(instrumentId));
                     return num;
