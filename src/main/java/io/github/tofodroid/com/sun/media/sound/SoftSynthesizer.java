@@ -1433,4 +1433,36 @@ public final class SoftSynthesizer implements AudioSynthesizer,
 
         throw new MidiUnavailableException("No transmitter available");
     }
+
+    public static SoftSynthesizer create(Boolean jitterCorrection, Integer latency, Integer samplerate, Integer bitrate, Soundbank sounds) throws MidiUnavailableException {
+        SoftSynthesizer midiSynth = new SoftSynthesizer();
+
+        if(midiSynth.getMaxReceivers() != 0) {
+            midiSynth.open();
+            midiSynth.close();
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("jitter correction", jitterCorrection);
+            params.put("latency", latency * 1000);
+            params.put("format", new AudioFormat(
+                samplerate, 
+                bitrate, 
+                2, true, false
+            ));
+
+            midiSynth.open(null, params);
+            
+            if(sounds != null) {
+                if(midiSynth.isSoundbankSupported(sounds)) {
+                    midiSynth.loadAllInstruments(sounds);
+                }
+            }
+            
+            midiSynth.getReceiver();
+            
+            return midiSynth;
+        }
+
+        throw new MidiUnavailableException("Midi Synth '" + midiSynth.getDeviceInfo().getName() + "' cannot support any receivers.");
+    }
 }
