@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.midi.MidiChannelNumber;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 
 public class ItemMidiSwitchboard extends Item {
@@ -96,7 +95,7 @@ public class ItemMidiSwitchboard extends Item {
             // MIDI Channels Filter
             SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(stack);
             if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
-                if(acceptedChannels.size() == MidiChannelNumber.values().length) {
+                if(acceptedChannels.size() == 16) {
                     tooltip.add(new TextComponent("Channels: All"));
                 } else {
                     tooltip.add(new TextComponent("Channels: " + acceptedChannels.stream().map(c -> Integer.valueOf(c.intValue()+1).toString()).collect(Collectors.joining(", "))));

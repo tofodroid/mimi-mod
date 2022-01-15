@@ -233,6 +233,7 @@ public final class SoftSynthesizer implements AudioSynthesizer,
     private SoftResampler resampler = new SoftLinearResampler();
 
     private int number_of_midi_channels = 16;
+    private boolean limit_channel_10 = true;
     private int maxpoly = 64;
     private long latency = 200000; // 200 msec
     private boolean jitter_correction = false;
@@ -355,6 +356,7 @@ public final class SoftSynthesizer implements AudioSynthesizer,
         jitter_correction = (Boolean)items[11].value;
         reverb_light = (Boolean)items[12].value;
         load_default_soundbank = (Boolean)items[13].value;
+        limit_channel_10 = (Boolean)items[14].value;
     }
 
     private String patchToString(Patch patch) {
@@ -433,7 +435,7 @@ public final class SoftSynthesizer implements AudioSynthesizer,
 
         // Channel 10 uses percussion instruments
         String p_plaf;
-        if (channel == 9)
+        if (channel == 9 && limit_channel_10)
             p_plaf = "p.";
         else
             p_plaf = "";
@@ -1019,6 +1021,11 @@ public final class SoftSynthesizer implements AudioSynthesizer,
         item.description = "Enabled/disable loading default soundbank";
         list.add(item);
 
+        // CUSTOM
+        item = new AudioSynthesizerPropertyInfo("limit channel 10", o?limit_channel_10:true);
+        item.description = "Limit channel 10 to only percussion";
+        list.add(item);
+
         AudioSynthesizerPropertyInfo[] items;
         items = list.toArray(new AudioSynthesizerPropertyInfo[list.size()]);
 
@@ -1434,7 +1441,7 @@ public final class SoftSynthesizer implements AudioSynthesizer,
         throw new MidiUnavailableException("No transmitter available");
     }
 
-    public static SoftSynthesizer create(Boolean jitterCorrection, Integer latency, Integer samplerate, Integer bitrate, Soundbank sounds) throws MidiUnavailableException {
+    public static SoftSynthesizer create(Boolean jitterCorrection, Boolean limitChannel10, Integer latency, Integer samplerate, Integer bitrate, Soundbank sounds) throws MidiUnavailableException {
         SoftSynthesizer midiSynth = new SoftSynthesizer();
 
         if(midiSynth.getMaxReceivers() != 0) {
@@ -1443,6 +1450,7 @@ public final class SoftSynthesizer implements AudioSynthesizer,
 
             Map<String, Object> params = new HashMap<>();
             params.put("jitter correction", jitterCorrection);
+            params.put("limit channel 10", limitChannel10);
             params.put("latency", latency * 1000);
             params.put("format", new AudioFormat(
                 samplerate, 
