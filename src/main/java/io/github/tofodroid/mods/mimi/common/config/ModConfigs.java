@@ -29,9 +29,11 @@ public class ModConfigs {
     
     @SubscribeEvent
     public static void onFileChange(final ModConfigEvent.Reloading event) {
+        /*
         if(event.getConfig().getSpec() == CLIENTSPEC && MIMIMod.proxy.getMidiSynth() != null) {
             MIMIMod.proxy.getMidiSynth().close();
             MIMIMod.proxy.getMidiSynth().init();
         }
+        */
     }
 }

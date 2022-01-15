@@ -91,7 +91,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 		if (slot != null && slot.hasItem()) {
-			ItemStack itemstack1 = slot.getItem();
+			ItemStack itemstack1 = slot.getItem().copy();
 			itemstack = itemstack1.copy();
 
 			// Return Empty Stack if Cannot Merge
@@ -110,7 +110,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			if (itemstack1.isEmpty()) {
 				slot.set(ItemStack.EMPTY);
 			} else {
-				slot.setChanged();
+				slot.set(itemstack1);
 			}
 		}
 

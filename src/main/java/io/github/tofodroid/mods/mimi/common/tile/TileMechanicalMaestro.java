@@ -92,31 +92,31 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
             tickCount ++;
         }        
     }
-    
+
     @Override
     public void setItem(int i, ItemStack item) {
-        super.setItem(i, item);
         this.allNotesOff();
+        super.setItem(i, item);
     }
 
     @Override
     public ItemStack removeItem(int i, int count) {
-        ItemStack result = super.removeItem(i, count);
         this.allNotesOff();
+        ItemStack result = super.removeItem(i, count);
         return result;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int i) {
-        ItemStack result = super.removeItemNoUpdate(i);
         this.allNotesOff();
+        ItemStack result = super.removeItemNoUpdate(i);
         return result;
     }
     
     @Override
     public void clearContent() {
-        super.clearContent();
         this.allNotesOff();
+        super.clearContent();
     }
 
     @Override
@@ -132,7 +132,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public void allNotesOff() {
 		if(this.getInstrumentId() != null && this.getLevel() instanceof ServerLevel) {
 			MidiNotePacketHandler.handlePacketsServer(
-                Arrays.asList(new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), this.getMaestroUUID(), true, this.getBlockPos())),
+                Arrays.asList(new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, this.getBlockPos())),
                 (ServerLevel)this.getLevel(),
                 null
             );

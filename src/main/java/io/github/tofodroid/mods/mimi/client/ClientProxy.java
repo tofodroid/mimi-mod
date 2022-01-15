@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
-import io.github.tofodroid.mods.mimi.client.midi.MidiSynthManager;
+import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.client.renderer.EntitySeatRenderer;
 import io.github.tofodroid.mods.mimi.client.renderer.EntityNoteResponseTileRenderer;
 import io.github.tofodroid.mods.mimi.common.Proxy;
@@ -25,13 +25,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy implements Proxy {
-    private MidiSynthManager MIDI_SYNTH;
+    private MidiMultiSynthManager MIDI_SYNTH;
     private MidiInputManager MIDI_INPUT;
 
     @Override
     public void init(final FMLCommonSetupEvent event) {
         // MIDI
-        MIDI_SYNTH = new MidiSynthManager();
+        MIDI_SYNTH = new MidiMultiSynthManager();
         MinecraftForge.EVENT_BUS.register(MIDI_SYNTH);
         
         MIDI_INPUT = new MidiInputManager();
@@ -43,7 +43,7 @@ public class ClientProxy implements Proxy {
     }
 
     @Override
-    public MidiSynthManager getMidiSynth() {
+    public MidiMultiSynthManager getMidiSynth() {
         return MIDI_SYNTH;
     }
 

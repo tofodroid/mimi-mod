@@ -17,6 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -32,7 +33,15 @@ public class MidiNotePacketHandler {
         if(messages != null && !messages.isEmpty()) {
             // Forward to players
             for(MidiNotePacket packet : messages) {
-                NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
+                if(ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
+                    NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
+                } else {
+                    ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
+                        if(player != sender && Math.sqrt(player.getOnPos().distSqr(packet.pos)) <= getQueryBoxRange(packet.velocity <= 0)) {
+                            NetworkManager.NET_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+                        }
+                    });
+                }
             }
 
             // Process Redstone

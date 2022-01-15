@@ -13,15 +13,13 @@ public class MidiNotePacket {
     public final Byte velocity;
     public final Byte instrumentId;
     public final UUID player;
-    public final Boolean mechanical;
     public final BlockPos pos;
 
-    public MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, Boolean mechanical, BlockPos pos) {
+    public MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos) {
         this.note = note;
         this.velocity = velocity;
         this.instrumentId = instrumentId;
         this.player = player;
-        this.mechanical = mechanical;
         this.pos = pos;
     }
 
@@ -31,9 +29,8 @@ public class MidiNotePacket {
             byte velocity = buf.readByte();
             byte instrumentId = buf.readByte();
             UUID player = buf.readUUID();
-            Boolean mechanical = buf.readBoolean();
             BlockPos pos = buf.readBlockPos();
-            return new MidiNotePacket(note, velocity, instrumentId, player, mechanical, pos);
+            return new MidiNotePacket(note, velocity, instrumentId, player, pos);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("MidiNoteOnPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -45,7 +42,6 @@ public class MidiNotePacket {
         buf.writeByte(pkt.velocity);
         buf.writeByte(pkt.instrumentId);
         buf.writeUUID(pkt.player);
-        buf.writeBoolean(pkt.mechanical);
         buf.writeBlockPos(pkt.pos);
     }
 }

@@ -24,16 +24,16 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     }
     
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, Player player) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrument, player.getUUID(), false, player.getOnPos());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         DebugUtils.logNoteTimingInfo(this.getClass(), true, instrument, midiNote, velocity, player.getOnPos());
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
     
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, Player player) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), false, player.getOnPos());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         DebugUtils.logNoteTimingInfo(this.getClass(), false, instrument, midiNote, null, null);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
 }

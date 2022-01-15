@@ -424,25 +424,25 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 this.releaseNote(note);
             }
 
-            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), false, player.getOnPos());
+            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NET_CHANNEL.sendToServer(packet);
-            MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+            MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
         }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), false, player.getOnPos());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         DebugUtils.logNoteTimingInfo(this.getClass(), true, instrumentId, midiNote, velocity, player.getOnPos());
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
-        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), false, player.getOnPos());
+        MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
         DebugUtils.logNoteTimingInfo(this.getClass(), false, instrumentId, midiNote, null, null);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOff(null, midiNote);
     }
 
