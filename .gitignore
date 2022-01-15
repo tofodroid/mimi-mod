@@ -14,8 +14,8 @@ build
 run
 logs
 
-# Temp
-src/main/resources/data/mimi/patchouli_books/guide_book/old
+# Project Utils
+utils/
 
 # Media
 media/**/*.png
