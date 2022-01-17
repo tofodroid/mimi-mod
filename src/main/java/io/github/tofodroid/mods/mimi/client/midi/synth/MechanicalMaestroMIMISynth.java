@@ -44,7 +44,6 @@ public class MechanicalMaestroMIMISynth extends AMIMISynth<PositionalMIMIChannel
 
     @Override
     protected String createChannelId(MidiNotePacket message) {
-        return message.instrumentId.toString();
+        return message.pos.toShortString() + "$" + message.instrumentId.toString();
     }
-    
 }

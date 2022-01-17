@@ -36,7 +36,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(internalSynth != null) {
             // Setup channel map
             Builder<T> builder = ImmutableList.builder();
-            for(int i = 9; i < 11; i++) {
+            for(int i = 0; i < internalSynth.getChannels().length; i++) {
                 builder.add(createChannel(i, this.internalSynth.getChannels()[i]));
             }
             this.midiChannelSet = builder.build();
@@ -61,7 +61,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    public final void noteOn(MidiNotePacket message) {
+    public void noteOn(MidiNotePacket message) {
         InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
 
@@ -75,10 +75,12 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
             }
         }
 
-        channel.noteOn(instrument, message.note, message.velocity, message.pos);
+        if(channel != null) {
+            channel.noteOn(instrument, message.note, message.velocity, message.pos);
+        }
     }
 
-    public final void noteOff(MidiNotePacket message) {
+    public void noteOff(MidiNotePacket message) {
         InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
 
@@ -87,7 +89,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    public final void allNotesOff() {
+    public void allNotesOff() {
         for(T channel : this.channelAssignmentMap.keySet()) {
             channel.noteOff(null, MidiNotePacket.ALL_NOTES_OFF);
         }
