@@ -49,7 +49,7 @@ public class MidiNotePacketHandler {
             BlockPos lastPacketPos = null;
 
             for(MidiNotePacket packet : messages) {
-                if(packet.velocity > 0) {
+                if(!packet.isControlPacket() && packet.velocity > 0) {
                     if(lastPacketPos != packet.pos) {  
                         lastPacketPos = packet.pos;
                         entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());

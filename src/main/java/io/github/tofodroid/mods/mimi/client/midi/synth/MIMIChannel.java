@@ -7,8 +7,6 @@ import javax.sound.midi.MidiChannel;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
@@ -28,28 +26,37 @@ public class MIMIChannel {
     public void setInstrument(InstrumentSpec instrument) {
         this.channel.programChange(instrument.midiBankNumber, instrument.midiPatchNumber);
         this.setVolume(Integer.valueOf(0).byteValue());
-        this.channel.allNotesOff();
+        this.channel.allSoundOff();
+        this.channel.resetAllControllers();
     }
 
     public void reset() {
         this.lastNoteTime = null;
         this.setVolume(Integer.valueOf(0).byteValue());
-        this.channel.allNotesOff();
+        this.channel.allSoundOff();
+        this.channel.resetAllControllers();
     }
 
     public void noteOn(InstrumentSpec instrument, Byte note, Byte velocity, BlockPos notePos) {
-        channel.noteOn(note, velocity);
+        this.channel.noteOn(note, velocity);
         this.lastNoteTime = Instant.now();
-        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrument != null ? instrument.instrumentId : MidiNotePacket.ALL_NOTES_OFF, note, velocity, notePos);
     }
 
     public void noteOff(InstrumentSpec instrument, Byte note) {
-        if(MidiNotePacket.ALL_NOTES_OFF.equals(note)) {
-            channel.allNotesOff();
+        if(note != null && note.equals(Byte.MIN_VALUE)) {
+            this.channel.allSoundOff();
         } else { 
-            channel.noteOff(note);
+            this.channel.noteOff(note);
         }
-        DebugUtils.logNoteTimingInfo(this.getClass(), false, instrument != null ? instrument.instrumentId : MidiNotePacket.ALL_NOTES_OFF, note, null, null);
+    }
+
+    public void allNotesOff() {
+        this.channel.resetAllControllers();
+        this.channel.allSoundOff();
+    }
+
+    public void controlChange(Byte controller, Byte value) {
+        this.channel.controlChange(controller, value);
     }
 
     public void setVolume(Byte volume) {

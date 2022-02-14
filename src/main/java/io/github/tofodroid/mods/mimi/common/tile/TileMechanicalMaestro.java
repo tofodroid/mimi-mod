@@ -132,7 +132,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
     public void allNotesOff() {
 		if(this.getInstrumentId() != null && this.getLevel() instanceof ServerLevel) {
 			MidiNotePacketHandler.handlePacketsServer(
-                Arrays.asList(new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), this.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, this.getBlockPos())),
+                Arrays.asList(MidiNotePacket.createAllNotesOffPacket(this.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, this.getBlockPos())),
                 (ServerLevel)this.getLevel(),
                 null
             );

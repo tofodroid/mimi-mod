@@ -6,7 +6,6 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
-import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import net.minecraft.world.entity.player.Player;
 
 public class MidiDeviceInputReceiver extends MidiInputReceiver {
@@ -18,7 +17,9 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
             } else if(isNoteOffMessage(message)) {
                 handleMidiNoteOff(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), message.getMessage()[1], player);
             } else if(isAllNotesOffMessage(message)) {
-                handleMidiNoteOff(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), MidiNotePacket.ALL_NOTES_OFF, player);
+                handleAllNotesOff(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), player);
+            } else if(isSupportedControlMessage(message)) {
+                handleControlMessage(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), message.getMessage()[1], message.getMessage()[2], player);
             }
         });
     }
@@ -26,14 +27,35 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, Player player) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrument, midiNote, velocity, player.getOnPos());
         MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
     
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, Player player) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        DebugUtils.logNoteTimingInfo(this.getClass(), false, instrument, midiNote, null, null);
         MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+    }
+
+    public void handleAllNotesOff(Byte channel, Byte instrument, Player player) {
+        MidiNotePacket packet =MidiNotePacket.createAllNotesOffPacket(instrument, player.getUUID(), player.getOnPos());
+        NetworkManager.NET_CHANNEL.sendToServer(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+    }
+    
+    public void handleControlMessage(Byte channel, Byte instrument, Byte controller, Byte value, Player player) {
+        MidiNotePacket packet =MidiNotePacket.createControlPacket(controller, value, instrument, player.getUUID(), player.getOnPos());
+        NetworkManager.NET_CHANNEL.sendToServer(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+    }
+
+    @Override
+    protected Boolean isSupportedControlMessage(ShortMessage msg) {
+        return ShortMessage.CONTROL_CHANGE == msg.getCommand() && (
+            msg.getData1() == 1
+            || msg.getData1() == 4
+            || (msg.getData1() >= 64 && msg.getData1() <= 69)
+            || msg.getData1() == 84
+            || (msg.getData1() >= 91 && msg.getData1() <= 95)
+        );
     }
 }

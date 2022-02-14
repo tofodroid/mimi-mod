@@ -31,6 +31,8 @@ public abstract class MidiInputReceiver implements Receiver {
     }
 
     protected Boolean isAllNotesOffMessage(ShortMessage msg) {
-        return ShortMessage.CONTROL_CHANGE == msg.getCommand() && ( msg.getData1() == 120 || msg.getData2() == 123);
+        return ShortMessage.CONTROL_CHANGE == msg.getCommand() && ( msg.getData1() == 120 || msg.getData1() == 123);
     }
+    
+    protected abstract Boolean isSupportedControlMessage(ShortMessage msg);
 }

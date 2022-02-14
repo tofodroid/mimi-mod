@@ -74,27 +74,39 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
     public void handlePacket(MidiNotePacket message) {
         AMIMISynth<?> targetSynth = getSynthForMessage(message);
 
-        if(targetSynth != null && message.velocity > 0) {
-            targetSynth.noteOn(message);
-        } else if(targetSynth != null && message.velocity <= 0) {
-            targetSynth.noteOff(message);
-        }        
+        if(targetSynth != null) {
+            if(!message.isControlPacket()) {
+                if(message.velocity > 0) {
+                    targetSynth.noteOn(message);
+                } else if(message.velocity <= 0) {
+                    targetSynth.noteOff(message);
+                }
+            } else {
+                targetSynth.controlChange(message);
+            }
+        }
+       
     }
 
     @Override
     public void handleLocalPacket(MidiNotePacket message) {
         LocalPlayerMIMISynth targetSynth = localSynth;
 
-        if(targetSynth != null && message.velocity > 0) {
-            targetSynth.noteOn(message);
-        } else if(targetSynth != null && message.velocity <= 0) {
-            targetSynth.noteOff(message);
-        }        
+        if(targetSynth != null) {
+            if(!message.isControlPacket()) {
+                if(message.velocity > 0) {
+                    targetSynth.noteOn(message);
+                } else if(message.velocity <= 0) {
+                    targetSynth.noteOff(message);
+                }
+            } else {
+                targetSynth.controlChange(message);
+            }
+        }     
     }
 
     @Override
     public void allNotesOff() {
-
         localSynth.allNotesOff();
         mechSynth.allNotesOff();
         playerSynth.allNotesOff();

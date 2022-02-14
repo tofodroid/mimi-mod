@@ -56,14 +56,18 @@ public class TransmitterNotePacketHandler {
         notePackets.put(TileMechanicalMaestro.MECH_UUID, new ArrayList<>());
         for(TileMechanicalMaestro maestro : getPotentialMechMaestros(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(message.velocity <= 0)))) {
             if(maestro.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
-                notePackets.get(TileMechanicalMaestro.MECH_UUID).add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(maestro.getSwitchboardStack(), message.velocity), maestro.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, maestro.getBlockPos()));
+                if(message.isControlPacket()) {
+                    notePackets.get(TileMechanicalMaestro.MECH_UUID).add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), maestro.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, maestro.getBlockPos()));
+                } else {
+                    notePackets.get(TileMechanicalMaestro.MECH_UUID).add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(maestro.getSwitchboardStack(), message.velocity), maestro.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, maestro.getBlockPos()));
+                }
             }
         }
 
         sendPlayerOnPackets(notePackets, worldIn);
 
         // Handle Receivers
-        if(message.velocity > 0) {
+        if(!message.isControlPacket() && message.velocity > 0) {
             for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(false)))) {
                 if(receiver.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
                     ModBlocks.RECEIVER.powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos());
@@ -79,7 +83,11 @@ public class TransmitterNotePacketHandler {
         if(instrumentEntity != null) { 
             Byte instrumentId = instrumentEntity.getInstrumentId();
             if(instrumentId != null && instrumentEntity.shouldHandleMessage(sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
-                packetList.add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(instrumentEntity.getSwitchboardStack(), message.velocity), instrumentId, target.getUUID(), target.getOnPos()));
+                if(message.isControlPacket()) {
+                    packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), instrumentId, target.getUUID(), target.getOnPos()));
+                } else {
+                    packetList.add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(instrumentEntity.getSwitchboardStack(), message.velocity), instrumentId, target.getUUID(), target.getOnPos()));
+                }
             }
         }
     }
@@ -89,7 +97,11 @@ public class TransmitterNotePacketHandler {
         ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
         Byte instrumentId = ItemInstrument.getInstrumentId(stack);
         if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
-            packetList.add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(ItemInstrument.getSwitchboardStack(stack), message.velocity), instrumentId, target.getUUID(), target.getOnPos()));
+            if(message.isControlPacket()) {
+                packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), instrumentId, target.getUUID(), target.getOnPos()));
+            } else {
+                packetList.add(new MidiNotePacket(message.note, ItemMidiSwitchboard.applyVolume(ItemInstrument.getSwitchboardStack(stack), message.velocity), instrumentId, target.getUUID(), target.getOnPos()));
+            }
         }
     }
     
