@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,11 +25,6 @@ public class TileConductor extends ASwitchboardContainerEntity {
 
     public TileConductor(BlockPos pos, BlockState state) {
         super(ModTiles.CONDUCTOR, pos, state, 1);
-    }
-
-    @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
-        return new ContainerConductor(id, playerInventory, this.getBlockPos());
     }
 
     public void transmitNoteOn(Level worldIn) {

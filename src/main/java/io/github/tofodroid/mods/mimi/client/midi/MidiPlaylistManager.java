@@ -17,6 +17,7 @@ import javax.sound.midi.Sequencer;
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 
 public class MidiPlaylistManager extends MidiInputSourceManager {
@@ -131,19 +132,19 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
     }
         
     public Integer getCurrentSongPosSeconds() {
-        Long micoPos;
+        Long microPos;
 
         if(isPlaying()) {
-            micoPos = this.activeSequencer.getMicrosecondPosition();
+            microPos = this.activeSequencer.getMicrosecondPosition();
         } else if(this.pausedMicrosecond != null) {
-            micoPos = this.pausedMicrosecond;
+            microPos = this.pausedMicrosecond;
         } else if(isSongLoaded()) {
-            micoPos = 0l;
+            microPos = 0l;
         } else {
             return null;
         }
 
-        return Long.valueOf(micoPos / 1000000).intValue();
+        return Long.valueOf(microPos / 1000000).intValue();
     }
 
     public MidiFileInfo getSelectedSongInfo() {

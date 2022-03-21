@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.client.midi;
 import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import net.minecraft.world.entity.player.Player;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;

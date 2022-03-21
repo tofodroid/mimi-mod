@@ -10,6 +10,7 @@ import javax.sound.midi.MidiUnavailableException;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
 
 public class MidiInputDeviceManager extends MidiInputSourceManager {
     private String selectedDeviceName;

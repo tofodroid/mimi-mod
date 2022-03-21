@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.client.midi;
+package io.github.tofodroid.mods.mimi.common.midi;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
