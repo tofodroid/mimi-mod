@@ -199,7 +199,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
-        return entity.isPassenger() && ModEntities.SEAT.equals(entity.getVehicle().getType());
+        return entity.isPassenger() && ModEntities.SEAT.get().equals(entity.getVehicle().getType());
     }
     
     public static EntitySeat getSeatForEntity(LivingEntity entity) {
