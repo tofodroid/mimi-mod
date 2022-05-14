@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -18,13 +19,13 @@ import net.minecraftforge.network.NetworkHooks;
 public class EntitySeat extends Entity {
     protected BlockPos source;
 
-    public EntitySeat(Level world) {
-        super(ModEntities.SEAT, world);
+    public EntitySeat(EntityType<? extends EntitySeat> type, Level world) {
+        super(type, world);
         this.noPhysics = true;
     }
 
     private EntitySeat(Level world, BlockPos source, Vector3d offset) {
-        this(world);
+        this(ModEntities.SEAT.get(), world);
         this.source = source;
         this.setPos(source.getX() + offset.x, source.getY() + offset.y, source.getZ() + offset.z);
     }

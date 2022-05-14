@@ -50,7 +50,7 @@ public class ItemMidiSwitchboard extends Item {
     private Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
     public ItemMidiSwitchboard() {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
         this.setRegistryName("switchboard");
     }
 

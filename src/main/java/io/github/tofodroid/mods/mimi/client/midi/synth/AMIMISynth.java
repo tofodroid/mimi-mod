@@ -83,15 +83,27 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     public void noteOff(MidiNotePacket message) {
         InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
-
+        
         if(channel != null) {
-            channel.noteOff(instrument, message.note);
+            if(message.isAllNotesOffPacket()) {
+                channel.allNotesOff();
+            } else {
+                channel.noteOff(instrument, message.note);
+            }
         }
     }
 
     public void allNotesOff() {
         for(T channel : this.channelAssignmentMap.keySet()) {
-            channel.noteOff(null, MidiNotePacket.ALL_NOTES_OFF);
+            channel.allNotesOff();
+        }
+    }
+
+    public void controlChange(MidiNotePacket message) {
+        T channel = channelAssignmentMap.inverse().get(createChannelId(message));
+        
+        if(channel != null) {
+            channel.controlChange(message.getControllerNumber(), message.getControllerValue());
         }
     }
 }

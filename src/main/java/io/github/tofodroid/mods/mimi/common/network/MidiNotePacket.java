@@ -7,14 +7,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class MidiNotePacket {
-    public static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
-    
+    private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
+
     public final Byte note;
     public final Byte velocity;
     public final Byte instrumentId;
     public final UUID player;
     public final BlockPos pos;
 
+    public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos) {
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos);
+    }
+
+    public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos) {
+        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos);
+    }
+    
     public MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos) {
         this.note = note;
         this.velocity = velocity;
@@ -43,5 +51,21 @@ public class MidiNotePacket {
         buf.writeByte(pkt.instrumentId);
         buf.writeUUID(pkt.player);
         buf.writeBlockPos(pkt.pos);
+    }
+
+    public Boolean isAllNotesOffPacket() {
+        return this.note == ALL_NOTES_OFF;
+    }
+
+    public Boolean isControlPacket() {
+        return this.note < 0 && !isAllNotesOffPacket();
+    }
+
+    public Byte getControllerNumber() {
+        return isControlPacket() ? Integer.valueOf(-this.note).byteValue() : null;
+    }
+
+    public Byte getControllerValue() {
+        return isControlPacket() ? this.velocity : null;
     }
 }

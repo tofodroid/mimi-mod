@@ -23,7 +23,6 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SyncItemInstrumentSwitchboardPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.util.DebugUtils;
 import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
@@ -196,6 +195,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     @Override
     public void onClose() {
+        this.toggleHoldPedal(false);
         this.allNotesOff();
         super.onClose();
     }
@@ -316,6 +316,8 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             shiftVisibleNotes(false, 7);
         } else if(keyCode == GLFW.GLFW_KEY_UP) {
             shiftVisibleNotes(true, 7);
+        } else if(keyCode == GLFW.GLFW_KEY_SPACE) {
+            this.toggleHoldPedal(true);
         } else {
             Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
 
@@ -335,11 +337,15 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         super.keyReleased(keyCode, scanCode, modifiers);
 
-        Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
+        if(keyCode == GLFW.GLFW_KEY_SPACE) {
+            this.toggleHoldPedal(false);
+        } else {
+            Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
 
-        if(midiNoteNums != null) {
-            for(Byte midiNoteNum : midiNoteNums) {
-                this.onGuiNoteRelease(midiNoteNum);
+            if(midiNoteNums != null) {
+                for(Byte midiNoteNum : midiNoteNums) {
+                    this.onGuiNoteRelease(midiNoteNum);
+                }
             }
         }
 
@@ -359,6 +365,14 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         this.editMode = false;
         this.allNotesOff();
         this.syncInstrumentToServer();
+    }
+
+    private void toggleHoldPedal(Boolean on) {
+        Byte controller = 64;
+        Byte value = on ? Byte.MAX_VALUE : Byte.MIN_VALUE;
+        MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos());
+        NetworkManager.NET_CHANNEL.sendToServer(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
 
     // Midi Functions
@@ -424,7 +438,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 this.releaseNote(note);
             }
 
-            MidiNotePacket packet = new MidiNotePacket(MidiNotePacket.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
+            MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NET_CHANNEL.sendToServer(packet);
             MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
         }
@@ -433,7 +447,6 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        DebugUtils.logNoteTimingInfo(this.getClass(), true, instrumentId, midiNote, velocity, player.getOnPos());
         MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
@@ -441,7 +454,6 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        DebugUtils.logNoteTimingInfo(this.getClass(), false, instrumentId, midiNote, null, null);
         MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOff(null, midiNote);
     }

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.client.midi;
+package io.github.tofodroid.mods.mimi.common.midi;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
@@ -31,6 +31,8 @@ public abstract class MidiInputReceiver implements Receiver {
     }
 
     protected Boolean isAllNotesOffMessage(ShortMessage msg) {
-        return ShortMessage.CONTROL_CHANGE == msg.getCommand() && ( msg.getData1() == 120 || msg.getData2() == 123);
+        return ShortMessage.CONTROL_CHANGE == msg.getCommand() && ( msg.getData1() == 120 || msg.getData1() == 123);
     }
+    
+    protected abstract Boolean isSupportedControlMessage(ShortMessage msg);
 }
