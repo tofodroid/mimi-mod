@@ -10,7 +10,6 @@ import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -92,7 +91,7 @@ public class TileConductor extends ASwitchboardContainerEntity {
 
     @Override
     public Component getDefaultName() {
-        return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
+        return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
     @Override

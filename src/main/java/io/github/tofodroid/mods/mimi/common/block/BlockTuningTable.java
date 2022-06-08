@@ -1,9 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,11 +19,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
 public class BlockTuningTable extends Block {
-   private static final Component CONTAINER_TITLE = new TranslatableComponent("container.tuning");
+   public static final String REGISTRY_NAME = "tuningtable";
+   private static final Component CONTAINER_TITLE = Component.translatable("container.tuning");
    
    protected BlockTuningTable() {
       super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
-      this.setRegistryName("tuningtable");
    }
 
    @Override

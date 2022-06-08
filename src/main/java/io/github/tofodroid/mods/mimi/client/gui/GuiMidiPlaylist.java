@@ -14,7 +14,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.CommonComponents;
 
 public class GuiMidiPlaylist extends BaseGui {
     // GUI
@@ -59,7 +59,7 @@ public class GuiMidiPlaylist extends BaseGui {
         super.init();
 
         // Fields
-        folderPathField = this.addWidget(new EditBox(this.font, this.START_X + 90, this.START_Y + 40, 207, 10, TextComponent.EMPTY));
+        folderPathField = this.addWidget(new EditBox(this.font, this.START_X + 90, this.START_Y + 40, 207, 10, CommonComponents.EMPTY));
         folderPathField.setValue(folderPathString);
         folderPathField.setMaxLength(256);
         folderPathField.setResponder(this::handlePathChange);

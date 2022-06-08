@@ -1,3 +1,5 @@
+/*
+
 package io.github.tofodroid.mods.mimi.integration.jei;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -47,7 +49,7 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 
 	@Override
 	public Component getTitle() {
-		return new TextComponent(this.title);
+		return Component.literal(this.title);
 	}
 
 	@Override
@@ -67,3 +69,5 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
         recipeLayout.addSlot(RecipeIngredientRole.INPUT, 35, 2).addIngredients(recipe.getIngredients().get(1));
     }
 }
+
+*/

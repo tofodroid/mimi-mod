@@ -15,8 +15,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.VillagePools;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
@@ -25,21 +27,19 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.npc.VillagerTrades.ItemListing;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.Projection;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.RegisterEvent;
 
 public class ModVillagers {
     // Points of Interest (Workstations)
-    public static final PoiType TUNINGTABLE = new PoiType("instrumentalist", PoiType.getBlockStates(ModBlocks.TUNINGTABLE), 1, 1).setRegistryName(MIMIMod.MODID, "tuningtable");
-
+    public static final PoiType TUNINGTABLE = new PoiType(ImmutableSet.copyOf(ModBlocks.TUNINGTABLE.getStateDefinition().getPossibleStates()), 1, 1);
+    public static final ResourceKey<PoiType> TUNINGTABLE_KEY = ResourceKey.create(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, new ResourceLocation(MIMIMod.MODID, "tuningtable"));
     // Professions
-    public static final VillagerProfession INSTRUMENTALIST = new VillagerProfession("instrumentalist", TUNINGTABLE, ImmutableSet.of(Items.NOTE_BLOCK), ImmutableSet.of(Blocks.NOTE_BLOCK), SoundEvents.VILLAGER_WORK_TOOLSMITH).setRegistryName(MIMIMod.MODID, "instrumentalist");
+    
+    public static final VillagerProfession INSTRUMENTALIST = new VillagerProfession("instrumentalist", (key -> { return key.is(TUNINGTABLE_KEY);}), (key -> { return key.is(TUNINGTABLE_KEY);}), ImmutableSet.of(Items.NOTE_BLOCK), null, SoundEvents.VILLAGER_WORK_TOOLSMITH);
 
     // Structures
     public static final List<Triple<ResourceLocation,ResourceLocation,Integer>> JIGSAW_PIECES = Arrays.asList(
@@ -50,23 +50,18 @@ public class ModVillagers {
         createJigsawPiece("village/taiga/houses", "instrumentalist_house", 4)
     );
 
-    @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistrationHandler {
-        @SubscribeEvent
-        public static void registerPoiTypes(final RegistryEvent.Register<PoiType> event) {
-            event.getRegistry().register(TUNINGTABLE);
-        }
+    public static void registerPoiTypes(final RegisterEvent.RegisterHelper<PoiType> event) {
+        event.register(TUNINGTABLE_KEY, TUNINGTABLE);
+    }
 
-        @SubscribeEvent
-        public static void registerProfessions(final RegistryEvent.Register<VillagerProfession> event) {
-            event.getRegistry().register(INSTRUMENTALIST);
-            injectGiftTables();
-            injectTrades();
-        }
+    public static void registerProfessions(final RegisterEvent.RegisterHelper<VillagerProfession> event) {
+        event.register("instrumentalist", INSTRUMENTALIST);
+        injectGiftTables();
+        injectTrades();
     }
 
     protected static void injectGiftTables() {
-        GiveGiftToHero.GIFTS.put(INSTRUMENTALIST, new ResourceLocation(INSTRUMENTALIST.getRegistryName().getNamespace(), "gameplay/hero_of_the_village/" + INSTRUMENTALIST.getRegistryName().getPath() + "_gift"));
+        GiveGiftToHero.GIFTS.put(INSTRUMENTALIST, new ResourceLocation(MIMIMod.MODID, "gameplay/hero_of_the_village/instrumentalist_gift"));
     }
 
     protected static void injectTrades() {

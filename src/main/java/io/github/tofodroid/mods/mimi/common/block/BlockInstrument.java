@@ -56,6 +56,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected final Byte instrumentId;
     protected final Boolean dyeable;
     protected final Integer defaultColor;
+    public final String REGISTRY_NAME;
 
     public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
         super(Properties.of(Material.WOOD).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
@@ -64,7 +65,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         this.defaultColor = defaultColor;
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
         this.SHAPES = this.generateShapes(collisionShape);
-        this.setRegistryName(registryName);
+        this.REGISTRY_NAME = registryName;
     }
 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {

@@ -9,7 +9,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
@@ -24,7 +24,7 @@ public abstract class BaseGui extends Screen {
     protected Integer START_Y;
 
     public BaseGui(Integer gWidth, Integer gHeight, Integer textureSize, String textureResource, String translationKey) {
-        super(new TranslatableComponent(translationKey));
+        super(Component.translatable(translationKey));
         this.guiTexture = new ResourceLocation(MIMIMod.MODID, textureResource);
         this.TEXTURE_SIZE = textureSize;
         this.GUI_HEIGHT = gHeight;

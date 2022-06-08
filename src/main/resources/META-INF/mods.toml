@@ -20,10 +20,10 @@ MIMI - Musical Instrument Minecraft Interface
 [[dependencies.mimi]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.0,1.19)"
+    versionRange="[1.19.0,1.20.0)"
     side="BOTH"
 [[dependencies.mimi]]
     modId="patchouli"
     mandatory=true
-    versionRange="[1.18.0,1.19)"
+    versionRange="[1.19.0,1.20.0)"
     side="BOTH"

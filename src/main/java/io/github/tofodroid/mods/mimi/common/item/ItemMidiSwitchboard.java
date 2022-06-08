@@ -1,7 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -25,6 +24,8 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 
 public class ItemMidiSwitchboard extends Item {
+    public static final String REGISTRY_NAME = "switchboard";
+
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
@@ -51,7 +52,6 @@ public class ItemMidiSwitchboard extends Item {
 
     public ItemMidiSwitchboard() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
-        this.setRegistryName("switchboard");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ItemMidiSwitchboard extends Item {
             if(target instanceof Player) {
                 ItemMidiSwitchboard.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 playerIn.setItemInHand(hand, stack);
-                playerIn.sendMessage(new TextComponent("Set MIDI Source to: " +  target.getName().getString()), playerIn.getUUID());
+                playerIn.displayClientMessage(Component.literal("Set MIDI Source to: " +  target.getName().getString()), true);
                 return InteractionResult.CONSUME;
             }
         } else {
@@ -81,37 +81,37 @@ public class ItemMidiSwitchboard extends Item {
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
             
-            tooltip.add(new TextComponent("----------------"));
+            tooltip.add(Component.literal("----------------"));
 
             // MIDI Source Filter
-            tooltip.add(new TextComponent("Transmitter: " + ItemMidiSwitchboard.getMidiSourceName(stack)));
+            tooltip.add(Component.literal("Transmitter: " + ItemMidiSwitchboard.getMidiSourceName(stack)));
 
             if(ItemMidiSwitchboard.getSysInput(stack)) {
-                tooltip.add(new TextComponent("System MIDI Device: Enabled"));
+                tooltip.add(Component.literal("System MIDI Device: Enabled"));
             } else {
-                tooltip.add(new TextComponent("System MIDI Device: Disabled"));
+                tooltip.add(Component.literal("System MIDI Device: Disabled"));
             }
 
             // MIDI Channels Filter
             SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(stack);
             if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
                 if(acceptedChannels.size() == 16) {
-                    tooltip.add(new TextComponent("Channels: All"));
+                    tooltip.add(Component.literal("Channels: All"));
                 } else {
-                    tooltip.add(new TextComponent("Channels: " + acceptedChannels.stream().map(c -> Integer.valueOf(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
+                    tooltip.add(Component.literal("Channels: " + acceptedChannels.stream().map(c -> Integer.valueOf(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
                 }
             } else {
-                tooltip.add(new TextComponent("Channels: None"));
+                tooltip.add(Component.literal("Channels: None"));
             }
 
             // MIDI Note Filter
-            tooltip.add(new TextComponent("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+            tooltip.add(Component.literal("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
 
             // Instrument Filter
-            tooltip.add(new TextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
+            tooltip.add(Component.literal("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
 
             // Instrument Volume
-            tooltip.add(new TextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
+            tooltip.add(Component.literal("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
         }
     }
 

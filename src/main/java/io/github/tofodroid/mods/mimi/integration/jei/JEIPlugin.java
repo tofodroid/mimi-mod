@@ -1,3 +1,5 @@
+/*
+
 package io.github.tofodroid.mods.mimi.integration.jei;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
@@ -54,3 +56,5 @@ public class JEIPlugin implements IModPlugin {
 		return ID;
 	}
 }
+
+*/

@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -15,7 +14,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class DyedInstrumentRecipe extends CustomRecipe {
-	public static final RecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<>(DyedInstrumentRecipe::new).setRegistryName(MIMIMod.MODID, "dyedinstrument");
+    public static final String REGISTRY_NAME = "dyedinstrument";
+
+	public static final RecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<>(DyedInstrumentRecipe::new);
 
     public DyedInstrumentRecipe(ResourceLocation recipeId) {
         super(recipeId);

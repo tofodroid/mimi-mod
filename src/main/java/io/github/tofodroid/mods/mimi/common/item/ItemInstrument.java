@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -25,6 +25,8 @@ import javax.annotation.Nonnull;
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
 public class ItemInstrument extends Item implements IDyeableInstrumentItem {
+    public final String REGISTRY_NAME;
+
     public static final String INVENTORY_TAG = "inventory";
 
     protected final Byte instrumentId;
@@ -33,7 +35,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
 
     public ItemInstrument(String name, Byte instrumentId, Boolean dyeable, Integer defaultColor) {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
-        this.setRegistryName(name);
+        this.REGISTRY_NAME = name;
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
         this.defaultColor = defaultColor;
@@ -83,7 +85,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
             }
     
             @Override
-            public TextComponent getDisplayName() {return new TextComponent("");}
+            public Component getDisplayName() {return Component.literal("");}
         };
     }
 
@@ -177,6 +179,6 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
         public AbstractContainerMenu createMenu(int p1, Inventory p2,  Player p3) {return null;}
 
         @Override
-        public TextComponent getDisplayName() {return null;}
+        public Component getDisplayName() {return null;}
     }
 }

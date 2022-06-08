@@ -1,8 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.mob.villager;
 
 import java.util.List;
-import java.util.Random;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ public class ItemsForItemsTrade implements VillagerTrades.ItemListing {
       this.priceMultiplier = 0.05F;
    }
 
-   public MerchantOffer getOffer(Entity trader, Random rand) {
+   public MerchantOffer getOffer(Entity trader, RandomSource rand) {
       return new MerchantOffer(new ItemStack(buyItems.get(rand.nextInt(buyItems.size())).asItem(), buyCount),  new ItemStack(sellItems.get(rand.nextInt(sellItems.size())).asItem(), sellCount), this.maxUses, this.xpValue, this.priceMultiplier);
    }
 }

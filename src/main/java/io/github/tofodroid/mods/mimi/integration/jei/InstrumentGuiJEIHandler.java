@@ -1,3 +1,5 @@
+/*
+
 package io.github.tofodroid.mods.mimi.integration.jei;
 
 import mezz.jei.api.gui.handlers.IGuiProperties;
@@ -17,3 +19,5 @@ public class InstrumentGuiJEIHandler implements IScreenHandler<GuiInstrumentCont
         return null;
     }
 }
+
+*/

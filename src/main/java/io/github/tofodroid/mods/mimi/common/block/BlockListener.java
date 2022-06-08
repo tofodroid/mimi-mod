@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import java.util.Random;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import net.minecraft.core.BlockPos;
@@ -22,12 +23,12 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 
 public class BlockListener extends AContainerBlock<TileListener> {
+    public static final String REGISTRY_NAME = "listener";
     private static final IntegerProperty POWER = BlockStateProperties.POWER;
 
     public BlockListener() {
         super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
-        this.setRegistryName("listener");
     }
 
     @Override
@@ -49,6 +50,8 @@ public class BlockListener extends AContainerBlock<TileListener> {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, ModTiles.LISTENER, TileListener::doTick);
     }
+
+    /*
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
         if (state.getValue(POWER) != 0) {
@@ -59,6 +62,7 @@ public class BlockListener extends AContainerBlock<TileListener> {
            }
         }
     }
+    */
 
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {

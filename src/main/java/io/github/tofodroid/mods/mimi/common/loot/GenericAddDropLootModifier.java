@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.loot;
 
 import com.google.gson.JsonObject;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -10,8 +11,6 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
-
-import java.util.List;
 
 public class GenericAddDropLootModifier extends LootModifier {
 
@@ -27,7 +26,7 @@ public class GenericAddDropLootModifier extends LootModifier {
     }
 
     @Override
-    protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
+    protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         generatedLoot.add(stack.copy());
         return generatedLoot;
     }
@@ -42,7 +41,7 @@ public class GenericAddDropLootModifier extends LootModifier {
         @Override
         public JsonObject write(GenericAddDropLootModifier instance) {
             JsonObject jsonObject = makeConditions(instance.conditions);
-            jsonObject.addProperty("item", instance.getStack().getItem().getRegistryName().toString());
+            jsonObject.addProperty("item", instance.getStack().getItem().toString());
             return jsonObject;
         }
     }

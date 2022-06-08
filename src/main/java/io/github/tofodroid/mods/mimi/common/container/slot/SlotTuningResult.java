@@ -56,7 +56,7 @@ public class SlotTuningResult extends Slot {
     public void onTake(Player p_150638_, ItemStack p_150639_) {
         this.checkTakeAchievements(p_150639_);
         net.minecraftforge.common.ForgeHooks.setCraftingPlayer(p_150638_);
-        NonNullList<ItemStack> nonnulllist = p_150638_.level.getRecipeManager().getRemainingItemsFor(ModRecipes.TUNING.get(), this.craftSlots, p_150638_.level);
+        NonNullList<ItemStack> nonnulllist = p_150638_.level.getRecipeManager().getRemainingItemsFor(ModRecipes.TUNING_TYPE, this.craftSlots, p_150638_.level);
         net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
         
         for(int i = 0; i < nonnulllist.size(); ++i) {
