@@ -16,14 +16,9 @@ MIMI - Musical Instrument Minecraft Interface
 [[dependencies.mimi]]
     modId="forge"
     mandatory=true
-    versionRange="[39.0.0,)"
+    versionRange="[41.0.1,)"
 [[dependencies.mimi]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.19.0,1.20.0)"
-    side="BOTH"
-[[dependencies.mimi]]
-    modId="patchouli"
     mandatory=true
     versionRange="[1.19.0,1.20.0)"
     side="BOTH"
