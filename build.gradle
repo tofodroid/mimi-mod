@@ -142,6 +142,10 @@ repositories {
         name = "JEI"
         url "https://dvs1.progwml6.com/files/maven"
     }
+    maven { 
+        name = "REI"
+        url "https://maven.shedaniel.me" 
+    }
 }
 
 dependencies {
@@ -154,6 +158,12 @@ dependencies {
     // JEI
     //compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.194:api")
     //runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.194")
+
+    // REI
+    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:9.0.472")
+    runtimeOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:9.0.472")
+    runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:7.0.69")
+    runtimeOnly fg.deobf("dev.architectury:architectury-forge:5.5.18")
 
     // Patchouli
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.19-70-SNAPSHOT:api")

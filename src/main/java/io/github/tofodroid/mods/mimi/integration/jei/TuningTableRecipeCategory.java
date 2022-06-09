@@ -1,5 +1,3 @@
-/*
-
 package io.github.tofodroid.mods.mimi.integration.jei;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -14,8 +12,6 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,7 +23,7 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
     public static final RecipeType<TuningTableRecipe> RECIPE_TYPE = new RecipeType<TuningTableRecipe>(CATEGORY_UID, TuningTableRecipe.class);
 
 	public TuningTableRecipeCategory(IGuiHelper helper) {
-        title = new TranslatableComponent("gui.jei." + MIMIMod.MODID + ".tuning").getString();
+        title = Component.translatable("gui.jei." + MIMIMod.MODID + ".tuning").getString();
 		icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.TUNINGTABLE));
 		background = helper.createDrawable(new ResourceLocation(MIMIMod.MODID, "textures/jei/tuning.png"), 0, 0, 59, 40);
 	}
@@ -69,5 +65,3 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
         recipeLayout.addSlot(RecipeIngredientRole.INPUT, 35, 2).addIngredients(recipe.getIngredients().get(1));
     }
 }
-
-*/

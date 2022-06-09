@@ -1,5 +1,3 @@
-/*
-
 package io.github.tofodroid.mods.mimi.integration.jei;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
@@ -32,7 +30,7 @@ public class JEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
 		RecipeManager manager = Objects.requireNonNull(MC.level).getRecipeManager();
-		registration.addRecipes(TuningTableRecipeCategory.RECIPE_TYPE, manager.getRecipes().parallelStream().filter(recipe -> recipe.getType().equals(ModRecipes.TUNING.get())).map(r -> (TuningTableRecipe) r).toList());
+		registration.addRecipes(TuningTableRecipeCategory.RECIPE_TYPE, manager.getRecipes().parallelStream().filter(recipe -> recipe.getType().equals(ModRecipes.TUNING_TYPE)).map(r -> (TuningTableRecipe) r).toList());
 	}
 
 	@Override
@@ -56,5 +54,3 @@ public class JEIPlugin implements IModPlugin {
 		return ID;
 	}
 }
-
-*/
