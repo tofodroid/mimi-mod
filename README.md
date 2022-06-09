@@ -1,7 +1,7 @@
 # MIMI - Musical Instrument Minecraft Interface
 
 ## Overview
-MIMI is a Forge mod for Minecraft Java Edition that allows you to play music from MIDI files or a MIDI Input Device using a variety of instruments either solo or with a group. The implementation is similar to the way that Rust instruments work and makes for a really easy to use yet powerful system. Mod releases are available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/).
+MIMI is a Forge mod for Minecraft Java Edition that allows you to play music from MIDI files or a MIDI Input Device using a variety of instruments either solo or with a group. The implementation is similar to the way that Rust instruments work and makes for a really easy to use yet powerful system. Mod releases are available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) and now on [Modrinth](https://modrinth.com/mod/mimi/).
 
 | Minecraft Version |        Mod Support Level |
 | -------------     |                    -----:|
@@ -47,10 +47,10 @@ I don't have tests setup for MIMI at this time and as such bugs are fairly likel
 I have a fairly lengthy list of potential new features and improvements to add to MIMI in the future (see below) but am also always open to suggestions. Please open an issue in the Issues tab above using the `Improvement Request` or `Feature Request` template. Note that issues requesting a port to another mod loader or a different version of Minecraft will be removed.
 
 ## Downloads
-**Official JAR builds of the mod will be posted on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) and only on CurseForge. If you find a JAR download on any site other than CurseForge it is not an official build and you may be putting your system at risk if you use it.**
+**Official JAR builds of the mod will be posted on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) and [Modrinth](https://modrinth.com/mod/mimi/). If you find a JAR download on any site other than CurseForge or Modrinth it is not an official build and you may be putting your system at risk if you use it.**
 
 ## Redistributing
-This mod may be included in modpacks. If you choose to redistribute the mod JAR itself outside of the official [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) page note the conditions of the [MIT License](https://opensource.org/licenses/MIT) and understand that from my point of view your build will be considered unofficial as noted in the section above.
+This mod may be included in modpacks. If you choose to redistribute the mod JAR itself outside of the official [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) or [Modrinth](https://modrinth.com/mod/mimi/) page note the conditions of the [MIT License](https://opensource.org/licenses/MIT) and understand that from my point of view your build will be considered unofficial as noted in the section above.
 
 ## Minecraft Versions
 MIMI is a mod that I am developing in my spare time and as such it will only be supporting a limited subset of Minecraft and Forge versions. When a new version is released it may take some time for the mod to be updated. Fabric is not supported and will not be supported by me, but if someone would like to port the mod to Fabric that would be fine! The current versions that this mod officially supports are outlined in the overview above.
