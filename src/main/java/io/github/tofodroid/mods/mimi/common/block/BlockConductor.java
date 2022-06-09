@@ -1,8 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import java.util.Random;
-
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -15,7 +12,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -80,18 +76,7 @@ public class BlockConductor extends AContainerBlock<TileConductor> {
 
         return super.use(state, worldIn, pos, player, hand, hit);
     }
-    
-    /*
-    @Override
-    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
-        TileConductor tile = getTileForBlock(worldIn, pos);
-                    
-        if(tile != null) {
-            tile.transmitNoteOff(worldIn);
-        }
-    }
-    */
-    
+
     @Override
     public BlockEntityType<TileConductor> getTileType() {
         return ModTiles.CONDUCTOR;

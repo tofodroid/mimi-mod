@@ -31,6 +31,11 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
             public boolean mayPlace(ItemStack stack) {
                 return ModItems.SWITCHBOARD.equals(stack.getItem());
             }
+
+			@Override
+			public int getMaxStackSize() {
+				return 1;
+			}
         };
     }
 

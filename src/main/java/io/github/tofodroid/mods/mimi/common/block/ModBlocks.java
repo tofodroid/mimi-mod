@@ -3,18 +3,10 @@ package io.github.tofodroid.mods.mimi.common.block;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.RegisterEvent;
 
 public class ModBlocks {
@@ -49,21 +41,6 @@ public class ModBlocks {
         INSTRUMENTS.forEach((BlockInstrument instrument) -> {
             event.register(instrument.REGISTRY_NAME, instrument);
         });
-    }
-
-
-    @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistrationHandler {
-        @SubscribeEvent
-        @OnlyIn(Dist.CLIENT)
-        public static void clientRegistration(final FMLClientSetupEvent event) {
-            // Renderers
-            /*
-            ModBlocks.INSTRUMENTS.forEach(block -> {
-                ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout());
-            });
-            */
-        }
     }
 
     public static List<BlockInstrument> buildInstruments()  {

@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
