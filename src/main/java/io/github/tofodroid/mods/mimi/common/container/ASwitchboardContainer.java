@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.container;
 
-import net.minecraftforge.items.SlotItemHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -10,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.UUID;
+
+import io.github.tofodroid.mods.mimi.common.container.slot.SlotSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 
@@ -26,17 +27,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
     }
 
     protected Slot buildSwitchboardSlot() {
-        return new SlotItemHandler(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY()) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return ModItems.SWITCHBOARD.equals(stack.getItem());
-            }
-
-			@Override
-			public int getMaxStackSize() {
-				return 1;
-			}
-        };
+        return new SlotSwitchboard(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY());
     }
 
     @Override

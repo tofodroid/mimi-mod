@@ -133,9 +133,16 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
         return super.mouseClicked(dmouseX, dmouseY, button);
     }
+    
+    @Override
+    protected Boolean shouldRenderBackground() {
+        return false;
+    }
 
     @Override
-    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {      
+        setAlpha(1.0f);
+
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 

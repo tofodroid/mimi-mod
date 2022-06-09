@@ -69,7 +69,7 @@ public class ServerPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
                         ));
                         playerInstrumentsMap.put(playerId, Arrays.asList(
                             ItemInstrument.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.MAIN_HAND),
-                            ItemInstrument.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.MAIN_HAND),
+                            ItemInstrument.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.OFF_HAND),
                             instrumentTile != null ? instrumentTile.getInstrumentId() : null
                         ));
                     }
