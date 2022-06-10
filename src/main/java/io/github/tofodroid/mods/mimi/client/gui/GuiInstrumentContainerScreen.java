@@ -260,20 +260,26 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 // Toggle Sys Device Button
                 ItemMidiSwitchboard.setSysInput(selectedSwitchboardStack, !ItemMidiSwitchboard.getSysInput(selectedSwitchboardStack));
                 this.syncSwitchboardToServer();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
                this.setSelfSource();
+               this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
                 this.setPublicSource();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
                 this.clearSource();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_UP_BUTTON_COORDS)) {
                 this.changeVolume(1);
             } else if(clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS)) {
                 this.changeVolume(-1);
             } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
                 this.clearChannels();
+                this.allNotesOff();
             } else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
                 this.enableAllChannels();
+                this.allNotesOff();
             } else {
                 // Individual Midi Channel Buttons
                 for(int i = 0; i < 16; i++) {
@@ -285,6 +291,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
                     if(clickedBox(imouseX, imouseY, buttonCoords)) {
                         this.toggleChannel(i);
+                        this.allNotesOff();
                         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
                     }
                 }
@@ -372,7 +379,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         Byte value = on ? Byte.MAX_VALUE : Byte.MIN_VALUE;
         MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
     }
 
     // Midi Functions
@@ -440,21 +447,21 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NET_CHANNEL.sendToServer(packet);
-            MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+            MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
         this.onMidiNoteOff(null, midiNote);
     }
 

@@ -25,13 +25,11 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
 
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
-    protected LocalPlayerMIMISynth localSynth;
     protected MechanicalMaestroMIMISynth mechSynth;
     protected ServerPlayerMIMISynth playerSynth;
 
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
-        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.mechSynth = new MechanicalMaestroMIMISynth(true, ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.playerSynth = new ServerPlayerMIMISynth(true, ModConfigs.CLIENT.latency.get(), this.soundbank);
     }
@@ -44,9 +42,6 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
         }
 
         midiTickCounter++;
-
-        // Tick local synth every tick
-        localSynth.tick(event.player);
 
         // Tick other synths every N tickets
         if(midiTickCounter >= MIDI_TICK_FREQUENCY) {
@@ -89,25 +84,7 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
     }
 
     @Override
-    public void handleLocalPacket(MidiNotePacket message) {
-        LocalPlayerMIMISynth targetSynth = localSynth;
-
-        if(targetSynth != null) {
-            if(!message.isControlPacket()) {
-                if(message.velocity > 0) {
-                    targetSynth.noteOn(message);
-                } else if(message.velocity <= 0) {
-                    targetSynth.noteOff(message);
-                }
-            } else {
-                targetSynth.controlChange(message);
-            }
-        }     
-    }
-
-    @Override
     public void allNotesOff() {
-        localSynth.allNotesOff();
         mechSynth.allNotesOff();
         playerSynth.allNotesOff();
     }
