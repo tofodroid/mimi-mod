@@ -31,6 +31,7 @@ public class ClientConfig {
     // SYNTH
     public ForgeConfigSpec.BooleanValue jitterCorrection;
     public ForgeConfigSpec.IntValue latency;
+    public ForgeConfigSpec.IntValue localLatency;
     public ForgeConfigSpec.ConfigValue<Integer> synthSampleRate;
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
@@ -62,9 +63,12 @@ public class ClientConfig {
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
             .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrection")
             .define("synthJitterCorrection", true);
-        latency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms)? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
+        latency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes from other players? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.latency")
             .defineInRange("synthBaselineLatency", 250, 10, 800);
+        localLatency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes played by you? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
+            .translation(MIMIMod.MODID + ".config.midi.synth.localLatency")
+            .defineInRange("synthBaselineLocalLatency", 30, 10, 800);
         synthSampleRate = builder.comment("What sample rate should the built-in midi synthesizer use (hz)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8000,11025,16000,22050,44100,48000,96000]")
             .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
             .defineInList("synthSampleRate", 44100, Arrays.asList(8000,11025,16000,22050,44100,48000,96000));

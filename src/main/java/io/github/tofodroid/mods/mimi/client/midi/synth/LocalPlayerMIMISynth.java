@@ -40,7 +40,7 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
             TileInstrument instrumentTile = BlockInstrument.getTileInstrumentForEntity(clientPlayer);
             List<Byte> playerInstruments = Arrays.asList(
                 ItemInstrument.getEntityHeldInstrumentId(clientPlayer, InteractionHand.MAIN_HAND),
-                ItemInstrument.getEntityHeldInstrumentId(clientPlayer, InteractionHand.MAIN_HAND),
+                ItemInstrument.getEntityHeldInstrumentId(clientPlayer, InteractionHand.OFF_HAND),
                 instrumentTile != null ? instrumentTile.getInstrumentId() : null
             );
 

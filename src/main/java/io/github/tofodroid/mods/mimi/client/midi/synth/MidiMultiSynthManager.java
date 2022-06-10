@@ -25,13 +25,15 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
 
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
+    protected LocalPlayerMIMISynth localSynth;
     protected MechanicalMaestroMIMISynth mechSynth;
     protected ServerPlayerMIMISynth playerSynth;
 
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
-        this.mechSynth = new MechanicalMaestroMIMISynth(true, ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.playerSynth = new ServerPlayerMIMISynth(true, ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
     @Override
@@ -43,8 +45,10 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
 
         midiTickCounter++;
 
-        // Tick other synths every N tickets
+        // Tick synths every N tickets
         if(midiTickCounter >= MIDI_TICK_FREQUENCY) {
+            // Local
+            localSynth.tick(event.player);
     
             // Mechanical Maestros
             mechSynth.tick(event.player);
@@ -80,11 +84,25 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
                 targetSynth.controlChange(message);
             }
         }
-       
+    }
+    
+    public void handleLocalPacket(MidiNotePacket message) {
+        if(localSynth != null) {
+            if(!message.isControlPacket()) {
+                if(message.velocity > 0) {
+                    localSynth.noteOn(message);
+                } else if(message.velocity <= 0) {
+                    localSynth.noteOff(message);
+                }
+            } else {
+                localSynth.controlChange(message);
+            }
+        }
     }
 
     @Override
     public void allNotesOff() {
+        localSynth.allNotesOff();
         mechSynth.allNotesOff();
         playerSynth.allNotesOff();
     }

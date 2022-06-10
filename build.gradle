@@ -160,8 +160,8 @@ dependencies {
     //runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.194")
 
     // REI
-    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:9.0.472")
-    runtimeOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:9.0.472")
+    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:9.0.475")
+    runtimeOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:9.0.475")
     runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:7.0.69")
     runtimeOnly fg.deobf("dev.architectury:architectury-forge:5.5.18")
 

@@ -28,25 +28,25 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, Player player) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
     
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, Player player) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
 
     public void handleAllNotesOff(Byte channel, Byte instrument, Player player) {
         MidiNotePacket packet =MidiNotePacket.createAllNotesOffPacket(instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
     
     public void handleControlMessage(Byte channel, Byte instrument, Byte controller, Byte value, Player player) {
         MidiNotePacket packet =MidiNotePacket.createControlPacket(controller, value, instrument, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handlePacket(packet);
+        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
     }
 
     @Override
