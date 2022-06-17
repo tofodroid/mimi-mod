@@ -44,7 +44,7 @@ public class TileListener extends ANoteResponsiveTile {
             world.setBlock(pos, state.setValue(BlockListener.POWER, Integer.valueOf(0)), 3);
  
             for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), ModBlocks.LISTENER);
+                world.updateNeighborsAt(pos.relative(direction), ModBlocks.LISTENER.get());
             }
          }
     }

@@ -19,6 +19,6 @@ public class MIMIModItemGroup extends CreativeModeTab {
     @Nonnull
     @OnlyIn(Dist.CLIENT)
     public ItemStack makeIcon() {
-        return new ItemStack(ModBlocks.INSTRUMENTS.get(0));
+        return new ItemStack(ModBlocks.getBlockInstruments().get(0));
     }
 }

@@ -60,7 +60,7 @@ public class MidiNotePacketHandler {
                     
                     getPotentialListeners(entities).forEach(listener -> {
                         if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
-                            ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
+                            ModBlocks.LISTENER.get().powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
                         }
                     });
                 }

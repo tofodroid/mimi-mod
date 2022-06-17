@@ -36,7 +36,7 @@ public class TileReceiver extends ANoteResponsiveTile {
             world.setBlock(pos, state.setValue(BlockReceiver.POWER, Integer.valueOf(0)), 3);
  
             for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), ModBlocks.RECEIVER);
+                world.updateNeighborsAt(pos.relative(direction), ModBlocks.RECEIVER.get());
             }
         }
     }

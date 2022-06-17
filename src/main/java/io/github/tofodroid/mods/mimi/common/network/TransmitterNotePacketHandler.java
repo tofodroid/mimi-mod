@@ -70,7 +70,7 @@ public class TransmitterNotePacketHandler {
         if(!message.isControlPacket() && message.velocity > 0) {
             for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(false)))) {
                 if(receiver.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
-                    ModBlocks.RECEIVER.powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos());
+                    ModBlocks.RECEIVER.get().powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos());
                 }
             }
         }

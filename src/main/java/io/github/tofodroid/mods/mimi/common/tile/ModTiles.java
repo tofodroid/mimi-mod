@@ -20,10 +20,10 @@ public class ModTiles {
     }
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
-        INSTRUMENT = registerType("instrument", BlockEntityType.Builder.of(TileInstrument::new, ModBlocks.INSTRUMENTS.toArray(new BlockInstrument[ModBlocks.INSTRUMENTS.size()])), event);
-        RECEIVER = registerType("receiver", BlockEntityType.Builder.of(TileReceiver::new, ModBlocks.RECEIVER), event);
-        LISTENER = registerType("listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER), event);
-        MECHANICALMAESTRO = registerType("mechanicalmaestro", BlockEntityType.Builder.of(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO), event);
-        CONDUCTOR = registerType("conductor", BlockEntityType.Builder.of(TileConductor::new, ModBlocks.CONDUCTOR), event);
+        INSTRUMENT = registerType("instrument", BlockEntityType.Builder.of(TileInstrument::new, ModBlocks.getBlockInstruments().toArray(new BlockInstrument[ModBlocks.getBlockInstruments().size()])), event);
+        RECEIVER = registerType("receiver", BlockEntityType.Builder.of(TileReceiver::new, ModBlocks.RECEIVER.get()), event);
+        LISTENER = registerType("listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER.get()), event);
+        MECHANICALMAESTRO = registerType("mechanicalmaestro", BlockEntityType.Builder.of(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO.get()), event);
+        CONDUCTOR = registerType("conductor", BlockEntityType.Builder.of(TileConductor::new, ModBlocks.CONDUCTOR.get()), event);
     }
 }

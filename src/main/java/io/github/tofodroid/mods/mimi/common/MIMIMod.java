@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common;
 
 import net.minecraft.core.Registry;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -44,32 +45,42 @@ public class MIMIMod
     }
 
     public static void preInit(FMLJavaModLoadingContext fmlContext, ModLoadingContext modContext) {
-        // Event Listener Registration
-        fmlContext.getModEventBus().addListener(NetworkManager::init);
-        fmlContext.getModEventBus().addListener(MIMIMod::init);
+        // Configs
+        ModConfigs.preInit(modContext);
+        InstrumentConfig.preInit();
 
+        // Event Listener Registration
+        MinecraftForge.EVENT_BUS.addListener(MIMIMod::init);
+        MinecraftForge.EVENT_BUS.addListener(NetworkManager::init);
+        MinecraftForge.EVENT_BUS.addListener(ModVillagers::registerTrades);
 
         // Deferred Registrations
         ModEntities.ENTITY_TYPES.register(fmlContext.getModEventBus());
         ModLootModifiers.REGISTER.register(fmlContext.getModEventBus());
 
-        // Other Pre-Init
-        ModConfigs.preInit(modContext);
-        InstrumentConfig.preInit();
+        // Blocks
+        ModBlocks.BLOCKS.register(fmlContext.getModEventBus());
+
+        // Items
+
+        // Tiles
+
+        // Recipes
+
+        //Containers
+
+        // Village Stuff
+        ModVillagers.POI_TYPES.register(fmlContext.getModEventBus());
+        ModVillagers.PROFESSIONS.register(fmlContext.getModEventBus());
+        ModVillagers.injectStructures();
     }
-    
+   
     public static void init(final FMLCommonSetupEvent event) {
         proxy.init(event);
-
-        // Other Init
-        event.enqueueWork(() -> ModVillagers.injectStructures());
     }
 
     @SubscribeEvent
     public static void registerContent(final RegisterEvent event) {
-        // Blocks
-        event.register(Registry.BLOCK_REGISTRY, (reg) -> {ModBlocks.submitRegistrations(reg);});
-
         // Items
         event.register(Registry.ITEM_REGISTRY, (reg) -> {ModItems.submitRegistrations(reg);});
 
@@ -82,9 +93,5 @@ public class MIMIMod
 
         // Containers
         event.register(Registry.MENU_REGISTRY, (reg) -> {ModContainers.submitRegistrations(reg);});
-
-        // Village Stuff
-        event.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, (reg) -> {ModVillagers.registerPoiTypes(reg);});
-        event.register(Registry.VILLAGER_PROFESSION_REGISTRY, (reg) -> {ModVillagers.registerProfessions(reg);});
     }
 }

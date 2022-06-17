@@ -52,20 +52,20 @@ public final class ModItems {
         event.register(ItemMidiSwitchboard.REGISTRY_NAME, SWITCHBOARD);
 
         // Redstone Blocks
-        LISTENER = new BlockItem(ModBlocks.LISTENER, new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        LISTENER = new BlockItem(ModBlocks.LISTENER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockListener.REGISTRY_NAME, LISTENER);
 
-        RECEIVER = new BlockItem(ModBlocks.RECEIVER, new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        RECEIVER = new BlockItem(ModBlocks.RECEIVER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockReceiver.REGISTRY_NAME, RECEIVER);
 
-        MECHANICALMAESTRO = new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        MECHANICALMAESTRO = new BlockItem(ModBlocks.MECHANICALMAESTRO.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockMechanicalMaestro.REGISTRY_NAME, MECHANICALMAESTRO);
         
-        CONDUCTOR = new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        CONDUCTOR = new BlockItem(ModBlocks.CONDUCTOR.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockConductor.REGISTRY_NAME, CONDUCTOR);
 
         // Village Blocks
-        TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockTuningTable.REGISTRY_NAME, TUNINGTABLE);
 
         // Instrument Items
