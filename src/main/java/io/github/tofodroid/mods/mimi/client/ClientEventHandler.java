@@ -29,7 +29,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void register(ColorHandlerEvent.Block event) {
-        registerBlockColors(event, ModBlocks.INSTRUMENTS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
+        registerBlockColors(event, ModBlocks.getBlockInstruments().stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
     }
 
     @SubscribeEvent
