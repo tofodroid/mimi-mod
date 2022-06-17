@@ -29,18 +29,8 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 	}
 
 	@Override
-	public ResourceLocation getUid() {
-		return new ResourceLocation(MIMIMod.MODID, "tuning");
-	}
-
-	@Override
 	public RecipeType<TuningTableRecipe> getRecipeType() {
 		return RECIPE_TYPE;
-	}
-
-	@Override
-	public Class<? extends TuningTableRecipe> getRecipeClass() {
-		return TuningTableRecipe.class;
 	}
 
 	@Override

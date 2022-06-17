@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.integration.jei;
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
 import io.github.tofodroid.mods.mimi.client.gui.GuiTuningTableContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
@@ -42,11 +41,6 @@ public class JEIPlugin implements IModPlugin {
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
 		registration.addRecipeClickArea(GuiTuningTableContainerScreen.class, 102, 39, 22, 15, TuningTableRecipeCategory.RECIPE_TYPE);
         registration.addGuiScreenHandler(GuiInstrumentContainerScreen.class, new InstrumentGuiJEIHandler());
-	}
-
-	@Override
-	public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-		registration.addRecipeTransferHandler(ContainerTuningTable.class, TuningTableRecipeCategory.RECIPE_TYPE, ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID, 2, 0, ContainerTuningTable.TARGET_CONTAINER_MIN_SLOT_ID);
 	}
 
 	@Override

@@ -76,9 +76,6 @@ public class MIMIMod
         // Tiles
         event.register(Registry.BLOCK_ENTITY_TYPE_REGISTRY, (reg) -> {ModTiles.submitRegistrations(reg);});
 
-        // Entities
-        //event.register(Registry.ENTITY_TYPE_REGISTRY, (reg) -> {ModEntities.submitRegistrations(reg);});
-
         // Recipes
         event.register(Registry.RECIPE_TYPE_REGISTRY, (reg) -> {ModRecipes.submitTypeRegistrations(reg);});
         event.register(Registry.RECIPE_SERIALIZER_REGISTRY, (reg) -> {ModRecipes.submitSerializerRegistrations(reg);});
