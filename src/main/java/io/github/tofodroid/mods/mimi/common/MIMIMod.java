@@ -50,8 +50,8 @@ public class MIMIMod
         InstrumentConfig.preInit();
 
         // Event Listener Registration
-        MinecraftForge.EVENT_BUS.addListener(MIMIMod::init);
-        MinecraftForge.EVENT_BUS.addListener(NetworkManager::init);
+        fmlContext.getModEventBus().addListener(MIMIMod::init);
+        fmlContext.getModEventBus().addListener(NetworkManager::init);
         MinecraftForge.EVENT_BUS.addListener(ModVillagers::registerTrades);
 
         // Deferred Registrations
