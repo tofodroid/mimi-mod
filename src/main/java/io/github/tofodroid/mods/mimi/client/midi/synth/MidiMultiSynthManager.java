@@ -14,7 +14,7 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.midi.AMidiSynthManager;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -60,7 +60,7 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
 
     @Override
     @SubscribeEvent
-    public void handleSelfLogOut(LoggedOutEvent event) {
+    public void handleSelfLogOut(LoggingOut event) {
         this.close();
     }
 

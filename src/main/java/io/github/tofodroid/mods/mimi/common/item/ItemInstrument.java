@@ -66,7 +66,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         if (!worldIn.isClientSide) {
-            NetworkHooks.openGui((ServerPlayer) playerIn, generateContainerProvider(handIn), buffer -> {
+            NetworkHooks.openScreen((ServerPlayer) playerIn, generateContainerProvider(handIn), buffer -> {
                 buffer.writeByte(this.instrumentId);
                 buffer.writeBoolean(true);
                 buffer.writeBoolean(InteractionHand.MAIN_HAND.equals(handIn));

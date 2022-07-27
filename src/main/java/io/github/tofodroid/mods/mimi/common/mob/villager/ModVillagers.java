@@ -49,7 +49,7 @@ public class ModVillagers {
     public static final RegistryObject<PoiType> INSTRUMENTALIST_POI = POI_TYPES.register("instrumentalist", () -> new PoiType(ImmutableSet.of(), 0, 0));
 
     // Professions
-    public static final DeferredRegister<VillagerProfession> PROFESSIONS = DeferredRegister.create(ForgeRegistries.PROFESSIONS, MIMIMod.MODID);
+    public static final DeferredRegister<VillagerProfession> PROFESSIONS = DeferredRegister.create(ForgeRegistries.VILLAGER_PROFESSIONS, MIMIMod.MODID);
     public static final RegistryObject<VillagerProfession> INSTRUMENTALIST = PROFESSIONS.register(
         "instrumentalist", 
         () -> {

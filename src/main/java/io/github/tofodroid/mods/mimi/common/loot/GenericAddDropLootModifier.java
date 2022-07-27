@@ -1,49 +1,42 @@
 package io.github.tofodroid.mods.mimi.common.loot;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class GenericAddDropLootModifier extends LootModifier {
+    public static final Codec<GenericAddDropLootModifier> CODEC = RecordCodecBuilder.create(
+        inst -> LootModifier.codecStart(inst)
+        .and(
+                ForgeRegistries.ITEMS.getCodec().fieldOf("item").forGetter(m -> m.item)
+        )
+        .apply(inst, GenericAddDropLootModifier::new)
+    );
 
-    private final ItemStack stack;
+    public Item item;
 
-    protected GenericAddDropLootModifier(LootItemCondition[] conditionsIn, ItemStack itemStack) {
+    protected GenericAddDropLootModifier(LootItemCondition[] conditionsIn, Item item) {
         super(conditionsIn);
-        this.stack = itemStack;
-    }
-
-    public ItemStack getStack() {
-        return stack;
+        this.item = item;
     }
 
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        generatedLoot.add(stack.copy());
+        generatedLoot.add(new ItemStack(item, 1));
         return generatedLoot;
     }
 
-    public static class Serializer extends GlobalLootModifierSerializer<GenericAddDropLootModifier> {
-        @Override
-        public GenericAddDropLootModifier read(ResourceLocation location, JsonObject object, LootItemCondition[] conditions) {
-            Item toAdd = ShapedRecipe.itemFromJson(object);
-            return new GenericAddDropLootModifier(conditions, new ItemStack(toAdd,1));
-        }
-
-        @Override
-        public JsonObject write(GenericAddDropLootModifier instance) {
-            JsonObject jsonObject = makeConditions(instance.conditions);
-            jsonObject.addProperty("item", instance.getStack().getItem().toString());
-            return jsonObject;
-        }
+    @Override
+    public Codec<? extends IGlobalLootModifier> codec() {
+        return ModLootModifiers.GENERIC_ADD_DROP.get();
     }
 }
 

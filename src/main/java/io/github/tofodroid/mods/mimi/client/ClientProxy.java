@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.client;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.Proxy;
-import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -19,10 +18,6 @@ public class ClientProxy implements Proxy {
         
         MIDI_INPUT = new MidiInputManager();
         MinecraftForge.EVENT_BUS.register(MIDI_INPUT);
-
-        // Keybinds
-        ModBindings.register();
-        MinecraftForge.EVENT_BUS.register(new ModBindings());
     }
 
     @Override
