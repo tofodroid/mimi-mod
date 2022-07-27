@@ -44,7 +44,7 @@ public abstract class AContainerBlock<T extends ASwitchboardContainerEntity> ext
             T tile = getTileForBlock(worldIn, pos);
             if(tile != null) {
                 ServerPlayer serverPlayerEntity = (ServerPlayer) player;
-                NetworkHooks.openGui(serverPlayerEntity, this.getMenuProvider(state, worldIn, pos), (FriendlyByteBuf -> {
+                NetworkHooks.openScreen(serverPlayerEntity, this.getMenuProvider(state, worldIn, pos), (FriendlyByteBuf -> {
                     writeGuiFriendlyByteBuf(state, worldIn, pos, player, hand, FriendlyByteBuf);
                 }));
                 return InteractionResult.CONSUME;

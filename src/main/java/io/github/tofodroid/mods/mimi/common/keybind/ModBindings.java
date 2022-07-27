@@ -11,8 +11,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.InputEvent.Key;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 @SuppressWarnings("resource")
@@ -24,7 +24,8 @@ public class ModBindings {
     public static KeyMapping MIDIGUIOFF;
     public static KeyMapping MIDIGUISEAT;
 
-    public static void register() {
+    @SubscribeEvent
+    public static void register(RegisterKeyMappingsEvent event) {
         MIDIPLAYLIST = new KeyMapping("key." + MIMIMod.MODID + ".midi.playlist", GLFW.GLFW_KEY_PERIOD, "key.categories." + MIMIMod.MODID);
         MIDISETTINGS = new KeyMapping("key." + MIMIMod.MODID + ".midi.settings", GLFW.GLFW_KEY_COMMA, "key.categories." + MIMIMod.MODID);
         MIDIALLOFF = new KeyMapping("key." + MIMIMod.MODID + ".midi.alloff", GLFW.GLFW_KEY_END, "key.categories." + MIMIMod.MODID);
@@ -32,16 +33,16 @@ public class ModBindings {
         MIDIGUIOFF = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.off", GLFW.GLFW_KEY_K, "key.categories." + MIMIMod.MODID);
         MIDIGUISEAT = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.seat", GLFW.GLFW_KEY_L, "key.categories." + MIMIMod.MODID);
 
-        ClientRegistry.registerKeyBinding(MIDIPLAYLIST);
-        ClientRegistry.registerKeyBinding(MIDISETTINGS);
-        ClientRegistry.registerKeyBinding(MIDIALLOFF);
-        ClientRegistry.registerKeyBinding(MIDIGUIMAIN);
-        ClientRegistry.registerKeyBinding(MIDIGUIOFF);
-        ClientRegistry.registerKeyBinding(MIDIGUISEAT);
+        event.register(MIDIPLAYLIST);
+        event.register(MIDISETTINGS);
+        event.register(MIDIALLOFF);
+        event.register(MIDIGUIMAIN);
+        event.register(MIDIGUIOFF);
+        event.register(MIDIGUISEAT);
     }
     
     @SubscribeEvent
-    public void onKeyInput(KeyInputEvent event) {
+    public void onKeyInput(Key event) {
         Level worldIn = Minecraft.getInstance().level;
         LocalPlayer playerIn = Minecraft.getInstance().player;
 

@@ -30,7 +30,7 @@ public class BlockTuningTable extends Block {
       if (worldIn.isClientSide) {
          return InteractionResult.SUCCESS;
       } else {
-         NetworkHooks.openGui((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {});
+         NetworkHooks.openScreen((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {});
          return InteractionResult.CONSUME;
       }
    }
