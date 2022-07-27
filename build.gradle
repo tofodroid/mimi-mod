@@ -6,7 +6,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '5.+'
 }
 
-version = '1.19.0-2.2.6'
+version = '1.19.0-2.2.7'
 group = 'io.github.tofodroid.mods.mimi'
 archivesBaseName = 'mimimod'
 
