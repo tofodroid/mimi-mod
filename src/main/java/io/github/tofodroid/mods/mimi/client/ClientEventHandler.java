@@ -10,11 +10,13 @@ import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +24,11 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 @SuppressWarnings("deprecation")
 public class ClientEventHandler {
+    @SubscribeEvent
+    public static void register(RegisterKeyMappingsEvent event) {
+        ModBindings.register(event);
+    }
+
     @SubscribeEvent
     public static void register(RegisterColorHandlersEvent.Item event) {
         registerItemColors(event, ModItems.INSTRUMENT_ITEMS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));

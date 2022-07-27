@@ -24,7 +24,6 @@ public class ModBindings {
     public static KeyMapping MIDIGUIOFF;
     public static KeyMapping MIDIGUISEAT;
 
-    @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         MIDIPLAYLIST = new KeyMapping("key." + MIMIMod.MODID + ".midi.playlist", GLFW.GLFW_KEY_PERIOD, "key.categories." + MIMIMod.MODID);
         MIDISETTINGS = new KeyMapping("key." + MIMIMod.MODID + ".midi.settings", GLFW.GLFW_KEY_COMMA, "key.categories." + MIMIMod.MODID);
