@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "B B",
+        "SBS",
+        " N "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "B": {
+            "item": "minecraft:glass_bottle"
+        },
+        "S": {
+            "item": "minecraft:string"
+        }
+    },
+    "result": {
+        "item": "mimi:bottle"
+    }
+}
