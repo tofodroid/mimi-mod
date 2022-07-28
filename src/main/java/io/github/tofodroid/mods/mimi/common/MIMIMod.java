@@ -61,14 +61,6 @@ public class MIMIMod
         // Blocks
         ModBlocks.BLOCKS.register(fmlContext.getModEventBus());
 
-        // Items
-
-        // Tiles
-
-        // Recipes
-
-        //Containers
-
         // Village Stuff
         ModVillagers.POI_TYPES.register(fmlContext.getModEventBus());
         ModVillagers.PROFESSIONS.register(fmlContext.getModEventBus());
