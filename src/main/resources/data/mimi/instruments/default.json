@@ -629,6 +629,8 @@
         "registryName": "recorder",
         "midiBankNumber": 0,
         "midiPatchNumber": 74,
+        "dyeable": true,
+        "defaultColor": 14474201,
         "isBlock": false
     },
     {
