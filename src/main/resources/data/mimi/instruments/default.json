@@ -639,7 +639,8 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 6,
         "isBlock": true,
-        "dyeable": false,
+        "dyeable": true,
+        "defaultColor": 13806979,
         "collisionShapes": [
             "0,0,0,16,16,6",
             "0,0,0,16,10,10",
@@ -653,7 +654,7 @@
         "midiPatchNumber": 4,
         "isBlock": true,
         "dyeable": true,
-        "defaultColor": 7820087,
+        "defaultColor": 1183244,
         "collisionShapes": [
             "0,0,0,16,16,6",
             "0,0,0,16,10,10",
@@ -667,7 +668,7 @@
         "midiPatchNumber": 5,
         "isBlock": true,
         "dyeable": true,
-        "defaultColor": 7820087,
+        "defaultColor": 1183244,
         "collisionShapes": [
             "0,0,0,16,16,6",
             "0,0,0,16,10,10",
@@ -681,7 +682,7 @@
         "midiPatchNumber": 7,
         "isBlock": true,
         "dyeable": true,
-        "defaultColor": 7820087,
+        "defaultColor": 1183244,
         "collisionShapes": [
             "0,0,0,16,16,6",
             "0,0,0,16,10,10",
@@ -695,7 +696,7 @@
         "midiPatchNumber": 16,
         "isBlock": true,
         "dyeable": true,
-        "defaultColor": 7820087,
+        "defaultColor": 1183244,
         "collisionShapes": [
             "0,0,0,16,16,6",
             "0,0,0,16,10,10",
@@ -709,7 +710,7 @@
         "midiPatchNumber": 4,
         "isBlock": true,
         "dyeable": true,
-        "defaultColor": 7820087,
+        "defaultColor": 1183244,
         "collisionShapes": [
             "0,0,0,16,16,6",
             "0,0,0,16,10,10",
