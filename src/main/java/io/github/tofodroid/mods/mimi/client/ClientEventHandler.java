@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.InputEvent.Key;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -27,6 +28,11 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         ModBindings.register(event);
+    }
+
+    @SubscribeEvent
+    public static void onKey(Key event) {
+        ModBindings.onKeyInput(event);
     }
 
     @SubscribeEvent
