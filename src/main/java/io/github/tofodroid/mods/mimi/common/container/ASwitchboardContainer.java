@@ -7,10 +7,12 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.container.slot.SlotSwitchboard;
+import org.jetbrains.annotations.NotNull;
+
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 
@@ -27,7 +29,23 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
     }
 
     protected Slot buildSwitchboardSlot() {
-        return new SlotSwitchboard(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY());
+		return new SlotItemHandler(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY()) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return stack.getItem() instanceof ItemMidiSwitchboard;
+            }
+
+			@Override
+            public int getMaxStackSize() {
+                return 1;
+            }
+			
+			@Override
+			public int getMaxStackSize(@NotNull ItemStack stack)
+			{
+				return 1;
+			}
+        };
     }
 
     @Override
