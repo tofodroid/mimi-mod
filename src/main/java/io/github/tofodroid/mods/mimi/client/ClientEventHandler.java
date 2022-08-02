@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.client.renderer.EntitySeatRenderer;
 import io.github.tofodroid.mods.mimi.client.renderer.EntityNoteResponseTileRenderer;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
@@ -14,10 +13,10 @@ import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.InputEvent.Key;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,11 +27,6 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         ModBindings.register(event);
-    }
-
-    @SubscribeEvent
-    public static void onKey(Key event) {
-        ModBindings.onKeyInput(event);
     }
 
     @SubscribeEvent
