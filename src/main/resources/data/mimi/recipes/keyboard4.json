@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/keyboard"
+    },
+    "addition": {
+        "item": "minecraft:ghast_tear"
+    },
+    "result": {
+        "item": "mimi:keyboard4"
+    }
+}

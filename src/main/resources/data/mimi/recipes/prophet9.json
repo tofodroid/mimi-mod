@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/prophet"
+    },
+    "addition": {
+        "item": "minecraft:poisonous_potato"
+    },
+    "result": {
+        "item": "mimi:prophet9"
+    }
+}

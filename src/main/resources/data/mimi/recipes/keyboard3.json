@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/keyboard"
+    },
+    "addition": {
+        "item": "minecraft:iron_nugget"
+    },
+    "result": {
+        "item": "mimi:keyboard3"
+    }
+}

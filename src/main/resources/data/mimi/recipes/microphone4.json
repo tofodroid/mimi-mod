@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/microphone"
+    },
+    "addition": {
+        "item": "minecraft:redstone"
+    },
+    "result": {
+        "item": "mimi:microphone3"
+    }
+}
