@@ -25,8 +25,8 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 	protected IItemHandler targetInventory;
 
 	public ASwitchboardContainer(MenuType<?> type, int id, Inventory playerInventory) {
-        super(type, id, playerInventory);
-    }
+		super(type, id, playerInventory);
+	}
 
     protected Slot buildSwitchboardSlot() {
 		return new SlotItemHandler(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY()) {
@@ -48,7 +48,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
         };
     }
 
-    @Override
+	@Override
 	protected Slot buildPlayerSlot(Inventory playerInventory, int slot, int xPos, int yPos) {
 		return new Slot(playerInventory, slot, xPos, yPos);
 	}
@@ -89,10 +89,10 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			this.setItem(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID, this.getStateId()+1, selectedStack);
 			this.setRemoteSlot(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID, selectedStack);
 			this.sendAllDataToRemote();
-            return true;
+			return true;
 		}
 
-        return false;
+		return false;
 	}
 
 	public ItemStack getSelectedSwitchboard() {
@@ -128,7 +128,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			}
 		}
 
-      return itemstack;
+	  return itemstack;
 	}
 	
 	public IItemHandler getTargetInventory() {
