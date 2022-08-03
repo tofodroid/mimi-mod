@@ -9,7 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientForgeEventHandler {
-    
+
     @SubscribeEvent
     public static void onKey(Key event) {
         ModBindings.onKeyInput(event);

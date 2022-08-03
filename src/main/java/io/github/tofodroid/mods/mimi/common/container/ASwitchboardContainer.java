@@ -28,25 +28,25 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 		super(type, id, playerInventory);
 	}
 
-    protected Slot buildSwitchboardSlot() {
+	protected Slot buildSwitchboardSlot() {
 		return new SlotItemHandler(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY()) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return stack.getItem() instanceof ItemMidiSwitchboard;
-            }
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return stack.getItem() instanceof ItemMidiSwitchboard;
+			}
 
 			@Override
-            public int getMaxStackSize() {
-                return 1;
-            }
+			public int getMaxStackSize() {
+				return 1;
+			}
 			
 			@Override
 			public int getMaxStackSize(@NotNull ItemStack stack)
 			{
 				return 1;
 			}
-        };
-    }
+		};
+	}
 
 	@Override
 	protected Slot buildPlayerSlot(Inventory playerInventory, int slot, int xPos, int yPos) {
