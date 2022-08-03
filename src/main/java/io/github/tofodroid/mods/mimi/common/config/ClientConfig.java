@@ -75,7 +75,7 @@ public class ClientConfig {
         synthBitRate = builder.comment("What bitrate should the built-in midi synthesizer use (bits)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8,16,24,32]")
             .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
             .defineInList("synthBitRate", 16, Arrays.asList(8,16,24,32));
-        soundfontPath = builder.comment("Optional full path to an SF2 or DLS format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
+        soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
         builder.pop();

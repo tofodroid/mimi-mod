@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.InputEvent.Key;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 @SuppressWarnings("resource")
 public class ModBindings {
@@ -40,8 +39,7 @@ public class ModBindings {
         event.register(MIDIGUISEAT);
     }
     
-    @SubscribeEvent
-    public void onKeyInput(Key event) {
+    public static void onKeyInput(Key event) {
         Level worldIn = Minecraft.getInstance().level;
         LocalPlayer playerIn = Minecraft.getInstance().player;
 
