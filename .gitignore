@@ -19,3 +19,4 @@ utils/
 
 # Media
 media/**/*.png
+*.sf2.bak

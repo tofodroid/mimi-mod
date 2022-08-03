@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.InputEvent.Key;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 @SuppressWarnings("resource")
 public class ModBindings {
@@ -24,7 +23,6 @@ public class ModBindings {
     public static KeyMapping MIDIGUIOFF;
     public static KeyMapping MIDIGUISEAT;
 
-    @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         MIDIPLAYLIST = new KeyMapping("key." + MIMIMod.MODID + ".midi.playlist", GLFW.GLFW_KEY_PERIOD, "key.categories." + MIMIMod.MODID);
         MIDISETTINGS = new KeyMapping("key." + MIMIMod.MODID + ".midi.settings", GLFW.GLFW_KEY_COMMA, "key.categories." + MIMIMod.MODID);
@@ -41,8 +39,7 @@ public class ModBindings {
         event.register(MIDIGUISEAT);
     }
     
-    @SubscribeEvent
-    public void onKeyInput(Key event) {
+    public static void onKeyInput(Key event) {
         Level worldIn = Minecraft.getInstance().level;
         LocalPlayer playerIn = Minecraft.getInstance().player;
 
