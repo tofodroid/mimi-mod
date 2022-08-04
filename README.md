@@ -5,9 +5,7 @@ MIMI is a Forge mod for Minecraft Java Edition that allows you to play music fro
 
 | Minecraft Version |        Mod Support Level |
 | -------------     |                    -----:|
-| < 1.16            |                     None |
-| 1.16.x            |           Bug Fixes Only |
-| 1.17.x            |                     None |
+| < 1.18.x          |                     None |
 | 1.18.x            |           Bug Fixes Only |
 | 1.19.x            |         Features & Fixes |
 | > 1.19.x          |                     None |
