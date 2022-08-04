@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/elecguitar"
+    },
+    "addition": {
+        "item": "minecraft:kelp"
+    },
+    "result": {
+        "item": "mimi:elecguitar3"
+    }
+}

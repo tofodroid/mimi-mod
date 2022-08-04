@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/elecguitar"
+    },
+    "addition": {
+        "item": "minecraft:snowball"
+    },
+    "result": {
+        "item": "mimi:elecguitar4"
+    }
+}

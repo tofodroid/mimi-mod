@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/synlead"
+    },
+    "addition": {
+        "item": "minecraft:stick"
+    },
+    "result": {
+        "item": "mimi:synlead"
+    }
+}

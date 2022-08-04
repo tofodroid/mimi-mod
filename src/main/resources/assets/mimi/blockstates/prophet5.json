@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "mimi:block/prophet" },
+    "facing=west": { "model": "mimi:block/prophet", "y": 90 },
+    "facing=north": { "model": "mimi:block/prophet", "y": 180 },
+    "facing=east": { "model": "mimi:block/prophet", "y": 270 }
+  }
+}

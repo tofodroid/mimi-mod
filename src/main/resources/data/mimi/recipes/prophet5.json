@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/prophet"
+    },
+    "addition": {
+        "item": "minecraft:string"
+    },
+    "result": {
+        "item": "mimi:prophet5"
+    }
+}
