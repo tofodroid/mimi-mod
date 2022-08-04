@@ -24,7 +24,7 @@ public class MIMIChannel {
     }
 
     public void setInstrument(InstrumentSpec instrument) {
-        this.channel.programChange(instrument.midiBankNumber, instrument.midiPatchNumber);
+        this.channel.programChange(instrument.midiBankNumber * 128, instrument.midiPatchNumber);
         this.setVolume(Integer.valueOf(0).byteValue());
         this.channel.allSoundOff();
         this.channel.resetAllControllers();

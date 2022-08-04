@@ -95,10 +95,64 @@
         "defaultColor": 10354710
     },
     {
+        "instrumentId": 80,
+        "registryName": "elecguitar2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 26,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 10354710
+    },
+    {
+        "instrumentId": 81,
+        "registryName": "elecguitar3",
+        "midiBankNumber": 1,
+        "midiPatchNumber": 26,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 10354710
+    },
+    {
+        "instrumentId": 82,
+        "registryName": "elecguitar4",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 27,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 10354710
+    },
+    {
+        "instrumentId": 83,
+        "registryName": "elecguitar5",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 29,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 10354710
+    },
+    {
         "instrumentId": 4,
         "registryName": "bassguitar",
         "midiBankNumber": 0,
         "midiPatchNumber": 34,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 3547670
+    },
+    {
+        "instrumentId": 61,
+        "registryName": "bassguitar2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 33,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 3547670
+    },
+    {
+        "instrumentId": 62,
+        "registryName": "bassguitar3",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 36,
         "isBlock": false,
         "dyeable": true,
         "defaultColor": 3547670
@@ -132,10 +186,38 @@
         "isBlock": false
     },
     {
+        "instrumentId": 53,
+        "registryName": "microphone4",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 85,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 54,
+        "registryName": "microphone5",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 91,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 55,
+        "registryName": "microphone6",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 94,
+        "isBlock": false
+    },
+    {
         "instrumentId": 7,
         "registryName": "trumpet",
         "midiBankNumber": 0,
         "midiPatchNumber": 56,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 79,
+        "registryName": "trumpet2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 59,
         "isBlock": false
     },
     {
@@ -204,6 +286,27 @@
         "isBlock": false
     },
     {
+        "instrumentId": 56,
+        "registryName": "synlead2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 81,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 57,
+        "registryName": "synlead3",
+        "midiBankNumber": 2,
+        "midiPatchNumber": 80,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 58,
+        "registryName": "synlead4",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 86,
+        "isBlock": false
+    },
+    {
         "instrumentId": 14,
         "registryName": "kalimba",
         "midiBankNumber": 0,
@@ -238,9 +341,18 @@
         "defaultColor": 12397098
     },
     {
+        "instrumentId": 52,
+        "registryName": "accordion2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 23,
+        "isBlock": false,
+        "dyeable": true,
+        "defaultColor": 12397098
+    },
+    {
         "instrumentId": 18,
         "registryName": "drums",
-        "midiBankNumber": 15360,
+        "midiBankNumber": 120,
         "midiPatchNumber": 0,
         "isBlock": true,
         "dyeable": true,
@@ -253,7 +365,7 @@
     {
         "instrumentId": 43,
         "registryName": "drums2",
-        "midiBankNumber": 15360,
+        "midiBankNumber": 120,
         "midiPatchNumber": 8,
         "isBlock": true,
         "dyeable": true,
@@ -266,7 +378,7 @@
     {
         "instrumentId": 44,
         "registryName": "drums3",
-        "midiBankNumber": 15360,
+        "midiBankNumber": 120,
         "midiPatchNumber": 16,
         "isBlock": true,
         "dyeable": true,
@@ -279,7 +391,7 @@
     {
         "instrumentId": 45,
         "registryName": "drums4",
-        "midiBankNumber": 15360,
+        "midiBankNumber": 120,
         "midiPatchNumber": 32,
         "isBlock": true,
         "dyeable": true,
@@ -292,7 +404,7 @@
     {
         "instrumentId": 46,
         "registryName": "drums5",
-        "midiBankNumber": 15360,
+        "midiBankNumber": 120,
         "midiPatchNumber": 40,
         "isBlock": true,
         "dyeable": true,
@@ -497,5 +609,255 @@
         "midiBankNumber": 0,
         "midiPatchNumber": 115,
         "isBlock": false
+    },
+    {
+        "instrumentId": 59,
+        "registryName": "bottle",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 76,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 68,
+        "registryName": "panflute",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 75,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 78,
+        "registryName": "recorder",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 74,
+        "dyeable": true,
+        "defaultColor": 14474201,
+        "isBlock": false
+    },
+    {
+        "instrumentId": 60,
+        "registryName": "harpsichord",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 6,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 13806979,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 63,
+        "registryName": "keyboard",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 4,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 1183244,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 64,
+        "registryName": "keyboard2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 5,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 1183244,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 65,
+        "registryName": "keyboard3",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 7,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 1183244,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 66,
+        "registryName": "keyboard4",
+        "midiBankNumber": 2,
+        "midiPatchNumber": 16,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 1183244,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 67,
+        "registryName": "keyboard5",
+        "midiBankNumber": 3,
+        "midiPatchNumber": 4,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 1183244,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 69,
+        "registryName": "prophet",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 90,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 70,
+        "registryName": "prophet2",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 62,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 71,
+        "registryName": "prophet3",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 63,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 72,
+        "registryName": "prophet4",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 83,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 73,
+        "registryName": "prophet5",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 50,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 74,
+        "registryName": "prophet6",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 95,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 75,
+        "registryName": "prophet7",
+        "midiBankNumber": 0,
+        "midiPatchNumber": 97,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 76,
+        "registryName": "prophet8",
+        "midiBankNumber": 1,
+        "midiPatchNumber": 98,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 77,
+        "registryName": "prophet9",
+        "midiBankNumber": 2,
+        "midiPatchNumber": 81,
+        "isBlock": true,
+        "dyeable": false,
+        "collisionShapes": [
+            "0,0,0,16,16,6",
+            "0,0,0,16,10,10",
+            "0,0,0,16,8,14"
+        ]
+    },
+    {
+        "instrumentId": 84,
+        "registryName": "edrums",
+        "midiBankNumber": 120,
+        "midiPatchNumber": 24,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
+    },
+    {
+        "instrumentId": 85,
+        "registryName": "edrums2",
+        "midiBankNumber": 120,
+        "midiPatchNumber": 25,
+        "isBlock": true,
+        "dyeable": true,
+        "defaultColor": 3972863,
+        "collisionShapes": [
+            "0,0,0,16,12,8",
+            "0,0,0,16,4,12"
+        ]
     }
 ]

@@ -33,6 +33,10 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:bottle"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:clarinet"
         },
         {
@@ -42,6 +46,10 @@
         {
             "type": "crafting",
             "recipe": "mimi:drums"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:edrums"
         },
         {
             "type": "crafting",
@@ -57,6 +65,10 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:glockenspiel"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:handbell"
         },
         {
@@ -65,7 +77,19 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:harpsichord"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:kalimba"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:keyboard"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:marimba"
         },
         {
             "type": "crafting",
@@ -89,11 +113,27 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:panflute"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:piano"
         },
         {
             "type": "crafting",
+            "recipe": "mimi:prophet"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:recorder"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:saxophone"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:steeldrum"
         },
         {
             "type": "crafting",
@@ -109,11 +149,19 @@
         },
         {
             "type": "crafting",
+            "recipe": "mimi:vibraphone"
+        },
+        {
+            "type": "crafting",
             "recipe": "mimi:violin"
         },
         {
             "type": "crafting",
             "recipe": "mimi:woodblock"
+        },
+        {
+            "type": "crafting",
+            "recipe": "mimi:xylophone"
         }
     ],
     "sortnum": 0

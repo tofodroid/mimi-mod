@@ -1,0 +1,7 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "mimi:item/instruments/recorder",
+        "layer1": "mimi:item/instruments/recorder_overlay"
+    }
+}

@@ -31,6 +31,16 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
 
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
+
+        if(this.soundbank != null) {
+            MIMIMod.LOGGER.debug("Loaded Soundbank:\n\n" +
+                "\tName: " + this.soundbank.getName() + "\n" +
+                "\tDesc: " + this.soundbank.getDescription() + "\n" +
+                "\tVers: " + this.soundbank.getVersion() + "\n" +
+                "\tVend: " + this.soundbank.getVendor() + "\n"
+            );
+        }
+
         this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
@@ -120,8 +130,14 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
             try {
                 return new SF2SoundbankReader().getSoundbank(new BufferedInputStream(new FileInputStream(new File(resourcePath.trim()))));
             } catch(NullPointerException | IOException | InvalidMidiDataException e) {
-                MIMIMod.LOGGER.error("Failed to load SoundFont. Error: ", e);
+                MIMIMod.LOGGER.warn("Failed to load user SoundFont. Error: ", e);
             }
+        }
+        
+        try {
+            return new SF2SoundbankReader().getSoundbank(new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("assets/mimi/soundfont/GMGSX.SF2")));
+        } catch(NullPointerException | IOException | InvalidMidiDataException e) {
+            MIMIMod.LOGGER.error("Failed to load MIMI SoundFont. Error: ", e);
         }
 
         return null;

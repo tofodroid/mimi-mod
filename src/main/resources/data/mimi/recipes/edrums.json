@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "G G",
+        "LIL",
+        "INI"
+    ],
+    "key": {
+        "G": {
+            "item": "minecraft:ink_sac"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "L": {
+            "item": "minecraft:redstone_block"
+        }
+    },
+    "result": {
+        "item": "mimi:edrums"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/prophet"
+    },
+    "addition": {
+        "item": "minecraft:copper_ingot"
+    },
+    "result": {
+        "item": "mimi:prophet3"
+    }
+}

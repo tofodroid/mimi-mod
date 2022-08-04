@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "LSL",
+        "LSL",
+        "QNQ"
+    ],
+    "key": {
+        "L": {
+            "tag": "minecraft:logs"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "Q": {
+            "item": "minecraft:quartz"
+        },
+        "S": {
+            "item": "minecraft:string"
+        }
+    },
+    "result": {
+        "item": "mimi:harpsichord"
+    }
+}
