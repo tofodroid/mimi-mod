@@ -54,7 +54,7 @@ public class GuiMusicPlayerContainerScreen extends BaseContainerGui<ContainerMus
 
     @Override
     protected void containerTick() {
-        if(this.lastDiskStack != null && !ItemStack.matches(this.lastDiskStack, this.menu.getActiveFloppyStack())) {
+        if(this.lastDiskStack != null && (this.menu.getActiveFloppyStack() == null || (this.menu.getActiveFloppyStack() != null && !ItemStack.matches(this.lastDiskStack, this.menu.getActiveFloppyStack())))) {
             this.lastDiskStack = this.menu.getActiveFloppyStack();
             this.resetMidiInfo();
         } else if(this.lastDiskStack == null) {
@@ -91,10 +91,19 @@ public class GuiMusicPlayerContainerScreen extends BaseContainerGui<ContainerMus
             if(this.midiInfo != null) {
                 switch(this.midiInfo.status) {
                     case ERROR_OTHER:
-                        this.font.draw(matrixStack,"Unable to parse MIDI file from Disk URL.", 7, 33, 0xFF00E600);
+                        this.font.draw(matrixStack,"Failed to load MIDI file from Disk URL.", 7, 33, 0xFF00E600);
                         break;
                     case ERROR_URL:
                         this.font.draw(matrixStack,"Disk has invalid or inaccessible URL.", 7, 33, 0xFF00E600);
+                        break;
+                    case ERROR_DISABLED:
+                        this.font.draw(matrixStack,"Web MIDI files are disabled by this server.", 7, 33, 0xFF00E600);
+                        break;
+                    case ERROR_HOST:
+                        this.font.draw(matrixStack,"Disk URL points to a website not allowed by this server.", 7, 33, 0xFF00E600);
+                        break;
+                    case ERROR_NOT_FOUND:
+                        this.font.draw(matrixStack,"Disk URL points to a server MIDI file that does not exist.", 7, 33, 0xFF00E600);
                         break;
                     case INFO:
                         this.font.draw(matrixStack, "Channel Instruments: ", 7, 33, 0xFF00E600);

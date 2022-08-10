@@ -9,7 +9,10 @@ public class ServerMidiInfoPacket {
         INFO,
         EMPTY,
         ERROR_URL,
+        ERROR_HOST,
+        ERROR_DISABLED,
         ERROR_OTHER,
+        ERROR_NOT_FOUND,
         UNKNOWN;
 
         public static STATUS_CODE fromByte(byte b) {

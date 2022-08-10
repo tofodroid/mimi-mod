@@ -27,16 +27,16 @@ public class MusicPlayerMidiHandler {
     private MusicPlayerReceiver activeReceiver;
     private Transmitter activeTransmitter;
 
-    public MusicPlayerMidiHandler(TileMusicPlayer tile, Sequence sequence) {
+    public MusicPlayerMidiHandler(TileMusicPlayer tile, Sequence sequence, ServerMidiInfoPacket.STATUS_CODE errorStatus) {
         this.activeSequence = sequence;
 
-        if(sequence == null) {
+        if(errorStatus != null) {
             this.error = true;
-            this.status = ServerMidiInfoPacket.STATUS_CODE.ERROR_URL;
-        } else if(createSequencer(tile)) {
+            this.status = errorStatus;
+        } else if(this.activeSequence != null && createSequencer(tile)) {
             try {
                 this.lastTempoBPM = getTempoBPM(this.activeSequence);
-                this.activeSequencer.setSequence(sequence);
+                this.activeSequencer.setSequence(this.activeSequence);
                 this.midiInfo = MidiFileInfo.fromSequence("server", sequence);
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to start sequencer: ", e);

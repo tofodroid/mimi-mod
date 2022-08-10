@@ -23,10 +23,12 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -35,15 +37,17 @@ public abstract class ServerMusicPlayerMidiManager {
     protected static Map<UUID,MusicPlayerMidiHandler> MUSIC_PLAYER_MAP = new HashMap<>();
     protected static TreeMap<Instant,String> SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
     protected static Map<String,File> SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
+    protected static Map<String,File> SERVER_SEQUENCE_VALUE_MAP = new HashMap<>();
     protected static File SEQUENCE_CACHE_FOLDER = null;
+    protected static File SERVER_SEQUENCE_FOLDER = null;
 
     // Music Player Cache
     public static MusicPlayerMidiHandler getOrAddMusicPlayer(TileMusicPlayer tile, String midiUrl) {
         MusicPlayerMidiHandler handler = getMusicPlayer(tile);
 
         if(handler == null) {
-            Sequence sequence = getOrCreateCachedSequence(ItemFloppyDisk.getMidiUrl(tile.getActiveFloppyDiskStack()));
-            MUSIC_PLAYER_MAP.put(tile.getMusicPlayerId(), new MusicPlayerMidiHandler(tile, sequence));
+            Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> result = getOrCreateCachedSequence(ItemFloppyDisk.getMidiUrl(tile.getActiveFloppyDiskStack()));
+            MUSIC_PLAYER_MAP.put(tile.getMusicPlayerId(), new MusicPlayerMidiHandler(tile, result.getLeft(), result.getRight()));
             return MUSIC_PLAYER_MAP.get(tile.getMusicPlayerId());
         }
 
@@ -67,7 +71,7 @@ public abstract class ServerMusicPlayerMidiManager {
     }
 
     // Music Sequence Cache
-    public static void preInit() {
+    public static void init() {
         try {
             // Create folders if not exists
             File mimiFolder = new File(FMLPaths.CONFIGDIR.get().toString(), "mimi");
@@ -75,19 +79,26 @@ public abstract class ServerMusicPlayerMidiManager {
                 throw new IOException("Could not create MIMI config directory!");
             }
 
-            File musicCacheFolder = new File(mimiFolder.getAbsolutePath(), "server_music_cache");
+            File musicCacheFolder = new File(mimiFolder.getAbsolutePath(), "music_cache");
             if (!musicCacheFolder.exists() && !musicCacheFolder.mkdirs() && !musicCacheFolder.isDirectory()) {
                 throw new IOException("Could not create MIMI server music cache directory!");
             }
             SEQUENCE_CACHE_FOLDER = musicCacheFolder;
+            
+            File serverMusicFolder = new File(mimiFolder.getAbsolutePath(), "default_music");
+            if (!serverMusicFolder.exists() && !serverMusicFolder.mkdirs() && !serverMusicFolder.isDirectory()) {
+                throw new IOException("Could not create MIMI default music directory!");
+            }
+            SERVER_SEQUENCE_FOLDER = serverMusicFolder;
 
             refreshSequenceCacheMaps();
+            refreshServerSequenceMap();
         } catch(Exception e) {
             throw new IllegalStateException("Failed to configure server music cache.", e);
         }
     }
 
-    protected static void refreshSequenceCacheMaps() {
+    public static void refreshSequenceCacheMaps() {
         SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
         SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
 
@@ -105,6 +116,23 @@ public abstract class ServerMusicPlayerMidiManager {
         }
     }
 
+    public static void refreshServerSequenceMap() {
+        SERVER_SEQUENCE_VALUE_MAP = new HashMap<>();
+
+        if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
+            try {
+                for(File file : SERVER_SEQUENCE_FOLDER.listFiles()) {
+                    if(file.isFile() && (file.getAbsolutePath().endsWith(".mid") || file.getAbsolutePath().endsWith(".midi"))) {
+                        SERVER_SEQUENCE_VALUE_MAP.put(file.getName(), file);
+                    }
+                }
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to load existing server default music: ", e);
+            }
+        }
+
+    }
+
     protected static String urlToFile(String url) {
         String file = url
             .replace("https","")
@@ -115,51 +143,82 @@ public abstract class ServerMusicPlayerMidiManager {
         return file + ".mid";
     }
 
-    public static Sequence getOrCreateCachedSequence(String midiUrl) {
-        if(midiUrl != null && !midiUrl.isBlank() && RemoteMidiUrlUtils.validateMidiUrl(midiUrl)) {
-            String fileName = urlToFile(midiUrl);
-
-            if(SEQUENCE_CACHE_VALUE_MAP.containsKey(fileName)) {
-                try {
-                    return loadSequence(fileName);
-                } catch(Exception e) {
-                    MIMIMod.LOGGER.error("Failed to load cached MIDI file: ", e);
-                }
-            } else {
-                try {
-                    Sequence sequence = downloadSequence(midiUrl);
-                    
-                    if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
-                        pruneSequenceCache();
-                        File savedSequence = saveSequence(fileName, sequence);
-                        SEQUENCE_CACHE_VALUE_MAP.put(fileName, savedSequence);
-                        SEQUENCE_CACHE_ORDER_MAP.put(Files.getLastModifiedTime(savedSequence.toPath()).toInstant(), fileName);
-                    }
-
-                    return sequence;
-                } catch(FileNotFoundException e) {
-                    // 404, Don't handle
-                } catch(MalformedURLException e) {
-                    // Bad URL, Don't handle
-                } catch(InvalidMidiDataException e) {
-                    // Bad MIDI, Don't handle
-                } catch(Exception e) {
-                    MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
-                }
-            }
-        }
-
-        return null;
+    protected static String urlToServerFile(String url) {
+        String file = url
+            .replace("server://","")
+            .replace("/", "");
+        return file ;
     }
 
-    protected static Sequence loadSequence(String fileName) throws IOException, InvalidMidiDataException {
-        File targetFile = new File(SEQUENCE_CACHE_FOLDER, fileName);
+    public static Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> getOrCreateCachedSequence(String midiUrl) {
+        if(midiUrl != null && !midiUrl.isBlank() && midiUrl.toLowerCase().startsWith("server://")) {
+            if(!RemoteMidiUrlUtils.validateFileUrl(midiUrl)) {
+                return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_URL);
+            }
 
+            String fileName = urlToServerFile(midiUrl);
+    
+            if(SERVER_SEQUENCE_VALUE_MAP.containsKey(fileName)) {
+                try {
+                    Sequence sequence = loadSequence(new File(SERVER_SEQUENCE_FOLDER, fileName));
+                    return Pair.of(sequence, null);
+                } catch(Exception e) {
+                    // Nothing
+                }
+            }
+
+            return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_NOT_FOUND);
+        } else if(ModConfigs.COMMON.allowWebMidi.get()) {
+            if(midiUrl != null && !midiUrl.isBlank() && RemoteMidiUrlUtils.validateMidiUrl(midiUrl)) {
+                if(!RemoteMidiUrlUtils.validateMidiHost(midiUrl)) {
+                    return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_HOST);
+                }
+
+                String fileName = urlToFile(midiUrl);
+    
+                if(SEQUENCE_CACHE_VALUE_MAP.containsKey(fileName)) {
+                    try {
+                        Sequence sequence = loadSequence(new File(SEQUENCE_CACHE_FOLDER, fileName));
+                        return Pair.of(sequence, null);
+                    } catch(Exception e) {
+                        MIMIMod.LOGGER.error("Failed to load cached MIDI file: ", e);
+                    }
+                } else {
+                    try {
+                        Sequence sequence = downloadSequence(midiUrl);
+                        
+                        if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
+                            pruneSequenceCache();
+                            File savedSequence = saveSequence(fileName, sequence);
+                            SEQUENCE_CACHE_VALUE_MAP.put(fileName, savedSequence);
+                            SEQUENCE_CACHE_ORDER_MAP.put(Files.getLastModifiedTime(savedSequence.toPath()).toInstant(), fileName);
+                        }
+    
+                        return Pair.of(sequence, null);
+                    } catch(FileNotFoundException e) {
+                        // 404, Don't handle
+                    } catch(MalformedURLException e) {
+                        // Bad URL, Don't handle
+                    } catch(InvalidMidiDataException e) {
+                        // Bad MIDI, Don't handle
+                    } catch(Exception e) {
+                        MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
+                    }
+                }
+            }
+            
+            return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER);
+        }
+
+        return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_DISABLED);     
+    }
+
+    protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {
         if(targetFile.exists() && targetFile.isFile()) {
             return MidiSystem.getSequence(targetFile);
         }
         
-        throw new IOException("Expected cached MIDI file '" + fileName + "' not found.");
+        throw new IOException("Expected cached MIDI file '" + targetFile.getName() + "' not found.");
     }
 
     protected static File saveSequence(String fileName, Sequence sequence) throws IOException {

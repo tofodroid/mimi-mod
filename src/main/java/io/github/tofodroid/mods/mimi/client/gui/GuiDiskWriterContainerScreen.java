@@ -98,7 +98,7 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
             return;
         }
 
-        if(newUrl != null && !newUrl.trim().isEmpty() && RemoteMidiUrlUtils.validateMidiUrl(newUrl)) {
+        if(newUrl != null && !newUrl.trim().isEmpty() && ((newUrl.toLowerCase().startsWith("server://") && RemoteMidiUrlUtils.validateFileUrl(newUrl)) || RemoteMidiUrlUtils.validateMidiUrl(newUrl))) {
             this.midiUrlField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
             this.midiUrlString = newUrl;
         } else {
