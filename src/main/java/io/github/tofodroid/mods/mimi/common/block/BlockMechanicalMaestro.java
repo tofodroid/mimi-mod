@@ -21,7 +21,7 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
 
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        if(!worldIn.isClientSide && ! worldIn.hasNeighborSignal(pos)) {
+        if(!worldIn.isClientSide && !worldIn.hasNeighborSignal(pos)) {
             TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
             
             if(tile != null) {

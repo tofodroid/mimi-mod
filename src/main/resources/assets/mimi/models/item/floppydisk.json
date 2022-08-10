@@ -1,0 +1,7 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "mimi:item/floppydisk",
+        "layer1": "mimi:item/floppydisk_overlay"
+    }
+}

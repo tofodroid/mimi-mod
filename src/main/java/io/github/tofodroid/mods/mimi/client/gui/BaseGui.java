@@ -69,4 +69,19 @@ public abstract class BaseGui extends Screen {
 
         return result;
     }
+    
+    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector3f buttonPos, Vector3f buttonSize) {
+        Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
+        Integer buttonMaxX = buttonMinX + Float.valueOf(buttonSize.x()).intValue();
+        Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();
+        Integer buttonMaxY = buttonMinY + Float.valueOf(buttonSize.y()).intValue();
+
+        Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
+
+        if(result) {
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
+
+        return result;
+    }
 }

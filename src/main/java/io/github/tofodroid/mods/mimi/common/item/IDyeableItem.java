@@ -3,12 +3,15 @@ package io.github.tofodroid.mods.mimi.common.item;
 import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 
 // Clone from net.minecraft.item.IDyeableArmorItem
-public interface IDyeableInstrumentItem extends DyeableLeatherItem {
+public interface IDyeableItem extends DyeableLeatherItem {
     public static final Integer DEFAULT_WHITE_COLOR = -1;
 
     public Boolean isDyeable();
@@ -40,9 +43,21 @@ public interface IDyeableInstrumentItem extends DyeableLeatherItem {
             stack.getOrCreateTagElement("display").putInt("color", color);
         }
     }
+    
+    default Boolean washItem(UseOnContext context) {
+        if(!context.getPlayer().isCrouching() && ((IDyeableItem)context.getItemInHand().getItem()).hasColor(context.getItemInHand()) && context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof LayeredCauldronBlock) {
+            if(context.getPlayer() instanceof ServerPlayer) {
+                ((IDyeableItem)context.getItemInHand().getItem()).clearColor(context.getItemInHand());
+                LayeredCauldronBlock.lowerFillLevel(context.getLevel().getBlockState(context.getClickedPos()), context.getLevel(), context.getClickedPos());
+            }
+            return true;
+        }
+
+        return false;
+    }
 
     static Boolean isDyeableInstrument(ItemStack stack) {
-        return (stack.getItem() instanceof IDyeableInstrumentItem) && ((IDyeableInstrumentItem)stack.getItem()).isDyeable();
+        return (stack.getItem() instanceof IDyeableItem) && ((IDyeableItem)stack.getItem()).isDyeable();
     }
 
     static ItemStack dyeItem(ItemStack stack, List<DyeItem> dyes) {

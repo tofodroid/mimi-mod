@@ -12,9 +12,11 @@ import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockConductor;
+import io.github.tofodroid.mods.mimi.common.block.BlockDiskWriter;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.BlockListener;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.block.BlockMusicPlayer;
 import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
@@ -29,6 +31,7 @@ public final class ModItems {
     // Other
     public static ItemTransmitter TRANSMITTER;
     public static ItemMidiSwitchboard SWITCHBOARD;
+    public static ItemFloppyDisk FLOPPYDISK;
 
     // Blocks - Redstone
     public static BlockItem LISTENER;
@@ -38,6 +41,8 @@ public final class ModItems {
 
     // Blocks - Other
     public static BlockItem TUNINGTABLE;
+    public static BlockItem DISKWRITER;
+    public static BlockItem MUSICPLAYER;
 
     public static MIMIModItemGroup ITEM_GROUP;
 
@@ -50,6 +55,9 @@ public final class ModItems {
 
         SWITCHBOARD = new ItemMidiSwitchboard();
         event.register(ItemMidiSwitchboard.REGISTRY_NAME, SWITCHBOARD);
+
+        FLOPPYDISK = new ItemFloppyDisk();
+        event.register(ItemFloppyDisk.REGISTRY_NAME, FLOPPYDISK);
 
         // Redstone Blocks
         LISTENER = new BlockItem(ModBlocks.LISTENER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
@@ -64,9 +72,15 @@ public final class ModItems {
         CONDUCTOR = new BlockItem(ModBlocks.CONDUCTOR.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockConductor.REGISTRY_NAME, CONDUCTOR);
 
-        // Village Blocks
+        // Other Blocks
         TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockTuningTable.REGISTRY_NAME, TUNINGTABLE);
+        
+        DISKWRITER = new BlockItem(ModBlocks.DISKWRITER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        event.register(BlockDiskWriter.REGISTRY_NAME, DISKWRITER);
+
+        MUSICPLAYER = new BlockItem(ModBlocks.MUSICPLAYER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        event.register(BlockMusicPlayer.REGISTRY_NAME, MUSICPLAYER);
 
         // Instrument Items
         INSTRUMENT_ITEMS = buildInstruments();

@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.config.instrument;
 
 import java.util.List;
 
-import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
+import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 
 public class InstrumentSpec {
     public Byte instrumentId;
@@ -19,6 +19,6 @@ public class InstrumentSpec {
     }
 
     public Integer defaultColor() {
-        return isDyeable() ? (defaultColor != null ? defaultColor : IDyeableInstrumentItem.DEFAULT_WHITE_COLOR) : null;
+        return isDyeable() ? (defaultColor != null ? defaultColor : IDyeableItem.DEFAULT_WHITE_COLOR) : null;
     }
 }

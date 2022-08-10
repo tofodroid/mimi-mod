@@ -4,22 +4,20 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
-
 public abstract class MidiInputReceiver implements Receiver {
-    @SuppressWarnings("resource")
-    public void send(MidiMessage msg, long timeStamp) {
-        Player player = Minecraft.getInstance().player;
+    private volatile boolean open = true;
 
-        if(player != null && msg instanceof ShortMessage) {
-            handleMessage((ShortMessage)msg, player);
+    public synchronized void send(MidiMessage msg, long timeStamp) {
+        if(open && msg instanceof ShortMessage) {
+            handleMessage((ShortMessage)msg);
         }
     }
+    
+    protected abstract void handleMessage(ShortMessage message);
 
-    public void close() { }
-
-    protected abstract void handleMessage(ShortMessage message, Player player);
+    public void close() {
+        open = false;
+    }
 
     // Message Utils
     protected Boolean isNoteOnMessage(ShortMessage msg) {

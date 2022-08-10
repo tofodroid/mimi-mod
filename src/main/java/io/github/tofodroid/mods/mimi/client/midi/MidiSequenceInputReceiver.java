@@ -5,14 +5,12 @@ import javax.sound.midi.ShortMessage;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
-import net.minecraft.world.entity.player.Player;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 
 // Receiver
 public class MidiSequenceInputReceiver extends MidiInputReceiver {
-
     @Override
-    protected void handleMessage(ShortMessage message, Player player) {
+    protected void handleMessage(ShortMessage message) {
         if(MIMIMod.proxy.getMidiInput().hasTransmitter()) {
             if(isNoteOnMessage(message)) {
                 this.sendTransmitterNoteOnPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);

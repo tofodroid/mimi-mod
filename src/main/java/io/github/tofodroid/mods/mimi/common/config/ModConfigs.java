@@ -16,15 +16,22 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 public class ModConfigs {
     public static ClientConfig CLIENT;
     private static ForgeConfigSpec CLIENTSPEC;
+    public static CommonConfig COMMON;
+    private static ForgeConfigSpec COMMONSPEC;
 
     static {
         final Pair<ClientConfig, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
         CLIENT = clientPair.getLeft();
         CLIENTSPEC = clientPair.getRight();
+
+        final Pair<CommonConfig, ForgeConfigSpec> commonPair = new ForgeConfigSpec.Builder().configure(CommonConfig::new);
+        COMMON = commonPair.getLeft();
+        COMMONSPEC = commonPair.getRight();
     }
 
     public static void preInit(ModLoadingContext context) { 
         context.registerConfig(Type.CLIENT, ModConfigs.CLIENTSPEC);
+        context.registerConfig(Type.COMMON, ModConfigs.COMMONSPEC);
     }
     
     @SubscribeEvent

@@ -3,8 +3,12 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MidiNotePacket {
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
@@ -14,6 +18,27 @@ public class MidiNotePacket {
     public final Byte instrumentId;
     public final UUID player;
     public final BlockPos pos;
+
+    @SuppressWarnings("resource")
+    @OnlyIn(Dist.CLIENT)
+    public static MidiNotePacket createClientAllNotesOffPacket(Byte instrumentId) {
+        Player player = Minecraft.getInstance().player;
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
+    }
+    
+    @SuppressWarnings("resource")
+    @OnlyIn(Dist.CLIENT)
+    public static MidiNotePacket createClientControlPacket(Byte controller, Byte value, Byte instrumentId) {
+        Player player = Minecraft.getInstance().player;
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
+    }
+    
+    @SuppressWarnings("resource")
+    @OnlyIn(Dist.CLIENT)
+    public static MidiNotePacket createClientNotePacket(Byte note, Byte velocity, Byte instrumentId) {
+        Player player = Minecraft.getInstance().player;
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
+    }
 
     public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos) {
         return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos);

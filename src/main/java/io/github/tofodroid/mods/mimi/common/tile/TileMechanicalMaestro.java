@@ -57,12 +57,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
 
         return null;
     }
-
-    public UUID getMaestroUUID() {
-        String idString = "tile-mech-maestro-" + this.getBlockPos().getX() + "-" + this.getBlockPos().getY() + "-" + this.getBlockPos().getZ();
-        return UUID.nameUUIDFromBytes(idString.getBytes());
-    }
-
+    
     public Boolean shouldHandleMessage(UUID sender, Byte channel, Byte note, Boolean publicTransmit) {
         ItemStack switchStack = getSwitchboardStack();
         if(!switchStack.isEmpty() && getInstrumentId() != null) {

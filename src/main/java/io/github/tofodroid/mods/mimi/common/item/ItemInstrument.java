@@ -14,7 +14,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -24,7 +23,7 @@ import javax.annotation.Nonnull;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
-public class ItemInstrument extends Item implements IDyeableInstrumentItem {
+public class ItemInstrument extends Item implements IDyeableItem {
     public final String REGISTRY_NAME;
 
     public static final String INVENTORY_TAG = "inventory";
@@ -55,7 +54,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
     @Override
     @Nonnull
     public InteractionResult useOn(UseOnContext context) {
-        if(!context.getPlayer().isCrouching() && ((IDyeableInstrumentItem)context.getItemInHand().getItem()).hasColor(context.getItemInHand()) && context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof CauldronBlock) {
+        if(washItem(context)) {
             return InteractionResult.SUCCESS;
         }
 

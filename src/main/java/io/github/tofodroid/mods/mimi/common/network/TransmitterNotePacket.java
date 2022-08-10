@@ -42,7 +42,7 @@ public class TransmitterNotePacket {
             TransmitMode transmitMode = TransmitMode.values()[Byte.valueOf(buf.readByte()).intValue()];
             return new TransmitterNotePacket(channel, note, velocity, transmitMode);
         } catch (IndexOutOfBoundsException e) {
-            MIMIMod.LOGGER.error("SpeakerNoteOnPacket did not contain enough bytes. Exception: " + e);
+            MIMIMod.LOGGER.error("TransmitterNotePacket did not contain enough bytes. Exception: " + e);
             return null;
         }
     }

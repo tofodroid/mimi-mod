@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.item;
 
 import javax.annotation.Nonnull;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -24,7 +24,7 @@ public class ItemTransmitter extends Item {
         final ItemStack heldItem = playerIn.getItemInHand(handIn);
 
         if(worldIn.isClientSide && !playerIn.isCrouching()) {
-            MIMIMod.guiWrapper.openPlaylistGui(worldIn, playerIn);
+            ClientGuiWrapper.openPlaylistGui(worldIn, playerIn);
             return new InteractionResultHolder<>(InteractionResult.SUCCESS, heldItem);
         }
 
