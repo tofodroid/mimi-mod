@@ -22,7 +22,7 @@ public class CommonConfig {
         serverMusicCacheSize = builder.comment("Server music cache limit. The maximum number of MIDI files (from Floppy Disks) to keep in the server-side music cache.")
             .translation(MIMIMod.MODID + ".config.server.cache.music.size")
             .defineInRange("serverMusicCacheSize", 100, 0, 999);
-        allowWebMidi = builder.comment("Whether or not to allow web URL for Floppy Disks.")
+        allowWebMidi = builder.comment("Whether or not to allow web URLs for Floppy Disks.")
             .translation(MIMIMod.MODID + ".config.server.music.allowed.hosts")
             .define("allowWebMidi", true);
         allowedMusicHosts = builder.comment("Allowed web hosts for Floppy Disk URLs (comma-separated). If no hosts are specified any host is allowed. Hosts should not include the protocol (I.E: https) or any paths (I.E: /path). Ex: bitmidi.com")
