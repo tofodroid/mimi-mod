@@ -53,7 +53,7 @@ public abstract class ServerMusicPlayerMidiManager {
 
         return handler;
     }
-
+    
     public static MusicPlayerMidiHandler getMusicPlayer(TileMusicPlayer tile) {
         if(tile != null) { 
             return MUSIC_PLAYER_MAP.get(tile.getMusicPlayerId());
@@ -68,6 +68,16 @@ public abstract class ServerMusicPlayerMidiManager {
             handler.close();
             MUSIC_PLAYER_MAP.remove(tile.getMusicPlayerId());
         }
+    }
+
+    public static void clearMusicPlayers() {
+        for(UUID id : MUSIC_PLAYER_MAP.keySet()) {
+            if(MUSIC_PLAYER_MAP.get(id) != null) {
+                MUSIC_PLAYER_MAP.get(id).close();
+            }
+            MUSIC_PLAYER_MAP.remove(id);
+        }
+        MUSIC_PLAYER_MAP = new HashMap<>();
     }
 
     // Music Sequence Cache
@@ -214,6 +224,7 @@ public abstract class ServerMusicPlayerMidiManager {
     }
 
     protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {
+        MIMIMod.LOGGER.info("Loading MIDI from disk: '" + targetFile.getParentFile().getName() + "/" + targetFile.getName() + "'");
         if(targetFile.exists() && targetFile.isFile()) {
             return MidiSystem.getSequence(targetFile);
         }
@@ -222,6 +233,7 @@ public abstract class ServerMusicPlayerMidiManager {
     }
 
     protected static File saveSequence(String fileName, Sequence sequence) throws IOException {
+        MIMIMod.LOGGER.info("Caching newly downloaded cached MIDI: '" + fileName + "'");
         File targetFile = new File(SEQUENCE_CACHE_FOLDER, fileName);
         try(FileOutputStream fout = new FileOutputStream(targetFile)) {
             MidiSystem.write(sequence, MidiSystem.getMidiFileTypes(sequence)[0], fout);
@@ -233,6 +245,7 @@ public abstract class ServerMusicPlayerMidiManager {
     }
 
     protected static Sequence downloadSequence(String midiUrl) throws IOException, InvalidMidiDataException {
+        MIMIMod.LOGGER.info("Downloading new MIDI from URL: '" + midiUrl + "'");
         URL url = new URL(midiUrl);
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(2000);
@@ -261,12 +274,12 @@ public abstract class ServerMusicPlayerMidiManager {
             }
             
             for(String removeKey : toRemove) {
-                MIMIMod.LOGGER.info("Deleting cached song: " + removeKey);
+                MIMIMod.LOGGER.info("Pruning cached song: '" + removeKey + "'");
                 SEQUENCE_CACHE_VALUE_MAP.remove(removeKey);
                 try {
                     Files.deleteIfExists(new File(SEQUENCE_CACHE_FOLDER, removeKey).toPath());
                 } catch(IOException e) {
-                    MIMIMod.LOGGER.error("Failed to delete cached song: " + removeKey);
+                    MIMIMod.LOGGER.error("Failed to prune cached song: " + removeKey);
                 }
             }
         }

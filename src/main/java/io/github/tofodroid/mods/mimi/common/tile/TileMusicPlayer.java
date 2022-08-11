@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockMusicPlayer;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMusicPlayer;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
@@ -80,11 +81,35 @@ public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker
             setChanged(this.level, this.getBlockPos(), state);
         }
     }
+
+    public void stopPlaying() {
+        ServerMusicPlayerMidiManager.removeMusicPlayer(this);
+        BlockState state = this.getBlockState().setValue(BlockMusicPlayer.POWER, 0);
+        this.level.setBlock(this.getBlockPos(), state, 3);
+        setChanged(this.level, this.getBlockPos(), state);
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        stopPlaying();
+        MIMIMod.LOGGER.info("MusicPlayer Unloaded. Stopping music.");
+    }
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, TileMusicPlayer self) {
         if(this.hasLevel() && !this.level.isClientSide && world instanceof ServerLevel) {
-            Boolean isPlaying = !(this.isRemoved() || this.getActiveFloppyDiskStack().isEmpty() || this.endOfMusicFlag);
+            // If removed, stop playing and return immediately
+            if(this.isRemoved() && this.wasPlaying) {
+                stopPlaying();
+                this.wasPlaying = false;
+                return;
+            } else if(this.isRemoved()) {
+                return;
+            }
+
+            // Otherwise, check if playing and tick accordingly
+            Boolean isPlaying = !(this.getActiveFloppyDiskStack().isEmpty() || this.endOfMusicFlag);
             
             if(this.wasPlaying != isPlaying) {
                 state = state.setValue(BlockMusicPlayer.POWER, isPlaying ? 15 : 0);
