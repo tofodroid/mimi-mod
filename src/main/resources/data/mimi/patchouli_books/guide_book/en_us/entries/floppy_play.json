@@ -1,0 +1,29 @@
+{
+    "name": "Playing Floppy Disks",
+    "icon": "mimi:musicplayer",
+    "category": "mimi:floppy",
+    "pages": [
+        {
+            "type": "crafting",
+            "title": "Crafting",
+            "recipe": "mimi:musicplayer",
+            "text": "Floppy Disks can be played using a Music Player block. The Music Player can play one Floppy Disk at a time and works similarly to a Jukebox."
+        },
+        {
+            "type": "text",
+            "title": "Usage",
+            "text": "To use the Music Player insert a written Floppy Disk in the disk slot. Once the Floppy Disk is inserted the Music Player will attempt to load the MIDI file from the Disk MIDI URL.$(br2)If the MIDI file loads successfully it will begin transmitting just like if it were coming from your transmitter.$(br2)The Music Player screen will show the instruments that the file has assigned to each MIDI Channel just like the Transmitter.$(br2)"
+        },
+        {
+            "type": "text",
+            "title": "Connecting",
+            "text": "To connect an instrument to the Music Player and start hearing the music, first connect a Switchboard by right-clicking the Music Player while holding the Switchboard.$(br2)Once the Switchboard is connected insert it into an instrument and enable the desired MIDI Channels."
+        },
+        {
+            "type": "text",
+            "title": "Error Messages",
+            "text": "If you receive an error message when loading the Floppy Disk into the Music Player you may need to try a different MIDI URL. The error message should explain the particular error and what you might need to do to correct it.$(br2)MIMI allows servers to restrict which websites may be used for Floppy Disks or disable all websites. If you get an error that the website you used is not allowed talk to a server Admin to find out which, if any, are allowed.$(br2)"
+        }
+    ],
+    "sortnum": 2
+}
