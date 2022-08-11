@@ -1,0 +1,12 @@
+{
+    "name": "Custom Instruments",
+    "icon": "mimi:steeldrum",
+    "category": "mimi:config",
+    "pages": [
+        {
+            "type": "text",
+            "text": "MIMI supports adding custom instruments via a DataPack and some Mod Configuration. To learn about adding custom instruments please visit this $(l:https://github.com/tofodroid/mimi-mod/tree/main/example)link$(/l)."
+        }
+    ],
+    "sortnum": 6
+}

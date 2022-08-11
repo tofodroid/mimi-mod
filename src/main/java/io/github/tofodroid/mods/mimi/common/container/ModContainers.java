@@ -13,6 +13,8 @@ public class ModContainers {
     public static MenuType<ContainerMechanicalMaestro> MECHANICALMAESTRO = null;
     public static MenuType<ContainerConductor> CONDUCTOR = null;
     public static MenuType<ContainerTuningTable> TUNINGTABLE = null;
+    public static MenuType<ContainerDiskWriter> DISKWRITER = null;
+    public static MenuType<ContainerMusicPlayer> MUSICPLAYER = null;
     
     private static <T extends AbstractContainerMenu> MenuType<T> registerType(String id, IContainerFactory<T> factory, final RegisterEvent.RegisterHelper<MenuType<?>> event) {
         MenuType<T> type = IForgeMenuType.create(factory);
@@ -27,5 +29,7 @@ public class ModContainers {
         MECHANICALMAESTRO = registerType("mechanicalmaestro", ContainerMechanicalMaestro::new, event);
         CONDUCTOR = registerType("conductor", ContainerConductor::new, event);
         TUNINGTABLE = registerType("tuningtable", ContainerTuningTable::new, event);
+        DISKWRITER = registerType("diskwriter", ContainerDiskWriter::new, event);
+        MUSICPLAYER = registerType("musicplayer", ContainerMusicPlayer::new, event);
     }
 }

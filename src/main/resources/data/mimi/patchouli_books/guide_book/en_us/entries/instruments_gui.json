@@ -40,7 +40,7 @@
         {
             "type": "text",
             "title": "Keyboard Layout",
-            "text": "The top right section of the Instrument GUI lets you cycle between keyboard layouts for the piano. The selected layout is saved globally using the $(l:config_file)Config File$(/l), not per-instrument.$(br2)$(l)MIMI$() is the default mode and is a 'floating' mode where the same keys are used regardless of where you are on the keyboard. This mode allows you to play all notes from C0-G10 but only the notes currently visible on your screen."
+            "text": "The top right section of the Instrument GUI lets you cycle between keyboard layouts for the piano. The selected layout is saved globally using the $(l:client_file)Config File$(/l), not per-instrument.$(br2)$(l)MIMI$() is the default mode and is a 'floating' mode where the same keys are used regardless of where you are on the keyboard. This mode allows you to play all notes from C0-G10 but only the notes currently visible on your screen."
         },
         {
             "type": "text",

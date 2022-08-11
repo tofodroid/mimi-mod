@@ -1,0 +1,22 @@
+{
+    "name": "MIDI Files",
+    "icon": "mimi:floppydisk",
+    "category": "mimi:config",
+    "pages": [
+        {
+            "type": "text",
+            "text": "MIMI stores MIDI files on disk in the configuration directory in certain instances."
+        },
+        {
+            "type": "text",
+            "title": "Web Cache",
+            "text": "When web MIDI files are enabled and players play a Floppy Disk in a Music Player block the server downloads the MIDI files from the disk URL and caches it for future plays.$(br2)Cached MIDI files are saved in your Minecraft instance $(#0046ff)config$() folder under $(#0046ff)mimi/music_cache$().$(br2)Cached files can be deleted at any time as long as the server is not running.$(br2)"
+        },
+        {
+            "type": "text",
+            "title": "Default Music",
+            "text": "Floppy Disks can also be created that point to a MIDI file saved on the server permanently, rather than a web URL.$(br2)To add MIDI files to your server open the default music folder in your Minecraft instance $(#0046ff)config$() folder under $(#0046ff)mimi/default_music$().$(br2)The files in this folder are refreshed when the server starts and can be deleted when the server is not running.$(br2)"
+        }
+    ],
+    "sortnum": 5
+}

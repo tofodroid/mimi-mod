@@ -19,7 +19,7 @@ public class ModRecipes {
 
     public static void submitSerializerRegistrations(final RegisterEvent.RegisterHelper<RecipeSerializer<?>> event) {
         event.register(TuningTableRecipe.Serializer.REGISTRY_NAME, TuningTableRecipe.SERIALIZER);
-        event.register(DyedInstrumentRecipe.REGISTRY_NAME, DyedInstrumentRecipe.SERIALIZER);
+        event.register(DyedItemRecipe.REGISTRY_NAME, DyedItemRecipe.SERIALIZER);
     }
 
 }

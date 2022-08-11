@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+      "particle": "mimi:block/diskwriter/side",
+      "north": "mimi:block/diskwriter/side",
+      "south": "mimi:block/diskwriter/side",
+      "east": "mimi:block/diskwriter/side",
+      "west": "mimi:block/diskwriter/side",
+      "up": "mimi:block/diskwriter/top",
+      "down": "mimi:block/diskwriter/bottom"
+    }
+  }

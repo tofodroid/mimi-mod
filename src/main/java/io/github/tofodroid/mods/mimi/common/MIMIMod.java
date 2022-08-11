@@ -10,21 +10,19 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
-import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.gui.GuiWrapper;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
-import io.github.tofodroid.mods.mimi.server.ServerGuiWrapper;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;
+import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,13 +30,10 @@ import org.apache.logging.log4j.Logger;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 @Mod(MIMIMod.MODID)
-public class MIMIMod
-{
+public class MIMIMod {
     public static final String MODID = "mimi";
-
     public static final Logger LOGGER = LogManager.getLogger();
     public static Proxy proxy = (Proxy)DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
-    public static GuiWrapper guiWrapper = (GuiWrapper)DistExecutor.safeRunForDist(() -> ClientGuiWrapper::new, () -> ServerGuiWrapper::new);
 
     public MIMIMod() {
         MIMIMod.preInit(FMLJavaModLoadingContext.get(), ModLoadingContext.get());
@@ -69,6 +64,7 @@ public class MIMIMod
    
     public static void init(final FMLCommonSetupEvent event) {
         proxy.init(event);
+        ServerMusicPlayerMidiManager.init();
     }
 
     @SubscribeEvent

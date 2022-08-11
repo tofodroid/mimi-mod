@@ -2,5 +2,5 @@
 	"name": "Redstone-Enabled Blocks",
 	"description": "MIMI also includes a number of redstone-enabled blocks that interact with instruments in the mod. These include behaviors like playing instruments and outputting signals based on notes that are played.",
 	"icon": "mimi:listener",
-	"sortnum": 5
+	"sortnum": 6
 }

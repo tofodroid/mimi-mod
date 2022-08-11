@@ -1,0 +1,24 @@
+{
+    "name": "Creating Floppy Disks",
+    "icon": "mimi:floppydisk",
+    "category": "mimi:floppy",
+    "pages": [
+        {
+            "type": "crafting",
+            "title": "Crafting",
+            "recipe": "mimi:floppydisk",
+            "text": "Floppy Disks can store the URL to a MIDI file found either on the internet or saved onto the server."
+        },
+        {
+            "type": "text",
+            "title": "Properties",
+            "text": "The Floppy Disk stores three things:$(br2)1. A Title for the Disk$(br2)1.The URL for the MIDI file$(br2)3. The Author of the Disk$(br2)To write data to a blank Floppy use a Disk Writer block. Once written to, a Floppy Disk cannot be written to again."
+        },
+        {
+            "type": "text",
+            "title": "Dyeing",
+            "text": "The Floppy Disk can be dyed by combining it with any dye item in a crafting grid.$(br2)The dye can be washed off by right-clicking a Cauldron with Water while holding the Floppy Disk."
+        }
+    ],
+    "sortnum": 0
+}

@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
+import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeItem;
@@ -13,12 +13,12 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.ArrayList;
 
-public class DyedInstrumentRecipe extends CustomRecipe {
-    public static final String REGISTRY_NAME = "dyedinstrument";
+public class DyedItemRecipe extends CustomRecipe {
+    public static final String REGISTRY_NAME = "dyeditem";
 
-	public static final RecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<>(DyedInstrumentRecipe::new);
+	public static final RecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<>(DyedItemRecipe::new);
 
-    public DyedInstrumentRecipe(ResourceLocation recipeId) {
+    public DyedItemRecipe(ResourceLocation recipeId) {
         super(recipeId);
     }
 
@@ -28,7 +28,7 @@ public class DyedInstrumentRecipe extends CustomRecipe {
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stackI = inv.getItem(i);
-            if (IDyeableInstrumentItem.isDyeableInstrument(stackI) && instrument.isEmpty()) {
+            if (IDyeableItem.isDyeableInstrument(stackI) && instrument.isEmpty()) {
                 instrument = stackI;
             } else if (!stackI.isEmpty() && !(stackI.getItem() instanceof DyeItem))  {
                 return false;
@@ -46,7 +46,7 @@ public class DyedInstrumentRecipe extends CustomRecipe {
         for (int i = 0; i < inv.getContainerSize(); ++i) {
             ItemStack stackI = inv.getItem(i);
             if (!stackI.isEmpty()) {
-                if (IDyeableInstrumentItem.isDyeableInstrument(stackI) && instrument.isEmpty()) {
+                if (IDyeableItem.isDyeableInstrument(stackI) && instrument.isEmpty()) {
                     instrument = stackI;
                 } else if (stackI.getItem() instanceof DyeItem)  {
                     dyes.add((DyeItem)stackI.getItem());
@@ -54,7 +54,7 @@ public class DyedInstrumentRecipe extends CustomRecipe {
             }
         }
 
-        return !instrument.isEmpty() && !dyes.isEmpty() ? IDyeableInstrumentItem.dyeItem(instrument, dyes) : ItemStack.EMPTY;
+        return !instrument.isEmpty() && !dyes.isEmpty() ? IDyeableItem.dyeItem(instrument, dyes) : ItemStack.EMPTY;
     }
 
     @Override
@@ -64,6 +64,6 @@ public class DyedInstrumentRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return DyedInstrumentRecipe.SERIALIZER;
+        return DyedItemRecipe.SERIALIZER;
     }
 }

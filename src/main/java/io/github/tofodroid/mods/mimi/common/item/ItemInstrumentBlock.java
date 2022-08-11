@@ -1,9 +1,13 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
-import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import net.minecraft.world.item.BlockItem;
+import javax.annotation.Nonnull;
 
-public class ItemInstrumentBlock extends BlockItem implements IDyeableInstrumentItem {
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.UseOnContext;
+
+public class ItemInstrumentBlock extends BlockItem implements IDyeableItem {
     public final String REGISTRY_NAME;
 
     public ItemInstrumentBlock(BlockInstrument blockIn, Properties builder, String name) {
@@ -23,5 +27,15 @@ public class ItemInstrumentBlock extends BlockItem implements IDyeableInstrument
     @Override
     public Integer getDefaultColor() {
         return ((BlockInstrument)getBlock()).getDefaultColor();
+    }
+    
+    @Override
+    @Nonnull
+    public InteractionResult useOn(UseOnContext context) {
+        if(washItem(context)) {
+            return InteractionResult.SUCCESS;
+        }
+
+        return super.useOn(context);
     }
 }

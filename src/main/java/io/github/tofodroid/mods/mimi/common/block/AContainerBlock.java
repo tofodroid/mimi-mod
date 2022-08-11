@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import io.github.tofodroid.mods.mimi.common.tile.ASwitchboardContainerEntity;
+import io.github.tofodroid.mods.mimi.common.tile.AContainerTile;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 
-public abstract class AContainerBlock<T extends ASwitchboardContainerEntity> extends BaseEntityBlock {
+public abstract class AContainerBlock<T extends AContainerTile> extends BaseEntityBlock {
     protected AContainerBlock(Properties builder) {
         super(builder);
     }
@@ -30,8 +30,8 @@ public abstract class AContainerBlock<T extends ASwitchboardContainerEntity> ext
 			return;
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
         
-        if (blockEntity instanceof ASwitchboardContainerEntity) {
-            ((ASwitchboardContainerEntity)blockEntity).dropContent();
+        if (blockEntity instanceof AContainerTile) {
+            ((AContainerTile)blockEntity).dropContent();
             worldIn.updateNeighbourForOutputSignal(pos, this);
         }
 
@@ -68,7 +68,7 @@ public abstract class AContainerBlock<T extends ASwitchboardContainerEntity> ext
     @SuppressWarnings("unchecked")
     public T getTileForBlock(Level worldIn, BlockPos pos) {
         BlockEntity entity = worldIn.getBlockEntity(pos);
-        return entity != null && entity instanceof ASwitchboardContainerEntity ? (T)entity : null;
+        return entity != null && entity instanceof AContainerTile ? (T)entity : null;
     }
     
     @Override

@@ -1,0 +1,24 @@
+{
+    "name": "Writing to Floppy Disks",
+    "icon": "mimi:diskwriter",
+    "category": "mimi:floppy",
+    "pages": [
+        {
+            "type": "crafting",
+            "title": "Crafting",
+            "recipe": "mimi:diskwriter",
+            "text": "Floppy Disks can be written to using a Disk Writer block.$(br2)The Disk Writer can write on up to 64 Floppy Disks at one time."
+        },
+        {
+            "type": "text",
+            "title": "Usage",
+            "text": "To use the Disk Writer insert up to 64 blank Floppy Disks in the disk slot. Once you have disks loaded fill out the fields:$(br2)1. Disk Title: The title of the disk (up to 64 characters).$(br2)2. Disk URL: The MIDI URL for the disk (up to 256 characters).$(br2)Click 'Write' to write the data to the disks."
+        },
+        {
+            "type": "text",
+            "title": "MIDI URL",
+            "text": "The MIDI URL should be a web URL (Ex: $(o)https://test.com/test.mid)$() pointing directly to a MIDI file.$(br2)MIMI will try to validate the URL and if the text box is red it means the URL is invalid.$(br2)The MIDI URL may also point to a MIDI file in the server's default music folder, if any exist. These URLs should use the format $(o)server://<file_name>$() (Ex: $(o)server://test.mid$())$(br2)"
+        }
+    ],
+    "sortnum": 1
+}

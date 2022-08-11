@@ -60,6 +60,7 @@
   "item.mimi.recorder": "Recorder",
   "item.mimi.switchboard": "Switchboard",
   "item.mimi.transmitter": "Transmitter",
+  "item.mimi.floppydisk": "Floppy Disk",
   "block.mimi.listener": "Listener",
   "block.mimi.receiver": "Receiver",
   "block.mimi.mechanicalmaestro": "Mechanical Maestro",
@@ -101,5 +102,6 @@
   "block.mimi.prophet9": "Prophet-5 (Dr. Solo)",
   "block.mimi.edrums": "E-Drums (Standard)",
   "block.mimi.edrums2": "E-Drums (TR-808)",
-  "block.mimi.tuningtable": "Tuning Table"
+  "block.mimi.tuningtable": "Tuning Table",
+  "block.mimi.diskwriter": "Disk Writer"
 }
