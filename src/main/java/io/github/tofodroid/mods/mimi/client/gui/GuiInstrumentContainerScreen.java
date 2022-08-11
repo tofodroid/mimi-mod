@@ -488,7 +488,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                 return Arrays.asList(getMidiNoteFromScanCode_VPiano(scanCode, modifier), ignoreModifier ? getMidiNoteFromScanCode_VPiano(scanCode, !modifier) : null)
                     .stream().filter(b -> b != null).collect(Collectors.toSet());
             default:
-                MIMIMod.LOGGER.info("Warning: Unknown keyboard layout selected for Instrument GUI.");
+                MIMIMod.LOGGER.warn("Warning: Unknown keyboard layout selected for Instrument GUI.");
                 return null;
         }
     }

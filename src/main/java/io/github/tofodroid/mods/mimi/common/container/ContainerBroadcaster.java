@@ -17,7 +17,7 @@ import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 
 public class ContainerBroadcaster extends APlayerInventoryContainer {
-	private static final int FLOPPY_SLOT_X = 14;
+	private static final int FLOPPY_SLOT_X = 8;
 	private static final int FLOPPY_SLOT_Y = 189;
 
 	protected IItemHandler targetInventory;

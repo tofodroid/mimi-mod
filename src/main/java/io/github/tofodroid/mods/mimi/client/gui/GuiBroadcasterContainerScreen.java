@@ -5,12 +5,15 @@ import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
+import io.github.tofodroid.mods.mimi.common.network.BroadcasterControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
+import io.github.tofodroid.mods.mimi.common.network.BroadcasterControlPacket.CONTROL;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket.STATUS_CODE;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -25,14 +28,20 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
     private Integer infoSyncTrack = 0;
     private ItemStack lastDiskStack = null;
 
+    // Button Boxes
+    private static final Vector3f STOP_BUTTON = new Vector3f(28,190,0);
+    private static final Vector3f PLAY_PAUSE_BUTTON = new Vector3f(48,190,0);
+    private static final Vector3f TRANSMIT_BUTTON = new Vector3f(145,190,0);
+    private static final Vector3f TRANSMIT_SCREEN = new Vector3f(163,191,0);
+
     // Time Slider
-    private static final Integer SLIDE_Y = 188;
-    private static final Integer SLIDE_MIN_X = 39;
-    private static final Integer SLIDE_MAX_X = 165;
+    private static final Integer SLIDE_Y = 189;
+    private static final Integer SLIDE_MIN_X = 65;
+    private static final Integer SLIDE_MAX_X = 135;
     private static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
 
     public GuiBroadcasterContainerScreen(ContainerBroadcaster container, Inventory inv, Component textComponent) {
-        super(container, inv, 350, 212, 350, "textures/gui/container_music_player.png", textComponent);
+        super(container, inv, 350, 212, 350, "textures/gui/container_broadcaster.png", textComponent);
         resetMidiInfo();
         this.lastDiskStack = this.menu.getActiveFloppyStack();
         this.infoSyncTrack = this.SYNC_EVERY_TICKS;
@@ -45,11 +54,31 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
 
     public void syncMidiInfo() {
         if(infoSyncTrack >= SYNC_EVERY_TICKS) {
-            NetworkManager.NET_CHANNEL.sendToServer(new ServerMidiInfoPacket(STATUS_CODE.INFO, null, null, null));
+            NetworkManager.NET_CHANNEL.sendToServer(new ServerMidiInfoPacket(STATUS_CODE.INFO, null, null, null, null));
             infoSyncTrack = 0;
         } else {
             infoSyncTrack++;
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int imouseX = (int)Math.round(mouseX);
+        int imouseY = (int)Math.round(mouseY);
+
+        if(clickedBox(imouseX, imouseY, STOP_BUTTON) && this.midiInfo != null) {
+            NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.STOP));
+        } else if(clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON) && this.midiInfo != null) {
+            if(this.midiInfo.running) { 
+                NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.PAUSE));
+            } else {
+                NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.PLAY));
+            } 
+        } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
+            NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.TOGGLE_PUBLIC));
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -72,15 +101,22 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         // GUI Background
         blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
-        Integer slideOffset = 0;
+        // Play/Pause Button
+        blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, this.getBlitOffset(), 1 + (this.midiInfo != null ? this.midiInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        
+        // Transmit Screen    
+        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.menu.getBroadcasterTile().isPublicBroadcast().compareTo(false)), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+
+        // Time Slider
         if(this.menu.hasActiveFloppy() && this.midiInfo != null && STATUS_CODE.INFO.equals(this.midiInfo.status)) {
             Integer slideLength = this.midiInfo.songLengthSeconds;
-            Integer slideProgress = this.midiInfo.songPositionSeconds;
+            Integer slideProgress = this.midiInfo.songPositionSeconds >= 0 ? this.midiInfo.songPositionSeconds : 0;
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
-            slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
+            Integer slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
+            blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
-        blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        
 
         return matrixStack;
     }

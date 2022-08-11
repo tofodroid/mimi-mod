@@ -30,6 +30,7 @@ public class ServerMidiInfoPacketHandler {
             ServerMidiInfoPacket.STATUS_CODE.EMPTY,
             null,
             null, 
+            null,
             null
         );
 
@@ -43,13 +44,15 @@ public class ServerMidiInfoPacketHandler {
                         ServerMidiInfoPacket.STATUS_CODE.INFO,
                         tileHandler.getMidiFileInfo().byteChannelMapping, 
                         tileHandler.getMidiFileInfo().songLength, 
-                        tileHandler.getPositionSeconds()
+                        tileHandler.getPositionSeconds(),
+                        tileHandler.isPlaying()
                     );
                 } else {
                     returnPacket = new ServerMidiInfoPacket(
                         tileHandler.getErrorStatus(),
                         null, 
                         null, 
+                        null,
                         null
                     );
                 }

@@ -27,13 +27,16 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-public abstract class ServerMusicPlayerMidiManager {
+@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+public class ServerMusicPlayerMidiManager {
     protected static Map<UUID,MusicPlayerMidiHandler> MUSIC_PLAYER_MAP = new HashMap<>();
     protected static TreeMap<Instant,String> SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
     protected static Map<String,File> SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
@@ -46,7 +49,7 @@ public abstract class ServerMusicPlayerMidiManager {
         MusicPlayerMidiHandler handler = getMusicPlayer(tile);
 
         if(handler == null) {
-            Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> result = getOrCreateCachedSequence(ItemFloppyDisk.getMidiUrl(tile.getActiveFloppyDiskStack()));
+            Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> result = getOrCreateCachedSequence(midiUrl);
             MUSIC_PLAYER_MAP.put(tile.getMusicPlayerId(), new MusicPlayerMidiHandler(tile, result.getLeft(), result.getRight()));
             return MUSIC_PLAYER_MAP.get(tile.getMusicPlayerId());
         }
@@ -78,6 +81,11 @@ public abstract class ServerMusicPlayerMidiManager {
             MUSIC_PLAYER_MAP.remove(id);
         }
         MUSIC_PLAYER_MAP = new HashMap<>();
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        clearMusicPlayers();
     }
 
     // Music Sequence Cache
@@ -207,10 +215,13 @@ public abstract class ServerMusicPlayerMidiManager {
                         return Pair.of(sequence, null);
                     } catch(FileNotFoundException e) {
                         // 404, Don't handle
+                        MIMIMod.LOGGER.debug("FNF");
                     } catch(MalformedURLException e) {
                         // Bad URL, Don't handle
+                        MIMIMod.LOGGER.debug("MFU");
                     } catch(InvalidMidiDataException e) {
                         // Bad MIDI, Don't handle
+                        MIMIMod.LOGGER.debug("IMD");
                     } catch(Exception e) {
                         MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
                     }
@@ -224,7 +235,6 @@ public abstract class ServerMusicPlayerMidiManager {
     }
 
     protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {
-        MIMIMod.LOGGER.info("Loading MIDI from disk: '" + targetFile.getParentFile().getName() + "/" + targetFile.getName() + "'");
         if(targetFile.exists() && targetFile.isFile()) {
             return MidiSystem.getSequence(targetFile);
         }
@@ -233,7 +243,6 @@ public abstract class ServerMusicPlayerMidiManager {
     }
 
     protected static File saveSequence(String fileName, Sequence sequence) throws IOException {
-        MIMIMod.LOGGER.info("Caching newly downloaded cached MIDI: '" + fileName + "'");
         File targetFile = new File(SEQUENCE_CACHE_FOLDER, fileName);
         try(FileOutputStream fout = new FileOutputStream(targetFile)) {
             MidiSystem.write(sequence, MidiSystem.getMidiFileTypes(sequence)[0], fout);

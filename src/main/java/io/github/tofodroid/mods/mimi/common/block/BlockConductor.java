@@ -59,10 +59,10 @@ public class BlockConductor extends AContainerBlock<TileConductor> {
 
     @Override
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        TileConductor tile = getTileForBlock(worldIn, pos);
-        
-        if(tile != null) {
-           if(!worldIn.isClientSide) {
+        if(!worldIn.isClientSide) {
+            TileConductor tile = getTileForBlock(worldIn, pos);
+
+            if(tile != null) {
                ItemStack stack = player.getItemInHand(hand);
 
                 if(ModItems.SWITCHBOARD.equals(stack.getItem())) {

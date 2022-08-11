@@ -16,9 +16,10 @@ import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 
 public class MusicPlayerMidiHandler {
     private Integer lastTempoBPM;
+    private Long pausedTickPosition;
+    private Long pausedMicrosecond;
     private MidiFileInfo midiInfo = null;
     private Boolean error = false;
-    private Boolean endOfMusic = false;
     private ServerMidiInfoPacket.STATUS_CODE status = null;
     
     // MIDI Sequencer
@@ -40,17 +41,13 @@ public class MusicPlayerMidiHandler {
                 this.midiInfo = MidiFileInfo.fromSequence("server", sequence);
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to start sequencer: ", e);
+                this.activeSequencer = null;
                 this.error = true;
                 this.status = ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER;
             }
         } else {
             this.error = true;
             this.status = ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER;
-        }
-
-        if(this.error) {
-            tile.endOfMusic();
-            this.endOfMusic = true;
         }
     }
 
@@ -62,8 +59,13 @@ public class MusicPlayerMidiHandler {
         return this.error;
     }
 
-    public Boolean isAtEndOfSong() {
-        return this.endOfMusic;
+    public Boolean isPlaying() {
+        return this.activeSequencer != null ? this.activeSequencer.isRunning() : false;
+    }
+
+    public Boolean isInProgress() {
+        Integer seconds = this.getPositionSeconds();
+        return seconds != null && seconds > 0;
     }
     
     public MidiFileInfo getMidiFileInfo() {
@@ -73,9 +75,9 @@ public class MusicPlayerMidiHandler {
     public Integer getPositionSeconds() {
         if(this.activeSequencer != null && this.activeSequencer.isOpen()) {
             if(this.activeSequencer.isRunning()) {
-                return Long.valueOf( this.activeSequencer.getMicrosecondPosition() / 1000000).intValue();
-            } else if(this.endOfMusic) {
-                return this.midiInfo.songLength;
+                return Long.valueOf(this.activeSequencer.getMicrosecondPosition() / 1000000).intValue();
+            } else if(!this.activeSequencer.isRunning() && this.pausedMicrosecond != null) {
+                return Long.valueOf(this.pausedMicrosecond / 1000000).intValue();
             } else {
                 return null;
             }
@@ -86,7 +88,36 @@ public class MusicPlayerMidiHandler {
 
     public void play() {
         if(this.activeSequencer != null && !this.activeSequencer.isRunning()) {
+            if(this.pausedTickPosition != null) {
+                this.activeSequencer.setTickPosition(this.pausedTickPosition);
+            }
+
+            if(this.lastTempoBPM != null) {
+                this.activeSequencer.setTempoInBPM(this.lastTempoBPM);
+            }
+
             this.activeSequencer.start();
+        }
+
+        this.pausedTickPosition = null;
+        this.pausedMicrosecond = null;
+    }
+
+    public void pause() {
+        if(this.activeSequencer != null && this.activeSequencer.isRunning()) {
+            this.pausedTickPosition = this.activeSequencer.getTickPosition();
+            this.pausedMicrosecond = this.activeSequencer.getMicrosecondPosition();;
+            this.activeSequencer.stop();
+        }
+    }
+    
+    public void stop() {
+        this.pausedTickPosition = null;
+        this.pausedMicrosecond = null;
+
+        if(this.activeSequencer != null) {
+            this.activeSequencer.stop();
+            this.activeSequencer.setTickPosition(0);
         }
     }
     
@@ -146,8 +177,7 @@ public class MusicPlayerMidiHandler {
                 @Override
                 public void meta(MetaMessage meta) {
                     if(MidiUtils.isMetaEndOfTrack(meta) && !activeSequencer.isRunning()) {
-                        activeReceiver.endOfTrack();
-                        endOfMusic = true;
+                        tile.stopMusic();
                     } else if(MidiUtils.isMetaTempo(meta) | (meta.getType() == 81 && meta.getData().length == 3)) {
                         byte[] data = meta.getData();
                         int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);

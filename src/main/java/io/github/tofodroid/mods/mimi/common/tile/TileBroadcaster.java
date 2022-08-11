@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
@@ -22,9 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileBroadcaster extends AContainerTile implements BlockEntityTicker<TileBroadcaster> {
-    ItemStack lastDisk = null;
-    Boolean wasPlaying = false;
-    Boolean endOfMusicFlag = false;
+    // Persist
+    public static final String BROADCAST_PUBLIC_TAG = "broadcast_public";
 
     public TileBroadcaster(BlockPos pos, BlockState state) {
         super(ModTiles.BROADCASTER, pos, state, 1);
@@ -51,7 +49,15 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
         String idString = "tile-music-player-" + this.getBlockPos().getX() + "-" + this.getBlockPos().getY() + "-" + this.getBlockPos().getZ();
         return UUID.nameUUIDFromBytes(idString.getBytes());
     }
+    public Boolean isPublicBroadcast() {
+        return this.getPersistentData().contains(BROADCAST_PUBLIC_TAG) && this.getPersistentData().getBoolean(BROADCAST_PUBLIC_TAG);
+    }
 
+    public void togglePublicBroadcast() {
+        this.getPersistentData().putBoolean(BROADCAST_PUBLIC_TAG, !this.isPublicBroadcast());
+        this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
+    }
+    
     @Override
     public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) {
         return stack.getItem().equals(ModItems.FLOPPYDISK) && ItemFloppyDisk.isWritten(stack);
@@ -67,75 +73,102 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
 		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
-    public void endOfMusic() {
-        this.endOfMusicFlag = true;
-    }
-
     @Override
     public void setItem(int i, ItemStack item) {
-        super.setItem(i, item);
-
         if(this.level instanceof ServerLevel && !this.level.isClientSide) {
-            BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 15);
-            this.level.setBlock(this.getBlockPos(), state, 3);
-            setChanged(this.level, this.getBlockPos(), state);
+            if(item.getItem() instanceof ItemFloppyDisk) {
+                // Unload existing disk, if present
+                if(!this.getActiveFloppyDiskStack().isEmpty() && !ItemStack.matches(this.getActiveFloppyDiskStack(), item)) {
+                    unloadDisk();
+                }
+
+                loadDisk(item);
+            } else {
+                unloadDisk();
+            }
+        }
+
+        super.setItem(i, item);
+    }
+
+    public void setUnpowered() {
+        BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 0);
+        this.level.setBlock(this.getBlockPos(), state, 3);
+        setChanged();
+    }
+
+    public void setPowered() {
+        BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 15);
+        this.level.setBlock(this.getBlockPos(), state, 3);
+        setChanged();
+    }
+
+    public void unloadDisk() {
+        this.setUnpowered();
+        ServerMusicPlayerMidiManager.removeMusicPlayer(this);
+    }
+
+    public void loadDisk(ItemStack stack) {
+        this.setPowered();        
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getOrAddMusicPlayer(this, ItemFloppyDisk.getMidiUrl(stack));
+        
+        if(handler != null) {
+            handler.play();
+        } else {
+            this.setUnpowered();
         }
     }
 
-    public void stopPlaying() {
-        ServerMusicPlayerMidiManager.removeMusicPlayer(this);
-        BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 0);
-        this.level.setBlock(this.getBlockPos(), state, 3);
-        setChanged(this.level, this.getBlockPos(), state);
+    public void playMusic() {
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+
+        if(handler != null) {
+            this.setPowered();
+            handler.play();
+        }
+    }
+
+    public void stopMusic() {
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+
+        if(handler != null) {
+            this.setUnpowered();
+            handler.stop();
+        }
+    }
+
+    public void pauseMusic() {
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+
+        if(handler != null) {
+            handler.pause();
+        }
     }
 
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
-        stopPlaying();
-        MIMIMod.LOGGER.info("Broadcaster unloaded. Stopping music.");
+        if(!this.level.isClientSide && this.level instanceof ServerLevel) {
+            ServerMusicPlayerMidiManager.removeMusicPlayer(this);
+        }
     }
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, TileBroadcaster self) {
         if(this.hasLevel() && !this.level.isClientSide && world instanceof ServerLevel) {
             // If removed, stop playing and return immediately
-            if(this.isRemoved() && this.wasPlaying) {
-                stopPlaying();
-                this.wasPlaying = false;
+            MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+            if(this.isRemoved() && handler != null) {
+                unloadDisk();
                 return;
             } else if(this.isRemoved()) {
                 return;
             }
-
-            // Otherwise, check if playing and tick accordingly
-            Boolean isPlaying = !(this.getActiveFloppyDiskStack().isEmpty() || this.endOfMusicFlag);
             
-            if(this.wasPlaying != isPlaying) {
-                state = state.setValue(BlockBroadcaster.POWER, isPlaying ? 15 : 0);
-                world.setBlock(pos, state, 3);
-                setChanged(world, pos, state);
+            // If loaded but has no handler, create one
+            if(this.hasActiveFloppyDisk() && handler == null) {
+                this.loadDisk(this.getActiveFloppyDiskStack());
             }
-
-            if(this.hasActiveFloppyDisk()) {
-                if(this.lastDisk != null && !this.lastDisk.equals(this.getActiveFloppyDiskStack())) {
-                    ServerMusicPlayerMidiManager.removeMusicPlayer(this);
-                    this.endOfMusicFlag = false;
-                }
-
-                if(!this.endOfMusicFlag) {
-                    MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getOrAddMusicPlayer(this, ItemFloppyDisk.getMidiUrl(this.lastDisk));
-                    if(handler != null && isPlaying) {
-                        handler.play();
-                    }
-                }
-            } else {
-                ServerMusicPlayerMidiManager.removeMusicPlayer(this);
-                this.endOfMusicFlag = false;
-            }
-
-            this.lastDisk = this.getActiveFloppyDiskStack();
-            this.wasPlaying = isPlaying;
         }
     }
 }

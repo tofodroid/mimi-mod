@@ -27,12 +27,14 @@ public class ServerMidiInfoPacket {
     public final byte[] channelMapping;
     public final Integer songLengthSeconds;
     public final Integer songPositionSeconds;
+    public final Boolean running;
     
-    public ServerMidiInfoPacket(STATUS_CODE status, byte[] channelMapping, Integer songLengthSeconds, Integer songPositionSeconds) {
+    public ServerMidiInfoPacket(STATUS_CODE status, byte[] channelMapping, Integer songLengthSeconds, Integer songPositionSeconds, Boolean running) {
         this.status = status != null ? status : STATUS_CODE.UNKNOWN;
         this.channelMapping = channelMapping != null ? channelMapping : new byte[]{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
         this.songLengthSeconds = songLengthSeconds != null ? songLengthSeconds : -1;
-        this.songPositionSeconds = songPositionSeconds != null ? songPositionSeconds : -1;
+        this.songPositionSeconds = songPositionSeconds != null ? songPositionSeconds : 0;
+        this.running = running != null ? running : false;
     }
     
     public static ServerMidiInfoPacket decodePacket(FriendlyByteBuf buf) {
@@ -53,8 +55,10 @@ public class ServerMidiInfoPacket {
             if(songPositionSeconds < 0) {
                 songPositionSeconds = null;
             }
+
+            Boolean running = buf.readBoolean();
             
-            return new ServerMidiInfoPacket(STATUS_CODE.fromByte(status), channelMapping, songLengthSeconds, songPositionSeconds);
+            return new ServerMidiInfoPacket(STATUS_CODE.fromByte(status), channelMapping, songLengthSeconds, songPositionSeconds, running);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ServerMidiInfoPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -69,5 +73,6 @@ public class ServerMidiInfoPacket {
         buf.writeByteArray(pkt.channelMapping);
         buf.writeInt(pkt.songLengthSeconds);
         buf.writeInt(pkt.songPositionSeconds);
+        buf.writeBoolean(pkt.running);
     }
 }
