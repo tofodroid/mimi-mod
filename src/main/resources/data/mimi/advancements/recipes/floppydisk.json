@@ -1,0 +1,32 @@
+{
+    "parent": "minecraft:recipes/root",
+    "rewards": {
+      "recipes": [
+        "mimi:floppydisk"
+      ]
+    },
+    "criteria": {
+      "has_note": {
+        "trigger": "minecraft:inventory_changed",
+        "conditions": {
+          "items": [
+            {
+              "item": "minecraft:copper_ingot"
+            }
+          ]
+        }
+      },
+      "has_the_recipe": {
+        "trigger": "minecraft:recipe_unlocked",
+        "conditions": {
+          "recipe": "mimi:floppydisk"
+        }
+      }
+    },
+    "requirements": [
+      [
+        "has_note",
+        "has_the_recipe"
+      ]
+    ]
+}
