@@ -3,8 +3,8 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.block.BlockMusicPlayer;
-import io.github.tofodroid.mods.mimi.common.container.ContainerMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
+import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
@@ -21,17 +21,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker<TileMusicPlayer> {
+public class TileBroadcaster extends AContainerTile implements BlockEntityTicker<TileBroadcaster> {
     ItemStack lastDisk = null;
     Boolean wasPlaying = false;
     Boolean endOfMusicFlag = false;
 
-    public TileMusicPlayer(BlockPos pos, BlockState state) {
-        super(ModTiles.MUSICPLAYER, pos, state, 1);
+    public TileBroadcaster(BlockPos pos, BlockState state) {
+        super(ModTiles.BROADCASTER, pos, state, 1);
         items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
     }
 
-    public static void doTick(Level world, BlockPos pos, BlockState state, TileMusicPlayer self) {
+    public static void doTick(Level world, BlockPos pos, BlockState state, TileBroadcaster self) {
         self.tick(world, pos, state, self);
     }
 
@@ -59,7 +59,7 @@ public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker
     
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
-        return new ContainerMusicPlayer(id, playerInventory, this.getBlockPos());
+        return new ContainerBroadcaster(id, playerInventory, this.getBlockPos());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker
         super.setItem(i, item);
 
         if(this.level instanceof ServerLevel && !this.level.isClientSide) {
-            BlockState state = this.getBlockState().setValue(BlockMusicPlayer.POWER, 15);
+            BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 15);
             this.level.setBlock(this.getBlockPos(), state, 3);
             setChanged(this.level, this.getBlockPos(), state);
         }
@@ -84,7 +84,7 @@ public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker
 
     public void stopPlaying() {
         ServerMusicPlayerMidiManager.removeMusicPlayer(this);
-        BlockState state = this.getBlockState().setValue(BlockMusicPlayer.POWER, 0);
+        BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 0);
         this.level.setBlock(this.getBlockPos(), state, 3);
         setChanged(this.level, this.getBlockPos(), state);
     }
@@ -93,11 +93,11 @@ public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
         stopPlaying();
-        MIMIMod.LOGGER.info("MusicPlayer Unloaded. Stopping music.");
+        MIMIMod.LOGGER.info("Broadcaster unloaded. Stopping music.");
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, TileMusicPlayer self) {
+    public void tick(Level world, BlockPos pos, BlockState state, TileBroadcaster self) {
         if(this.hasLevel() && !this.level.isClientSide && world instanceof ServerLevel) {
             // If removed, stop playing and return immediately
             if(this.isRemoved() && this.wasPlaying) {
@@ -112,7 +112,7 @@ public class TileMusicPlayer extends AContainerTile implements BlockEntityTicker
             Boolean isPlaying = !(this.getActiveFloppyDiskStack().isEmpty() || this.endOfMusicFlag);
             
             if(this.wasPlaying != isPlaying) {
-                state = state.setValue(BlockMusicPlayer.POWER, isPlaying ? 15 : 0);
+                state = state.setValue(BlockBroadcaster.POWER, isPlaying ? 15 : 0);
                 world.setBlock(pos, state, 3);
                 setChanged(world, pos, state);
             }

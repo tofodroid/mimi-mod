@@ -2,9 +2,9 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.function.Supplier;
 
-import io.github.tofodroid.mods.mimi.client.gui.GuiMusicPlayerContainerScreen;
-import io.github.tofodroid.mods.mimi.common.container.ContainerMusicPlayer;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.client.gui.GuiBroadcasterContainerScreen;
+import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraft.client.Minecraft;
@@ -33,8 +33,8 @@ public class ServerMidiInfoPacketHandler {
             null
         );
 
-        if(sender.containerMenu != null && sender.containerMenu instanceof ContainerMusicPlayer) {
-            TileMusicPlayer playerTile = ((ContainerMusicPlayer)sender.containerMenu).getMusicPlayerTile();
+        if(sender.containerMenu != null && sender.containerMenu instanceof ContainerBroadcaster) {
+            TileBroadcaster playerTile = ((ContainerBroadcaster)sender.containerMenu).getBroadcasterTile();
             MusicPlayerMidiHandler tileHandler = ServerMusicPlayerMidiManager.getMusicPlayer(playerTile);
 
             if(playerTile != null && tileHandler != null) {
@@ -62,8 +62,8 @@ public class ServerMidiInfoPacketHandler {
     @OnlyIn(Dist.CLIENT)
     @SuppressWarnings("resource")
     public static void handlePacketClient(final ServerMidiInfoPacket message) {
-        if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiMusicPlayerContainerScreen) {
-            ((GuiMusicPlayerContainerScreen)Minecraft.getInstance().screen).handleMidiInfoPacket(message);
+        if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiBroadcasterContainerScreen) {
+            ((GuiBroadcasterContainerScreen)Minecraft.getInstance().screen).handleMidiInfoPacket(message);
         }
     }
 }

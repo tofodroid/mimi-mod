@@ -1,7 +1,7 @@
 {
     "variants": {
         "": {
-            "model": "mimi:block/musicplayer"
+            "model": "mimi:block/broadcaster"
         }
     }
 }

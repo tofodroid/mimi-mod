@@ -10,7 +10,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 // 1. Default MIDI Input Device
 
 public class CommonConfig {
-    public static final String MUSIC_PLAYER_CATEGORY_NAME = "Music Player";
+    public static final String MUSIC_PLAYER_CATEGORY_NAME = "Server Music";
 
     public ForgeConfigSpec.IntValue serverMusicCacheSize;
     public ForgeConfigSpec.BooleanValue allowWebMidi;

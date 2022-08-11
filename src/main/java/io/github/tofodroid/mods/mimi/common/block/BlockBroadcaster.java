@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,11 +22,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 
-public class BlockMusicPlayer extends AContainerBlock<TileMusicPlayer> {
+public class BlockBroadcaster extends AContainerBlock<TileBroadcaster> {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
-    public static final String REGISTRY_NAME = "musicplayer";
+    public static final String REGISTRY_NAME = "broadcaster";
 
-    public BlockMusicPlayer() {
+    public BlockBroadcaster() {
         super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
     }
@@ -36,7 +36,7 @@ public class BlockMusicPlayer extends AContainerBlock<TileMusicPlayer> {
         if(!worldIn.isClientSide && worldIn instanceof ServerLevel) {
             if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
                 return;
-            TileMusicPlayer tile = getTileForBlock(worldIn, pos);
+            TileBroadcaster tile = getTileForBlock(worldIn, pos);
             ServerMusicPlayerMidiManager.removeMusicPlayer(tile);
         }
 
@@ -45,12 +45,12 @@ public class BlockMusicPlayer extends AContainerBlock<TileMusicPlayer> {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ModTiles.MUSICPLAYER, TileMusicPlayer::doTick);
+        return createTickerHelper(type, ModTiles.BROADCASTER, TileBroadcaster::doTick);
     }
     
     @Override
-    public BlockEntityType<TileMusicPlayer> getTileType() {
-        return ModTiles.MUSICPLAYER;
+    public BlockEntityType<TileBroadcaster> getTileType() {
+        return ModTiles.BROADCASTER;
     }
     
     @Override

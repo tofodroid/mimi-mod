@@ -29,7 +29,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -42,7 +42,7 @@ public abstract class ServerMusicPlayerMidiManager {
     protected static File SERVER_SEQUENCE_FOLDER = null;
 
     // Music Player Cache
-    public static MusicPlayerMidiHandler getOrAddMusicPlayer(TileMusicPlayer tile, String midiUrl) {
+    public static MusicPlayerMidiHandler getOrAddMusicPlayer(TileBroadcaster tile, String midiUrl) {
         MusicPlayerMidiHandler handler = getMusicPlayer(tile);
 
         if(handler == null) {
@@ -54,14 +54,14 @@ public abstract class ServerMusicPlayerMidiManager {
         return handler;
     }
     
-    public static MusicPlayerMidiHandler getMusicPlayer(TileMusicPlayer tile) {
+    public static MusicPlayerMidiHandler getMusicPlayer(TileBroadcaster tile) {
         if(tile != null) { 
             return MUSIC_PLAYER_MAP.get(tile.getMusicPlayerId());
         }
         return null;
     }
 
-    public static void removeMusicPlayer(TileMusicPlayer tile) {
+    public static void removeMusicPlayer(TileBroadcaster tile) {
         MusicPlayerMidiHandler handler = getMusicPlayer(tile);
 
         if(handler != null) {

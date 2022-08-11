@@ -14,24 +14,24 @@ import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 
-public class ContainerMusicPlayer extends APlayerInventoryContainer {
+public class ContainerBroadcaster extends APlayerInventoryContainer {
 	private static final int FLOPPY_SLOT_X = 14;
 	private static final int FLOPPY_SLOT_Y = 189;
 
 	protected IItemHandler targetInventory;
 	private final BlockPos tilePos;
 
-	public ContainerMusicPlayer(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
-		super(ModContainers.MUSICPLAYER, id, playerInventory);
+	public ContainerBroadcaster(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
+		super(ModContainers.BROADCASTER, id, playerInventory);
 		tilePos = extraData.readBlockPos();
 		this.targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		this.addSlot(buildFloppySlot());
 	}
 
-	public ContainerMusicPlayer(int id, Inventory playerInventory, BlockPos pos) {
-		super(ModContainers.MUSICPLAYER, id, playerInventory);
+	public ContainerBroadcaster(int id, Inventory playerInventory, BlockPos pos) {
+		super(ModContainers.BROADCASTER, id, playerInventory);
 		tilePos = pos;
 		this.targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
 		this.addSlot(buildFloppySlot());
@@ -49,11 +49,11 @@ public class ContainerMusicPlayer extends APlayerInventoryContainer {
 		return null;
 	}
 
-	public TileMusicPlayer getMusicPlayerTile() {
+	public TileBroadcaster getBroadcasterTile() {
 		BlockEntity ent = playerInventory.player.level.getBlockEntity(tilePos);
 
-		if(ent != null && ent instanceof TileMusicPlayer) {
-			return (TileMusicPlayer)ent;
+		if(ent != null && ent instanceof TileBroadcaster) {
+			return (TileBroadcaster)ent;
 		}
 		return null;
 	}

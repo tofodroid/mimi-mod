@@ -6,15 +6,15 @@ import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class MusicPlayerReceiver extends MidiInputReceiver {
-    protected TileMusicPlayer tile;
+    protected TileBroadcaster tile;
 
-    public MusicPlayerReceiver(TileMusicPlayer tile) {
+    public MusicPlayerReceiver(TileBroadcaster tile) {
         super();
         this.tile = tile;
     }

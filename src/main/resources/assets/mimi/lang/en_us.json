@@ -103,5 +103,6 @@
   "block.mimi.edrums": "E-Drums (Standard)",
   "block.mimi.edrums2": "E-Drums (TR-808)",
   "block.mimi.tuningtable": "Tuning Table",
-  "block.mimi.diskwriter": "Disk Writer"
+  "block.mimi.diskwriter": "Disk Writer",
+  "block.mimi.broadcaster": "Broadcaster"
 }

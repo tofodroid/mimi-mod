@@ -2,12 +2,12 @@
     "type": "minecraft:block",
     "pools": [
         {
-            "name": "musicplayer",
+            "name": "broadcaster",
             "rolls": 1,
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "mimi:musicplayer"
+                    "name": "mimi:broadcaster"
                 }
             ],
             "conditions": [

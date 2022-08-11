@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "Web Cache",
-            "text": "When web MIDI files are enabled and players play a Floppy Disk in a Music Player block the server downloads the MIDI files from the disk URL and caches it for future plays.$(br2)Cached MIDI files are saved in your Minecraft instance $(#0046ff)config$() folder under $(#0046ff)mimi/music_cache$().$(br2)Cached files can be deleted at any time as long as the server is not running.$(br2)"
+            "text": "When web MIDI files are enabled and players play a Floppy Disk in a Broadcaster block the server downloads the MIDI files from the disk URL and caches it for future plays.$(br2)Cached MIDI files are saved in your Minecraft instance $(#0046ff)config$() folder under $(#0046ff)mimi/music_cache$().$(br2)Cached files can be deleted at any time as long as the server is not running.$(br2)"
         },
         {
             "type": "text",

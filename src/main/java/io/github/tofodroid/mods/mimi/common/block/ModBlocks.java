@@ -27,7 +27,7 @@ public class ModBlocks {
 
     // Other Blocks
     public static final RegistryObject<BlockDiskWriter> DISKWRITER = BLOCKS.register(BlockDiskWriter.REGISTRY_NAME, () -> new BlockDiskWriter());
-    public static final RegistryObject<BlockMusicPlayer> MUSICPLAYER = BLOCKS.register(BlockMusicPlayer.REGISTRY_NAME, () -> new BlockMusicPlayer());
+    public static final RegistryObject<BlockBroadcaster> BROADCASTER = BLOCKS.register(BlockBroadcaster.REGISTRY_NAME, () -> new BlockBroadcaster());
 
     // Instrument Blocks
     protected static List<RegistryObject<BlockInstrument>> INSTRUMENTS = buildInstruments();

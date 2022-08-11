@@ -16,7 +16,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockDiskWriter;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.BlockListener;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
-import io.github.tofodroid.mods.mimi.common.block.BlockMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
@@ -42,7 +42,7 @@ public final class ModItems {
     // Blocks - Other
     public static BlockItem TUNINGTABLE;
     public static BlockItem DISKWRITER;
-    public static BlockItem MUSICPLAYER;
+    public static BlockItem BROADCASTER;
 
     public static MIMIModItemGroup ITEM_GROUP;
 
@@ -79,8 +79,8 @@ public final class ModItems {
         DISKWRITER = new BlockItem(ModBlocks.DISKWRITER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
         event.register(BlockDiskWriter.REGISTRY_NAME, DISKWRITER);
 
-        MUSICPLAYER = new BlockItem(ModBlocks.MUSICPLAYER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
-        event.register(BlockMusicPlayer.REGISTRY_NAME, MUSICPLAYER);
+        BROADCASTER = new BlockItem(ModBlocks.BROADCASTER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64));
+        event.register(BlockBroadcaster.REGISTRY_NAME, BROADCASTER);
 
         // Instrument Items
         INSTRUMENT_ITEMS = buildInstruments();

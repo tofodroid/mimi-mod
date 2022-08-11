@@ -6,7 +6,7 @@ import java.util.Map;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import io.github.tofodroid.mods.mimi.common.container.ContainerMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -18,7 +18,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-public class GuiMusicPlayerContainerScreen extends BaseContainerGui<ContainerMusicPlayer> {
+public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBroadcaster> {
     private final Integer SYNC_EVERY_TICKS = 10;
     private ServerMidiInfoPacket midiInfo = null;
     private Map<Integer,String> instrumentMap = null;
@@ -31,7 +31,7 @@ public class GuiMusicPlayerContainerScreen extends BaseContainerGui<ContainerMus
     private static final Integer SLIDE_MAX_X = 165;
     private static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
 
-    public GuiMusicPlayerContainerScreen(ContainerMusicPlayer container, Inventory inv, Component textComponent) {
+    public GuiBroadcasterContainerScreen(ContainerBroadcaster container, Inventory inv, Component textComponent) {
         super(container, inv, 350, 212, 350, "textures/gui/container_music_player.png", textComponent);
         resetMidiInfo();
         this.lastDiskStack = this.menu.getActiveFloppyStack();

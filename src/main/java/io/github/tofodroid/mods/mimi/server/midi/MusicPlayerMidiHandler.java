@@ -12,7 +12,7 @@ import io.github.tofodroid.com.sun.media.sound.RealTimeSequencerProvider;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 
 public class MusicPlayerMidiHandler {
     private Integer lastTempoBPM;
@@ -27,7 +27,7 @@ public class MusicPlayerMidiHandler {
     private MusicPlayerReceiver activeReceiver;
     private Transmitter activeTransmitter;
 
-    public MusicPlayerMidiHandler(TileMusicPlayer tile, Sequence sequence, ServerMidiInfoPacket.STATUS_CODE errorStatus) {
+    public MusicPlayerMidiHandler(TileBroadcaster tile, Sequence sequence, ServerMidiInfoPacket.STATUS_CODE errorStatus) {
         this.activeSequence = sequence;
 
         if(errorStatus != null) {
@@ -137,7 +137,7 @@ public class MusicPlayerMidiHandler {
         return 120;        
     }
     
-    protected Boolean createSequencer(TileMusicPlayer tile) {
+    protected Boolean createSequencer(TileBroadcaster tile) {
         try {
             RealTimeSequencerProvider provider = new RealTimeSequencerProvider();
             this.activeSequencer = (Sequencer)provider.getDevice(provider.getDeviceInfo()[0]);
