@@ -12,7 +12,7 @@
         {
             "type": "text",
             "title": "Usage",
-            "text": "To use the Broadcaster insert a written Floppy Disk in the disk slot. Once the Floppy Disk is inserted the Broadcaster will attempt to load the MIDI file from the Disk MIDI URL.$(br2)If the MIDI file loads successfully it will begin transmitting just like if it were coming from your transmitter.$(br2)The Broadcaster screen will show the instruments that the file has assigned to each MIDI Channel just like the Transmitter.$(br2)"
+            "text": "To use the Broadcaster insert a written Floppy Disk in the disk slot. Once the Floppy Disk is inserted the Broadcaster will attempt to load the MIDI file from the Disk MIDI URL.$(br2)If the MIDI file loads successfully it will begin transmitting just like if it were coming from your FileCaster.$(br2)The Broadcaster screen will show the instruments that the file has assigned to each MIDI Channel just like the FileCaster.$(br2)"
         },
         {
             "type": "text",

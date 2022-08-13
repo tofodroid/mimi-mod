@@ -2,7 +2,7 @@
   "key.categories.mimi": "MIMI - Musical Instrument Minecraft Interface",
   "key.mimi.midi.settings": "Open MIDI Input Device Configuration GUI",
   "key.mimi.midi.alloff": "Stop all currently playing MIDI notes",
-  "key.mimi.midi.playlist": "Open Transmitter GUI when Transmitter on Hotbar",
+  "key.mimi.midi.playlist": "Open FileCaster GUI when FileCaster on Hotbar",
   "key.mimi.midi.gui.main": "Open Instrument GUI for instrument in Main Hand",
   "key.mimi.midi.gui.off": "Open Instrument GUI for instrument in Off Hand",
   "key.mimi.midi.gui.seat": "Open Instrument GUI for instrument seated at",

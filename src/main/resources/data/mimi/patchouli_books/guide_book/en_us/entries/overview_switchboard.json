@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "In order to connect an instrument or redstone-enabled block to a Transmitter or configure other settings you must insert a Switchboard.$(br2)The Switchboard stores all configured settings and can then be moved between instruments and blocks to quickly transfer settings between them."
+            "text": "In order to connect an instrument or redstone-enabled block to a FileCaster or configure other settings you must insert a Switchboard.$(br2)The Switchboard stores all configured settings and can then be moved between instruments and blocks to quickly transfer settings between them."
         },
         {
             "type": "crafting",

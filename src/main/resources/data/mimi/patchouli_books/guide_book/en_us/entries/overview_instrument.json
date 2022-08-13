@@ -32,7 +32,7 @@
         {
             "type": "text",
             "title": "The Instrument GUI",
-            "text": "The lower half of the GUI shows your current inventory and includes a slot to insert a $(l:overview_switchboard)Switchboard$() into the current instrument.$(br2)Inserting a Switchboard allows you to connect the instrument to a $(l:overview_transmitter)Transmitter$() or enable input from a System MIDI Input device."
+            "text": "The lower half of the GUI shows your current inventory and includes a slot to insert a $(l:overview_switchboard)Switchboard$() into the current instrument.$(br2)Inserting a Switchboard allows you to connect the instrument to a $(l:overview_filecaster)FileCaster$() or enable input from a System MIDI Input device."
         },
         {
             "type": "text",

@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "The Mechanical Maestro is a block which, when powered by Redstone and a Switchboard is inserted, can receive notes from a Linked Transmitter within range (16 blocks) and play an inserted Instrument accordingly."
+            "text": "The Mechanical Maestro is a block which, when powered by Redstone and a Switchboard is inserted, can receive notes from a Linked FileCaster within range (16 blocks) and play an inserted Instrument accordingly."
         },
         {
             "type": "text",
@@ -20,7 +20,7 @@
         {
             "type": "text",
             "title": "Switchboard Properties",
-            "text": "Mechanical Maestros use the following $(l:switchboard_properties)Switchboard Properties$():$(br2)- Linked Transmitter$(br)- MIDI Channels"
+            "text": "Mechanical Maestros use the following $(l:switchboard_properties)Switchboard Properties$():$(br2)- Linked FileCaster$(br)- MIDI Channels"
         }
     ],
     "sortnum": 2

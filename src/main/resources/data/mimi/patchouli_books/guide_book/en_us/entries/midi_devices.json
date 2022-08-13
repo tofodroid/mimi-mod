@@ -1,6 +1,6 @@
 {
     "name": "Devices",
-    "icon": "mimi:transmitter",
+    "icon": "mimi:filecaster",
     "category": "mimi:midi",
     "pages": [
         {

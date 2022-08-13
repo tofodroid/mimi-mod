@@ -1,6 +1,6 @@
 {
     "name": "Tools",
-    "icon": "mimi:transmitter",
+    "icon": "mimi:filecaster",
     "category": "mimi:recipes",
     "pages": [
         {
@@ -9,7 +9,7 @@
         },
         {
             "type": "crafting",
-            "recipe": "mimi:transmitter"
+            "recipe": "mimi:filecaster"
         },
         {
             "type": "crafting",

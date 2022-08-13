@@ -1,6 +1,6 @@
 {
 	"name": "Floppy Disks",
-	"description": "Don't have MIDI files on your computer to use with the transmitter?$(br2)Want music to keep playing when you're not around?$(br2)MIMI supports server-side playing of MIDI files using Floppy Disks and the Broadcaster block.",
+	"description": "Don't have MIDI files on your computer to use with the FileCaster?$(br2)Want music to keep playing when you're not around?$(br2)MIMI supports server-side playing of MIDI files using Floppy Disks and the Broadcaster block.",
 	"icon": "mimi:floppydisk",
 	"sortnum": 5
 }

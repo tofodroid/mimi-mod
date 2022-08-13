@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "text",
-            "text": "The Receiver is a block which, when a Switchboard is inserted, can receive notes from a Linked Transmitter within range (16 blocks) and output a redstone signal if the note matches the configured filter criteria."
+            "text": "The Receiver is a block which, when a Switchboard is inserted, can receive notes from a Linked FileCaster within range (16 blocks) and output a redstone signal if the note matches the configured filter criteria."
         },
         {
             "type": "text",
@@ -15,7 +15,7 @@
         {
             "type": "text",
             "title": "Switchboard Properties",
-            "text": "Receivers use the following $(l:switchboard_properties)Switchboard Properties$():$(br2)- Linked Transmitter$(br)- MIDI Channels$(br)- Filter Note"
+            "text": "Receivers use the following $(l:switchboard_properties)Switchboard Properties$():$(br2)- Linked FileCaster$(br)- MIDI Channels$(br)- Filter Note"
         }
     ],
     "sortnum": 1

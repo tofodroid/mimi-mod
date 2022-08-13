@@ -1,6 +1,6 @@
 {
 	"name": "System MIDI Devices",
-	"description": "In addition to the Instrument GUI and MIDI Transmitter there is another way to play MIMI instruments - using a System MIDI Input Device.",
+	"description": "In addition to the Instrument GUI and MIDI FileCaster there is another way to play MIMI instruments - using a System MIDI Input Device.",
 	"icon": "mimi:synlead",
 	"sortnum": 7
 }

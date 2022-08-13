@@ -20,7 +20,7 @@
         {
             "type": "text",
             "title": "Playing without GUI",
-            "text": "Block instruments can also be played without the GUI being open by Linking a Transmitter or enabling System MIDI Input Device Input on the Instrument's Switchboard. Note that you must still be seated at the Block Instrument to play it using a Transmitter or System MIDI Input Device."
+            "text": "Block instruments can also be played without the GUI being open by Linking a FileCaster or enabling System MIDI Input Device Input on the Instrument's Switchboard. Note that you must still be seated at the Block Instrument to play it using a FileCaster or System MIDI Input Device."
         }
     ],
     "sortnum": 3

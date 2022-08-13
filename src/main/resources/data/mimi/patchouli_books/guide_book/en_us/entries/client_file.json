@@ -10,7 +10,7 @@
         {
             "type": "text",
             "title": "MIDI Playlist Folder",
-            "text": "$(l)Param:$() playlistFolderPath$(br)$(l)Type:$() Folder Path$(br)$(l)Default:$() unset$(br2)This parameter stores the default MIDI Playlist Folder to load into the Transmitter GUI when the game starts. This can be set using the in-game controls on the Transmitter GUI or set directly in the config file."
+            "text": "$(l)Param:$() playlistFolderPath$(br)$(l)Type:$() Folder Path$(br)$(l)Default:$() unset$(br2)This parameter stores the default MIDI Playlist Folder to load into the FileCaster GUI when the game starts. This can be set using the in-game controls on the FileCaster GUI or set directly in the config file."
         },
         {
             "type": "text",

@@ -1,16 +1,16 @@
 {
-    "name": "Transmitter GUI",
+    "name": "FileCaster GUI",
     "icon": "minecraft:music_disc_13",
-    "category": "mimi:transmitter",
+    "category": "mimi:filecaster",
     "pages": [
         {
             "type": "text",
-            "text": "The Transmitter GUI can be accessed either by right clicking while holding a Transmitter item or by pressing the configured Transmitter GUI keybind when at least one Transmitter is on your hotbar. $(br2)The current keybind is: $(l)$(k:key.mimi.midi.playlist)$()"
+            "text": "The FileCaster GUI can be accessed either by right clicking while holding a FileCaster item or by pressing the configured FileCaster GUI keybind when at least one FileCaster is on your hotbar. $(br2)The current keybind is: $(l)$(k:key.mimi.midi.playlist)$()"
         },
         {
             "type": "text",
             "title": "Playlist Folder",
-            "text": "The top section of the Transmitter GUI allows to specify which folder on your system should be loaded into the playlist. If you type a valid folder path the text will appear white, otherwise it will appear red.$(br2)Once a folder has been entered press the open button to load the folder into the playlist, replacing any existing playlist if one is loaded."
+            "text": "The top section of the FileCaster GUI allows to specify which folder on your system should be loaded into the playlist. If you type a valid folder path the text will appear white, otherwise it will appear red.$(br2)Once a folder has been entered press the open button to load the folder into the playlist, replacing any existing playlist if one is loaded."
         },
         {
             "type": "text",
@@ -30,17 +30,17 @@
         {
             "type": "text",
             "title": "Media Controls",
-            "text": "The bottom left section of the Transmitter GUI contains the media playback controls which allow you to perform standard media actions on the loaded playlist such as: Play, Pause, Stop, Skip, and Reverse Skip.$(br2)In the bottom right of the GUI you will see the song progress slider which shows the current playback position of the selected song. Note that at this time you cannot interact with the slider."
+            "text": "The bottom left section of the FileCaster GUI contains the media playback controls which allow you to perform standard media actions on the loaded playlist such as: Play, Pause, Stop, Skip, and Reverse Skip.$(br2)In the bottom right of the GUI you will see the song progress slider which shows the current playback position of the selected song. Note that at this time you cannot interact with the slider."
         },
         {
             "type": "text",
             "title": "Loop and Shuffle",
-            "text": "The bottom middle section of the Transmitter GUI contains the toggle buttons for the playlist loop modes (loop single, loop all, and loop none) and playlist shuffle mode.$(br2)The buttons themselves toggle between the different available modes for each setting and the screen to the right of each button shows the currently selected mode."
+            "text": "The bottom middle section of the FileCaster GUI contains the toggle buttons for the playlist loop modes (loop single, loop all, and loop none) and playlist shuffle mode.$(br2)The buttons themselves toggle between the different available modes for each setting and the screen to the right of each button shows the currently selected mode."
         },
         {
             "type": "text",
             "title": "Transmit Mode",
-            "text": "The bottom middle section of the Transmitter GUI also contains the toggle button for the $(l:transmitter_modes)Transmit Modes$(/l).$(br2)Pressing the button cycles between the available modes and the screen to the right shows the current mode (P = Public, L = Linked, S = Self)."
+            "text": "The bottom middle section of the FileCaster GUI also contains the toggle button for the $(l:FileCaster_modes)Transmit Modes$(/l).$(br2)Pressing the button cycles between the available modes and the screen to the right shows the current mode (P = Public, L = Linked, S = Self)."
         }
     ],
     "sortnum": 1

@@ -1,0 +1,33 @@
+{
+    "name": "Using the FileCaster",
+    "icon": "mimi:filecaster",
+    "category": "mimi:overview",
+    "pages": [
+        {
+            "type": "text",
+            "text": "Now that you have an instrument and switchboard created let's play a song! MIMI provides the MIDI FileCaster item which allows you to load MIDI files from your system into a playlist to transmit to nearby instruments including your own."
+        },
+        {
+            "type": "crafting",
+            "title": "Crafting and Opening",
+            "recipe": "mimi:filecaster",
+            "text": "$(br)Once you've crafted the MIDI FileCaster as shown above simply hold it in your main hand and right click to open the FileCaster GUI."
+        },
+        {
+            "type": "text",
+            "title": "The FileCaster GUI",
+            "text": "You should now see the FileCaster GUI on your screen.$(br2)This GUI lets you select a folder on your system from which to load MIDI files and then displays all loaded files in a playlist. Use the media control buttons in the bottom left to control playback of the playlist."
+        },
+        {
+            "type": "text",
+            "title": "The FileCaster GUI",
+            "text": "The buttons to the right of the media controls allow you to toggle the song loop mode (loop single, loop all, and no loop), toggle shuffle on and off, and toggle the Transmit Mode (public, linked, and self).$(br2)The area below the playlist shows the instrument-channel-mapping for the current song which can help give you an idea of which MIDI channels you should enable on your instrument(s)."
+        },
+        {
+            "type": "text",
+            "title": "Playing with Others",
+            "text": "To play songs with other players set your MIDI FileCaster transmit mode to public. This will allow any instrument within 16 blocks of you to receive the notes you are transmitting if they have a Switchboard inserted with 'Public FileCasters' set as the Linked FileCaster and the relevant channels enabled."
+        }
+    ],
+    "sortnum": 2
+}

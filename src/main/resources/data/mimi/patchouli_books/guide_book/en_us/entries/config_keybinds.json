@@ -19,8 +19,8 @@
         },
         {
             "type": "text",
-            "title": "Transmitter GUI",
-            "text": "Current keybind: $(l)$(k:key.mimi.midi.playlist)$()$(br2)Pressing this key opens the $(l:transmitter_gui)Transmitter GUI$(/l) if you have at least one $(l:transmitter_usage)MIDI Transmitter$(/l) on your hotbar."
+            "title": "FileCaster GUI",
+            "text": "Current keybind: $(l)$(k:key.mimi.midi.playlist)$()$(br2)Pressing this key opens the $(l:filecaster_gui)FileCaster GUI$(/l) if you have at least one $(l:filecaster_usage)MIDI FileCaster$(/l) on your hotbar."
         },
         {
             "type": "text",
