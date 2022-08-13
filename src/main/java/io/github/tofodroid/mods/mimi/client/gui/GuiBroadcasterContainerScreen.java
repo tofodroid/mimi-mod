@@ -33,6 +33,7 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
     private static final Vector3f PLAY_PAUSE_BUTTON = new Vector3f(48,190,0);
     private static final Vector3f TRANSMIT_BUTTON = new Vector3f(145,190,0);
     private static final Vector3f TRANSMIT_SCREEN = new Vector3f(163,191,0);
+    private static final Vector3f TRANSMIT_LIGHT = new Vector3f(338,33,0);
 
     // Time Slider
     private static final Integer SLIDE_Y = 189;
@@ -66,9 +67,9 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(clickedBox(imouseX, imouseY, STOP_BUTTON) && this.midiInfo != null) {
+        if(this.midiInfo != null && clickedBox(imouseX, imouseY, STOP_BUTTON)) {
             NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.STOP));
-        } else if(clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON) && this.midiInfo != null) {
+        } else if(this.midiInfo != null && clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
             if(this.midiInfo.running) { 
                 NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.PAUSE));
             } else {
@@ -106,6 +107,11 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         
         // Transmit Screen    
         blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.menu.getBroadcasterTile().isPublicBroadcast().compareTo(false)), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+
+        // Transmit Light
+        if(this.menu.getBroadcasterTile().isPowered()) {
+            blit(matrixStack, START_X + Float.valueOf(TRANSMIT_LIGHT.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_LIGHT.y()).intValue(), this.getBlitOffset(), 8, 225, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
+        }
 
         // Time Slider
         if(this.menu.hasActiveFloppy() && this.midiInfo != null && STATUS_CODE.INFO.equals(this.midiInfo.status)) {

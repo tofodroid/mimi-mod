@@ -77,7 +77,7 @@ public class MidiFileInfo {
         }
 
         for(int i = 0; i < 16; i++) {
-            if(channelMap[i] > 0) {
+            if(channelMap[i] >= 0) {
                 if(i != 9) {
                     mapping.put(i, MidiPatchName.getForPatch(Byte.valueOf(channelMap[i]).intValue()).name);
                 } else {

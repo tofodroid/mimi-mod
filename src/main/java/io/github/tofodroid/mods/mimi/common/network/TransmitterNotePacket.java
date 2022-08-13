@@ -5,7 +5,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class TransmitterNotePacket {
-    public static final Byte NO_CHANNEL = Byte.MAX_VALUE;
+    public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
     
     public final Byte channel;

@@ -6,6 +6,9 @@ import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraft.core.BlockPos;
@@ -49,13 +52,44 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
         String idString = "tile-music-player-" + this.getBlockPos().getX() + "-" + this.getBlockPos().getY() + "-" + this.getBlockPos().getZ();
         return UUID.nameUUIDFromBytes(idString.getBytes());
     }
+
     public Boolean isPublicBroadcast() {
         return this.getPersistentData().contains(BROADCAST_PUBLIC_TAG) && this.getPersistentData().getBoolean(BROADCAST_PUBLIC_TAG);
     }
 
     public void togglePublicBroadcast() {
-        this.getPersistentData().putBoolean(BROADCAST_PUBLIC_TAG, !this.isPublicBroadcast());
-        this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
+        if(this.hasLevel() && !this.level.isClientSide && this.level instanceof ServerLevel) {
+            ServerMusicPlayerMidiManager.getMusicPlayer(this);
+            MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+
+            // Send ALL NOTES OFF for ALL CHANNELS if playing
+            if(handler != null && handler.isPlaying()) {
+                TransmitterNotePacket offPacket = TransmitterNotePacket.createAllNotesOffPacket(
+                    TransmitterNotePacket.ALL_CHANNELS, 
+                    this.getTransmitMode()
+                );
+                ((ServerLevel)this.level).getServer().execute(() -> {
+                    TransmitterNotePacketHandler.handlePacketServer(
+                        offPacket, 
+                        this.getBlockPos(), 
+                        (ServerLevel)this.level, 
+                        this.getMusicPlayerId(), 
+                        null
+                    );
+                });
+            }
+
+            this.getPersistentData().putBoolean(BROADCAST_PUBLIC_TAG, !this.isPublicBroadcast());
+            this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
+        }
+    }
+    
+    public TransmitMode getTransmitMode() {
+        return this.isPublicBroadcast() ? TransmitMode.PUBLIC : TransmitMode.LINKED;
+    }
+
+    public Boolean isPowered() {
+        return this.getBlockState().getValue(BlockBroadcaster.POWER) > 0;
     }
     
     @Override
@@ -90,6 +124,19 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
 
         super.setItem(i, item);
     }
+
+    @Override
+    public ItemStack removeItem(int i, int count) {
+        unloadDisk();
+        return super.removeItem(i, count);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int i) {
+        unloadDisk();
+        return super.removeItemNoUpdate(i);
+    }
+
 
     public void setUnpowered() {
         BlockState state = this.getBlockState().setValue(BlockBroadcaster.POWER, 0);

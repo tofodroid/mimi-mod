@@ -5,7 +5,6 @@ import javax.sound.midi.ShortMessage;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -31,13 +30,9 @@ public class MusicPlayerReceiver extends MidiInputReceiver {
             this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         }
     }
-
-    public TransmitMode getTransmitMode() {
-        return this.tile.isPublicBroadcast() ? TransmitMode.PUBLIC : TransmitMode.LINKED;
-    }
     
     public void sendTransmitterNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
-        TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, velocity, getTransmitMode());
+        TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, velocity, tile.getTransmitMode());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
             TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), null);
@@ -45,7 +40,7 @@ public class MusicPlayerReceiver extends MidiInputReceiver {
     }
     
     public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
-        TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), getTransmitMode());
+        TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), tile.getTransmitMode());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
             TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), null);
@@ -53,7 +48,7 @@ public class MusicPlayerReceiver extends MidiInputReceiver {
     }
 
     public void sendTransmitterAllNotesOffPacket(Byte channel) {
-        TransmitterNotePacket packet = TransmitterNotePacket.createAllNotesOffPacket(channel, getTransmitMode());
+        TransmitterNotePacket packet = TransmitterNotePacket.createAllNotesOffPacket(channel, tile.getTransmitMode());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
             TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), null);
@@ -61,7 +56,7 @@ public class MusicPlayerReceiver extends MidiInputReceiver {
     }
 
     public void sendTransmitterControllerPacket(Byte channel, Byte controller, Byte value) {
-        TransmitterNotePacket packet = TransmitterNotePacket.createControllerPacket(channel, controller, value, getTransmitMode());
+        TransmitterNotePacket packet = TransmitterNotePacket.createControllerPacket(channel, controller, value, tile.getTransmitMode());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
             TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), null);

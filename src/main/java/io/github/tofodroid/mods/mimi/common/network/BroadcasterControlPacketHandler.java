@@ -4,8 +4,6 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -37,18 +35,6 @@ public class BroadcasterControlPacketHandler {
                         break;
                     case TOGGLE_PUBLIC:
                         container.getBroadcasterTile().togglePublicBroadcast();
-                        TransmitterNotePacketHandler.handlePacketServer(
-                            TransmitterNotePacket.createAllNotesOffPacket(
-                                TransmitterNotePacket.NO_CHANNEL, 
-                                // Flip public broadcast value since we just toggled it
-                                container.getBroadcasterTile().isPublicBroadcast() 
-                                    ? TransmitMode.LINKED : TransmitMode.PUBLIC
-                            ), 
-                            container.getBroadcasterTile().getBlockPos(), 
-                            (ServerLevel)container.getBroadcasterTile().getLevel(), 
-                            container.getBroadcasterTile().getMusicPlayerId(), 
-                            null
-                        );
                         break;
                     default:
                         break;

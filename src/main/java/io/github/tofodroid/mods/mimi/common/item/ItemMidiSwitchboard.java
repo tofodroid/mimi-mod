@@ -24,8 +24,8 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 
 public class ItemMidiSwitchboard extends Item {
+    public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     public static final String REGISTRY_NAME = "switchboard";
-
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
@@ -188,7 +188,7 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public static Boolean isChannelEnabled(ItemStack switchStack, Byte channelId) {
-        return getEnabledChannelsSet(switchStack).contains(channelId);
+        return ALL_CHANNELS.equals(channelId) || getEnabledChannelsSet(switchStack).contains(channelId);
     }
     
     public static SortedArraySet<Byte> getEnabledChannelsSet(ItemStack switchStack) {
