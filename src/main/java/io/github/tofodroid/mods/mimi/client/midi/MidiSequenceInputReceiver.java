@@ -11,7 +11,7 @@ import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 public class MidiSequenceInputReceiver extends MidiInputReceiver {
     @Override
     protected void handleMessage(ShortMessage message) {
-        if(MIMIMod.proxy.getMidiInput().hasTransmitter()) {
+        if(MIMIMod.proxy.getMidiInput().hasFileCaster()) {
             if(isNoteOnMessage(message)) {
                 this.sendTransmitterNoteOnPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
             } else if(isNoteOffMessage(message)) {

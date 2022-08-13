@@ -52,7 +52,7 @@ public class ModBindings {
         // GUIs
         if(worldIn != null && playerIn != null) {
             if(MIDIPLAYLIST.isDown()) {
-                if(MIMIMod.proxy.getMidiInput().hasTransmitter()) {
+                if(MIMIMod.proxy.getMidiInput().hasFileCaster()) {
                     ClientGuiWrapper.openPlaylistGui(worldIn, playerIn);
                 }
             } else if(MIDIGUIMAIN.isDown()) {

@@ -11,10 +11,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class ItemTransmitter extends Item {
-    public static final String REGISTRY_NAME = "transmitter";
+public class ItemFilecaster extends Item {
+    public static final String REGISTRY_NAME = "filecaster";
 
-    public ItemTransmitter() {
+    public ItemFilecaster() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
     }
     

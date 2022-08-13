@@ -29,7 +29,7 @@ public class MidiInputManager extends AMidiInputManager {
     public final MidiInputDeviceManager inputDeviceManager;
     public final MidiPlaylistManager playlistManager;
 
-    private Boolean hasTransmitter = false;
+    private Boolean hasFileCaster = false;
     private List<Object> localInstrumentToPlay = new ArrayList<>();
 
     public MidiInputManager() {
@@ -39,8 +39,8 @@ public class MidiInputManager extends AMidiInputManager {
         this.inputDeviceManager.open();
     }
 
-    public Boolean hasTransmitter() {
-        return hasTransmitter;
+    public Boolean hasFileCaster() {
+        return hasFileCaster;
     }
 
     public TransmitMode getTransmitMode() {
@@ -75,13 +75,13 @@ public class MidiInputManager extends AMidiInputManager {
             return;
         }
 
-        if(hasTransmitter(event.player)) {
-            this.hasTransmitter = true;
+        if(hasFileCaster(event.player)) {
+            this.hasFileCaster = true;
         } else {
-            if(this.hasTransmitter) {
+            if(this.hasFileCaster) {
                 this.playlistManager.stop();
             }
-            this.hasTransmitter = false;
+            this.hasFileCaster = false;
         }
         this.localInstrumentToPlay = localInstrumentsToPlay(event.player);
     }
@@ -100,25 +100,25 @@ public class MidiInputManager extends AMidiInputManager {
         }
     }
         
-    protected Boolean hasTransmitter(Player player) {
+    protected Boolean hasFileCaster(Player player) {
         if(player.getInventory() != null) {
 
             // Off-hand isn't part of hotbar, so check it explicitly
-            if(ModItems.TRANSMITTER.equals(player.getItemInHand(InteractionHand.OFF_HAND).getItem())) {
+            if(ModItems.FILECASTER.equals(player.getItemInHand(InteractionHand.OFF_HAND).getItem())) {
                 return true;
             }
 
             // check hotbar
             for(int i = 0; i < 9; i++) {
                 ItemStack invStack = player.getInventory().getItem(i);
-                if(invStack != null && ModItems.TRANSMITTER.equals(invStack.getItem())) {
+                if(invStack != null && ModItems.FILECASTER.equals(invStack.getItem())) {
                     return true;
                 }
             }
 
             // check mouse item
-            if(player.getInventory().getSelected() != null && ModItems.TRANSMITTER.equals(player.getInventory().getSelected().getItem())) {
-                return hasTransmitter;
+            if(player.getInventory().getSelected() != null && ModItems.FILECASTER.equals(player.getInventory().getSelected().getItem())) {
+                return hasFileCaster;
             }
         }
 

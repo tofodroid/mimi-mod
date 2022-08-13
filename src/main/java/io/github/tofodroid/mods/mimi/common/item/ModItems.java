@@ -29,7 +29,7 @@ public final class ModItems {
     public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS;
 
     // Other
-    public static ItemTransmitter TRANSMITTER;
+    public static ItemFilecaster FILECASTER;
     public static ItemMidiSwitchboard SWITCHBOARD;
     public static ItemFloppyDisk FLOPPYDISK;
 
@@ -50,8 +50,8 @@ public final class ModItems {
         ITEM_GROUP = new MIMIModItemGroup();
 
         // Other Items
-        TRANSMITTER = new ItemTransmitter();
-        event.register(ItemTransmitter.REGISTRY_NAME, TRANSMITTER);
+        FILECASTER = new ItemFilecaster();
+        event.register(ItemFilecaster.REGISTRY_NAME, FILECASTER);
 
         SWITCHBOARD = new ItemMidiSwitchboard();
         event.register(ItemMidiSwitchboard.REGISTRY_NAME, SWITCHBOARD);

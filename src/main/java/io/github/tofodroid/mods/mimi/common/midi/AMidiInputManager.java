@@ -12,7 +12,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public abstract class AMidiInputManager {
-    public abstract Boolean hasTransmitter();
+    public abstract Boolean hasFileCaster();
     public abstract TransmitMode getTransmitMode();
     public abstract List<Pair<Byte,ItemStack>> getLocalInstrumentsForMidiDevice(Player player, Byte channel);
     public abstract void handleTick(PlayerTickEvent event);
