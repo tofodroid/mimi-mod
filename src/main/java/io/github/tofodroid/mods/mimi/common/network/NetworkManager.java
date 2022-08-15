@@ -25,5 +25,6 @@ public class NetworkManager {
         NET_CHANNEL.registerMessage(5, WriteDiskPacket.class, WriteDiskPacket::encodePacket, WriteDiskPacket::decodePacket, WriteDiskPacketHandler::handlePacket);
         NET_CHANNEL.registerMessage(6, ServerMidiInfoPacket.class, ServerMidiInfoPacket::encodePacket, ServerMidiInfoPacket::decodePacket, ServerMidiInfoPacketHandler::handlePacket);
         NET_CHANNEL.registerMessage(7, BroadcasterControlPacket.class, BroadcasterControlPacket::encodePacket, BroadcasterControlPacket::decodePacket, BroadcasterControlPacketHandler::handlePacket);
+        NET_CHANNEL.registerMessage(8, TransmitterStackUpdatePacket.class, TransmitterStackUpdatePacket::encodePacket, TransmitterStackUpdatePacket::decodePacket, TransmitterStackUpdatePacketHandler::handlePacket);
     }
 }

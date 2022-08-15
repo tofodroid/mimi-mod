@@ -11,7 +11,6 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Soundbank;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.midi.AMidiSynthManager;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
@@ -20,7 +19,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
-public class MidiMultiSynthManager extends AMidiSynthManager {
+public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 4;
 
     protected Soundbank soundbank = null;
@@ -46,7 +45,6 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
-    @Override
     @SubscribeEvent
     public void handleTick(PlayerTickEvent event) {
         if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isLocalPlayer()) {
@@ -68,18 +66,15 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
         }
     }
 
-    @Override
     @SubscribeEvent
     public void handleSelfLogOut(LoggingOut event) {
         this.close();
     }
 
-    @Override
     public void close() {
         this.allNotesOff();
     }
 
-    @Override
     public void handlePacket(MidiNotePacket message) {
         AMIMISynth<?> targetSynth = getSynthForMessage(message);
 
@@ -110,7 +105,6 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
         }
     }
 
-    @Override
     public void allNotesOff() {
         localSynth.allNotesOff();
         mechSynth.allNotesOff();

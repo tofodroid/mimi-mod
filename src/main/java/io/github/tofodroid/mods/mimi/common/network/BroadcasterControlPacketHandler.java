@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -22,23 +23,26 @@ public class BroadcasterControlPacketHandler {
         if(sender.containerMenu != null) {
             if(sender.containerMenu instanceof ContainerBroadcaster) {
                 ContainerBroadcaster container = (ContainerBroadcaster)sender.containerMenu;
+                TileBroadcaster tile = container.getBroadcasterTile();
 
-                switch(message.control) {
-                    case PAUSE:
-                        container.getBroadcasterTile().pauseMusic();
-                        break;
-                    case PLAY:
-                        container.getBroadcasterTile().playMusic();
-                        break;
-                    case STOP:
-                        container.getBroadcasterTile().stopMusic();
-                        break;
-                    case TOGGLE_PUBLIC:
-                        container.getBroadcasterTile().togglePublicBroadcast();
-                        break;
-                    default:
-                        break;
-
+                if(tile != null) {
+                    switch(message.control) {
+                        case PAUSE:
+                            tile.pauseMusic();
+                            break;
+                        case PLAY:
+                            tile.playMusic();
+                            break;
+                        case STOP:
+                            tile.stopMusic();
+                            break;
+                        case TOGGLE_PUBLIC:
+                            tile.togglePublicBroadcast();
+                            break;
+                        default:
+                            break;
+    
+                    }
                 }
             }
         }

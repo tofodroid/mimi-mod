@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.keybind;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.KeybindOpenInstrumentPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -45,15 +46,17 @@ public class ModBindings {
         LocalPlayer playerIn = Minecraft.getInstance().player;
 
         // MIDI All Off
-        if(MIDIALLOFF.isDown()) {
-            MIMIMod.proxy.getMidiSynth().allNotesOff();
+        if(MIDIALLOFF.isDown() && MIMIMod.proxy.isClient()) {
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().allNotesOff();
         }
                 
         // GUIs
-        if(worldIn != null && playerIn != null) {
+        if(worldIn != null && playerIn != null && MIMIMod.proxy.isClient()) {
             if(MIDIPLAYLIST.isDown()) {
-                if(MIMIMod.proxy.getMidiInput().hasFileCaster()) {
-                    ClientGuiWrapper.openPlaylistGui(worldIn, playerIn);
+                if(((ClientProxy)MIMIMod.proxy).getMidiInput().fileCasterIsActive()) {
+                    ClientGuiWrapper.openPlaylistGui(worldIn, playerIn, ((ClientProxy)MIMIMod.proxy).getMidiInput().getActiveSlot());
+                } else if(((ClientProxy)MIMIMod.proxy).getMidiInput().transmitterIsActive()) {
+                    // TODO - Send packet to open screen
                 }
             } else if(MIDIGUIMAIN.isDown()) {
                 NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.MAIN_HAND));

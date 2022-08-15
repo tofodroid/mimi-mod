@@ -40,6 +40,7 @@ public class ClientEventHandler {
         MenuScreens.register(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
         MenuScreens.register(ModContainers.DISKWRITER, GuiDiskWriterContainerScreen::new);
         MenuScreens.register(ModContainers.BROADCASTER, GuiBroadcasterContainerScreen::new);
+        MenuScreens.register(ModContainers.TRANSMITTER, GuiTransmitterContainerScreen::new);
     }
 
     @SubscribeEvent

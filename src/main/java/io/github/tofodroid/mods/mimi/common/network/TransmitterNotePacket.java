@@ -17,6 +17,10 @@ public class TransmitterNotePacket {
         PUBLIC,
         LINKED,
         SELF;
+
+        public static TransmitMode fromInt(Integer val) {
+            return val >=0 && TransmitMode.values().length > val ? TransmitMode.values()[val] : null;
+        }
     }
 
     public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, TransmitMode transmitMode) {

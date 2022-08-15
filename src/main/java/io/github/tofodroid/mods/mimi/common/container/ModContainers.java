@@ -15,6 +15,7 @@ public class ModContainers {
     public static MenuType<ContainerTuningTable> TUNINGTABLE = null;
     public static MenuType<ContainerDiskWriter> DISKWRITER = null;
     public static MenuType<ContainerBroadcaster> BROADCASTER = null;
+    public static MenuType<ContainerTransmitter> TRANSMITTER = null;
     
     private static <T extends AbstractContainerMenu> MenuType<T> registerType(String id, IContainerFactory<T> factory, final RegisterEvent.RegisterHelper<MenuType<?>> event) {
         MenuType<T> type = IForgeMenuType.create(factory);
@@ -31,5 +32,6 @@ public class ModContainers {
         TUNINGTABLE = registerType("tuningtable", ContainerTuningTable::new, event);
         DISKWRITER = registerType("diskwriter", ContainerDiskWriter::new, event);
         BROADCASTER = registerType("broadcaster", ContainerBroadcaster::new, event);
+        TRANSMITTER = registerType("transmitter", ContainerTransmitter::new, event);
     }
 }

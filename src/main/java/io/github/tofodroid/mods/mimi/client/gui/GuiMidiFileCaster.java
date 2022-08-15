@@ -8,21 +8,26 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.CommonComponents;
 
-public class GuiMidiPlaylist extends BaseGui {
+public class GuiMidiFileCaster extends BaseGui {
     // GUI
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
     private EditBox folderPathField;
 
     // Data
     private String folderPathString;
+    private Integer casterSlot;
     
     // Button Boxes
     private static final Vector3f LOAD_FOLDER_BUTTON = new Vector3f(301,37,0);
@@ -48,10 +53,11 @@ public class GuiMidiPlaylist extends BaseGui {
     // MIDI
     private MidiInputManager midiInputManager;
     
-    public GuiMidiPlaylist(Player player) {
+    public GuiMidiFileCaster(Player player, Integer casterSlot) {
         super(368, 300, 400, "textures/gui/gui_midi_playlist.png", "item.MIMIMod.gui_midi_playlist");
-        this.midiInputManager = (MidiInputManager)MIMIMod.proxy.getMidiInput();
-        this.folderPathString = this.midiInputManager.playlistManager.getPlaylistFolderPath();
+        this.midiInputManager = ((ClientProxy)MIMIMod.proxy).getMidiInput();
+        this.folderPathString = this.midiInputManager.fileCasterManager.getPlaylistFolderPath();
+        this.casterSlot = casterSlot;
     }
 
     @Override
@@ -71,41 +77,45 @@ public class GuiMidiPlaylist extends BaseGui {
         int imouseY = (int)Math.round(mouseY);
 
         if(this.folderPathString != null && clickedBox(imouseX, imouseY, LOAD_FOLDER_BUTTON)) {
-            this.midiInputManager.playlistManager.loadFromFolder(this.folderPathString);
+            this.midiInputManager.fileCasterManager.loadFromFolder(this.folderPathString);
         } else if(this.folderPathString != null && clickedBox(imouseX, imouseY, SAVE_DEFAULT_BUTTON)) {
             ModConfigs.CLIENT.playlistFolderPath.set(this.folderPathString);
         } else if(ModConfigs.CLIENT.playlistFolderPath.get() != null && !ModConfigs.CLIENT.playlistFolderPath.get().isEmpty() && clickedBox(imouseX, imouseY, LOAD_DEFAULT_BUTTON)) {
             this.folderPathString = ModConfigs.CLIENT.playlistFolderPath.get();
             this.folderPathField.setValue(this.folderPathString);
-            this.midiInputManager.playlistManager.loadFromFolder(this.folderPathString);
+            this.midiInputManager.fileCasterManager.loadFromFolder(this.folderPathString);
         } else if(clickedBox(imouseX, imouseY, PREVIOUS_BUTTON)) {
             Double slidePercentage = null;
 
-            if(this.midiInputManager.playlistManager.isSongLoaded()) {
-                slidePercentage =  Double.valueOf(this.midiInputManager.playlistManager.getCurrentSongPosSeconds()) / Double.valueOf(this.midiInputManager.playlistManager.getSongLengthSeconds());
+            if(this.midiInputManager.fileCasterManager.isSongLoaded()) {
+                slidePercentage =  Double.valueOf(this.midiInputManager.fileCasterManager.getCurrentSongPosSeconds()) / Double.valueOf(this.midiInputManager.fileCasterManager.getSongLengthSeconds());
             }
 
             if(slidePercentage != null && slidePercentage >= 0.25) {
-                this.midiInputManager.playlistManager.playFromBeginning();
+                this.midiInputManager.fileCasterManager.playFromBeginning();
             } else {
-                this.midiInputManager.playlistManager.shiftSong(false);
+                this.midiInputManager.fileCasterManager.shiftSong(false);
             }
         } else if(clickedBox(imouseX, imouseY, STOP_BUTTON)) {
-            this.midiInputManager.playlistManager.stop();
+            this.midiInputManager.fileCasterManager.stop();
         } else if(clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
-            if(this.midiInputManager.playlistManager.isPlaying()) { 
-                this.midiInputManager.playlistManager.pause();
+            if(this.midiInputManager.fileCasterManager.isPlaying()) { 
+                this.midiInputManager.fileCasterManager.pause();
+            } else if(this.midiInputManager.fileCasterIsActive()) {
+                this.midiInputManager.fileCasterManager.playFromLastTickPosition();
             } else {
-                this.midiInputManager.playlistManager.playFromLastTickPosition();
-            }            
+                this.midiInputManager.setActiveSlot(this.casterSlot, this.minecraft.player.getInventory().getItem(this.casterSlot));
+            }
         } else if(clickedBox(imouseX, imouseY, NEXT_BUTTON)) {
-            this.midiInputManager.playlistManager.shiftSong(true);
+            this.midiInputManager.fileCasterManager.shiftSong(true);
         } else if(clickedBox(imouseX, imouseY, LOOP_BUTTON)) {
-            this.midiInputManager.playlistManager.shiftLoopMode();
+            this.midiInputManager.fileCasterManager.shiftLoopMode();
         } else if(clickedBox(imouseX, imouseY, SHUFFLE_BUTTON)) {
-            this.midiInputManager.playlistManager.toggleShuffle();
+            this.midiInputManager.fileCasterManager.toggleShuffle();
         } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
-            this.midiInputManager.playlistManager.shiftTransmitMode();
+            TransmitMode oldMode = this.midiInputManager.fileCasterManager.getTransmitMode();
+            this.midiInputManager.fileCasterManager.shiftTransmitMode();
+            NetworkManager.NET_CHANNEL.sendToServer(TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, oldMode));
         }
         
         return super.mouseClicked(mouseX, mouseY, button);
@@ -129,13 +139,13 @@ public class GuiMidiPlaylist extends BaseGui {
         blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Selected Song Box
-        if(this.midiInputManager.playlistManager.isSongSelected()) {
+        if(this.midiInputManager.fileCasterManager.isSongSelected()) {
             Integer songOffset;
 
-            if(this.midiInputManager.playlistManager.getSongCount() <= 6 || this.midiInputManager.playlistManager.getSelectedSongIndex() < 3) {
-                songOffset = this.midiInputManager.playlistManager.getSelectedSongIndex();
-            } else if(this.midiInputManager.playlistManager.getSelectedSongIndex() > this.midiInputManager.playlistManager.getSongCount() - 3) {
-                songOffset = 6 - (this.midiInputManager.playlistManager.getSongCount() - this.midiInputManager.playlistManager.getSelectedSongIndex());
+            if(this.midiInputManager.fileCasterManager.getSongCount() <= 6 || this.midiInputManager.fileCasterManager.getSelectedSongIndex() < 3) {
+                songOffset = this.midiInputManager.fileCasterManager.getSelectedSongIndex();
+            } else if(this.midiInputManager.fileCasterManager.getSelectedSongIndex() > this.midiInputManager.fileCasterManager.getSongCount() - 3) {
+                songOffset = 6 - (this.midiInputManager.fileCasterManager.getSongCount() - this.midiInputManager.fileCasterManager.getSelectedSongIndex());
             } else {
                 songOffset = 3;
             }
@@ -145,22 +155,22 @@ public class GuiMidiPlaylist extends BaseGui {
         }
 
         // Play/Pause Button
-        blit(matrixStack, START_X + 53, START_Y + 272, this.getBlitOffset(), 1 + this.midiInputManager.playlistManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + 53, START_Y + 272, this.getBlitOffset(), 1 + this.midiInputManager.fileCasterManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Loop Screen
-        blit(matrixStack, START_X + Float.valueOf(LOOP_SCREEN.x()).intValue(), START_Y + Float.valueOf(LOOP_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(LOOP_SCREEN.x()).intValue(), START_Y + Float.valueOf(LOOP_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.fileCasterManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Shuffle Screen    
-        blit(matrixStack, START_X + Float.valueOf(SHUFFLE_SCREEN.x()).intValue(), START_Y + Float.valueOf(SHUFFLE_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(SHUFFLE_SCREEN.x()).intValue(), START_Y + Float.valueOf(SHUFFLE_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.fileCasterManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.playlistManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.fileCasterManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;
-        if(this.midiInputManager.playlistManager.isSongLoaded()) {
-            Integer slideLength = this.midiInputManager.playlistManager.getSongLengthSeconds();
-            Integer slideProgress = this.midiInputManager.playlistManager.getCurrentSongPosSeconds();
+        if(this.midiInputManager.fileCasterManager.isSongLoaded()) {
+            Integer slideLength = this.midiInputManager.fileCasterManager.getSongLengthSeconds();
+            Integer slideProgress = this.midiInputManager.fileCasterManager.getCurrentSongPosSeconds();
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
@@ -176,19 +186,19 @@ public class GuiMidiPlaylist extends BaseGui {
     @Override
     protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Playlist
-        if(this.midiInputManager.playlistManager.getSongCount() > 0) {
+        if(this.midiInputManager.fileCasterManager.getSongCount() > 0) {
             Integer minSong;
-            if(this.midiInputManager.playlistManager.getSongCount() <= 6 || this.midiInputManager.playlistManager.getSelectedSongIndex() < 3) {
+            if(this.midiInputManager.fileCasterManager.getSongCount() <= 6 || this.midiInputManager.fileCasterManager.getSelectedSongIndex() < 3) {
                 minSong = 0;
-            } else if(this.midiInputManager.playlistManager.getSelectedSongIndex() > this.midiInputManager.playlistManager.getSongCount() - 3) {
-                minSong = this.midiInputManager.playlistManager.getSongCount() - 6;
+            } else if(this.midiInputManager.fileCasterManager.getSelectedSongIndex() > this.midiInputManager.fileCasterManager.getSongCount() - 3) {
+                minSong = this.midiInputManager.fileCasterManager.getSongCount() - 6;
             } else {
-                minSong = this.midiInputManager.playlistManager.getSelectedSongIndex() - 3;
+                minSong = this.midiInputManager.fileCasterManager.getSelectedSongIndex() - 3;
             }
 
             for(int i = 0; i < 6; i++) {
-                if(this.midiInputManager.playlistManager.getSongCount() > (minSong + i)) {
-                    MidiFileInfo info = this.midiInputManager.playlistManager.getLoadedPlaylist().get(minSong + i);
+                if(this.midiInputManager.fileCasterManager.getSongCount() > (minSong + i)) {
+                    MidiFileInfo info = this.midiInputManager.fileCasterManager.getLoadedPlaylist().get(minSong + i);
                     this.font.draw(matrixStack, (minSong + i + 1) + "). " + (info.fileName.length() > 50 ? info.fileName.substring(0,50) + "..." : info.fileName), START_X + 18, START_Y + 84 + i * 10, 0xFF00E600);
                 } else {
                     break;
@@ -197,7 +207,7 @@ public class GuiMidiPlaylist extends BaseGui {
         }
 
         // Current Song
-        MidiFileInfo info = this.midiInputManager.playlistManager.getSelectedSongInfo();
+        MidiFileInfo info = this.midiInputManager.fileCasterManager.getSelectedSongInfo();
         if(info != null) {
             this.font.draw(matrixStack, "Channel Instruments: ", START_X + 16, START_Y + 174, 0xFF00E600);
             

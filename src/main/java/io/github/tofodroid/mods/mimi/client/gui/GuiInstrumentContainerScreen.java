@@ -18,6 +18,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -379,7 +380,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         Byte value = on ? Byte.MAX_VALUE : Byte.MIN_VALUE;
         MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
     }
 
     // Midi Functions
@@ -448,22 +449,22 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NET_CHANNEL.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
-            MIMIMod.proxy.getMidiSynth().handlePacket(packet);
-            MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         }
     }
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NET_CHANNEL.sendToServer(packet);
-        MIMIMod.proxy.getMidiSynth().handleLocalPacket(packet);
+        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOff(null, midiNote);
     }
 

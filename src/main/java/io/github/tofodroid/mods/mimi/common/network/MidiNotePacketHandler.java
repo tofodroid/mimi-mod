@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
@@ -69,7 +70,7 @@ public class MidiNotePacketHandler {
     }
 
     public static void handlePacketClient(final MidiNotePacket message) {
-        MIMIMod.proxy.getMidiSynth().handlePacket(message); 
+        if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
     }
 
     protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerLevel worldIn, BlockPos notePos, Integer range) {

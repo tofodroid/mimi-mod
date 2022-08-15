@@ -17,12 +17,12 @@ import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +64,7 @@ public class MIMIMod {
    
     public static void init(final FMLCommonSetupEvent event) {
         proxy.init(event);
-        ServerMusicPlayerMidiManager.init();
+        MidiFileCacheManager.init();
     }
 
     @SubscribeEvent

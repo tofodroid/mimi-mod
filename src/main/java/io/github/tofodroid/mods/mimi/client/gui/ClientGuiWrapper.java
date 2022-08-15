@@ -8,8 +8,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public abstract class ClientGuiWrapper {
-    public static void openPlaylistGui(Level world, Player player) {
-        openGui(world, new GuiMidiPlaylist(player));
+    public static void openPlaylistGui(Level world, Player player, Integer casterSlot) {
+        openGui(world, new GuiMidiFileCaster(player, casterSlot));
     }
 
     public static void openConfigGui(Level world, Player player) {

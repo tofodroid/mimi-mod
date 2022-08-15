@@ -84,7 +84,7 @@ public class ItemInstrument extends Item implements IDyeableItem {
             }
     
             @Override
-            public Component getDisplayName() {return Component.literal("");}
+            public Component getDisplayName() {return Component.literal("mimi.instrument");}
         };
     }
 

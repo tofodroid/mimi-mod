@@ -21,7 +21,7 @@ import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 
-public class MidiPlaylistManager extends MidiInputSourceManager {
+public class MidiFileCasterManager extends MidiInputSourceManager {
     // Playlist
     private String playlistFolderPath;
     private List<MidiFileInfo> songList;
@@ -36,9 +36,9 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         
     // MIDI Sequencer
     private Sequencer activeSequencer;
-    private MidiSequenceInputReceiver activeReceiver;
+    private MidiFileCasterInputReceiver activeReceiver;
 
-    public MidiPlaylistManager() {
+    public MidiFileCasterManager() {
         // Create Sequencer
         createSequencer();
         
@@ -289,17 +289,15 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         return currentLoopMode.ordinal();
     }
 
-    public void shiftTransmitMode() {
+    public TransmitMode shiftTransmitMode() {
         if(currentTransmitMode == TransmitMode.PUBLIC) {
-            stop();
             currentTransmitMode = TransmitMode.LINKED;
         } else if(currentTransmitMode == TransmitMode.LINKED) {
-            stop();
             currentTransmitMode = TransmitMode.SELF;
         } else {
-            stop();
             currentTransmitMode = TransmitMode.PUBLIC;
         }
+        return currentTransmitMode;
     }
 
     public TransmitMode getTransmitMode() {
@@ -346,7 +344,7 @@ public class MidiPlaylistManager extends MidiInputSourceManager {
         if(isOpen()) {
             try {
                 this.activeTransmitter = this.activeSequencer.getTransmitter();
-                this.activeReceiver = new MidiSequenceInputReceiver();
+                this.activeReceiver = new MidiFileCasterInputReceiver();
                 this.activeTransmitter.setReceiver(this.activeReceiver);
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Midi Device Error: ", e);
