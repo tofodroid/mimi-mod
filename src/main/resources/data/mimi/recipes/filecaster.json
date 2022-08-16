@@ -2,21 +2,21 @@
     "type": "minecraft:crafting_shaped",
     "pattern": [
         "   ",
-        " T ",
-        "RJR"
+        "RIR",
+        " D "
     ],
     "key": {
-        "J": {
-            "item": "minecraft:jukebox"
-        },
-        "T": {
+        "I": {
             "item": "mimi:transmitter"
+        },
+        "D": {
+            "item": "minecraft:diamond"
         },
         "R": {
             "item": "minecraft:redstone"
         }
     },
     "result": {
-        "item": "mimi:broadcaster"
+        "item": "mimi:filecaster"
     }
 }

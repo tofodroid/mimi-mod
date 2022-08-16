@@ -2,7 +2,7 @@
     "parent": "minecraft:recipes/root",
     "rewards": {
       "recipes": [
-        "mimi:filecaster"
+        "mimi:deviceconfig"
       ]
     },
     "criteria": {
@@ -11,7 +11,7 @@
         "conditions": {
           "items": [
             {
-              "item": "mimi:transmitter"
+              "item": "mimi:switchboard"
             }
           ]
         }
@@ -19,7 +19,7 @@
       "has_the_recipe": {
         "trigger": "minecraft:recipe_unlocked",
         "conditions": {
-          "recipe": "mimi:filecaster"
+          "recipe": "mimi:deviceconfig"
         }
       }
     },

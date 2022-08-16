@@ -47,7 +47,6 @@ public class ItemFileCaster extends Item {
         }
     }
 
-    
     @Override
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
