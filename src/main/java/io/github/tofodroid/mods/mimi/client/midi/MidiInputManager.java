@@ -94,11 +94,6 @@ public class MidiInputManager {
                     return true;
                 }
             }
-
-            // check mouse item
-            if(player.hasContainerOpen() && player.containerMenu.getCarried() != null && ModItems.FILECASTER.equals(player.containerMenu.getCarried().getItem())) {
-                return hasActiveFileCaster;
-            }
         }
 
         return false;

@@ -66,6 +66,12 @@ public class ItemTransmitter extends Item {
             
             tooltip.add(Component.literal("----------------"));
 
+            if(stack.hasFoil()) {
+                tooltip.add(Component.literal("§2§lCurrently Playing§r"));
+                tooltip.add(Component.literal("§oMoving this Transmitter will stop playing§r"));
+                tooltip.add(Component.literal("----------------"));
+            }
+
             // Disk Title
             if(ItemTransmitter.hasActiveFloppyDisk(stack)) {
                 tooltip.add(Component.literal("Loaded Disk: " + ItemFloppyDisk.getDiskTitle(ItemTransmitter.getActiveFloppyDiskStack(stack))));
