@@ -1,12 +1,19 @@
 package io.github.tofodroid.mods.mimi.client.midi.synth;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
 
 import javax.sound.midi.MidiChannel;
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Soundbank;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
+import javax.sound.sampled.SourceDataLine;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -14,21 +21,30 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList.Builder;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable {
+    public static final String MC_DEFAULT_DEVICE="Device";
     protected SoftSynthesizer internalSynth;
+    protected AudioFormat format;
     protected final ImmutableList<T> midiChannelSet;
     protected final BiMap<T, String> channelAssignmentMap;
 
     public AMIMISynth(Boolean jitterCorrection, Integer latency, Soundbank sounds) {
         try {
-            this.internalSynth = SoftSynthesizer.create(jitterCorrection, false, latency, ModConfigs.CLIENT.synthBitRate.get(), ModConfigs.CLIENT.synthSampleRate.get(), sounds);
+            this.format = new AudioFormat(
+                ModConfigs.CLIENT.synthSampleRate.get(), 
+                ModConfigs.CLIENT.synthBitRate.get(), 
+                2, true, false
+            );
+            this.internalSynth = createSynth(getDeviceOutLine(this.format), this.format, jitterCorrection, false, latency, sounds);
+            
         } catch(Exception e) {
             this.internalSynth = null;
         }
@@ -105,5 +121,63 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(channel != null) {
             channel.controlChange(message.getControllerNumber(), message.getControllerValue());
         }
+    }
+
+    @SuppressWarnings("resource")
+    public static SourceDataLine getDeviceOutLine(AudioFormat format) {
+        String mcDevice = Minecraft.getInstance().options.soundDevice().get();
+
+        // Minecraft device name is "<Driver> on <Device>" and we only want device
+        if(mcDevice.toLowerCase().indexOf(" on ") >= 0) {
+            mcDevice = mcDevice.substring(mcDevice.toLowerCase().indexOf(" on ")+4);
+        }
+
+        if(mcDevice.equals(MC_DEFAULT_DEVICE)) {
+            return null;
+        } else {
+            try {
+                for(Mixer.Info info : AudioSystem.getMixerInfo()) {
+                    if(info.getClass().getName().contains("DirectAudioDevice") 
+                        && info.getName().equals(mcDevice)
+                    ) {
+                        return AudioSystem.getSourceDataLine(format, info);
+                    }
+                }
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to open target AudioOut Device. Falling back to default. Error: ", e);
+            }
+        }
+
+        return null;
+    }
+
+    /* Code copied from com.sun.media.sound.SoftSynthesizer and customzied */
+    public static SoftSynthesizer createSynth(SourceDataLine outLine, AudioFormat format, Boolean jitterCorrection, Boolean limitChannel10, Integer latency, Soundbank sounds) throws MidiUnavailableException {
+        SoftSynthesizer midiSynth = new SoftSynthesizer();
+
+        if(midiSynth.getMaxReceivers() != 0) {
+            midiSynth.open();
+            midiSynth.close();
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("jitter correction", jitterCorrection);
+            params.put("limit channel 10", limitChannel10);
+            params.put("latency", latency * 1000);
+            params.put("format", format);
+
+            midiSynth.open(outLine, params);
+            
+            if(sounds != null) {
+                if(midiSynth.isSoundbankSupported(sounds)) {
+                    midiSynth.loadAllInstruments(sounds);
+                }
+            }
+            
+            midiSynth.getReceiver();
+            
+            return midiSynth;
+        }
+
+        throw new MidiUnavailableException("Midi Synth '" + midiSynth.getDeviceInfo().getName() + "' cannot support any receivers.");
     }
 }

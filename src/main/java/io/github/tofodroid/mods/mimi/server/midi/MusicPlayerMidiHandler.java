@@ -17,6 +17,8 @@ import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import net.minecraft.world.entity.player.Player;
 
 public class MusicPlayerMidiHandler {
+    public final String url;
+
     private Integer lastTempoBPM;
     private Long pausedTickPosition;
     private Long pausedMicrosecond;
@@ -27,8 +29,9 @@ public class MusicPlayerMidiHandler {
     private Receiver activeReceiver;
     private Transmitter activeTransmitter;
 
-    public MusicPlayerMidiHandler(TileBroadcaster tile, Sequence sequence) throws IOException {
+    public MusicPlayerMidiHandler(TileBroadcaster tile, Sequence sequence, String url) throws IOException {
         this.activeSequence = sequence;
+        this.url = url;
 
         try {
             createSequencer(tile);
@@ -39,8 +42,9 @@ public class MusicPlayerMidiHandler {
         }
     }
 
-    public MusicPlayerMidiHandler(Player player, Sequence sequence) throws IOException  {
+    public MusicPlayerMidiHandler(Player player, Sequence sequence, String url) throws IOException  {
         this.activeSequence = sequence;
+        this.url = url;
 
         try {
             createSequencer(player);
@@ -110,7 +114,7 @@ public class MusicPlayerMidiHandler {
     }
     
     public void close() {
-        if(this.activeSequencer != null) {
+        if(this.activeSequencer != null && this.activeSequencer.isOpen()) {
             this.activeSequencer.stop();
         }
 
@@ -120,7 +124,6 @@ public class MusicPlayerMidiHandler {
         }
 
         if(this.activeTransmitter != null) {
-            this.activeTransmitter.setReceiver(null);
             this.activeTransmitter.close();
             this.activeTransmitter = null;
         }

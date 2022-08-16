@@ -8,6 +8,12 @@ import java.util.regex.Pattern;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 
 public abstract class RemoteMidiUrlUtils {
+    public static Boolean validHostString(String url) {
+        Pattern regex = Pattern.compile("^[0-9a-zA-Z][0-9a-zA-Z.]*?\\.[a-zA-Z][a-zA-Z][a-zA-Z]*?$");
+        Matcher matcher = regex.matcher(url);
+        return !(url.toLowerCase().startsWith("www.") || !matcher.find());
+    }
+
     public static Boolean validateMidiUrl(String url) {
         try {
             Pattern regex = Pattern.compile("^[hH][tT][tT][pP][sS]?:\\/\\/.*\\/[^\\/\\\\\\s]*[^\\/.\\\\\\s]$");

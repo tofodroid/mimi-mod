@@ -12,9 +12,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -26,7 +24,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -34,8 +32,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MidiFileCacheManager {
     protected static TreeMap<Instant,String> SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
-    protected static Map<String,File> SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
-    protected static Map<String,File> SERVER_SEQUENCE_VALUE_MAP = new HashMap<>();
+    protected static TreeMap<String,File> SEQUENCE_CACHE_VALUE_MAP = new TreeMap<>();
+    protected static TreeMap<String,File> SERVER_SEQUENCE_VALUE_MAP = new TreeMap<>();
     protected static File SEQUENCE_CACHE_FOLDER = null;
     protected static File SERVER_SEQUENCE_FOLDER = null;
     
@@ -66,9 +64,54 @@ public class MidiFileCacheManager {
         }
     }
 
+    public static Integer getCachedFileNamePages(Integer pageSize) {
+        return Double.valueOf(Math.ceil((double)SEQUENCE_CACHE_VALUE_MAP.size() / (double)pageSize)).intValue();
+    }
+
+    public static Integer getServerFileNamesPages(Integer pageSize) {
+        return Double.valueOf(Math.ceil((double)SERVER_SEQUENCE_VALUE_MAP.size() / (double)pageSize)).intValue();
+    }
+
+    public static List<String> getCachedFileNames(Integer pageSize, Integer pageNum) {
+        List<String> orderedSequenceList = new ArrayList<>(SEQUENCE_CACHE_VALUE_MAP.keySet());
+
+        if(orderedSequenceList.size() <= pageSize) {
+            return orderedSequenceList;
+        } else {
+            List<String> result = new ArrayList<>();
+            Integer startingIndex = pageSize * pageNum;
+            for(int i = startingIndex; i < (startingIndex + pageSize); i++) {
+                if(i >= orderedSequenceList.size()) {
+                    return result;
+                }
+                result.add(orderedSequenceList.get(i));
+            }
+            return result;
+        }
+    }
+    
+    public static List<String> getServerFileNames(Integer pageSize, Integer pageNum) {
+        List<String> orderedSequenceList = new ArrayList<>(SERVER_SEQUENCE_VALUE_MAP.keySet());
+
+        if(orderedSequenceList.size() <= pageSize) {
+            return orderedSequenceList;
+        } else {
+            List<String> result = new ArrayList<>();
+            Integer startingIndex = pageSize * pageNum;
+            for(int i = startingIndex; i < (startingIndex + pageSize); i++) {
+                if(i >= orderedSequenceList.size()) {
+                    return result;
+                }
+                result.add(orderedSequenceList.get(i));
+            }
+            return result;
+        }
+    }
+
+
     public static void refreshSequenceCacheMaps() {
         SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
-        SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
+        SEQUENCE_CACHE_VALUE_MAP = new TreeMap<>();
 
         if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
             try {
@@ -85,13 +128,15 @@ public class MidiFileCacheManager {
     }
 
     public static void refreshServerSequenceMap() {
-        SERVER_SEQUENCE_VALUE_MAP = new HashMap<>();
+        SERVER_SEQUENCE_VALUE_MAP = new TreeMap<>();
 
         if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
             try {
                 for(File file : SERVER_SEQUENCE_FOLDER.listFiles()) {
                     if(file.isFile() && (file.getAbsolutePath().endsWith(".mid") || file.getAbsolutePath().endsWith(".midi"))) {
-                        SERVER_SEQUENCE_VALUE_MAP.put(file.getName(), file);
+                        SERVER_SEQUENCE_VALUE_MAP.put(file.getName().substring(0,
+                            file.getName().lastIndexOf(".midi") >= 0 ? file.getName().lastIndexOf(".midi") : file.getName().lastIndexOf(".mid")
+                        ), file);
                     }
                 }
             } catch(Exception e) {
@@ -115,13 +160,14 @@ public class MidiFileCacheManager {
         String file = url
             .replace("server://","")
             .replace("/", "");
-        return file ;
+
+        return file;
     }
 
-    public static Pair<Sequence,ServerMidiStatus.STATUS_CODE> getOrCreateCachedSequence(String midiUrl) {
+    public static Pair<Sequence,STATUS_CODE> getOrCreateCachedSequence(String midiUrl) {
         if(midiUrl != null && !midiUrl.isBlank() && midiUrl.toLowerCase().startsWith("server://")) {
             if(!RemoteMidiUrlUtils.validateFileUrl(midiUrl)) {
-                return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_URL);
+                return Pair.of(null, STATUS_CODE.ERROR_URL);
             }
 
             String fileName = urlToServerFile(midiUrl);
@@ -135,11 +181,11 @@ public class MidiFileCacheManager {
                 }
             }
 
-            return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_NOT_FOUND);
+            return Pair.of(null, STATUS_CODE.ERROR_NOT_FOUND);
         } else if(ModConfigs.COMMON.allowWebMidi.get()) {
             if(midiUrl != null && !midiUrl.isBlank() && RemoteMidiUrlUtils.validateMidiUrl(midiUrl)) {
                 if(!RemoteMidiUrlUtils.validateMidiHost(midiUrl)) {
-                    return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_HOST);
+                    return Pair.of(null, STATUS_CODE.ERROR_HOST);
                 }
 
                 String fileName = urlToFile(midiUrl);
@@ -157,7 +203,7 @@ public class MidiFileCacheManager {
                         
                         if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
                             pruneSequenceCache();
-                            File savedSequence = saveSequence(fileName, sequence);
+                            File savedSequence = saveSequence(SEQUENCE_CACHE_FOLDER, fileName, sequence);
                             SEQUENCE_CACHE_VALUE_MAP.put(fileName, savedSequence);
                             SEQUENCE_CACHE_ORDER_MAP.put(Files.getLastModifiedTime(savedSequence.toPath()).toInstant(), fileName);
                         }
@@ -175,10 +221,19 @@ public class MidiFileCacheManager {
                 }
             }
             
-            return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_OTHER);
+            return Pair.of(null, STATUS_CODE.ERROR_OTHER);
         }
 
-        return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_DISABLED);
+        return Pair.of(null, STATUS_CODE.ERROR_DISABLED);
+    }
+
+    public static STATUS_CODE addServerMusic(String midiUrl) {
+        // TODO
+        return STATUS_CODE.SUCCESS;
+    }
+    
+    public static void removeServerMusic(String key) {
+        // TODO
     }
 
     protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {
@@ -189,8 +244,8 @@ public class MidiFileCacheManager {
         throw new IOException("Expected cached MIDI file '" + targetFile.getName() + "' not found.");
     }
 
-    protected static File saveSequence(String fileName, Sequence sequence) throws IOException {
-        File targetFile = new File(SEQUENCE_CACHE_FOLDER, fileName);
+    protected static File saveSequence(File folder, String fileName, Sequence sequence) throws IOException {
+        File targetFile = new File(folder, fileName);
         try(FileOutputStream fout = new FileOutputStream(targetFile)) {
             MidiSystem.write(sequence, MidiSystem.getMidiFileTypes(sequence)[0], fout);
             fout.close();
@@ -216,7 +271,7 @@ public class MidiFileCacheManager {
         }
     }
 
-    protected static void pruneSequenceCache() {
+    public static void pruneSequenceCache() {
         if(!SEQUENCE_CACHE_VALUE_MAP.isEmpty() && (SEQUENCE_CACHE_VALUE_MAP.size() + 1) > ModConfigs.COMMON.serverMusicCacheSize.get()) {
             Integer cycle = 0;
             List<String> toRemove = new ArrayList<>();
@@ -238,6 +293,24 @@ public class MidiFileCacheManager {
                     MIMIMod.LOGGER.error("Failed to prune cached song: " + removeKey);
                 }
             }
+        }
+    }
+
+    public static void emptySequenceCache() {
+        if(!SEQUENCE_CACHE_VALUE_MAP.isEmpty()) {
+            List<String> toRemove = new ArrayList<>(SEQUENCE_CACHE_VALUE_MAP.keySet());
+            
+            for(String removeKey : toRemove) {
+                MIMIMod.LOGGER.info("Deleting cached song: '" + removeKey + "'");
+                try {
+                    Files.deleteIfExists(new File(SEQUENCE_CACHE_FOLDER, removeKey).toPath());
+                } catch(IOException e) {
+                    MIMIMod.LOGGER.error("Failed to prune cached song: " + removeKey);
+                }
+            }
+
+            SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
+            SEQUENCE_CACHE_VALUE_MAP = new TreeMap<>();
         }
     }
 }

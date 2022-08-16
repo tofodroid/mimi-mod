@@ -1,10 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.config;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
+import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 // 1. Default MIDI Input Device
@@ -41,7 +42,35 @@ public class CommonConfig {
             }
         }
 
-        return allowedHostsList;        
+        return new ArrayList<>(allowedHostsList);
+    }
+
+    public void onConfigChange() {
+        clearAllowedHostsList();
+        if(allowWebMidi.get()) {
+            ServerMusicPlayerMidiManager.revalidate();
+        } else {
+            ServerMusicPlayerMidiManager.clearMusicPlayers();
+        }
+    }
+
+    public void addAllowedHost(String host) {
+        List<String> allowedHosts = getAllowedHostsList();
+        allowedHosts.add(host);
+        allowedMusicHosts.set(allowedHosts.stream().collect(Collectors.joining(",")));
+        onConfigChange();
+    }
+
+    public void removeAllowedHost(Integer index) {
+        List<String> allowedHosts = getAllowedHostsList();
+        allowedHosts.remove(index.intValue());
+
+        if(allowedHosts.isEmpty()) {
+            allowedMusicHosts.set("");
+        } else {
+            allowedMusicHosts.set(allowedHosts.stream().collect(Collectors.joining(",")));
+        }
+        onConfigChange();
     }
 
     public void clearAllowedHostsList() {

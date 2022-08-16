@@ -102,10 +102,6 @@ public class BroadcastControlPacketHandler {
                 case STOP:
                     if(handler != null && handler.getLeft().equals(container.playerInvSlot)) {
                         ServerMusicPlayerMidiManager.stopTransmitter(sender.getUUID());
-                        NetworkManager.INFO_CHANNEL.send(
-                            PacketDistributor.PLAYER.with(() -> sender),
-                            new ActiveTransmitterIdPacket(null)
-                        );
                     }
                     break;
                 case TOGGLE_PUBLIC:
