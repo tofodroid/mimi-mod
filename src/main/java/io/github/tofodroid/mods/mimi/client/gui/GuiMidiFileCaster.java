@@ -27,7 +27,6 @@ public class GuiMidiFileCaster extends BaseGui {
 
     // Data
     private String folderPathString;
-    private Integer casterSlot;
     
     // Button Boxes
     private static final Vector3f LOAD_FOLDER_BUTTON = new Vector3f(301,37,0);
@@ -53,11 +52,10 @@ public class GuiMidiFileCaster extends BaseGui {
     // MIDI
     private MidiInputManager midiInputManager;
     
-    public GuiMidiFileCaster(Player player, Integer casterSlot) {
+    public GuiMidiFileCaster(Player player) {
         super(368, 300, 400, "textures/gui/gui_midi_playlist.png", "item.MIMIMod.gui_midi_playlist");
         this.midiInputManager = ((ClientProxy)MIMIMod.proxy).getMidiInput();
         this.folderPathString = this.midiInputManager.fileCasterManager.getPlaylistFolderPath();
-        this.casterSlot = casterSlot;
     }
 
     @Override
@@ -103,8 +101,6 @@ public class GuiMidiFileCaster extends BaseGui {
                 this.midiInputManager.fileCasterManager.pause();
             } else if(this.midiInputManager.fileCasterIsActive()) {
                 this.midiInputManager.fileCasterManager.playFromLastTickPosition();
-            } else {
-                this.midiInputManager.setActiveSlot(this.casterSlot, this.minecraft.player.getInventory().getItem(this.casterSlot));
             }
         } else if(clickedBox(imouseX, imouseY, NEXT_BUTTON)) {
             this.midiInputManager.fileCasterManager.shiftSong(true);
@@ -115,7 +111,7 @@ public class GuiMidiFileCaster extends BaseGui {
         } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
             TransmitMode oldMode = this.midiInputManager.fileCasterManager.getTransmitMode();
             this.midiInputManager.fileCasterManager.shiftTransmitMode();
-            NetworkManager.NET_CHANNEL.sendToServer(TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, oldMode));
+            NetworkManager.BROADCAST_CHANNEL.sendToServer(TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, oldMode));
         }
         
         return super.mouseClicked(mouseX, mouseY, button);

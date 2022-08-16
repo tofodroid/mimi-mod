@@ -4,7 +4,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 
-public class BroadcasterControlPacket {
+public class BroadcastControlPacket {
     public enum CONTROL {
         PLAY,
         PAUSE,
@@ -22,15 +22,15 @@ public class BroadcasterControlPacket {
     
     public final CONTROL control;
 
-    public BroadcasterControlPacket(CONTROL control) {
+    public BroadcastControlPacket(CONTROL control) {
         this.control = control != null ? control : CONTROL.UNKNOWN;
     }
     
-    public static BroadcasterControlPacket decodePacket(FriendlyByteBuf buf) {
+    public static BroadcastControlPacket decodePacket(FriendlyByteBuf buf) {
         try {
             byte control = buf.readByte();
 
-            return new BroadcasterControlPacket(CONTROL.fromByte(control));
+            return new BroadcastControlPacket(CONTROL.fromByte(control));
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("BroadcasterControlPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -40,7 +40,7 @@ public class BroadcasterControlPacket {
         }
     }
 
-    public static void encodePacket(BroadcasterControlPacket pkt, FriendlyByteBuf buf) {
+    public static void encodePacket(BroadcastControlPacket pkt, FriendlyByteBuf buf) {
         buf.writeByte(Integer.valueOf(pkt.control.ordinal()).byteValue());
     }
 }

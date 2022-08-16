@@ -360,7 +360,8 @@ public class MidiFileCasterManager extends MidiInputSourceManager {
                 this.activeSequencer = MidiSystem.getSequencer(false);
                 this.activeSequencer.open();
             } catch(Exception e) {
-                // TODO
+                this.activeSequencer = null;
+                MIMIMod.LOGGER.error("Failed to open FileCaster Sequencer: ", e);
             }
         }
         

@@ -1,12 +1,15 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTransmitter;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import net.minecraft.network.chat.Component;
@@ -29,6 +32,7 @@ import net.minecraftforge.network.NetworkHooks;
 public class ItemTransmitter extends Item {
     public static final String REGISTRY_NAME = "transmitter";
     public static final String TRANSMIT_MODE_TAG = "broadcastMode";
+    public static final String TRANSMIT_ID_TAG = "transmit_id";
     public static final String INVENTORY_TAG = "inventory";
 
     public ItemTransmitter() {
@@ -53,7 +57,6 @@ public class ItemTransmitter extends Item {
 		return new InteractionResultHolder<>(InteractionResult.SUCCESS, playerIn.getItemInHand(handIn));
     }
 
-
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
@@ -71,6 +74,11 @@ public class ItemTransmitter extends Item {
             // Transmit Mode
             tooltip.add(Component.literal("Transmit Mode: " + StringUtils.capitalizeFirstLetter(ItemTransmitter.getTransmitMode(stack).name().toLowerCase())));
         }
+    }
+
+    @Override
+    public boolean isFoil(ItemStack stack) {
+        return ItemTransmitter.getTransmitId(stack) != null && ItemTransmitter.getTransmitId(stack).equals(((ClientProxy)MIMIMod.proxy).getMidiInput().getActiveTransmitterIdCache());
     }
     
     public static ItemStackHandler getInventoryHandler(ItemStack stack) {
@@ -122,6 +130,21 @@ public class ItemTransmitter extends Item {
         }
 
         return TransmitMode.SELF;
+    }
+    
+    public static void setTransmitId(ItemStack stack, UUID transmitId) {
+        if (transmitId != null) {
+            stack.getOrCreateTag().putUUID(TRANSMIT_ID_TAG, transmitId);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(TRANSMIT_ID_TAG);
+        }
+    }
+
+    public static UUID getTransmitId(ItemStack stack) {
+        if (stackTagContainsKey(stack, TRANSMIT_ID_TAG)) {
+            return stack.getTag().getUUID(TRANSMIT_ID_TAG);
+        }
+        return null;
     }
 
     public static Boolean hasActiveFloppyDisk(ItemStack stack) {

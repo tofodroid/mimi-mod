@@ -6,8 +6,6 @@ import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
@@ -59,26 +57,6 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
 
     public void togglePublicBroadcast() {
         if(this.hasLevel() && !this.level.isClientSide && this.level instanceof ServerLevel) {
-            ServerMusicPlayerMidiManager.getMusicPlayer(this);
-            MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
-
-            // Send ALL NOTES OFF for ALL CHANNELS if playing
-            if(handler != null && handler.isPlaying()) {
-                TransmitterNotePacket offPacket = TransmitterNotePacket.createAllNotesOffPacket(
-                    TransmitterNotePacket.ALL_CHANNELS, 
-                    this.getTransmitMode()
-                );
-                ((ServerLevel)this.level).getServer().execute(() -> {
-                    TransmitterNotePacketHandler.handlePacketServer(
-                        offPacket, 
-                        this.getBlockPos(), 
-                        (ServerLevel)this.level, 
-                        this.getMusicPlayerId(), 
-                        null
-                    );
-                });
-            }
-
             this.getPersistentData().putBoolean(BROADCAST_PUBLIC_TAG, !this.isPublicBroadcast());
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
         }
@@ -152,22 +130,21 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
 
     public void unloadDisk() {
         this.setUnpowered();
-        ServerMusicPlayerMidiManager.removeMusicPlayer(this);
+        ServerMusicPlayerMidiManager.stopBroadcaster(this.getMusicPlayerId());
     }
 
     public void loadDisk(ItemStack stack) {
         this.setPowered();        
-        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getOrAddMusicPlayer(this, ItemFloppyDisk.getMidiUrl(stack));
         
-        if(handler != null) {
-            handler.play();
+        if(ServerMusicPlayerMidiManager.createBroadcaster(this, ItemFloppyDisk.getMidiUrl(stack))) {
+            ServerMusicPlayerMidiManager.playBroadcaster(this.getMusicPlayerId());
         } else {
             this.setUnpowered();
         }
     }
 
     public void playMusic() {
-        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getBroadcaster(this.getMusicPlayerId());
 
         if(handler != null) {
             this.setPowered();
@@ -176,7 +153,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
     }
 
     public void stopMusic() {
-        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getBroadcaster(this.getMusicPlayerId());
 
         if(handler != null) {
             this.setUnpowered();
@@ -185,7 +162,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
     }
 
     public void pauseMusic() {
-        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+        MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getBroadcaster(this.getMusicPlayerId());
 
         if(handler != null) {
             handler.pause();
@@ -196,7 +173,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
         if(!this.level.isClientSide && this.level instanceof ServerLevel) {
-            ServerMusicPlayerMidiManager.removeMusicPlayer(this);
+            ServerMusicPlayerMidiManager.stopBroadcaster(this.getMusicPlayerId());
         }
     }
     
@@ -204,7 +181,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
     public void tick(Level world, BlockPos pos, BlockState state, TileBroadcaster self) {
         if(this.hasLevel() && !this.level.isClientSide && world instanceof ServerLevel) {
             // If removed, stop playing and return immediately
-            MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getMusicPlayer(this);
+            MusicPlayerMidiHandler handler = ServerMusicPlayerMidiManager.getBroadcaster(this.getMusicPlayerId());
             if(this.isRemoved() && handler != null) {
                 unloadDisk();
                 return;

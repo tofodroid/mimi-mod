@@ -43,7 +43,7 @@ public class BlockBroadcaster extends AContainerBlock<TileBroadcaster> {
             if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
                 return;
             TileBroadcaster tile = getTileForBlock(worldIn, pos);
-            ServerMusicPlayerMidiManager.removeMusicPlayer(tile);
+            ServerMusicPlayerMidiManager.stopBroadcaster(tile.getMusicPlayerId());
         }
 
         super.onRemove(state, worldIn, pos, newState, isMoving);

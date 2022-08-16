@@ -37,11 +37,11 @@ public class MidiNotePacketHandler {
             // Forward to players
             for(MidiNotePacket packet : messages) {
                 if(ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
-                    NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
+                    NetworkManager.NOTE_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
                 } else {
                     ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
                         if(player != sender && Math.sqrt(player.getOnPos().distSqr(packet.pos)) <= getQueryBoxRange(packet.velocity <= 0)) {
-                            NetworkManager.NET_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+                            NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
                         }
                     });
                 }

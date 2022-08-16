@@ -54,16 +54,14 @@ public class ModBindings {
         if(worldIn != null && playerIn != null && MIMIMod.proxy.isClient()) {
             if(MIDIPLAYLIST.isDown()) {
                 if(((ClientProxy)MIMIMod.proxy).getMidiInput().fileCasterIsActive()) {
-                    ClientGuiWrapper.openPlaylistGui(worldIn, playerIn, ((ClientProxy)MIMIMod.proxy).getMidiInput().getActiveSlot());
-                } else if(((ClientProxy)MIMIMod.proxy).getMidiInput().transmitterIsActive()) {
-                    // TODO - Send packet to open screen
+                    ClientGuiWrapper.openPlaylistGui(worldIn, playerIn);
                 }
             } else if(MIDIGUIMAIN.isDown()) {
-                NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.MAIN_HAND));
+                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.MAIN_HAND));
             } else if(MIDIGUIOFF.isDown()) {
-                NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.OFF_HAND));
+                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.OFF_HAND));
             } else if(MIDIGUISEAT.isDown()) {
-                NetworkManager.NET_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(false, null));
+                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(false, null));
             } else if(MIDISETTINGS.isDown()) {
                 ClientGuiWrapper.openConfigGui(worldIn, playerIn);
             }

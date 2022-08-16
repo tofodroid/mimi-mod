@@ -1,7 +1,10 @@
 package io.github.tofodroid.mods.mimi.server.midi;
 
+import java.io.IOException;
+
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Track;
@@ -10,53 +13,42 @@ import javax.sound.midi.Transmitter;
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.com.sun.media.sound.RealTimeSequencerProvider;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
-import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
+import net.minecraft.world.entity.player.Player;
 
 public class MusicPlayerMidiHandler {
     private Integer lastTempoBPM;
     private Long pausedTickPosition;
     private Long pausedMicrosecond;
-    private MidiFileInfo midiInfo = null;
-    private Boolean error = false;
-    private ServerMidiInfoPacket.STATUS_CODE status = null;
     
     // MIDI Sequencer
     private Sequence activeSequence;
     private Sequencer activeSequencer;
-    private MusicPlayerReceiver activeReceiver;
+    private Receiver activeReceiver;
     private Transmitter activeTransmitter;
 
-    public MusicPlayerMidiHandler(TileBroadcaster tile, Sequence sequence, ServerMidiInfoPacket.STATUS_CODE errorStatus) {
+    public MusicPlayerMidiHandler(TileBroadcaster tile, Sequence sequence) throws IOException {
         this.activeSequence = sequence;
 
-        if(errorStatus != null) {
-            this.error = true;
-            this.status = errorStatus;
-        } else if(this.activeSequence != null && createSequencer(tile)) {
-            try {
-                this.lastTempoBPM = getTempoBPM(this.activeSequence);
-                this.activeSequencer.setSequence(this.activeSequence);
-                this.midiInfo = MidiFileInfo.fromSequence("server", sequence);
-            } catch(Exception e) {
-                MIMIMod.LOGGER.error("Failed to start sequencer: ", e);
-                this.activeSequencer = null;
-                this.error = true;
-                this.status = ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER;
-            }
-        } else {
-            this.error = true;
-            this.status = ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER;
+        try {
+            createSequencer(tile);
+            this.lastTempoBPM = getTempoBPM(this.activeSequence);
+            this.activeSequencer.setSequence(this.activeSequence);
+        } catch(Exception e) {
+            throw new IOException("Failed to start Server Music Handler: ", e);
         }
     }
 
-    public ServerMidiInfoPacket.STATUS_CODE getErrorStatus() {
-        return this.status;
-    }
+    public MusicPlayerMidiHandler(Player player, Sequence sequence) throws IOException  {
+        this.activeSequence = sequence;
 
-    public Boolean isInError() {
-        return this.error;
+        try {
+            createSequencer(player);
+            this.lastTempoBPM = getTempoBPM(this.activeSequence);
+            this.activeSequencer.setSequence(this.activeSequence);
+        } catch(Exception e) {
+            throw new IOException("Failed to start Server Music Handler: ", e);
+        }
     }
 
     public Boolean isPlaying() {
@@ -68,10 +60,6 @@ public class MusicPlayerMidiHandler {
         return seconds != null && seconds > 0;
     }
     
-    public MidiFileInfo getMidiFileInfo() {
-        return this.midiInfo;
-    }
-
     public Integer getPositionSeconds() {
         if(this.activeSequencer != null && this.activeSequencer.isOpen()) {
             if(this.activeSequencer.isRunning()) {
@@ -187,7 +175,7 @@ public class MusicPlayerMidiHandler {
                 }
             });
             this.activeTransmitter = this.activeSequencer.getTransmitter();
-            this.activeReceiver = new MusicPlayerReceiver(tile);
+            this.activeReceiver = new BroadcasterReceiver(tile);
             this.activeTransmitter.setReceiver(this.activeReceiver);
             return true;
         } catch(Exception e) {
@@ -195,6 +183,33 @@ public class MusicPlayerMidiHandler {
             this.activeReceiver = null;
             MIMIMod.LOGGER.error("Failed to create sequencer: ", e);
             return false;
+        }
+    }
+
+    protected Boolean createSequencer(Player player) {
+        try {
+            RealTimeSequencerProvider provider = new RealTimeSequencerProvider();
+            this.activeSequencer = (Sequencer)provider.getDevice(provider.getDeviceInfo()[0]);
+            this.activeSequencer.open();
+            this.activeSequencer.addMetaEventListener(new MetaEventListener(){
+                @Override
+                public void meta(MetaMessage meta) {
+                    if(MidiUtils.isMetaEndOfTrack(meta) && !activeSequencer.isRunning()) {
+                        ServerMusicPlayerMidiManager.stopTransmitter(player.getUUID());
+                    } else if(MidiUtils.isMetaTempo(meta) | (meta.getType() == 81 && meta.getData().length == 3)) {
+                        byte[] data = meta.getData();
+                        int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);
+                        lastTempoBPM = Math.round(60000001f / mspq);
+                        activeSequencer.setTempoInBPM(lastTempoBPM);
+                    }
+                }
+            });
+            this.activeTransmitter = this.activeSequencer.getTransmitter();
+            this.activeReceiver = new TransmitterReceiver(player);
+            this.activeTransmitter.setReceiver(this.activeReceiver);
+            return true;
+        } catch(Exception e) {
+            throw new RuntimeException("Failed to create sequencer: ", e);
         }
     }
 }

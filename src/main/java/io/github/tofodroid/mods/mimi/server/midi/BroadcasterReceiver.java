@@ -10,10 +10,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class MusicPlayerReceiver extends MidiInputReceiver {
+public class BroadcasterReceiver extends MidiInputReceiver {
     protected TileBroadcaster tile;
 
-    public MusicPlayerReceiver(TileBroadcaster tile) {
+    public BroadcasterReceiver(TileBroadcaster tile) {
         super();
         this.tile = tile;
     }

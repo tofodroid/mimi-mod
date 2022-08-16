@@ -81,8 +81,24 @@ public class ContainerTransmitter extends APlayerInventoryContainer {
 		return this.playerInventory.getItem(this.playerInvSlot);
 	}
 
-	public void setTransmitMode(TransmitMode mode) {
-		ItemTransmitter.setTransmitMode(this.playerInventory.getItem(this.playerInvSlot), mode);
+	public TransmitMode getTransmitMode() {
+		return ItemTransmitter.getTransmitMode(this.playerInventory.getItem(this.playerInvSlot));
+	}
+
+	public TransmitMode toggleTransmitMode() {
+		TransmitMode oldMode = ItemTransmitter.getTransmitMode(this.playerInventory.getItem(this.playerInvSlot));
+		TransmitMode newMode;
+
+		if(TransmitMode.SELF.equals(oldMode)) {
+			newMode = TransmitMode.LINKED;
+		} else if(TransmitMode.LINKED.equals(oldMode)) {
+			newMode = TransmitMode.PUBLIC;
+		} else {
+			newMode = TransmitMode.SELF;
+		}
+
+		ItemTransmitter.setTransmitMode(this.playerInventory.getItem(this.playerInvSlot), newMode);
+		return newMode;
 	}
 
 	public ItemStack getActiveFloppyStack() {

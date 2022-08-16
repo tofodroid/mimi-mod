@@ -26,7 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -118,10 +118,10 @@ public class MidiFileCacheManager {
         return file ;
     }
 
-    public static Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> getOrCreateCachedSequence(String midiUrl) {
+    public static Pair<Sequence,ServerMidiStatus.STATUS_CODE> getOrCreateCachedSequence(String midiUrl) {
         if(midiUrl != null && !midiUrl.isBlank() && midiUrl.toLowerCase().startsWith("server://")) {
             if(!RemoteMidiUrlUtils.validateFileUrl(midiUrl)) {
-                return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_URL);
+                return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_URL);
             }
 
             String fileName = urlToServerFile(midiUrl);
@@ -135,11 +135,11 @@ public class MidiFileCacheManager {
                 }
             }
 
-            return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_NOT_FOUND);
+            return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_NOT_FOUND);
         } else if(ModConfigs.COMMON.allowWebMidi.get()) {
             if(midiUrl != null && !midiUrl.isBlank() && RemoteMidiUrlUtils.validateMidiUrl(midiUrl)) {
                 if(!RemoteMidiUrlUtils.validateMidiHost(midiUrl)) {
-                    return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_HOST);
+                    return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_HOST);
                 }
 
                 String fileName = urlToFile(midiUrl);
@@ -175,10 +175,10 @@ public class MidiFileCacheManager {
                 }
             }
             
-            return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER);
+            return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_OTHER);
         }
 
-        return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_DISABLED);
+        return Pair.of(null, ServerMidiStatus.STATUS_CODE.ERROR_DISABLED);
     }
 
     protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {

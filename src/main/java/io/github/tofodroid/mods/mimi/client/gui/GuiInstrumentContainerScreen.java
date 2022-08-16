@@ -379,7 +379,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         Byte controller = 64;
         Byte value = on ? Byte.MAX_VALUE : Byte.MIN_VALUE;
         MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
+        NetworkManager.NOTE_CHANNEL.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
     }
 
@@ -447,7 +447,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             }
 
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos());
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.NOTE_CHANNEL.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
@@ -456,14 +456,14 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
+        NetworkManager.NOTE_CHANNEL.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOn(null, midiNote, velocity);
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
-        NetworkManager.NET_CHANNEL.sendToServer(packet);
+        NetworkManager.NOTE_CHANNEL.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         this.onMidiNoteOff(null, midiNote);
     }
@@ -710,7 +710,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         SyncItemInstrumentSwitchboardPacket packet = new SyncItemInstrumentSwitchboardPacket(true);
         
         if(packet != null) {
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.INFO_CHANNEL.sendToServer(packet);
         }
     }    
 }

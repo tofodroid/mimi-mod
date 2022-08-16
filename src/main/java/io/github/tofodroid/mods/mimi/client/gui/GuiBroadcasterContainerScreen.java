@@ -10,11 +10,12 @@ import com.mojang.math.Vector3f;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
-import io.github.tofodroid.mods.mimi.common.network.BroadcasterControlPacket;
+import io.github.tofodroid.mods.mimi.common.network.BroadcastControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
-import io.github.tofodroid.mods.mimi.common.network.BroadcasterControlPacket.CONTROL;
-import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket.STATUS_CODE;
+import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
+import io.github.tofodroid.mods.mimi.common.network.BroadcastControlPacket.CONTROL;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -23,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBroadcaster> {
     private final Integer SYNC_EVERY_TICKS = 10;
+    private ServerMusicPlayerStatusPacket playerInfo = null;
     private ServerMidiInfoPacket midiInfo = null;
     private Map<Integer,String> instrumentMap = null;
     private Integer infoSyncTrack = 0;
@@ -55,7 +57,7 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
 
     public void syncMidiInfo() {
         if(infoSyncTrack >= SYNC_EVERY_TICKS) {
-            NetworkManager.NET_CHANNEL.sendToServer(new ServerMidiInfoPacket(STATUS_CODE.INFO, null, null, null, null));
+            NetworkManager.INFO_CHANNEL.sendToServer(ServerMusicPlayerStatusPacket.requestPacket());
             infoSyncTrack = 0;
         } else {
             infoSyncTrack++;
@@ -67,16 +69,16 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(this.midiInfo != null && clickedBox(imouseX, imouseY, STOP_BUTTON)) {
-            NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.STOP));
-        } else if(this.midiInfo != null && clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
-            if(this.midiInfo.running) { 
-                NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.PAUSE));
+        if(this.playerInfo != null && clickedBox(imouseX, imouseY, STOP_BUTTON)) {
+            NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.STOP));
+        } else if(this.playerInfo != null && clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
+            if(this.playerInfo.running) { 
+                NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.PAUSE));
             } else {
-                NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.PLAY));
+                NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.PLAY));
             } 
         } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
-            NetworkManager.NET_CHANNEL.sendToServer(new BroadcasterControlPacket(CONTROL.TOGGLE_PUBLIC));
+            NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.TOGGLE_PUBLIC));
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -103,7 +105,7 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Play/Pause Button
-        blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, this.getBlitOffset(), 1 + (this.midiInfo != null ? this.midiInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, this.getBlitOffset(), 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
         blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.menu.getBroadcasterTile().isPublicBroadcast().compareTo(false)), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -114,16 +116,14 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         }
 
         // Time Slider
-        if(this.menu.hasActiveFloppy() && this.midiInfo != null && STATUS_CODE.INFO.equals(this.midiInfo.status)) {
+        if(this.menu.hasActiveFloppy() && this.midiInfo != null &&  this.playerInfo != null && STATUS_CODE.SUCCESS.equals(this.playerInfo.status)) {
             Integer slideLength = this.midiInfo.songLengthSeconds;
-            Integer slideProgress = this.midiInfo.songPositionSeconds >= 0 ? this.midiInfo.songPositionSeconds : 0;
+            Integer slideProgress = this.playerInfo.songPositionSeconds >= 0 ? this.playerInfo.songPositionSeconds : 0;
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             Integer slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
             blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
-
         
-
         return matrixStack;
     }
 
@@ -147,7 +147,7 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
                     case ERROR_NOT_FOUND:
                         this.font.draw(matrixStack,"Disk URL points to a server MIDI file that does not exist.", 7, 33, 0xFF00E600);
                         break;
-                    case INFO:
+                    case SUCCESS:
                         this.font.draw(matrixStack, "Channel Instruments: ", 7, 33, 0xFF00E600);
                         
                         Integer index = 0;
@@ -188,14 +188,20 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         }
         return matrixStack;
     }
-
+    
+    public void handlePlayerStatusPacket(ServerMusicPlayerStatusPacket packet) {
+        if(STATUS_CODE.EMPTY.equals(packet.status)) {
+            this.playerInfo = null;
+        } else {
+            this.playerInfo = packet;
+        }
+    }
+    
     public void handleMidiInfoPacket(ServerMidiInfoPacket packet) {
         this.midiInfo = packet;
 
-        if(STATUS_CODE.INFO.equals(packet.status)) {
+        if(STATUS_CODE.SUCCESS.equals(packet.status)) {
             this.instrumentMap = MidiFileInfo.getInstrumentMapping(packet.channelMapping);
-        } else if(STATUS_CODE.EMPTY.equals(packet.status)) {
-            this.resetMidiInfo();
         }
     }
 }

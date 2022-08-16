@@ -73,7 +73,7 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
             && midiUrlString != null && diskTitleString != null
             && clickedBox(imouseX, imouseY, WRITE_BUTTON_COORDS, WRITE_BUTTON_SIZE)
         ) {
-            NetworkManager.NET_CHANNEL.sendToServer(new WriteDiskPacket(this.midiUrlString, this.diskTitleString));
+            NetworkManager.INFO_CHANNEL.sendToServer(new WriteDiskPacket(this.midiUrlString, this.diskTitleString));
         }
         
         return super.mouseClicked(dmouseX, dmouseY, button);

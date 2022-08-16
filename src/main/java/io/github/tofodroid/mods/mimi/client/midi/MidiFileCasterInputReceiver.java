@@ -28,28 +28,28 @@ public class MidiFileCasterInputReceiver extends MidiInputReceiver {
     public void sendTransmitterNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
         if(MIMIMod.proxy.isClient()) {
             TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, velocity, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }
     
     public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
         if(MIMIMod.proxy.isClient()) {
             TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }
 
     public void sendTransmitterAllNotesOffPacket(Byte channel) {
         if(MIMIMod.proxy.isClient()) {
             TransmitterNotePacket packet = TransmitterNotePacket.createAllNotesOffPacket(channel, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }
 
     public void sendTransmitterControllerPacket(Byte channel, Byte controller, Byte value) {
         if(MIMIMod.proxy.isClient()) {
             TransmitterNotePacket packet = TransmitterNotePacket.createControllerPacket(channel, controller, value, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }
     

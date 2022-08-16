@@ -2,11 +2,12 @@ package io.github.tofodroid.mods.mimi.common.item;
 
 import javax.annotation.Nonnull;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +21,11 @@ public class ItemFileCaster extends Item {
     }
     
     @Override
+    public boolean isFoil(ItemStack stack) {
+        return ((ClientProxy)MIMIMod.proxy).getMidiInput().fileCasterIsActive() && ((ClientProxy)MIMIMod.proxy).getMidiInput().fileCasterManager.isPlaying();
+    }
+    
+    @Override
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         final ItemStack heldItem = playerIn.getItemInHand(handIn);
@@ -27,8 +33,7 @@ public class ItemFileCaster extends Item {
         if(worldIn.isClientSide && !playerIn.isCrouching()) {
             ClientGuiWrapper.openPlaylistGui(
                 worldIn, 
-                playerIn, 
-                InteractionHand.MAIN_HAND.equals(handIn) ? playerIn.getInventory().selected : Inventory.SLOT_OFFHAND
+                playerIn
             );
             return new InteractionResultHolder<>(InteractionResult.SUCCESS, heldItem);
         }

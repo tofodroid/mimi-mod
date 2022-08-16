@@ -1,40 +1,33 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class ServerMidiInfoPacket {
-    public enum STATUS_CODE {
-        INFO,
-        EMPTY,
-        ERROR_URL,
-        ERROR_HOST,
-        ERROR_DISABLED,
-        ERROR_OTHER,
-        ERROR_NOT_FOUND,
-        UNKNOWN;
-
-        public static STATUS_CODE fromByte(byte b) {
-            try {
-                return STATUS_CODE.values()[b];
-            } catch(Exception e) {}
-            return STATUS_CODE.UNKNOWN;
-        }
-    };
-
     public final STATUS_CODE status;
+    public final String midiUrl;
     public final byte[] channelMapping;
     public final Integer songLengthSeconds;
-    public final Integer songPositionSeconds;
-    public final Boolean running;
-    
-    public ServerMidiInfoPacket(STATUS_CODE status, byte[] channelMapping, Integer songLengthSeconds, Integer songPositionSeconds, Boolean running) {
+
+    public ServerMidiInfoPacket(STATUS_CODE status, String midiUrl, byte[] channelMapping, Integer songLengthSeconds) {
         this.status = status != null ? status : STATUS_CODE.UNKNOWN;
+        this.midiUrl = midiUrl != null ? midiUrl : "";
         this.channelMapping = channelMapping != null ? channelMapping : new byte[]{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
         this.songLengthSeconds = songLengthSeconds != null ? songLengthSeconds : -1;
-        this.songPositionSeconds = songPositionSeconds != null ? songPositionSeconds : 0;
-        this.running = running != null ? running : false;
+    }
+
+    public ServerMidiInfoPacket(STATUS_CODE status, byte[] channelMapping, Integer songLengthSeconds) {
+        this(status, null, channelMapping, songLengthSeconds);
+    }
+
+    public ServerMidiInfoPacket(String midiUrl) {
+        this(null, midiUrl, null, null);
+    }
+
+    public Boolean isValid() {
+        return STATUS_CODE.SUCCESS.equals(status);
     }
     
     public static ServerMidiInfoPacket decodePacket(FriendlyByteBuf buf) {
@@ -45,25 +38,19 @@ public class ServerMidiInfoPacket {
             if(channelMapping.length == 0) {
                 channelMapping = null;
             }
-            
+
             Integer songLengthSeconds = buf.readInt();
-            if(songLengthSeconds < 1) {
-                songLengthSeconds = null;
-            }
 
-            Integer songPositionSeconds = buf.readInt();
-            if(songPositionSeconds < 0) {
-                songPositionSeconds = null;
+            String midiUrl = buf.readUtf(256);
+            if(midiUrl.trim().isEmpty()) {
+                midiUrl = null;
             }
-
-            Boolean running = buf.readBoolean();
-            
-            return new ServerMidiInfoPacket(STATUS_CODE.fromByte(status), channelMapping, songLengthSeconds, songPositionSeconds, running);
+            return new ServerMidiInfoPacket(STATUS_CODE.fromByte(status), midiUrl, channelMapping, songLengthSeconds);
         } catch(IndexOutOfBoundsException e) {
-            MIMIMod.LOGGER.error("ServerMidiInfoPacket did not contain enough bytes. Exception: " + e);
+            MIMIMod.LOGGER.error("ServerValidateRemoteMidiPacket did not contain enough bytes. Exception: " + e);
             return null;
         } catch(DecoderException e) {
-            MIMIMod.LOGGER.error("ServerMidiInfoPacket contained invalid bytes. Exception: " + e);
+            MIMIMod.LOGGER.error("ServerValidateRemoteMidiPacket contained invalid bytes. Exception: " + e);
             return null;
         }
     }
@@ -72,7 +59,6 @@ public class ServerMidiInfoPacket {
         buf.writeByte(Integer.valueOf(pkt.status.ordinal()).byteValue());
         buf.writeByteArray(pkt.channelMapping);
         buf.writeInt(pkt.songLengthSeconds);
-        buf.writeInt(pkt.songPositionSeconds);
-        buf.writeBoolean(pkt.running);
+        buf.writeUtf(pkt.midiUrl, 256);
     }
 }

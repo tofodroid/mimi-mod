@@ -2,12 +2,17 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.function.Supplier;
 
+import javax.sound.midi.Sequence;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import io.github.tofodroid.mods.mimi.client.gui.GuiBroadcasterContainerScreen;
-import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
-import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
-import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
+import io.github.tofodroid.mods.mimi.client.gui.GuiTransmitterContainerScreen;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,47 +31,27 @@ public class ServerMidiInfoPacketHandler {
     }
     
     public static void handlePacketServer(final ServerMidiInfoPacket message, ServerPlayer sender) {
-        ServerMidiInfoPacket returnPacket = new ServerMidiInfoPacket(
-            ServerMidiInfoPacket.STATUS_CODE.EMPTY,
-            null,
-            null, 
-            null,
-            null
-        );
+        Pair<Sequence,STATUS_CODE> result = MidiFileCacheManager.getOrCreateCachedSequence(message.midiUrl);
+        ServerMidiInfoPacket resultPacket;
 
-        if(sender.containerMenu != null && sender.containerMenu instanceof ContainerBroadcaster) {
-            TileBroadcaster playerTile = ((ContainerBroadcaster)sender.containerMenu).getBroadcasterTile();
-            MusicPlayerMidiHandler tileHandler = ServerMusicPlayerMidiManager.getMusicPlayer(playerTile);
-
-            if(playerTile != null && tileHandler != null) {
-                if(!tileHandler.isInError()) {
-                    returnPacket = new ServerMidiInfoPacket(
-                        ServerMidiInfoPacket.STATUS_CODE.INFO,
-                        tileHandler.getMidiFileInfo().byteChannelMapping, 
-                        tileHandler.getMidiFileInfo().songLength, 
-                        tileHandler.getPositionSeconds(),
-                        tileHandler.isPlaying()
-                    );
-                } else {
-                    returnPacket = new ServerMidiInfoPacket(
-                        tileHandler.getErrorStatus(),
-                        null, 
-                        null, 
-                        null,
-                        null
-                    );
-                }
-            }
+        if(result.getRight() == null && result.getLeft() != null) {
+            MidiFileInfo info = MidiFileInfo.fromSequence(message.midiUrl, result.getLeft());
+            resultPacket = new ServerMidiInfoPacket(STATUS_CODE.SUCCESS, info.byteChannelMapping, info.songLength);
+        } else {
+            resultPacket = new ServerMidiInfoPacket(result.getRight(), null, null);
         }
-
-        NetworkManager.NET_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), returnPacket);
+        
+        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), resultPacket);
     }
     
     @OnlyIn(Dist.CLIENT)
     @SuppressWarnings("resource")
     public static void handlePacketClient(final ServerMidiInfoPacket message) {
-        if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiBroadcasterContainerScreen) {
-            ((GuiBroadcasterContainerScreen)Minecraft.getInstance().screen).handleMidiInfoPacket(message);
+        Screen screen = Minecraft.getInstance().screen;
+        if(screen != null && screen instanceof GuiBroadcasterContainerScreen) {
+            //((GuiBroadcasterContainerScreen)screen).handleMidiInfoPacket(message);
+        } else if(screen != null && screen instanceof GuiTransmitterContainerScreen) {
+            ((GuiTransmitterContainerScreen)screen).handleMidiInfoPacket(message);
         }
     }
 }
