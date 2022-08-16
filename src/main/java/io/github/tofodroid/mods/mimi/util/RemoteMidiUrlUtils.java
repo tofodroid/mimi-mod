@@ -28,8 +28,14 @@ public abstract class RemoteMidiUrlUtils {
         }
     }
 
+    public static Boolean validateFilename(String name) {
+        Pattern regex = Pattern.compile("^[0-9a-zA-Z][0-9a-zA-Z-_]*?[0-9a-zA-Z]$");
+        Matcher matcher = regex.matcher(name);
+        return name.length() <= 64 && matcher.find();
+    }
+
     public static Boolean validateFileUrl(String url) {
-        Pattern regex = Pattern.compile("^server:\\/\\/[^.\\/\\\\\\s][^.\\/\\\\\\s]*.[mM][iI][dD][iI]?$");
+        Pattern regex = Pattern.compile("^server:\\/\\/[0-9a-zA-Z][0-9a-zA-Z-_]*?[0-9a-zA-Z]$?$");
         Matcher matcher = regex.matcher(url);
         if(!matcher.find()) {
             return false;

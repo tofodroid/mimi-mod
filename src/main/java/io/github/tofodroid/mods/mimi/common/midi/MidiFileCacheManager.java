@@ -146,6 +146,44 @@ public class MidiFileCacheManager {
 
     }
 
+    public static String loadNewServerMusic(String url, String name) {
+        if(RemoteMidiUrlUtils.validateMidiUrl(url) && RemoteMidiUrlUtils.validateFilename(name) && !SERVER_SEQUENCE_VALUE_MAP.containsKey(name)) {
+            try {
+                Sequence sequence = downloadSequence(url);
+                
+                if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
+                    File savedSequence = saveSequence(SERVER_SEQUENCE_FOLDER, name + ".mid", sequence);
+                    SERVER_SEQUENCE_VALUE_MAP.put(name, savedSequence);
+                }
+    
+                return name;
+            } catch(FileNotFoundException e) {
+                // 404, Don't handle
+            } catch(MalformedURLException e) {
+                // Bad URL, Don't handle
+            } catch(InvalidMidiDataException e) {
+                // Bad MIDI, Don't handle
+            } catch(Exception e) {
+                MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
+            }
+        }
+       
+        return null;
+    }
+
+    public static Boolean removeServerMusic(String name) {
+        if(SERVER_SEQUENCE_VALUE_MAP.get(name) != null) {
+            try {
+                Files.deleteIfExists(SERVER_SEQUENCE_VALUE_MAP.get(name).toPath());
+                SERVER_SEQUENCE_VALUE_MAP.remove(name);
+                return true;
+            } catch(IOException e) {
+                MIMIMod.LOGGER.error("Failed to delete server song: " + name + ".mid");
+            }
+        }
+        return false;
+    }
+
     protected static String urlToFile(String url) {
         String file = url
             .replace("https","")
@@ -156,7 +194,7 @@ public class MidiFileCacheManager {
         return file + ".mid";
     }
 
-    protected static String urlToServerFile(String url) {
+    protected static String urlToServerKey(String url) {
         String file = url
             .replace("server://","")
             .replace("/", "");
@@ -169,12 +207,10 @@ public class MidiFileCacheManager {
             if(!RemoteMidiUrlUtils.validateFileUrl(midiUrl)) {
                 return Pair.of(null, STATUS_CODE.ERROR_URL);
             }
-
-            String fileName = urlToServerFile(midiUrl);
-    
+            String fileName = urlToServerKey(midiUrl);
             if(SERVER_SEQUENCE_VALUE_MAP.containsKey(fileName)) {
                 try {
-                    Sequence sequence = loadSequence(new File(SERVER_SEQUENCE_FOLDER, fileName));
+                    Sequence sequence = loadSequence(SERVER_SEQUENCE_VALUE_MAP.get(fileName));
                     return Pair.of(sequence, null);
                 } catch(Exception e) {
                     // Nothing
@@ -192,7 +228,7 @@ public class MidiFileCacheManager {
     
                 if(SEQUENCE_CACHE_VALUE_MAP.containsKey(fileName)) {
                     try {
-                        Sequence sequence = loadSequence(new File(SEQUENCE_CACHE_FOLDER, fileName));
+                        Sequence sequence = loadSequence(SEQUENCE_CACHE_VALUE_MAP.get(fileName));
                         return Pair.of(sequence, null);
                     } catch(Exception e) {
                         MIMIMod.LOGGER.error("Failed to load cached MIDI file: ", e);
@@ -225,15 +261,6 @@ public class MidiFileCacheManager {
         }
 
         return Pair.of(null, STATUS_CODE.ERROR_DISABLED);
-    }
-
-    public static STATUS_CODE addServerMusic(String midiUrl) {
-        // TODO
-        return STATUS_CODE.SUCCESS;
-    }
-    
-    public static void removeServerMusic(String key) {
-        // TODO
     }
 
     protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {

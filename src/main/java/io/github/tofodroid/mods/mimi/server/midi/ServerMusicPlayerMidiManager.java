@@ -41,7 +41,7 @@ public class ServerMusicPlayerMidiManager {
         // Broadcasters
         final ArrayList<UUID> toRemove = new ArrayList<>();
         BROADCASTER_MAP.entrySet().forEach(entry -> {
-            if(!RemoteMidiUrlUtils.validateMidiHost(entry.getValue().url)) {
+            if(!RemoteMidiUrlUtils.validateMidiHost(entry.getValue().url) && !RemoteMidiUrlUtils.validateFileUrl(entry.getValue().url)) {
                 toRemove.add(entry.getKey());
             }
         });
@@ -52,7 +52,7 @@ public class ServerMusicPlayerMidiManager {
         // Transmitters
         toRemove.clear();
         TRANSMITTER_MAP.entrySet().forEach(entry -> {
-            if(!RemoteMidiUrlUtils.validateMidiHost(entry.getValue().getRight().url)) {
+            if(!RemoteMidiUrlUtils.validateMidiHost(entry.getValue().getRight().url) && !RemoteMidiUrlUtils.validateFileUrl(entry.getValue().getRight().url)) {
                 toRemove.add(entry.getKey());
             }
         });
