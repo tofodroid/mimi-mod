@@ -49,7 +49,7 @@ public class ServerMidiInfoPacketHandler {
     public static void handlePacketClient(final ServerMidiInfoPacket message) {
         Screen screen = Minecraft.getInstance().screen;
         if(screen != null && screen instanceof GuiBroadcasterContainerScreen) {
-            //((GuiBroadcasterContainerScreen)screen).handleMidiInfoPacket(message);
+            ((GuiBroadcasterContainerScreen)screen).handleMidiInfoPacket(message);
         } else if(screen != null && screen instanceof GuiTransmitterContainerScreen) {
             ((GuiTransmitterContainerScreen)screen).handleMidiInfoPacket(message);
         }

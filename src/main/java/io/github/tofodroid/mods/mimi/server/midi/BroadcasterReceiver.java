@@ -20,7 +20,7 @@ public class BroadcasterReceiver extends MidiInputReceiver {
 
     @Override
     protected void handleMessage(ShortMessage message) {
-        if(isNoteOnMessage(message)) {
+        if(!tile.isRemoved() && isNoteOnMessage(message)) {
             this.sendTransmitterNoteOnPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         } else if(isNoteOffMessage(message)) {
             this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);

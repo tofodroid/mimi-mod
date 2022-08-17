@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import javax.net.ssl.SSLException;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
@@ -62,6 +63,10 @@ public class MidiFileCacheManager {
         } catch(Exception e) {
             throw new IllegalStateException("Failed to configure server music cache.", e);
         }
+    }
+
+    public static Boolean hasServerFile(String key) {
+        return SERVER_SEQUENCE_VALUE_MAP.containsKey(key);
     }
 
     public static Integer getCachedFileNamePages(Integer pageSize) {
@@ -163,6 +168,8 @@ public class MidiFileCacheManager {
                 // Bad URL, Don't handle
             } catch(InvalidMidiDataException e) {
                 // Bad MIDI, Don't handle
+            } catch(SSLException e) {
+                // Bad SSL, Don't handle
             } catch(Exception e) {
                 MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
             }
@@ -251,6 +258,8 @@ public class MidiFileCacheManager {
                         // Bad URL, Don't handle
                     } catch(InvalidMidiDataException e) {
                         // Bad MIDI, Don't handle
+                    } catch(SSLException e) {
+                        // Bad SSL, Don't handle
                     } catch(Exception e) {
                         MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
                     }

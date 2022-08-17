@@ -83,7 +83,6 @@ public class ServerMusicPlayerMidiManager {
 
         if(handler != null) {
             handler.play();
-            BROADCASTER_MAP.remove(id);
         }
     }
 

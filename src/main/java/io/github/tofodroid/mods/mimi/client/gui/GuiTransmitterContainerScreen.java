@@ -209,6 +209,11 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
     
     public void handleMidiInfoPacket(ServerMidiInfoPacket packet) {
         this.midiInfo = packet;
-        this.instrumentMap = MidiFileInfo.getInstrumentMapping(packet.channelMapping);
+        
+        if(STATUS_CODE.SUCCESS.equals(packet.status)) {
+            this.instrumentMap = MidiFileInfo.getInstrumentMapping(packet.channelMapping);
+        } else {
+            this.instrumentMap = null;
+        }
     }
 }

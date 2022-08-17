@@ -105,21 +105,18 @@ public class ModCommands {
     private static int getServerMusicList(CommandSourceStack source, Integer pageNum) {
         pageNum--;
         Integer numPages = MidiFileCacheManager.getServerFileNamesPages(5);
-
-        if(pageNum >= numPages) {
-            source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
-            return 1;
-        }
-
         List<String> fileNames = MidiFileCacheManager.getServerFileNames(5, pageNum);
 
         if(fileNames.isEmpty()) {
             source.sendSuccess(Component.literal("No files found"), false);
+        } else if(pageNum >= numPages) {
+            source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
+            return 1;
         } else {
             source.sendSuccess(Component.literal("Server Music (" + (pageNum+1) + "/" + numPages + ")"), false);
             Integer resultNum = pageNum * 5;
             for(String file : fileNames) {
-                source.sendSuccess(Component.literal(resultNum + ". " + file), false);
+                source.sendSuccess(Component.literal((resultNum+1) + ". " + file), false);
                 resultNum++;
             }
         }
@@ -187,11 +184,13 @@ public class ModCommands {
     }
 
     private static int addWebHost(CommandSourceStack source, String host) {
-        if(!RemoteMidiUrlUtils.validHostString(host.stripLeading().trim())) {
+        host = host.strip();
+
+        if(!RemoteMidiUrlUtils.validHostString(host)) {
             source.sendFailure(Component.literal("Provided host is invalid. Host must use the format of: http[s]://<host>.<extension>. Ex: https://bitmidi.com"));
             return 1;
         }
-        ModConfigs.COMMON.addAllowedHost(host.stripLeading().trim());
+        ModConfigs.COMMON.addAllowedHost(host);
         source.sendSuccess(Component.literal("Host '" + host + "' added to Allowed Hosts."), true);
         return 0;
     }
@@ -224,17 +223,23 @@ public class ModCommands {
     }
 
     private static int addServerSong(CommandSourceStack source, String url, String name) {
-        if(url.strip().isEmpty() || url.strip().length() > 256) {
+        url = url.strip();
+        name = name.strip();
+
+        if(url.isEmpty() || url.length() > 256) {
             source.sendFailure(Component.literal("Supplied URL has invalid length. Max: 256 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateMidiUrl(url)) {
             source.sendFailure(Component.literal("Supplied URL is not a valid MIDI URL"));
             return 1;
-        } else if(name.strip().length() < 3 || name.strip().length() > 64) {
+        } else if(name.length() < 3 || name.length() > 64) {
             source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
             source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_', and must start and end with a letter or number."));
+            return 1;
+        } else if(MidiFileCacheManager.hasServerFile(name)) {
+            source.sendFailure(Component.literal("A server MIDI file already exists with that name."));
             return 1;
         }
 
@@ -250,11 +255,16 @@ public class ModCommands {
     }
 
     private static int removeServerSong(CommandSourceStack source, String name) {
-        if(name.strip().length() < 3 || name.strip().length() > 64) {
+        name = name.strip();
+
+        if(name.length() < 3 || name.length() > 64) {
             source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
             source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_'"));
+            return 1;
+        } else if(!MidiFileCacheManager.hasServerFile(name)) {
+            source.sendFailure(Component.literal("No server MIDI found with supplied name."));
             return 1;
         }
 

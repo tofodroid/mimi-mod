@@ -23,11 +23,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
 public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBroadcaster> {
-    private final Integer SYNC_EVERY_TICKS = 10;
+    private final Integer SYNC_STATUS_EVERY_TICKS = 10;
     private ServerMusicPlayerStatusPacket playerInfo = null;
     private ServerMidiInfoPacket midiInfo = null;
     private Map<Integer,String> instrumentMap = null;
-    private Integer infoSyncTrack = 0;
+    private Integer statusSyncTrack = 0;
     private ItemStack lastDiskStack = null;
 
     // Button Boxes
@@ -45,22 +45,26 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
 
     public GuiBroadcasterContainerScreen(ContainerBroadcaster container, Inventory inv, Component textComponent) {
         super(container, inv, 350, 212, 350, "textures/gui/container_broadcaster.png", textComponent);
-        resetMidiInfo();
-        this.lastDiskStack = this.menu.getActiveFloppyStack();
-        this.infoSyncTrack = this.SYNC_EVERY_TICKS;
-    }
-
-    public void resetMidiInfo() {
         this.midiInfo = null;
         this.instrumentMap = null;
+        this.playerInfo = null;
+        this.statusSyncTrack = this.SYNC_STATUS_EVERY_TICKS;
+        this.lastDiskStack = this.menu.getActiveFloppyStack();
+        this.syncMidiInfo();
     }
 
-    public void syncMidiInfo() {
-        if(infoSyncTrack >= SYNC_EVERY_TICKS) {
+    public void syncPlayerInfo() {
+        if(statusSyncTrack >= SYNC_STATUS_EVERY_TICKS) {
             NetworkManager.INFO_CHANNEL.sendToServer(ServerMusicPlayerStatusPacket.requestPacket());
-            infoSyncTrack = 0;
+            statusSyncTrack = 0;
         } else {
-            infoSyncTrack++;
+            statusSyncTrack++;
+        }
+    }
+    
+    public void syncMidiInfo() {
+        if(this.lastDiskStack != null) {
+            NetworkManager.INFO_CHANNEL.sendToServer(new ServerMidiInfoPacket(ItemFloppyDisk.getMidiUrl(this.lastDiskStack)));
         }
     }
 
@@ -69,10 +73,10 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(this.playerInfo != null && clickedBox(imouseX, imouseY, STOP_BUTTON)) {
+        if(this.midiInfo != null && this.midiInfo.isValid() && this.playerInfo != null && clickedBox(imouseX, imouseY, STOP_BUTTON)) {
             NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.STOP));
-        } else if(this.playerInfo != null && clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
-            if(this.playerInfo.running) { 
+        } else if(this.midiInfo != null && this.midiInfo.isValid() && clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
+            if(this.playerInfo != null && this.playerInfo.running) { 
                 NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.PAUSE));
             } else {
                 NetworkManager.INFO_CHANNEL.sendToServer(new BroadcastControlPacket(CONTROL.PLAY));
@@ -88,12 +92,16 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
     protected void containerTick() {
         if(this.lastDiskStack != null && (this.menu.getActiveFloppyStack() == null || (this.menu.getActiveFloppyStack() != null && !ItemStack.matches(this.lastDiskStack, this.menu.getActiveFloppyStack())))) {
             this.lastDiskStack = this.menu.getActiveFloppyStack();
-            this.resetMidiInfo();
+            this.playerInfo = null;
+            this.midiInfo = null;
+            this.instrumentMap = null;
+            this.syncMidiInfo();
         } else if(this.lastDiskStack == null) {
             this.lastDiskStack = this.menu.getActiveFloppyStack();
+            this.syncMidiInfo();
         }
         
-        this.syncMidiInfo();
+        this.syncPlayerInfo();
     }
 
     @Override
@@ -108,22 +116,22 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, this.getBlitOffset(), 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.menu.getBroadcasterTile().isPublicBroadcast().compareTo(false)), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.menu.getBroadcasterTile().getTransmitMode().ordinal()), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Transmit Light
-        if(this.menu.getBroadcasterTile().isPowered()) {
+        if(this.playerInfo != null && this.playerInfo.running) {
             blit(matrixStack, START_X + Float.valueOf(TRANSMIT_LIGHT.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_LIGHT.y()).intValue(), this.getBlitOffset(), 8, 225, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Time Slider
-        if(this.menu.hasActiveFloppy() && this.midiInfo != null &&  this.playerInfo != null && STATUS_CODE.SUCCESS.equals(this.playerInfo.status)) {
+        if(this.menu.hasActiveFloppy() && this.midiInfo != null && this.playerInfo != null && STATUS_CODE.SUCCESS.equals(this.playerInfo.status)) {
             Integer slideLength = this.midiInfo.songLengthSeconds;
             Integer slideProgress = this.playerInfo.songPositionSeconds >= 0 ? this.playerInfo.songPositionSeconds : 0;
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             Integer slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
             blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
-        
+
         return matrixStack;
     }
 
@@ -148,20 +156,22 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
                         this.font.draw(matrixStack,"Disk URL points to a server MIDI file that does not exist.", 7, 33, 0xFF00E600);
                         break;
                     case SUCCESS:
-                        this.font.draw(matrixStack, "Channel Instruments: ", 7, 33, 0xFF00E600);
+                        if(this.instrumentMap != null) {
+                            this.font.draw(matrixStack, "Channel Instruments: ", 7, 33, 0xFF00E600);
                         
-                        Integer index = 0;
-                        for(Integer i = 0; i < 16; i+=2) {
-                            String name = instrumentMap.get(i) == null ? "None" : instrumentMap.get(i);
-                            this.font.draw(matrixStack, (i+1) + ": " + name, 7, 47 + 10*index, 0xFF00E600);
-                            index++;
-                        }
-
-                        index = 0;
-                        for(Integer i = 1; i < 16; i+=2) {
-                            String name = instrumentMap.get(i) == null ? "None" : instrumentMap.get(i);
-                            this.font.draw(matrixStack, (i+1) + ": " + name, 175, 47 + 10*index, 0xFF00E600);
-                            index++;
+                            Integer index = 0;
+                            for(Integer i = 0; i < 16; i+=2) {
+                                String name = instrumentMap.get(i) == null ? "None" : instrumentMap.get(i);
+                                this.font.draw(matrixStack, (i+1) + ": " + name, 7, 47 + 10*index, 0xFF00E600);
+                                index++;
+                            }
+    
+                            index = 0;
+                            for(Integer i = 1; i < 16; i+=2) {
+                                String name = instrumentMap.get(i) == null ? "None" : instrumentMap.get(i);
+                                this.font.draw(matrixStack, (i+1) + ": " + name, 175, 47 + 10*index, 0xFF00E600);
+                                index++;
+                            }
                         }
                         break;
                     default:
@@ -188,7 +198,7 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
         }
         return matrixStack;
     }
-    
+
     public void handlePlayerStatusPacket(ServerMusicPlayerStatusPacket packet) {
         if(STATUS_CODE.EMPTY.equals(packet.status)) {
             this.playerInfo = null;
@@ -202,6 +212,8 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
 
         if(STATUS_CODE.SUCCESS.equals(packet.status)) {
             this.instrumentMap = MidiFileInfo.getInstrumentMapping(packet.channelMapping);
+        } else {
+            this.instrumentMap = null;
         }
     }
 }

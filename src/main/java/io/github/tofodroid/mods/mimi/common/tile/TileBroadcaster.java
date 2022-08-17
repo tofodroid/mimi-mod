@@ -22,6 +22,8 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileBroadcaster extends AContainerTile implements BlockEntityTicker<TileBroadcaster> {
+    protected Boolean diskError = false;
+
     // Persist
     public static final String BROADCAST_PUBLIC_TAG = "broadcast_public";
 
@@ -130,6 +132,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
 
     public void unloadDisk() {
         this.setUnpowered();
+        diskError = false;
         ServerMusicPlayerMidiManager.stopBroadcaster(this.getMusicPlayerId());
     }
 
@@ -140,6 +143,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
             ServerMusicPlayerMidiManager.playBroadcaster(this.getMusicPlayerId());
         } else {
             this.setUnpowered();
+            this.diskError = true;
         }
     }
 
@@ -190,7 +194,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
             }
             
             // If loaded but has no handler, create one
-            if(this.hasActiveFloppyDisk() && handler == null) {
+            if(this.hasActiveFloppyDisk() && handler == null && !diskError) {
                 this.loadDisk(this.getActiveFloppyDiskStack());
             }
         }
