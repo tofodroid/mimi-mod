@@ -71,13 +71,13 @@ public class ModCommands {
                     )
                 )
                 .then(Commands.literal("web")
-                    .then(Commands.literal("hosts")
+                    .then(Commands.literal("list")
                         .then(Commands.argument("page", IntegerArgumentType.integer(1, 99999))
                             .executes(ctx -> listWebHosts(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "page")))
                         )
                         .executes(ctx -> listWebHosts(ctx.getSource(), 1))
                     )
-                    .then(Commands.literal("enabled")
+                    .then(Commands.literal("status")
                         .executes(ctx -> getWebStatus(ctx.getSource()))
                     )
                     .then(Commands.literal("add")
@@ -126,6 +126,68 @@ public class ModCommands {
     private static int reloadServerMusicList(CommandSourceStack source) {
         MidiFileCacheManager.refreshServerSequenceMap();
         source.sendSuccess(Component.literal("Server saved music reloaded. Found " + MidiFileCacheManager.getServerFileNamesPages(1) + " files"), true);
+        return 0;
+    }
+
+    
+    private static int addServerSong(CommandSourceStack source, String url, String name) {
+        url = url.strip();
+        name = name.strip();
+
+        if(!ModConfigs.COMMON.allowServerCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(url.isEmpty() || url.length() > 256) {
+            source.sendFailure(Component.literal("Supplied URL has invalid length. Max: 256 characters"));
+            return 1;
+        } else if(!RemoteMidiUrlUtils.validateMidiUrl(url)) {
+            source.sendFailure(Component.literal("Supplied URL is not a valid MIDI URL"));
+            return 1;
+        } else if(name.length() < 3 || name.length() > 64) {
+            source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
+            return 1;
+        } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
+            source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_', and must start and end with a letter or number."));
+            return 1;
+        } else if(MidiFileCacheManager.hasServerFile(name)) {
+            source.sendFailure(Component.literal("A server MIDI file already exists with that name."));
+            return 1;
+        }
+
+        String resultName = MidiFileCacheManager.loadNewServerMusic(url, name);
+
+        if(resultName == null) {
+            source.sendFailure(Component.literal("Failed to download and save MIDI from supplied URL"));
+            return 1;
+        }
+
+        source.sendSuccess(Component.literal("New Server MIDI downloaded and saved as '" + name + "'"), true);
+        return 0;
+    }
+
+    private static int removeServerSong(CommandSourceStack source, String name) {
+        name = name.strip();
+
+        if(!ModConfigs.COMMON.allowServerCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(name.length() < 3 || name.length() > 64) {
+            source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
+            return 1;
+        } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
+            source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_'"));
+            return 1;
+        } else if(!MidiFileCacheManager.hasServerFile(name)) {
+            source.sendFailure(Component.literal("No server MIDI found with supplied name."));
+            return 1;
+        }
+
+        if(!MidiFileCacheManager.removeServerMusic(name)) {
+            source.sendFailure(Component.literal("Failed to delete server MIDI file. Check the logs for more info"));
+            return 1;
+        }
+        
+        source.sendSuccess(Component.literal("Successfully deleted server MIDI '" + name + "'"), true);
         return 0;
     }
 
@@ -183,10 +245,18 @@ public class ModCommands {
         return 0;
     }
 
+    private static int getWebStatus(CommandSourceStack source) {
+        source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
+        return 0;
+    }
+    
     private static int addWebHost(CommandSourceStack source, String host) {
         host = host.strip();
 
-        if(!RemoteMidiUrlUtils.validHostString(host)) {
+        if(!ModConfigs.COMMON.allowWebCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(!RemoteMidiUrlUtils.validHostString(host)) {
             source.sendFailure(Component.literal("Provided host is invalid. Host must use the format of: http[s]://<host>.<extension>. Ex: https://bitmidi.com"));
             return 1;
         }
@@ -198,7 +268,10 @@ public class ModCommands {
     private static int removeWebHost(CommandSourceStack source, Integer number) {
         number--;
 
-        if(ModConfigs.COMMON.getAllowedHostsList().isEmpty()) {
+        if(!ModConfigs.COMMON.allowWebCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(ModConfigs.COMMON.getAllowedHostsList().isEmpty()) {
             source.sendFailure(Component.literal("Allowed hosts list is already empty"));
             return 1;
         } else if(number >= ModConfigs.COMMON.getAllowedHostsList().size()) {
@@ -211,69 +284,13 @@ public class ModCommands {
         return 0;
     }
     
-    private static int getWebStatus(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
-        return 0;
-    }
-
     private static int setWebStatus(CommandSourceStack source, Boolean enable) {
-        ModConfigs.COMMON.allowWebMidi.set(enable);
+        if(!ModConfigs.COMMON.allowWebCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        }
+
         source.sendSuccess(Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
-        return 0;
-    }
-
-    private static int addServerSong(CommandSourceStack source, String url, String name) {
-        url = url.strip();
-        name = name.strip();
-
-        if(url.isEmpty() || url.length() > 256) {
-            source.sendFailure(Component.literal("Supplied URL has invalid length. Max: 256 characters"));
-            return 1;
-        } else if(!RemoteMidiUrlUtils.validateMidiUrl(url)) {
-            source.sendFailure(Component.literal("Supplied URL is not a valid MIDI URL"));
-            return 1;
-        } else if(name.length() < 3 || name.length() > 64) {
-            source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
-            return 1;
-        } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
-            source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_', and must start and end with a letter or number."));
-            return 1;
-        } else if(MidiFileCacheManager.hasServerFile(name)) {
-            source.sendFailure(Component.literal("A server MIDI file already exists with that name."));
-            return 1;
-        }
-
-        String resultName = MidiFileCacheManager.loadNewServerMusic(url, name);
-
-        if(resultName == null) {
-            source.sendFailure(Component.literal("Failed to download and save MIDI from supplied URL"));
-            return 1;
-        }
-
-        source.sendSuccess(Component.literal("New Server MIDI downloaded and saved as '" + name + "'"), true);
-        return 0;
-    }
-
-    private static int removeServerSong(CommandSourceStack source, String name) {
-        name = name.strip();
-
-        if(name.length() < 3 || name.length() > 64) {
-            source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
-            return 1;
-        } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
-            source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_'"));
-            return 1;
-        } else if(!MidiFileCacheManager.hasServerFile(name)) {
-            source.sendFailure(Component.literal("No server MIDI found with supplied name."));
-            return 1;
-        }
-
-        if(!MidiFileCacheManager.removeServerMusic(name)) {
-            source.sendFailure(Component.literal("Failed to delete server MIDI file. Check the logs for more info"));
-            return 1;
-        }
-        
-        source.sendSuccess(Component.literal("Successfully deleted server MIDI '" + name + "'"), true);
         return 0;
     }
 }
