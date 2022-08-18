@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "minecraft:player_head",
+    "category": "mimi:9server",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}

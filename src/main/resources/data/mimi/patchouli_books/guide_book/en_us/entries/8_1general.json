@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "minecraft:command_block",
+    "category": "mimi:8commands",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}

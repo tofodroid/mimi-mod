@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "mimi:keyboard",
+    "category": "mimi:4devices",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}

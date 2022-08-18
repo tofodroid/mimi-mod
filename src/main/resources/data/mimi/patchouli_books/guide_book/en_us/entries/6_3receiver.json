@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "mimi:receiver",
+    "category": "mimi:6redstone",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 3
+}

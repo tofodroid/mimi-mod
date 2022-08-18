@@ -1,6 +1,0 @@
-{
-	"name": "The FileCaster",
-	"description": "The MIDI FileCaster allows you to load a playlist of MIDI songs that you can then transmit to nearby instruments, including your own.",
-	"icon": "mimi:filecaster",
-	"sortnum": 2
-}

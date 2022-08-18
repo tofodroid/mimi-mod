@@ -1,6 +1,0 @@
-{
-	"name": "An Introduction to MIDI",
-	"description": "MIMI is designed around using the MIDI standard to play music in Minecraft. While an understanding of MIDI is not needed to play with the mod, it can be helpful for more advanced usage.$(br2)The topics in this section will give you an introduction to the basic concepts of MIDI.",
-	"icon": "minecraft:command_block",
-	"sortnum": 9
-}

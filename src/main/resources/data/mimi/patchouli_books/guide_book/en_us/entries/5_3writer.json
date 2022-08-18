@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "mimi:diskwriter",
+    "category": "mimi:5files",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 3
+}
