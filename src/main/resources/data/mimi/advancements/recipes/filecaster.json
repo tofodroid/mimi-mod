@@ -1,0 +1,32 @@
+{
+    "parent": "minecraft:recipes/root",
+    "rewards": {
+      "recipes": [
+        "mimi:filecaster"
+      ]
+    },
+    "criteria": {
+      "has_note": {
+        "trigger": "minecraft:inventory_changed",
+        "conditions": {
+          "items": [
+            {
+              "item": "mimi:transmitter"
+            }
+          ]
+        }
+      },
+      "has_the_recipe": {
+        "trigger": "minecraft:recipe_unlocked",
+        "conditions": {
+          "recipe": "mimi:filecaster"
+        }
+      }
+    },
+    "requirements": [
+      [
+        "has_note",
+        "has_the_recipe"
+      ]
+    ]
+}

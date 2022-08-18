@@ -1,6 +1,0 @@
-{
-	"name": "Switchboards",
-	"description": "In order to connect instruments and redstone-enabled blocks in MIMI to Transmitters you need to insert a MIDI Switchboard item into them.$(br2)Switchboards store all of the properties used to configure instruments and redstone-enabled blocks in MIMI and allow you to quickly transfer settings between them,",
-	"icon": "mimi:switchboard",
-	"sortnum": 3
-}

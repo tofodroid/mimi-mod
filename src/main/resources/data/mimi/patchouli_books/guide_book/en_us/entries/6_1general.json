@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "minecraft:redstone",
+    "category": "mimi:6redstone",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}

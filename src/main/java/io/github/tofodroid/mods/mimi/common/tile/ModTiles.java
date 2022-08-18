@@ -12,7 +12,7 @@ public class ModTiles {
     public static BlockEntityType<TileListener> LISTENER = null;
     public static BlockEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = null;
     public static BlockEntityType<TileConductor> CONDUCTOR = null;
-    public static BlockEntityType<TileMusicPlayer> MUSICPLAYER = null;
+    public static BlockEntityType<TileBroadcaster> BROADCASTER = null;
     
     private static <T extends BlockEntity> BlockEntityType<T> registerType(String id, BlockEntityType.Builder<T> builder, RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
         BlockEntityType<T> type = builder.build(null);
@@ -26,6 +26,6 @@ public class ModTiles {
         LISTENER = registerType("listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER.get()), event);
         MECHANICALMAESTRO = registerType("mechanicalmaestro", BlockEntityType.Builder.of(TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO.get()), event);
         CONDUCTOR = registerType("conductor", BlockEntityType.Builder.of(TileConductor::new, ModBlocks.CONDUCTOR.get()), event);
-        MUSICPLAYER = registerType("musicplayer", BlockEntityType.Builder.of(TileMusicPlayer::new, ModBlocks.MUSICPLAYER.get()), event);
+        BROADCASTER = registerType("broadcaster", BlockEntityType.Builder.of(TileBroadcaster::new, ModBlocks.BROADCASTER.get()), event);
     }
 }

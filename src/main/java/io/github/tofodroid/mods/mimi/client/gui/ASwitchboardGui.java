@@ -65,7 +65,7 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
             packet = ItemMidiSwitchboard.getSyncPacket(selectedSwitchboardStack);
         }        
         if(packet != null) {
-            NetworkManager.NET_CHANNEL.sendToServer(packet);
+            NetworkManager.INFO_CHANNEL.sendToServer(packet);
         }
     }
     

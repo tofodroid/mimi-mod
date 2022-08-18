@@ -1,16 +1,17 @@
 package io.github.tofodroid.mods.mimi.common.config;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
+import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 // 1. Default MIDI Input Device
 
 public class CommonConfig {
-    public static final String MUSIC_PLAYER_CATEGORY_NAME = "Music Player";
+    public static final String MUSIC_PLAYER_CATEGORY_NAME = "Server Music";
 
     public ForgeConfigSpec.IntValue serverMusicCacheSize;
     public ForgeConfigSpec.BooleanValue allowWebMidi;
@@ -22,7 +23,7 @@ public class CommonConfig {
         serverMusicCacheSize = builder.comment("Server music cache limit. The maximum number of MIDI files (from Floppy Disks) to keep in the server-side music cache.")
             .translation(MIMIMod.MODID + ".config.server.cache.music.size")
             .defineInRange("serverMusicCacheSize", 100, 0, 999);
-        allowWebMidi = builder.comment("Whether or not to allow web URL for Floppy Disks.")
+        allowWebMidi = builder.comment("Whether or not to allow web URLs for Floppy Disks.")
             .translation(MIMIMod.MODID + ".config.server.music.allowed.hosts")
             .define("allowWebMidi", true);
         allowedMusicHosts = builder.comment("Allowed web hosts for Floppy Disk URLs (comma-separated). If no hosts are specified any host is allowed. Hosts should not include the protocol (I.E: https) or any paths (I.E: /path). Ex: bitmidi.com")
@@ -41,7 +42,35 @@ public class CommonConfig {
             }
         }
 
-        return allowedHostsList;        
+        return new ArrayList<>(allowedHostsList);
+    }
+
+    public void onConfigChange() {
+        clearAllowedHostsList();
+        if(allowWebMidi.get()) {
+            ServerMusicPlayerMidiManager.revalidate();
+        } else {
+            ServerMusicPlayerMidiManager.clearMusicPlayers();
+        }
+    }
+
+    public void addAllowedHost(String host) {
+        List<String> allowedHosts = getAllowedHostsList();
+        allowedHosts.add(host);
+        allowedMusicHosts.set(allowedHosts.stream().collect(Collectors.joining(",")));
+        onConfigChange();
+    }
+
+    public void removeAllowedHost(Integer index) {
+        List<String> allowedHosts = getAllowedHostsList();
+        allowedHosts.remove(index.intValue());
+
+        if(allowedHosts.isEmpty()) {
+            allowedMusicHosts.set("");
+        } else {
+            allowedMusicHosts.set(allowedHosts.stream().collect(Collectors.joining(",")));
+        }
+        onConfigChange();
     }
 
     public void clearAllowedHostsList() {

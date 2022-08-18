@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
@@ -36,11 +37,11 @@ public class MidiNotePacketHandler {
             // Forward to players
             for(MidiNotePacket packet : messages) {
                 if(ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
-                    NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
+                    NetworkManager.NOTE_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
                 } else {
                     ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
                         if(player != sender && Math.sqrt(player.getOnPos().distSqr(packet.pos)) <= getQueryBoxRange(packet.velocity <= 0)) {
-                            NetworkManager.NET_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+                            NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
                         }
                     });
                 }
@@ -69,7 +70,7 @@ public class MidiNotePacketHandler {
     }
 
     public static void handlePacketClient(final MidiNotePacket message) {
-        MIMIMod.proxy.getMidiSynth().handlePacket(message); 
+        if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
     }
 
     protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerLevel worldIn, BlockPos notePos, Integer range) {

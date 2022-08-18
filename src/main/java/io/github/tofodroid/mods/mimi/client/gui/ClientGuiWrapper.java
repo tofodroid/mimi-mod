@@ -9,7 +9,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public abstract class ClientGuiWrapper {
     public static void openPlaylistGui(Level world, Player player) {
-        openGui(world, new GuiMidiPlaylist(player));
+        openGui(world, new GuiMidiFileCaster(player));
     }
 
     public static void openConfigGui(Level world, Player player) {

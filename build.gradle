@@ -147,7 +147,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.2-43.0.7'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.0.19'
 
     // Mod Integrations
     // JEI
@@ -157,8 +157,8 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.246")
 
     // Patchouli
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.19-76-SNAPSHOT:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.19-76-SNAPSHOT")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.2-76:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.2-76")
 }
 
 jar {

@@ -1,6 +1,0 @@
-{
-	"name": "The Transmitter",
-	"description": "The MIDI Transmitter allows you to load a playlist of MIDI songs that you can then transmit to nearby instruments, including your own.",
-	"icon": "mimi:transmitter",
-	"sortnum": 2
-}

@@ -1,0 +1,12 @@
+{
+    "name": "",
+    "icon": "mimi:tuningtable",
+    "category": "mimi:7villager",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}

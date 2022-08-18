@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 
 import javax.sound.midi.MidiChannel;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -73,7 +72,6 @@ public class MIMIChannel {
         } else if(this.lastNoteTime != null) {
             return false;
         } else {
-            MIMIMod.LOGGER.warn("Attempted to tick improperly channel: " + this.channel.toString());
             return null;
         }
     }

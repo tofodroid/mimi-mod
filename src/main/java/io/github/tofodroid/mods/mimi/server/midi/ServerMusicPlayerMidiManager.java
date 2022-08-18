@@ -1,274 +1,252 @@
 package io.github.tofodroid.mods.mimi.server.midi;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
-import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileMusicPlayer;
+import io.github.tofodroid.mods.mimi.common.item.ItemTransmitter;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
+import io.github.tofodroid.mods.mimi.common.network.ActiveTransmitterIdPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
+import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
-public abstract class ServerMusicPlayerMidiManager {
-    protected static Map<UUID,MusicPlayerMidiHandler> MUSIC_PLAYER_MAP = new HashMap<>();
-    protected static TreeMap<Instant,String> SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
-    protected static Map<String,File> SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
-    protected static Map<String,File> SERVER_SEQUENCE_VALUE_MAP = new HashMap<>();
-    protected static File SEQUENCE_CACHE_FOLDER = null;
-    protected static File SERVER_SEQUENCE_FOLDER = null;
+@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+public class ServerMusicPlayerMidiManager {
+    protected static Map<UUID,MusicPlayerMidiHandler> BROADCASTER_MAP = new HashMap<>();
+    protected static Map<UUID,Pair<Integer,MusicPlayerMidiHandler>> TRANSMITTER_MAP = new HashMap<>();
+    protected static Map<UUID,ItemStack> TRANSMITTER_STACK_MAP = new HashMap<>();
 
-    // Music Player Cache
-    public static MusicPlayerMidiHandler getOrAddMusicPlayer(TileMusicPlayer tile, String midiUrl) {
-        MusicPlayerMidiHandler handler = getMusicPlayer(tile);
-
-        if(handler == null) {
-            Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> result = getOrCreateCachedSequence(ItemFloppyDisk.getMidiUrl(tile.getActiveFloppyDiskStack()));
-            MUSIC_PLAYER_MAP.put(tile.getMusicPlayerId(), new MusicPlayerMidiHandler(tile, result.getLeft(), result.getRight()));
-            return MUSIC_PLAYER_MAP.get(tile.getMusicPlayerId());
+    // Util
+    public static void revalidate() {
+        // Broadcasters
+        final ArrayList<UUID> toRemove = new ArrayList<>();
+        BROADCASTER_MAP.entrySet().forEach(entry -> {
+            if(!RemoteMidiUrlUtils.validateMidiHost(entry.getValue().url) && !RemoteMidiUrlUtils.validateFileUrl(entry.getValue().url)) {
+                toRemove.add(entry.getKey());
+            }
+        });
+        for(UUID id : toRemove) {
+            stopBroadcaster(id);
         }
 
-        return handler;
-    }
-
-    public static MusicPlayerMidiHandler getMusicPlayer(TileMusicPlayer tile) {
-        if(tile != null) { 
-            return MUSIC_PLAYER_MAP.get(tile.getMusicPlayerId());
+        // Transmitters
+        toRemove.clear();
+        TRANSMITTER_MAP.entrySet().forEach(entry -> {
+            if(!RemoteMidiUrlUtils.validateMidiHost(entry.getValue().getRight().url) && !RemoteMidiUrlUtils.validateFileUrl(entry.getValue().getRight().url)) {
+                toRemove.add(entry.getKey());
+            }
+        });
+        for(UUID id : toRemove) {
+            stopTransmitter(id);
         }
-        return null;
     }
 
-    public static void removeMusicPlayer(TileMusicPlayer tile) {
-        MusicPlayerMidiHandler handler = getMusicPlayer(tile);
+    // Broadcaster
+    public static Boolean createBroadcaster(TileBroadcaster tile, String midiUrl) {
+        Pair<Sequence, STATUS_CODE> midiStatus = MidiFileCacheManager.getOrCreateCachedSequence(midiUrl);
+
+        if(midiStatus.getRight() == null && midiStatus.getLeft() != null) {
+            try {
+                stopBroadcaster(tile.getMusicPlayerId());
+                BROADCASTER_MAP.put(tile.getMusicPlayerId(), new MusicPlayerMidiHandler(tile, midiStatus.getLeft(), midiUrl));
+                return true;
+            } catch(Exception e) {
+                MIMIMod.LOGGER.warn(e);
+            }
+        }
+        
+        return false;
+    }
+
+    public static void playBroadcaster(UUID id) {
+        MusicPlayerMidiHandler handler = BROADCASTER_MAP.get(id);
+
+        if(handler != null) {
+            handler.play();
+        }
+    }
+
+    public static void pauseBroadcaster(UUID id) {
+        MusicPlayerMidiHandler handler = BROADCASTER_MAP.get(id);
+
+        if(handler != null) {
+            handler.pause();
+        }
+    }
+
+    public static void stopBroadcaster(UUID id) {
+        MusicPlayerMidiHandler handler = BROADCASTER_MAP.get(id);
 
         if(handler != null) {
             handler.close();
-            MUSIC_PLAYER_MAP.remove(tile.getMusicPlayerId());
+            BROADCASTER_MAP.remove(id);
         }
     }
 
-    // Music Sequence Cache
-    public static void init() {
-        try {
-            // Create folders if not exists
-            File mimiFolder = new File(FMLPaths.CONFIGDIR.get().toString(), "mimi");
-            if (!mimiFolder.exists() && !mimiFolder.mkdirs() && !mimiFolder.isDirectory()) {
-                throw new IOException("Could not create MIMI config directory!");
-            }
-
-            File musicCacheFolder = new File(mimiFolder.getAbsolutePath(), "music_cache");
-            if (!musicCacheFolder.exists() && !musicCacheFolder.mkdirs() && !musicCacheFolder.isDirectory()) {
-                throw new IOException("Could not create MIMI server music cache directory!");
-            }
-            SEQUENCE_CACHE_FOLDER = musicCacheFolder;
-            
-            File serverMusicFolder = new File(mimiFolder.getAbsolutePath(), "default_music");
-            if (!serverMusicFolder.exists() && !serverMusicFolder.mkdirs() && !serverMusicFolder.isDirectory()) {
-                throw new IOException("Could not create MIMI default music directory!");
-            }
-            SERVER_SEQUENCE_FOLDER = serverMusicFolder;
-
-            refreshSequenceCacheMaps();
-            refreshServerSequenceMap();
-        } catch(Exception e) {
-            throw new IllegalStateException("Failed to configure server music cache.", e);
-        }
+    public static MusicPlayerMidiHandler getBroadcaster(UUID id) {
+        return BROADCASTER_MAP.get(id);
     }
+    
+    // Transmitter
+    public static Boolean createTransmitter(Player player, Integer slot, String midiUrl) {
+        Pair<Sequence, STATUS_CODE> midiStatus = MidiFileCacheManager.getOrCreateCachedSequence(midiUrl);
 
-    public static void refreshSequenceCacheMaps() {
-        SEQUENCE_CACHE_ORDER_MAP = new TreeMap<>();
-        SEQUENCE_CACHE_VALUE_MAP = new HashMap<>();
-
-        if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
+        if(midiStatus.getRight() == null && midiStatus.getLeft() != null && player.getInventory().getItem(slot).getItem() instanceof ItemTransmitter) {
             try {
-                for(File file : SEQUENCE_CACHE_FOLDER.listFiles()) {
-                    if(file.isFile() && file.getAbsolutePath().endsWith(".mid")) {
-                        SEQUENCE_CACHE_ORDER_MAP.put(Files.getLastModifiedTime(file.toPath()).toInstant(), file.getName());
-                        SEQUENCE_CACHE_VALUE_MAP.put(file.getName(), file);
-                    }
-                }
+                stopTransmitter(player.getUUID());
+                TRANSMITTER_MAP.put(player.getUUID(), Pair.of(slot, new MusicPlayerMidiHandler(player, midiStatus.getLeft(), midiUrl)));
+                ItemTransmitter.setTransmitId(player.getInventory().getItem(slot), UUID.randomUUID());
+                TRANSMITTER_STACK_MAP.put(player.getUUID(), player.getInventory().getItem(slot));
+                return true;
             } catch(Exception e) {
-                MIMIMod.LOGGER.error("Failed to load existing server music cache: ", e);
+                MIMIMod.LOGGER.warn(e);
             }
-        }
-    }
-
-    public static void refreshServerSequenceMap() {
-        SERVER_SEQUENCE_VALUE_MAP = new HashMap<>();
-
-        if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
-            try {
-                for(File file : SERVER_SEQUENCE_FOLDER.listFiles()) {
-                    if(file.isFile() && (file.getAbsolutePath().endsWith(".mid") || file.getAbsolutePath().endsWith(".midi"))) {
-                        SERVER_SEQUENCE_VALUE_MAP.put(file.getName(), file);
-                    }
-                }
-            } catch(Exception e) {
-                MIMIMod.LOGGER.error("Failed to load existing server default music: ", e);
-            }
-        }
-
-    }
-
-    protected static String urlToFile(String url) {
-        String file = url
-            .replace("https","")
-            .replace("http", "")
-            .replace("://","")
-            .replace(".", "_")
-            .replace("/", "_");
-        return file + ".mid";
-    }
-
-    protected static String urlToServerFile(String url) {
-        String file = url
-            .replace("server://","")
-            .replace("/", "");
-        return file ;
-    }
-
-    public static Pair<Sequence,ServerMidiInfoPacket.STATUS_CODE> getOrCreateCachedSequence(String midiUrl) {
-        if(midiUrl != null && !midiUrl.isBlank() && midiUrl.toLowerCase().startsWith("server://")) {
-            if(!RemoteMidiUrlUtils.validateFileUrl(midiUrl)) {
-                return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_URL);
-            }
-
-            String fileName = urlToServerFile(midiUrl);
-    
-            if(SERVER_SEQUENCE_VALUE_MAP.containsKey(fileName)) {
-                try {
-                    Sequence sequence = loadSequence(new File(SERVER_SEQUENCE_FOLDER, fileName));
-                    return Pair.of(sequence, null);
-                } catch(Exception e) {
-                    // Nothing
-                }
-            }
-
-            return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_NOT_FOUND);
-        } else if(ModConfigs.COMMON.allowWebMidi.get()) {
-            if(midiUrl != null && !midiUrl.isBlank() && RemoteMidiUrlUtils.validateMidiUrl(midiUrl)) {
-                if(!RemoteMidiUrlUtils.validateMidiHost(midiUrl)) {
-                    return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_HOST);
-                }
-
-                String fileName = urlToFile(midiUrl);
-    
-                if(SEQUENCE_CACHE_VALUE_MAP.containsKey(fileName)) {
-                    try {
-                        Sequence sequence = loadSequence(new File(SEQUENCE_CACHE_FOLDER, fileName));
-                        return Pair.of(sequence, null);
-                    } catch(Exception e) {
-                        MIMIMod.LOGGER.error("Failed to load cached MIDI file: ", e);
-                    }
-                } else {
-                    try {
-                        Sequence sequence = downloadSequence(midiUrl);
-                        
-                        if(ModConfigs.COMMON.serverMusicCacheSize.get() > 0) {
-                            pruneSequenceCache();
-                            File savedSequence = saveSequence(fileName, sequence);
-                            SEQUENCE_CACHE_VALUE_MAP.put(fileName, savedSequence);
-                            SEQUENCE_CACHE_ORDER_MAP.put(Files.getLastModifiedTime(savedSequence.toPath()).toInstant(), fileName);
-                        }
-    
-                        return Pair.of(sequence, null);
-                    } catch(FileNotFoundException e) {
-                        // 404, Don't handle
-                    } catch(MalformedURLException e) {
-                        // Bad URL, Don't handle
-                    } catch(InvalidMidiDataException e) {
-                        // Bad MIDI, Don't handle
-                    } catch(Exception e) {
-                        MIMIMod.LOGGER.warn("Failed to download and cache MIDI file: ", e);
-                    }
-                }
-            }
-            
-            return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_OTHER);
-        }
-
-        return Pair.of(null, ServerMidiInfoPacket.STATUS_CODE.ERROR_DISABLED);     
-    }
-
-    protected static Sequence loadSequence(File targetFile) throws IOException, InvalidMidiDataException {
-        if(targetFile.exists() && targetFile.isFile()) {
-            return MidiSystem.getSequence(targetFile);
         }
         
-        throw new IOException("Expected cached MIDI file '" + targetFile.getName() + "' not found.");
+        return false;
     }
 
-    protected static File saveSequence(String fileName, Sequence sequence) throws IOException {
-        File targetFile = new File(SEQUENCE_CACHE_FOLDER, fileName);
-        try(FileOutputStream fout = new FileOutputStream(targetFile)) {
-            MidiSystem.write(sequence, MidiSystem.getMidiFileTypes(sequence)[0], fout);
-            fout.close();
-            return targetFile;
-        } catch(Exception e) {
-            throw new IOException(e);
-        }        
-    }
+    public static void playTransmitter(UUID id) {
+        Pair<Integer,MusicPlayerMidiHandler> handler = TRANSMITTER_MAP.get(id);
 
-    protected static Sequence downloadSequence(String midiUrl) throws IOException, InvalidMidiDataException {
-        URL url = new URL(midiUrl);
-        URLConnection conn = url.openConnection();
-        conn.setConnectTimeout(2000);
-        conn.setReadTimeout(5000);
-        conn.connect(); 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(conn.getInputStream(), baos);
-        try(ByteArrayInputStream stream = new ByteArrayInputStream(baos.toByteArray())) {
-            return MidiSystem.getSequence(stream);
-        } catch(Exception e) {
-            throw e;
+        if(handler != null) {
+            handler.getRight().play();
+        }
+    }
+    
+    public static void pauseTransmitter(UUID id) {
+        Pair<Integer,MusicPlayerMidiHandler> handler = TRANSMITTER_MAP.get(id);
+
+        if(handler != null) {
+            handler.getRight().pause();
         }
     }
 
-    protected static void pruneSequenceCache() {
-        if(!SEQUENCE_CACHE_VALUE_MAP.isEmpty() && (SEQUENCE_CACHE_VALUE_MAP.size() + 1) > ModConfigs.COMMON.serverMusicCacheSize.get()) {
-            Integer cycle = 0;
-            List<String> toRemove = new ArrayList<>();
+    public static void stopTransmitter(UUID id) {
+        Pair<Integer,MusicPlayerMidiHandler> handler = TRANSMITTER_MAP.get(id);
 
-            while(
-                ((SEQUENCE_CACHE_VALUE_MAP.size() + 1) - toRemove.size()) > ModConfigs.COMMON.serverMusicCacheSize.get() 
-                && cycle <= SEQUENCE_CACHE_VALUE_MAP.size()
-            ) {
-                cycle++;
-                toRemove.add(SEQUENCE_CACHE_ORDER_MAP.pollFirstEntry().getValue());
+        if(handler != null) {
+            handler.getRight().close();
+            TRANSMITTER_MAP.remove(id);
+            TRANSMITTER_STACK_MAP.remove(id);
+            
+            ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(id);
+
+            if(player != null) {
+                NetworkManager.INFO_CHANNEL.send(
+                    PacketDistributor.PLAYER.with(() -> player),
+                    new ActiveTransmitterIdPacket(null)
+                );
             }
             
-            for(String removeKey : toRemove) {
-                MIMIMod.LOGGER.info("Deleting cached song: " + removeKey);
-                SEQUENCE_CACHE_VALUE_MAP.remove(removeKey);
-                try {
-                    Files.deleteIfExists(new File(SEQUENCE_CACHE_FOLDER, removeKey).toPath());
-                } catch(IOException e) {
-                    MIMIMod.LOGGER.error("Failed to delete cached song: " + removeKey);
+        }
+    }
+
+    public static Pair<Integer,MusicPlayerMidiHandler> getTransmitter(UUID id) {
+        return TRANSMITTER_MAP.get(id);
+    }
+    
+    public static ItemStack getTransmitterStack(UUID id) {
+        return TRANSMITTER_STACK_MAP.get(id);
+    }
+    
+    public static void forceUpdateTransmitterStack(UUID id, ItemStack newStack) {
+        if(TRANSMITTER_STACK_MAP.get(id) != null) {
+            TRANSMITTER_STACK_MAP.put(id, newStack);
+        }
+    }
+    
+    public static void clearMusicPlayers() {
+        for(UUID id : BROADCASTER_MAP.keySet()) {
+            stopBroadcaster(id);
+        }
+        BROADCASTER_MAP = new HashMap<>();
+        
+        for(UUID id : TRANSMITTER_MAP.keySet()) {
+            stopTransmitter(id);
+        }
+        TRANSMITTER_MAP = new HashMap<>();
+        TRANSMITTER_STACK_MAP = new HashMap<>();
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
+            return;
+        }
+        
+        if(TRANSMITTER_MAP.containsKey(event.player.getUUID())) {
+            ItemStack oldStack = TRANSMITTER_STACK_MAP.get(event.player.getUUID()).copy();
+            ItemStack newStack = event.player.getInventory().getItem(TRANSMITTER_MAP.get(event.player.getUUID()).getLeft()).copy();
+
+            if(newStack.getItem() instanceof ItemTransmitter) {
+                ItemTransmitter.setTransmitMode(oldStack, ItemTransmitter.getTransmitMode(newStack));
+
+                if(ItemStack.matches(oldStack, newStack)) {
+                    TRANSMITTER_STACK_MAP.put(event.player.getUUID(), newStack);
+                    return;
                 }
             }
+
+            stopTransmitter(event.player.getUUID());
+            NetworkManager.INFO_CHANNEL.send(
+                PacketDistributor.PLAYER.with(() -> (ServerPlayer)event.player),
+                new ActiveTransmitterIdPacket(null)
+            );
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        clearMusicPlayers();
+    }
+    
+    @SubscribeEvent
+    public static void onPlayerDeath(PlayerEvent.PlayerRespawnEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+
+        stopTransmitter(event.getEntity().getUUID());
+    }
+    
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        NetworkManager.INFO_CHANNEL.send(
+            PacketDistributor.PLAYER.with(() -> (ServerPlayer)event.getEntity()),
+            new ActiveTransmitterIdPacket(null)
+        );
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        
+        stopTransmitter(event.getEntity().getUUID());
     }
 }

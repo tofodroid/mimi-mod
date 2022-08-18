@@ -73,7 +73,7 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
             && midiUrlString != null && diskTitleString != null
             && clickedBox(imouseX, imouseY, WRITE_BUTTON_COORDS, WRITE_BUTTON_SIZE)
         ) {
-            NetworkManager.NET_CHANNEL.sendToServer(new WriteDiskPacket(this.midiUrlString, this.diskTitleString));
+            NetworkManager.INFO_CHANNEL.sendToServer(new WriteDiskPacket(this.midiUrlString, this.diskTitleString));
         }
         
         return super.mouseClicked(dmouseX, dmouseY, button);
@@ -94,11 +94,19 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
     }
     
     protected void handleUrlChange(String newUrl) {
-        if(newUrl != null && newUrl.equals(this.midiUrlString)) {
+        if(newUrl == null || newUrl.strip().isEmpty()) {
+            this.midiUrlString = null;
+            this.midiUrlField.setTextColor(13112340);
             return;
         }
 
-        if(newUrl != null && !newUrl.trim().isEmpty() && ((newUrl.toLowerCase().startsWith("server://") && RemoteMidiUrlUtils.validateFileUrl(newUrl)) || RemoteMidiUrlUtils.validateMidiUrl(newUrl))) {
+        newUrl = newUrl.strip();
+
+        if(newUrl.equals(this.midiUrlString)) {
+            return;
+        }
+
+        if(!newUrl.isEmpty() && (RemoteMidiUrlUtils.validateFileUrl(newUrl)) || RemoteMidiUrlUtils.validateMidiUrl(newUrl)) {
             this.midiUrlField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
             this.midiUrlString = newUrl;
         } else {
@@ -108,12 +116,19 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
     }
 
     protected void handleTitleChange(String newTitle) {
-        if(newTitle != null && !newTitle.trim().isEmpty()) {
-            this.diskTitleField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
-            this.diskTitleString = newTitle;
-        } else {
+        if(newTitle == null || newTitle.strip().isEmpty()) {
             this.diskTitleString = null;
             this.diskTitleField.setTextColor(13112340);
+            return;
         }
+
+        newTitle = newTitle.strip();
+
+        if(newTitle.equals(this.diskTitleString)) {
+            return;
+        }
+
+        this.diskTitleField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
+        this.diskTitleString = newTitle.strip();
     }
 }
