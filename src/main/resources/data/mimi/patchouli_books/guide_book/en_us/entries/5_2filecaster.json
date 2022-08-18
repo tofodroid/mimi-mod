@@ -1,22 +1,18 @@
 {
-    "name": "Play a MIDI File",
+    "name": "The FileCaster",
     "icon": "mimi:filecaster",
-    "category": "mimi:1overview",
+    "category": "mimi:5files",
     "pages": [
         {
-            "type": "patchouli:text",
-            "text": "There are several ways to play MIDI files with your instruments in MIMI but the easiest way is to use the FileCaster to play MIDI files that are on your PC.$(br2)First, you'll need to craft a FileCaster and a Switchboard to insert into your instrument and allow it to connect to the FileCaster."
+            "type": "patchouli:spotlight",
+            "title": "The FileCaster",
+            "item": "mimi:filecaster",
+            "text": "There are several ways to play MIDI files with your instruments in MIMI but the easiest way is to use the FileCaster to play MIDI files that are on your PC."
         },
         {
             "type": "patchouli:crafting",
-            "title": "Recipes",
-            "recipe": "mimi:filecaster",
-            "recipe2": "mimi:switchboard"
-        },
-        {
-            "type": "patchouli:text",
-            "title": "The Switchboard",
-            "text": "The Switchboard stores many settings that are used by MIMI Instruments and other MIMI Items and Blocks to control their behavior and interactions with eachother.$(br2)More information about all of the individual Switchboard properties is available later in this guide. For now, you'll just need to open up the Instrument Screen for your desired instrument(s) and insert a Switchboard."
+            "title": "Recipe",
+            "recipe": "mimi:filecaster"
         },
         {
             "type": "patchouli:text",
@@ -26,6 +22,7 @@
         {
             "type": "patchouli:text",
             "title": "The FileCaster Screen",
+            "anchor": "screen",
             "text": "The FileCaster screen allows you to select a folder on your PC to play MIDI files from. First, enter the folder path in the textbox and then click the Load Folder button to load the list of MIDI files into the playlist.$(br2)When a song is selected, the MIDI Channel Assignments for that song will display on the screen."
         },
         {
@@ -34,17 +31,23 @@
         },
         {
             "type": "patchouli:text",
-            "text": "You can also change the Transmit Mode for the FileCaster from the FileCaster Screen. This is covered more later in the guide, and leaving this setting as the default 'Public' ('P') for now is good.$(br2)Once a song is playing you can close the FileCaster screen and it will continue to play as long as you keep at least one FileCaster item on your hotbar or in your off hand."
+            "anchor": "transmission",
+            "text": "You can also change the Transmission Mode for the FileCaster to change who/what can receive notes:$(br)$(li)'Public' ('P') - All nearby instruments / receivers with their source set to 'Public'.$(br)$(li)'Linked' ('L') - All nearby instruments / receivers that have you as their source.$(br)$(li)'Self' ('S') - Only yourself and your instruments that you have set as their source."
         },
         {
             "type": "patchouli:text",
+            "text": "You can close the FileCaster Screen once the song starts playing and it will continue to play as long as you keep at least one FileCaster item in your hotbar or off hand."
+        },
+        {
+            "type": "patchouli:text",
+            "anchor": "connect",
             "title": "Connecting Instruments",
-            "text": "The last step is to connect your instrument(s) to the FileCaster. Open the Instrument Screen and click the Edit (pencil) button to bring up the Switchboard's properties.$(br2)Press 'PUB' in the transmission section to enable Public transmissions and press 'O' in the channels section to enable all channels (but un-tick channel 10). You should now hear your song!"
+            "text": "To connect an instrument to your FileCaster it must have a Switchboard.$(br2)The Switchboard 'Transmission Source' property should be $(l:3_2properties#setsource)set$() so that is $(l:3_2properties#source)compatible$() with the FileCaster's 'Transmission Mode'.$(br2)The Switchboard's $(l:3_2properties#channels)Enabled Channels$() should line up with those outlined in the Channel Map on the FileCaster Screen."
         },
         {
             "type": "patchouli:text",
             "text": "You can close the Instrument Screen once your instrument starts playing and it will continue to play as long as you continue to hold it (handheld instruments) or remain seated at it (block instruments). This means you can play up to 3 instruments at the same time!$(br2)Play around with enabling and disabling channels on each of the instruments that you're playing to remix the way a song sounds."
         }
     ],
-    "sortnum": 4
+    "sortnum": 2
 }
