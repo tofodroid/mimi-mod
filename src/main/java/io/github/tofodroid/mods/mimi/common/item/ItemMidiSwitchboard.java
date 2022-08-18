@@ -359,6 +359,8 @@ public class ItemMidiSwitchboard extends Item {
 
         if(stack != null && stack.getItem().equals(ModItems.SWITCHBOARD)) {
             result = Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
+        } else {
+            result =  Integer.valueOf(Double.valueOf((Double.valueOf(3) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
         }
 
         return  result;
