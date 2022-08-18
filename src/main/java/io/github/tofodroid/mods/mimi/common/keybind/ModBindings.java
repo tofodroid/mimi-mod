@@ -30,7 +30,7 @@ public class ModBindings {
     public static void register(RegisterKeyMappingsEvent event) {
         GUIFILECASTER = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.filecaster", GLFW.GLFW_KEY_PERIOD, "key.categories." + MIMIMod.MODID);
         GUITRANSMITTER = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.transmitter", GLFW.GLFW_KEY_COMMA, "key.categories." + MIMIMod.MODID);
-        MIDISETTINGS = new KeyMapping("key." + MIMIMod.MODID + ".midi.settings", GLFW.GLFW_KEY_HOME, "key.categories." + MIMIMod.MODID);
+        MIDISETTINGS = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.settings", GLFW.GLFW_KEY_HOME, "key.categories." + MIMIMod.MODID);
         MIDIALLOFF = new KeyMapping("key." + MIMIMod.MODID + ".midi.alloff", GLFW.GLFW_KEY_END, "key.categories." + MIMIMod.MODID);
         MIDIGUIMAIN = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.main", GLFW.GLFW_KEY_J, "key.categories." + MIMIMod.MODID);
         MIDIGUIOFF = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.off", GLFW.GLFW_KEY_K, "key.categories." + MIMIMod.MODID);
