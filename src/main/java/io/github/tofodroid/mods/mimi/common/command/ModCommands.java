@@ -216,7 +216,7 @@ public class ModCommands {
 
     private static int reloadServerCache(CommandSourceStack source) {
         MidiFileCacheManager.refreshSequenceCacheMaps();
-        source.sendSuccess(Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files."), true);
+        source.sendSuccess(Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files"), true);
         return 0;
     }
 
@@ -249,7 +249,7 @@ public class ModCommands {
         source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
         return 0;
     }
-    
+
     private static int addWebHost(CommandSourceStack source, String host) {
         host = host.strip();
 
