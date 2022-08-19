@@ -6,8 +6,6 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.codehaus.plexus.util.StringUtils;
-
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTransmitter;
@@ -78,7 +76,9 @@ public class ItemTransmitter extends Item {
             }
 
             // Transmit Mode
-            tooltip.add(Component.literal("Transmit Mode: " + StringUtils.capitalizeFirstLetter(ItemTransmitter.getTransmitMode(stack).name().toLowerCase())));
+            String transmitModeString = ItemTransmitter.getTransmitMode(stack).name();
+            transmitModeString = transmitModeString.substring(0,1).toUpperCase() + transmitModeString.substring(1).toLowerCase();
+            tooltip.add(Component.literal("Transmit Mode: " + transmitModeString));
         }
     }
 
