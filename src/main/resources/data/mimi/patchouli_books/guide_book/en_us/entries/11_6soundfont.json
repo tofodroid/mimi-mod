@@ -5,7 +5,7 @@
     "pages": [
         {
             "type": "patchouli:text",
-            "text": "Soundfonts are files that store the actual sound data used by a software synthesizer to produce sound from MIDI data.$(br2)Java contains a default Soundfont that it uses when playing MIDI data if no other Soundfont is provided, and by default this is what you will hear in this mod."
+            "text": "Soundfonts are files that store the actual sound data used by a software synthesizer to produce sound from MIDI data.$(br2)MIMI contains a default Soundfont, $(l:https://musical-artifacts.com/artifacts/841)GMGSX$() - a free SoundFont by Kenneth Rundt, that it uses when playing MIDI data if no other Soundfont is provided."
         },
         {
             "type": "patchouli:text",

@@ -9,11 +9,13 @@
         },
         {
             "type": "text",
+            "anchor": "source",
             "title": "Transmission Source",
             "text": "Stores which nearby Transmission Source(s) the Switchboard will receive notes from when the source is transmitting.$(br2)When set to `Public` mode the Switchboard will receive notes from all sources that are broadcasting in public mode.$(br2)When set to a specific source (a player, Broadcaster, or Conductor), the instrument will only receive notes from that."
         },
         {
             "type": "text",
+            "anchor": "setsource",
             "title": "Setting Source",
             "text": "The Transmission Source can be set from the screen of any item or block that accepts a Switchboard and uses the Transmission Source property. The screen allows you to link to either Public sources or yourself.$(br2)If you want to link to another player or a Broadcaster or Conductor you can hold the Switchboard in your main hand and then right click on the desired source to link to them."
         },
@@ -24,6 +26,7 @@
         },
         {
             "type": "text",
+            "anchor": "channels",
             "title": "MIDI Channels",
             "text": "A MIDI file is able to play 16 different instruments at a time. Each instrument is assigned a number - called a channel - and notes for that instrument are sent to that channel. A Switchboard can be configured to receive data from specific channels, all channels, or no channels."
         },

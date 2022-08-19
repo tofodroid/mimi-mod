@@ -76,22 +76,22 @@ public class ModVillagers {
 
             event.getTrades().get(2).addAll(Arrays.asList(
                 new ItemsForItemsTrade(ModItems.INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
-                new ItemsForItemsTrade(Arrays.asList(ModItems.SWITCHBOARD), 1, Arrays.asList(Items.EMERALD), 1, 32, 10)
+                new ItemsForItemsTrade(Arrays.asList(ModItems.SWITCHBOARD, ModItems.FLOPPYDISK), 1, Arrays.asList(Items.EMERALD), 1, 32, 10)
             ));
             
             event.getTrades().get(3).addAll(Arrays.asList(
                 new ItemsForItemsTrade(ModItems.BLOCK_INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
-                new ItemsForItemsTrade(Arrays.asList(ModItems.MECHANICALMAESTRO,ModItems.CONDUCTOR,ModItems.RECEIVER), 1, Arrays.asList(Items.EMERALD), 8, 16, 30)
+                new ItemsForItemsTrade(Arrays.asList(ModItems.TRANSMITTER,ModItems.FILECASTER,ModItems.BROADCASTER), 4, Arrays.asList(Items.EMERALD), 1, 16, 30)
             ));
             
             event.getTrades().get(4).addAll(Arrays.asList(
-                new ItemsForItemsTrade(Arrays.asList(ModItems.FILECASTER), 1, Arrays.asList(Items.EMERALD), 6, 16, 30),
-                new ItemsForItemsTrade(Arrays.asList(ModItems.LISTENER), 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
+                new ItemsForItemsTrade(ModItems.INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
+                new ItemsForItemsTrade(Arrays.asList(ModItems.LISTENER,ModItems.RECEIVER,ModItems.CONDUCTOR,ModItems.MECHANICALMAESTRO), 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
             ));
             
             event.getTrades().get(5).addAll(Arrays.asList(
-                new ItemsForItemsTrade(Arrays.asList(Items.MUSIC_DISC_PIGSTEP,Items.MUSIC_DISC_STAL,Items.MUSIC_DISC_WAIT,Items.MUSIC_DISC_STRAD,Items.MUSIC_DISC_11,Items.MUSIC_DISC_WARD,Items.MUSIC_DISC_BLOCKS,Items.MUSIC_DISC_CHIRP,Items.MUSIC_DISC_FAR,Items.MUSIC_DISC_MALL,Items.MUSIC_DISC_MELLOHI), 1, Arrays.asList(Items.EMERALD), 16, 1, 50),
-                new ItemsForItemsTrade(ModItems.INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
+                new ItemsForItemsTrade(Arrays.asList(Items.DISC_FRAGMENT_5,Items.MUSIC_DISC_PIGSTEP,Items.MUSIC_DISC_STAL,Items.MUSIC_DISC_WAIT,Items.MUSIC_DISC_STRAD,Items.MUSIC_DISC_11,Items.MUSIC_DISC_WARD,Items.MUSIC_DISC_BLOCKS,Items.MUSIC_DISC_CHIRP,Items.MUSIC_DISC_FAR,Items.MUSIC_DISC_MALL,Items.MUSIC_DISC_MELLOHI), 1, Arrays.asList(Items.EMERALD), 16, 1, 50),
+                new ItemsForItemsTrade(ModItems.BLOCK_INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
             ));
         }        
     }

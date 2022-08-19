@@ -10,7 +10,7 @@
         {
             "type": "patchouli:text",
             "title": "Playing",
-            "text": "First select it on your hotbar with your main hand or place it in your off hand slot. Then, simply right click while holding the instrument to open the Instrument Screen.$(br2)When holding one instrument in each hand right-clicking will open the Instrument Screen for the instrument in your main hand. Using Keybinds you can directly open the instruments in your main hand ($(bold)$(k:key.mimi.midi.gui.main)$()) or off hand ($(bold)$(k:key.mimi.midi.gui.off)$())."
+            "text": "First select it on your hotbar with your main hand or place it in your off hand slot. Then, simply right click while holding the instrument to open the Instrument Screen.$(br2)When holding one instrument in each hand right-clicking will open the Instrument Screen for the instrument in your main hand. Using key binds you can directly open the instruments in your main hand ($(bold)$(k:key.mimi.midi.gui.main)$()) or off hand ($(bold)$(k:key.mimi.midi.gui.off)$())."
         }
     ],
     "sortnum": 1

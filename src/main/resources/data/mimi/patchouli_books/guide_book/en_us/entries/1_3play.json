@@ -10,12 +10,12 @@
         {
             "type": "patchouli:text",
             "title": "Handheld",
-            "text": "First select it on your hotbar with your main hand or place it in your off hand slot. Then, simply right click while holding the instrument to open the Instrument Screen.$(br2)When holding one instrument in each hand right-clicking will open the Instrument Screen for the instrument in your main hand. Using Keybinds you can directly open the instruments in your main hand ($(bold)$(k:key.mimi.midi.gui.main)$()) or off hand ($(bold)$(k:key.mimi.midi.gui.off)$())."
+            "text": "First select it on your hotbar with your main hand or place it in your off hand slot. Then, simply right click while holding the instrument to open the Instrument Screen.$(br2)When holding one instrument in each hand right-clicking will open the Instrument Screen for the instrument in your main hand. Using key binds you can directly open the instruments in your main hand ($(bold)$(k:key.mimi.midi.gui.main)$()) or off hand ($(bold)$(k:key.mimi.midi.gui.off)$())."
         },
         {
             "type": "patchouli:text",
             "title": "Block",
-            "text": "First place the instrument as a block in the world. Then, right click the instrument block to sit down at it (like a boat) and again to open the Instrument Screen.$(br2)When holding an instrument and sitting at an instrument it can be confusing as to which Instrument Screen is opened when clicking. Using a Keybind ($(bold)$(k:key.mimi.midi.gui.seat)$()) you can directly open the instrument you are seated at.$(br2)"
+            "text": "First place the instrument as a block in the world. Then, right click the instrument block to sit down at it (like a boat) and again to open the Instrument Screen.$(br2)When holding an instrument and sitting at an instrument it can be confusing as to which Instrument Screen is opened when clicking. Using a key bind ($(bold)$(k:key.mimi.midi.gui.seat)$()) you can directly open the instrument you are seated at.$(br2)"
         }
     ],
     "sortnum": 3

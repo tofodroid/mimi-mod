@@ -15,6 +15,8 @@ public class CommonConfig {
 
     public ForgeConfigSpec.IntValue serverMusicCacheSize;
     public ForgeConfigSpec.BooleanValue allowWebMidi;
+    public ForgeConfigSpec.BooleanValue allowWebCommands;
+    public ForgeConfigSpec.BooleanValue allowServerCommands;
     public ForgeConfigSpec.ConfigValue<String> allowedMusicHosts;
     protected List<String> allowedHostsList = null;
 
@@ -29,6 +31,12 @@ public class CommonConfig {
         allowedMusicHosts = builder.comment("Allowed web hosts for Floppy Disk URLs (comma-separated). If no hosts are specified any host is allowed. Hosts should not include the protocol (I.E: https) or any paths (I.E: /path). Ex: bitmidi.com")
             .translation(MIMIMod.MODID + ".config.server.music.allowed.hosts")
             .define("allowedMusicHosts", "");
+        allowWebCommands = builder.comment("Wether or not the server should allow the above web MIDI settings to be modified via in-game commands by players with 'op' privileges.")
+            .translation(MIMIMod.MODID + ".config.server.command.allow.web")
+            .define("allowWebCommands", true);
+        allowServerCommands = builder.comment("Whether or not the server should allow the list of server-provided MIDI Files to be modified via in-game commands by players with 'op' privileges.")
+            .translation(MIMIMod.MODID + ".config.server.command.allow.server")
+            .define("allowServerCommands", true);
         builder.pop();
     }
 

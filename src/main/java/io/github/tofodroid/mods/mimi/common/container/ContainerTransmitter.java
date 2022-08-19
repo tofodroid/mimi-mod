@@ -169,7 +169,7 @@ public class ContainerTransmitter extends APlayerInventoryContainer {
 				}
 			} else {
 				// Player --> Target
-				if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID, false)) {
+				if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID + 1, false)) {
 					return ItemStack.EMPTY;
 				}
 			}

@@ -71,13 +71,13 @@ public class ModCommands {
                     )
                 )
                 .then(Commands.literal("web")
-                    .then(Commands.literal("hosts")
+                    .then(Commands.literal("list")
                         .then(Commands.argument("page", IntegerArgumentType.integer(1, 99999))
                             .executes(ctx -> listWebHosts(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "page")))
                         )
                         .executes(ctx -> listWebHosts(ctx.getSource(), 1))
                     )
-                    .then(Commands.literal("enabled")
+                    .then(Commands.literal("status")
                         .executes(ctx -> getWebStatus(ctx.getSource()))
                     )
                     .then(Commands.literal("add")
@@ -129,104 +129,15 @@ public class ModCommands {
         return 0;
     }
 
-    private static int getServerCacheSize(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server music cache: " + MidiFileCacheManager.getCachedFileNamePages(1) + "/" + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), false);
-        return 0;
-    }
-
-    private static int setServerCacheSize(CommandSourceStack source, Integer size) {
-        ModConfigs.COMMON.serverMusicCacheSize.set(size);
-        source.sendSuccess(Component.literal("Server music cache size set to: " + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), true);
-        return 0;
-    }
-
-    private static int pruneServerCache(CommandSourceStack source) {
-        MidiFileCacheManager.pruneSequenceCache();
-        source.sendSuccess(Component.literal("Server music cache pruned."), true);
-        return 0;
-    }
-
-    private static int emptyServerCache(CommandSourceStack source) {
-        MidiFileCacheManager.pruneSequenceCache();
-        source.sendSuccess(Component.literal("Server music cache cleared"), true);
-        return 0;
-    }
-
-    private static int reloadServerCache(CommandSourceStack source) {
-        MidiFileCacheManager.refreshSequenceCacheMaps();
-        source.sendSuccess(Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files."), true);
-        return 0;
-    }
-
-    private static int listWebHosts(CommandSourceStack source, Integer pageNum) {
-        pageNum--;
-
-        List<String> hosts = ModConfigs.COMMON.getAllowedHostsList();
-        Integer numPages = Double.valueOf(Math.ceil((double)hosts.size() / 5d)).intValue();
-        
-        if(hosts.isEmpty()) {
-            source.sendSuccess(Component.literal("Server allows all web hosts"), false);
-            return 0;
-        } else if(pageNum >= numPages) {
-            source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
-            return 1;
-        }
-
-        source.sendSuccess(Component.literal("Allowed Hosts (" + (pageNum+1) + "/" + numPages + ")"), false);
-        for(int i = pageNum*5; i < (pageNum*5 + 5); i++) {
-            if(i >= hosts.size()) {
-                return 0;
-            }
-            source.sendSuccess(Component.literal((i+1) + ". " + hosts.get(i)), false);
-        }
-        
-        return 0;
-    }
-
-    private static int addWebHost(CommandSourceStack source, String host) {
-        host = host.strip();
-
-        if(!RemoteMidiUrlUtils.validHostString(host)) {
-            source.sendFailure(Component.literal("Provided host is invalid. Host must use the format of: http[s]://<host>.<extension>. Ex: https://bitmidi.com"));
-            return 1;
-        }
-        ModConfigs.COMMON.addAllowedHost(host);
-        source.sendSuccess(Component.literal("Host '" + host + "' added to Allowed Hosts."), true);
-        return 0;
-    }
-
-    private static int removeWebHost(CommandSourceStack source, Integer number) {
-        number--;
-
-        if(ModConfigs.COMMON.getAllowedHostsList().isEmpty()) {
-            source.sendFailure(Component.literal("Allowed hosts list is already empty"));
-            return 1;
-        } else if(number >= ModConfigs.COMMON.getAllowedHostsList().size()) {
-            source.sendFailure(Component.literal("Provided host number is too large. Max: " + ModConfigs.COMMON.getAllowedHostsList().size()));
-            return 1;
-        }
-        String removedHost = ModConfigs.COMMON.getAllowedHostsList().get(number);
-        ModConfigs.COMMON.removeAllowedHost(number);
-        source.sendSuccess(Component.literal("Allowed Host '" + removedHost + "' removed."), true);
-        return 0;
-    }
     
-    private static int getWebStatus(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
-        return 0;
-    }
-
-    private static int setWebStatus(CommandSourceStack source, Boolean enable) {
-        ModConfigs.COMMON.allowWebMidi.set(enable);
-        source.sendSuccess(Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
-        return 0;
-    }
-
     private static int addServerSong(CommandSourceStack source, String url, String name) {
         url = url.strip();
         name = name.strip();
 
-        if(url.isEmpty() || url.length() > 256) {
+        if(!ModConfigs.COMMON.allowServerCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(url.isEmpty() || url.length() > 256) {
             source.sendFailure(Component.literal("Supplied URL has invalid length. Max: 256 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateMidiUrl(url)) {
@@ -257,7 +168,10 @@ public class ModCommands {
     private static int removeServerSong(CommandSourceStack source, String name) {
         name = name.strip();
 
-        if(name.length() < 3 || name.length() > 64) {
+        if(!ModConfigs.COMMON.allowServerCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(name.length() < 3 || name.length() > 64) {
             source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
@@ -274,6 +188,109 @@ public class ModCommands {
         }
         
         source.sendSuccess(Component.literal("Successfully deleted server MIDI '" + name + "'"), true);
+        return 0;
+    }
+
+    private static int getServerCacheSize(CommandSourceStack source) {
+        source.sendSuccess(Component.literal("Server music cache: " + MidiFileCacheManager.getCachedFileNamePages(1) + "/" + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), false);
+        return 0;
+    }
+
+    private static int setServerCacheSize(CommandSourceStack source, Integer size) {
+        ModConfigs.COMMON.serverMusicCacheSize.set(size);
+        source.sendSuccess(Component.literal("Server music cache size set to: " + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), true);
+        return 0;
+    }
+
+    private static int pruneServerCache(CommandSourceStack source) {
+        MidiFileCacheManager.pruneSequenceCache();
+        source.sendSuccess(Component.literal("Server music cache pruned."), true);
+        return 0;
+    }
+
+    private static int emptyServerCache(CommandSourceStack source) {
+        MidiFileCacheManager.pruneSequenceCache();
+        source.sendSuccess(Component.literal("Server music cache cleared"), true);
+        return 0;
+    }
+
+    private static int reloadServerCache(CommandSourceStack source) {
+        MidiFileCacheManager.refreshSequenceCacheMaps();
+        source.sendSuccess(Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files"), true);
+        return 0;
+    }
+
+    private static int listWebHosts(CommandSourceStack source, Integer pageNum) {
+        pageNum--;
+
+        List<String> hosts = ModConfigs.COMMON.getAllowedHostsList();
+        Integer numPages = Double.valueOf(Math.ceil((double)hosts.size() / 5d)).intValue();
+        
+        if(hosts.isEmpty()) {
+            source.sendSuccess(Component.literal("Server allows all web hosts"), false);
+            return 0;
+        } else if(pageNum >= numPages) {
+            source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
+            return 1;
+        }
+
+        source.sendSuccess(Component.literal("Allowed Hosts (" + (pageNum+1) + "/" + numPages + ")"), false);
+        for(int i = pageNum*5; i < (pageNum*5 + 5); i++) {
+            if(i >= hosts.size()) {
+                return 0;
+            }
+            source.sendSuccess(Component.literal((i+1) + ". " + hosts.get(i)), false);
+        }
+        
+        return 0;
+    }
+
+    private static int getWebStatus(CommandSourceStack source) {
+        source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
+        return 0;
+    }
+
+    private static int addWebHost(CommandSourceStack source, String host) {
+        host = host.strip();
+
+        if(!ModConfigs.COMMON.allowWebCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(!RemoteMidiUrlUtils.validHostString(host)) {
+            source.sendFailure(Component.literal("Provided host is invalid. Host must use the format of: http[s]://<host>.<extension>. Ex: https://bitmidi.com"));
+            return 1;
+        }
+        ModConfigs.COMMON.addAllowedHost(host);
+        source.sendSuccess(Component.literal("Host '" + host + "' added to Allowed Hosts."), true);
+        return 0;
+    }
+
+    private static int removeWebHost(CommandSourceStack source, Integer number) {
+        number--;
+
+        if(!ModConfigs.COMMON.allowWebCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        } else if(ModConfigs.COMMON.getAllowedHostsList().isEmpty()) {
+            source.sendFailure(Component.literal("Allowed hosts list is already empty"));
+            return 1;
+        } else if(number >= ModConfigs.COMMON.getAllowedHostsList().size()) {
+            source.sendFailure(Component.literal("Provided host number is too large. Max: " + ModConfigs.COMMON.getAllowedHostsList().size()));
+            return 1;
+        }
+        String removedHost = ModConfigs.COMMON.getAllowedHostsList().get(number);
+        ModConfigs.COMMON.removeAllowedHost(number);
+        source.sendSuccess(Component.literal("Allowed Host '" + removedHost + "' removed."), true);
+        return 0;
+    }
+    
+    private static int setWebStatus(CommandSourceStack source, Boolean enable) {
+        if(!ModConfigs.COMMON.allowWebCommands.get()) {
+            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            return 1;
+        }
+
+        source.sendSuccess(Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
         return 0;
     }
 }
