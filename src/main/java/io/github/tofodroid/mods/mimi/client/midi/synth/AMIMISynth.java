@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList.Builder;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
@@ -30,6 +31,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         try {
             this.internalSynth = SoftSynthesizer.create(jitterCorrection, false, latency, ModConfigs.CLIENT.synthBitRate.get(), ModConfigs.CLIENT.synthSampleRate.get(), sounds);
         } catch(Exception e) {
+            MIMIMod.LOGGER.error("FAILED TO CREATE SYNTH: ",e);
             this.internalSynth = null;
         }
 
@@ -42,8 +44,8 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
             this.midiChannelSet = builder.build();
             this.channelAssignmentMap = HashBiMap.create(midiChannelSet.size());
         } else {
-            this.midiChannelSet = null;
-            this.channelAssignmentMap = null;
+            this.midiChannelSet = ImmutableList.of();
+            this.channelAssignmentMap = HashBiMap.create();
             this.close();
         }
     }
@@ -62,6 +64,10 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void noteOn(MidiNotePacket message) {
+        if(this.channelAssignmentMap == null) {
+            return;
+        }
+
         InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
 
@@ -81,6 +87,10 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void noteOff(MidiNotePacket message) {
+        if(this.channelAssignmentMap == null) {
+            return;
+        }
+
         InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
         
@@ -94,12 +104,20 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void allNotesOff() {
+        if(this.channelAssignmentMap == null) {
+            return;
+        }
+        
         for(T channel : this.channelAssignmentMap.keySet()) {
             channel.allNotesOff();
         }
     }
 
     public void controlChange(MidiNotePacket message) {
+        if(this.channelAssignmentMap == null) {
+            return;
+        }
+
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
         
         if(channel != null) {
