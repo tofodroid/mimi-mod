@@ -11,8 +11,8 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.InputEvent.Key;
@@ -47,7 +47,7 @@ public class ModBindings {
     
     public static void onKeyInput(Key event) {
         Level worldIn = Minecraft.getInstance().level;
-        LocalPlayer playerIn = Minecraft.getInstance().player;
+        Player playerIn = Minecraft.getInstance().player;
 
         // MIDI All Off
         if(MIDIALLOFF.isDown() && MIMIMod.proxy.isClient()) {
