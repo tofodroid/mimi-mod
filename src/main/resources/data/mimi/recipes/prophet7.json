@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/prophet"
+    },
+    "addition": {
+        "item": "minecraft:chorus_fruit"
+    },
+    "result": {
+        "item": "mimi:prophet7"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/accordion"
+    },
+    "addition": {
+        "item": "minecraft:cocoa_beans"
+    },
+    "result": {
+        "item": "mimi:accordion2"
+    }
+}

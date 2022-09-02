@@ -5,7 +5,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class TransmitterNotePacket {
-    public static final Byte NO_CHANNEL = Byte.MAX_VALUE;
+    public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
     
     public final Byte channel;
@@ -17,6 +17,10 @@ public class TransmitterNotePacket {
         PUBLIC,
         LINKED,
         SELF;
+
+        public static TransmitMode fromInt(Integer val) {
+            return val >=0 && TransmitMode.values().length > val ? TransmitMode.values()[val] : null;
+        }
     }
 
     public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, TransmitMode transmitMode) {
@@ -42,7 +46,7 @@ public class TransmitterNotePacket {
             TransmitMode transmitMode = TransmitMode.values()[Byte.valueOf(buf.readByte()).intValue()];
             return new TransmitterNotePacket(channel, note, velocity, transmitMode);
         } catch (IndexOutOfBoundsException e) {
-            MIMIMod.LOGGER.error("SpeakerNoteOnPacket did not contain enough bytes. Exception: " + e);
+            MIMIMod.LOGGER.error("TransmitterNotePacket did not contain enough bytes. Exception: " + e);
             return null;
         }
     }

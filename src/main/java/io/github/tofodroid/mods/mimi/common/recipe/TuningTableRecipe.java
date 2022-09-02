@@ -76,10 +76,12 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     public static class Serializer extends net.minecraftforge.registries.ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<TuningTableRecipe> {
-        Serializer() {
-			this.setRegistryName(new ResourceLocation(MIMIMod.MODID, "tuning"));
-		}
+        public static final String REGISTRY_NAME = "tuning";
         
+        Serializer() {
+			this.setRegistryName(new ResourceLocation(MIMIMod.MODID, REGISTRY_NAME));
+		}
+
         @Override
         public TuningTableRecipe fromJson(ResourceLocation resource, JsonObject json) {
             Ingredient ingredient = Ingredient.fromJson(json.get("instrument"));

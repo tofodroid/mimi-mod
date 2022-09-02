@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "RIR",
+        " D "
+    ],
+    "key": {
+        "I": {
+            "item": "mimi:transmitter"
+        },
+        "D": {
+            "item": "minecraft:diamond"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        }
+    },
+    "result": {
+        "item": "mimi:filecaster"
+    }
+}

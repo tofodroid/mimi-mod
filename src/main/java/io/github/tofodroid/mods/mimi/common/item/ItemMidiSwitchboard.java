@@ -25,6 +25,8 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.common.network.SwitchboardStackUpdatePacket;
 
 public class ItemMidiSwitchboard extends Item {
+    public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
+    public static final String REGISTRY_NAME = "switchboard";
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
@@ -51,7 +53,7 @@ public class ItemMidiSwitchboard extends Item {
 
     public ItemMidiSwitchboard() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
-        this.setRegistryName("switchboard");
+        setRegistryName(REGISTRY_NAME);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class ItemMidiSwitchboard extends Item {
             if(target instanceof Player) {
                 ItemMidiSwitchboard.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 playerIn.setItemInHand(hand, stack);
-                playerIn.sendMessage(new TextComponent("Set MIDI Source to: " +  target.getName().getString()), playerIn.getUUID());
+                playerIn.displayClientMessage(new TextComponent("Set MIDI Source to: " +  target.getName().getString()), true);
                 return InteractionResult.CONSUME;
             }
         } else {
@@ -188,7 +190,7 @@ public class ItemMidiSwitchboard extends Item {
     }
 
     public static Boolean isChannelEnabled(ItemStack switchStack, Byte channelId) {
-        return getEnabledChannelsSet(switchStack).contains(channelId);
+        return ALL_CHANNELS.equals(channelId) || getEnabledChannelsSet(switchStack).contains(channelId);
     }
     
     public static SortedArraySet<Byte> getEnabledChannelsSet(ItemStack switchStack) {
@@ -359,6 +361,8 @@ public class ItemMidiSwitchboard extends Item {
 
         if(stack != null && stack.getItem().equals(ModItems.SWITCHBOARD)) {
             result = Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
+        } else {
+            result =  Integer.valueOf(Double.valueOf((Double.valueOf(3) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
         }
 
         return  result;

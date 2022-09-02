@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/keyboard"
+    },
+    "addition": {
+        "item": "minecraft:chorus_fruit"
+    },
+    "result": {
+        "item": "mimi:keyboard2"
+    }
+}

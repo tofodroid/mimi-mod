@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.container;
 
-import net.minecraftforge.items.SlotItemHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -8,8 +7,12 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
+
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 
@@ -22,19 +25,30 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 	protected IItemHandler targetInventory;
 
 	public ASwitchboardContainer(MenuType<?> type, int id, Inventory playerInventory) {
-        super(type, id, playerInventory);
-    }
+		super(type, id, playerInventory);
+	}
 
-    protected Slot buildSwitchboardSlot() {
-        return new SlotItemHandler(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY()) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return ModItems.SWITCHBOARD.equals(stack.getItem());
-            }
-        };
-    }
+	protected Slot buildSwitchboardSlot() {
+		return new SlotItemHandler(targetInventory, 0, getSwitchboardSlotX(), getSwitchboardSlotY()) {
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return stack.getItem() instanceof ItemMidiSwitchboard;
+			}
 
-    @Override
+			@Override
+			public int getMaxStackSize() {
+				return 1;
+			}
+			
+			@Override
+			public int getMaxStackSize(@NotNull ItemStack stack)
+			{
+				return 1;
+			}
+		};
+	}
+
+	@Override
 	protected Slot buildPlayerSlot(Inventory playerInventory, int slot, int xPos, int yPos) {
 		return new Slot(playerInventory, slot, xPos, yPos);
 	}
@@ -75,10 +89,10 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			this.setItem(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID, this.getStateId()+1, selectedStack);
 			this.setRemoteSlot(APlayerInventoryContainer.TARGET_CONTAINER_MIN_SLOT_ID, selectedStack);
 			this.sendAllDataToRemote();
-            return true;
+			return true;
 		}
 
-        return false;
+		return false;
 	}
 
 	public ItemStack getSelectedSwitchboard() {
@@ -114,7 +128,7 @@ public abstract class ASwitchboardContainer extends APlayerInventoryContainer {
 			}
 		}
 
-      return itemstack;
+	  return itemstack;
 	}
 	
 	public IItemHandler getTargetInventory() {

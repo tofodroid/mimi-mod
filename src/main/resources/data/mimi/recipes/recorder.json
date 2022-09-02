@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "  P",
+        " B ",
+        "N  "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "B": {
+            "item": "minecraft:bone"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:recorder"
+    }
+}

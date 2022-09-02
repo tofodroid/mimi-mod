@@ -17,6 +17,7 @@
         }
     },
     "result": {
-        "item": "mimi:switchboard"
+        "item": "mimi:switchboard",
+        "count": 4
     }
 }

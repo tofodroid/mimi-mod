@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/edrums"
+    },
+    "addition": {
+        "item": "minecraft:quartz"
+    },
+    "result": {
+        "item": "mimi:edrums2"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "RNR",
+        "QQQ",
+        "L L"
+    ],
+    "key": {
+        "R": {
+            "item": "minecraft:redstone_block"
+        },
+        "L": {
+            "tag": "minecraft:logs"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "Q": {
+            "item": "minecraft:quartz"
+        }
+    },
+    "result": {
+        "item": "mimi:prophet"
+    }
+}

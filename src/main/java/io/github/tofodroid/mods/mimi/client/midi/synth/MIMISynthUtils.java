@@ -20,7 +20,7 @@ public abstract class MIMISynthUtils {
         }
 
         // 2. Adjust for game volume
-        Float catVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.PLAYERS);
+        Float catVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.RECORDS);
               catVolume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
               volume *= catVolume.doubleValue();
 

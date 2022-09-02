@@ -52,7 +52,6 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected Integer filterInstrumentIndex = 0;
     protected Integer filterNoteOctave;
     protected Integer filterNoteLetter;
-    protected String filterNoteString = "";
 
     public ASwitchboardBlockGui(T container, Inventory inv, Component textComponent) {
         super(container, inv, 337, 250, 395, "textures/gui/container_generic_switchboard_block.png", textComponent);
@@ -70,7 +69,6 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         super.clearSwitchboard();
         this.filterNoteLetter = 127;
         this.filterNoteOctave = 127;
-        this.filterNoteString = "";
         this.filterInstrumentIndex = null;
     }
 
@@ -133,9 +131,16 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
         return super.mouseClicked(dmouseX, dmouseY, button);
     }
+    
+    @Override
+    protected Boolean shouldRenderBackground() {
+        return false;
+    }
 
     @Override
-    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {      
+        setAlpha(1.0f);
+
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 
@@ -216,7 +221,7 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 			font.draw(matrixStack, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", Float.valueOf(LINKED_TRANSMITTER_TEXTBOX_COORDS.x()).intValue(), Float.valueOf(LINKED_TRANSMITTER_TEXTBOX_COORDS.y()).intValue(), linkedTransmitterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 
 			// Filter Note
-			font.draw(matrixStack, this.filterNoteString, Float.valueOf(FILTER_NOTE_TEXTBOX_COORDS.x()).intValue(), Float.valueOf(FILTER_NOTE_TEXTBOX_COORDS.y()).intValue(), noteFilterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
+			font.draw(matrixStack, ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack), Float.valueOf(FILTER_NOTE_TEXTBOX_COORDS.x()).intValue(), Float.valueOf(FILTER_NOTE_TEXTBOX_COORDS.y()).intValue(), noteFilterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
 
 			// Filter Instrument
 			font.draw(matrixStack, ModItems.SWITCHBOARD.getInstrumentName(selectedSwitchboardStack), Float.valueOf(FILTER_INSTRUMENT_TEXTBOX_COORDS.x()).intValue(), Float.valueOf(FILTER_INSTRUMENT_TEXTBOX_COORDS.y()).intValue(), instrumentFilterWidgetEnabled() ? 0xFF00E600 : 0xFF005C00);
@@ -301,7 +306,6 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         }
 
         ItemMidiSwitchboard.setFilterNote(selectedSwitchboardStack, filterNoteLetter.byteValue());
-        this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
         this.syncSwitchboardToServer();
     }
     
@@ -316,13 +320,11 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         }
         
         ItemMidiSwitchboard.setFilterOct(selectedSwitchboardStack, filterNoteOctave.byteValue());
-        this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
         this.syncSwitchboardToServer();
     }
 
     protected void toggleInvertFilterNote() {
         ItemMidiSwitchboard.setInvertNoteOct(selectedSwitchboardStack, !ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack));
-        this.filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
         this.syncSwitchboardToServer();
     }
     
@@ -332,13 +334,11 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 
     protected void loadFilterLetterAndOctave() {
 		if(this.selectedSwitchboardStack != null) {
-			filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
-			filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
-			filterNoteString = ItemMidiSwitchboard.getFilteredNotesAsString(selectedSwitchboardStack);
+			this.filterNoteLetter = ItemMidiSwitchboard.getFilterNote(selectedSwitchboardStack).intValue();
+			this.filterNoteOctave = ItemMidiSwitchboard.getFilterOct(selectedSwitchboardStack).intValue();
 		} else {
-			filterNoteOctave = 127;
-			filterNoteLetter = 127;
-			filterNoteString = "";
+			this.filterNoteOctave = 127;
+			this.filterNoteLetter = 127;
 		}       
     }
 

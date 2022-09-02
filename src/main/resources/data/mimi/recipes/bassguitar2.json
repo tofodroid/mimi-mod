@@ -1,0 +1,12 @@
+{
+    "type": "mimi:tuning",
+    "instrument": {
+        "tag": "mimi:instrument/bassguitar"
+    },
+    "addition": {
+        "item": "minecraft:leather"
+    },
+    "result": {
+        "item": "mimi:bassguitar2"
+    }
+}

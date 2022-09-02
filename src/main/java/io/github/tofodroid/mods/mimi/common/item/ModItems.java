@@ -5,68 +5,102 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
+import io.github.tofodroid.mods.mimi.common.block.BlockConductor;
+import io.github.tofodroid.mods.mimi.common.block.BlockDiskWriter;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.block.BlockListener;
+import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
+import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 
-@ObjectHolder(MIMIMod.MODID)
 public final class ModItems {
     // Instruments
-    public static List<ItemInstrument> INSTRUMENT_ITEMS = null;
-    public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS = null;
+    public static List<ItemInstrument> INSTRUMENT_ITEMS;
+    public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS;
 
     // Other
-    public static final ItemTransmitter TRANSMITTER = null;
-    public static final ItemMidiSwitchboard SWITCHBOARD = null;
+    public static ItemMidiDeviceConfig DEVICECONFIG;
+    public static ItemTransmitter TRANSMITTER;
+    public static ItemFileCaster FILECASTER;
+    public static ItemMidiSwitchboard SWITCHBOARD;
+    public static ItemFloppyDisk FLOPPYDISK;
 
     // Blocks - Redstone
-    public static final BlockItem LISTENER = null;
-    public static final BlockItem RECEIVER = null;
-    public static final BlockItem MECHANICALMAESTRO = null;
-    public static final BlockItem CONDUCTOR = null;
+    public static Item LISTENER;
+    public static Item RECEIVER;
+    public static Item MECHANICALMAESTRO;
+    public static Item CONDUCTOR;
 
     // Blocks - Other
-    public static final BlockItem TUNINGTABLE = null;
+    public static Item TUNINGTABLE;
+    public static Item DISKWRITER;
+    public static Item BROADCASTER;
 
     public static MIMIModItemGroup ITEM_GROUP;
 
-    @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistrationHandler {
-        @SubscribeEvent
-        public static void registerItems(final RegistryEvent.Register<Item> event) {
-            ITEM_GROUP = new MIMIModItemGroup();
+    public static void submitRegistrations(final RegistryEvent.Register<Item> event) {
+        ITEM_GROUP = new MIMIModItemGroup();
 
-            // Other Items
-            event.getRegistry().register(new ItemTransmitter());
-            event.getRegistry().register(new ItemMidiSwitchboard());
+        // Other Items
+        DEVICECONFIG = new ItemMidiDeviceConfig();
+        event.getRegistry().register(DEVICECONFIG);
 
-            // Redstone Blocks
-            event.getRegistry().register(new BlockItem(ModBlocks.LISTENER, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("listener"));
-            event.getRegistry().register(new BlockItem(ModBlocks.RECEIVER, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("receiver"));
-            event.getRegistry().register(new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("mechanicalmaestro"));
-            event.getRegistry().register(new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("conductor"));
+        TRANSMITTER = new ItemTransmitter();
+        event.getRegistry().register(TRANSMITTER);
 
-            // Village Blocks
-            event.getRegistry().register(new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName("tuningtable"));
+        FILECASTER = new ItemFileCaster();
+        event.getRegistry().register(FILECASTER);
 
-            // Instrument Items
-            INSTRUMENT_ITEMS = buildInstruments();
-            event.getRegistry().registerAll(INSTRUMENT_ITEMS.toArray(new ItemInstrument[INSTRUMENT_ITEMS.size()]));
+        SWITCHBOARD = new ItemMidiSwitchboard();
+        event.getRegistry().register(SWITCHBOARD);
 
-            // Instrument Block Items
-            BLOCK_INSTRUMENT_ITEMS = buildBlockInstruments();
-            event.getRegistry().registerAll(BLOCK_INSTRUMENT_ITEMS.toArray(new ItemInstrumentBlock[BLOCK_INSTRUMENT_ITEMS.size()]));
-        }
+        FLOPPYDISK = new ItemFloppyDisk();
+        event.getRegistry().register(FLOPPYDISK);
+
+        // Redstone Blocks
+        LISTENER = new BlockItem(ModBlocks.LISTENER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockListener.REGISTRY_NAME);
+        event.getRegistry().register(LISTENER);
+
+        RECEIVER = new BlockItem(ModBlocks.RECEIVER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockReceiver.REGISTRY_NAME);
+        event.getRegistry().register(RECEIVER);
+
+        MECHANICALMAESTRO = new BlockItem(ModBlocks.MECHANICALMAESTRO.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockMechanicalMaestro.REGISTRY_NAME);
+        event.getRegistry().register(MECHANICALMAESTRO);
+        
+        CONDUCTOR = new BlockItem(ModBlocks.CONDUCTOR.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockConductor.REGISTRY_NAME);
+        event.getRegistry().register(CONDUCTOR);
+
+        // Other Blocks
+        TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockTuningTable.REGISTRY_NAME);
+        event.getRegistry().register(TUNINGTABLE);
+        
+        DISKWRITER = new BlockItem(ModBlocks.DISKWRITER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockDiskWriter.REGISTRY_NAME);
+        event.getRegistry().register(DISKWRITER);
+
+        BROADCASTER = new BlockItem(ModBlocks.BROADCASTER.get(), new Item.Properties().tab(ITEM_GROUP).stacksTo(64)).setRegistryName(BlockBroadcaster.REGISTRY_NAME);
+        event.getRegistry().register(BROADCASTER);
+
+        // Instrument Items
+        INSTRUMENT_ITEMS = buildInstruments();
+        INSTRUMENT_ITEMS.forEach((ItemInstrument instrument) -> {
+            event.getRegistry().register(instrument);
+        });
+
+        // Instrument Block Items
+        BLOCK_INSTRUMENT_ITEMS = buildBlockInstruments();
+        BLOCK_INSTRUMENT_ITEMS.forEach((ItemInstrumentBlock instrument) -> {
+            event.getRegistry().register(instrument);
+        });
     }
 
     public static List<ItemInstrument> buildInstruments() {
@@ -83,7 +117,7 @@ public final class ModItems {
             Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(MIMIMod.MODID, instrument.registryName));
 
             if(block instanceof BlockInstrument) {
-                list.add((ItemInstrumentBlock)new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().tab(ITEM_GROUP).stacksTo(1)).setRegistryName(instrument.registryName));
+                list.add((ItemInstrumentBlock)new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().tab(ITEM_GROUP).stacksTo(1), instrument.registryName));
             } else {
                 MIMIMod.LOGGER.error("Failed to create ItemInstrumentBlock for Instrument: " + instrument.registryName + " - Corresponding Registry Block is not a BlockInstrument!");
             }            

@@ -11,66 +11,81 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Soundbank;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.midi.AMidiSynthManager;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.Mod;
 
-public class MidiMultiSynthManager extends AMidiSynthManager {
+@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 4;
-
+    
+    protected String lastSoundDevice = null;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     protected LocalPlayerMIMISynth localSynth;
     protected MechanicalMaestroMIMISynth mechSynth;
     protected ServerPlayerMIMISynth playerSynth;
 
+    @SuppressWarnings("resource")
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
-        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.mechSynth = new MechanicalMaestroMIMISynth(true, ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.playerSynth = new ServerPlayerMIMISynth(true, ModConfigs.CLIENT.latency.get(), this.soundbank);
+
+        if(this.soundbank != null) {
+            MIMIMod.LOGGER.debug("Loaded Soundbank:\n\n" +
+                "\tName: " + this.soundbank.getName() + "\n" +
+                "\tDesc: " + this.soundbank.getDescription() + "\n" +
+                "\tVers: " + this.soundbank.getVersion() + "\n" +
+                "\tVend: " + this.soundbank.getVendor() + "\n"
+            );
+        }
+
+        this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
-    @Override
     @SubscribeEvent
-    public void handleTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isLocalPlayer()) {
+    @SuppressWarnings("resource")
+    public void handleTick(ClientTickEvent event) {
+        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT) {
             return;
         }
 
         midiTickCounter++;
 
-        // Tick local synth every tick
-        localSynth.tick(event.player);
-
-        // Tick other synths every N tickets
+        // Tick synths every N tickets
         if(midiTickCounter >= MIDI_TICK_FREQUENCY) {
+            if(Minecraft.getInstance().player != null) {
+                // Local
+                localSynth.tick(Minecraft.getInstance().player);
     
-            // Mechanical Maestros
-            mechSynth.tick(event.player);
-    
-            // Players
-            playerSynth.tick(event.player);
+                // Mechanical Maestros
+                mechSynth.tick(Minecraft.getInstance().player);
+        
+                // Players
+                playerSynth.tick(Minecraft.getInstance().player);
+            }
+
+           
         }
     }
 
-    @Override
     @SubscribeEvent
     public void handleSelfLogOut(LoggedOutEvent event) {
         this.close();
     }
 
-    @Override
     public void close() {
         this.allNotesOff();
     }
 
-    @Override
     public void handlePacket(MidiNotePacket message) {
         AMIMISynth<?> targetSynth = getSynthForMessage(message);
 
@@ -85,27 +100,22 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
                 targetSynth.controlChange(message);
             }
         }
-       
     }
-
-    @Override
+    
     public void handleLocalPacket(MidiNotePacket message) {
-        LocalPlayerMIMISynth targetSynth = localSynth;
-
-        if(targetSynth != null) {
+        if(localSynth != null) {
             if(!message.isControlPacket()) {
                 if(message.velocity > 0) {
-                    targetSynth.noteOn(message);
+                    localSynth.noteOn(message);
                 } else if(message.velocity <= 0) {
-                    targetSynth.noteOff(message);
+                    localSynth.noteOff(message);
                 }
             } else {
-                targetSynth.controlChange(message);
+                localSynth.controlChange(message);
             }
-        }     
+        }
     }
 
-    @Override
     public void allNotesOff() {
         localSynth.allNotesOff();
         mechSynth.allNotesOff();
@@ -125,8 +135,14 @@ public class MidiMultiSynthManager extends AMidiSynthManager {
             try {
                 return new SF2SoundbankReader().getSoundbank(new BufferedInputStream(new FileInputStream(new File(resourcePath.trim()))));
             } catch(NullPointerException | IOException | InvalidMidiDataException e) {
-                MIMIMod.LOGGER.error("Failed to load SoundFont. Error: ", e);
+                MIMIMod.LOGGER.warn("Failed to load user SoundFont. Error: ", e);
             }
+        }
+        
+        try {
+            return new SF2SoundbankReader().getSoundbank(new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("assets/mimi/soundfont/GMGSX.SF2")));
+        } catch(NullPointerException | IOException | InvalidMidiDataException e) {
+            MIMIMod.LOGGER.error("Failed to load MIMI SoundFont. Error: ", e);
         }
 
         return null;

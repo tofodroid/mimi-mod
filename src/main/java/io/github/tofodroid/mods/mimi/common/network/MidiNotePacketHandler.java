@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
@@ -34,17 +35,17 @@ public class MidiNotePacketHandler {
             // Forward to players
             for(MidiNotePacket packet : messages) {
                 if(ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
-                    NetworkManager.NET_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
+                    NetworkManager.NOTE_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
                 } else {
                     ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
                         if(player != sender && Math.sqrt(player.getOnPos().distSqr(packet.pos)) <= getQueryBoxRange(packet.velocity <= 0)) {
-                            NetworkManager.NET_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+                            NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
                         }
                     });
                 }
             }
 
-            // Process Redstone
+            // Process Redstone and Sculk
             List<EntityNoteResponsiveTile> entities = new ArrayList<>();
             BlockPos lastPacketPos = null;
 
@@ -53,11 +54,13 @@ public class MidiNotePacketHandler {
                     if(lastPacketPos != packet.pos) {  
                         lastPacketPos = packet.pos;
                         entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
+                        // Unused below 1.19.x
+                        //worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, packet.pos, GameEvent.Context.of(worldIn.getBlockState(packet.pos)));
                     }
                     
                     getPotentialListeners(entities).forEach(listener -> {
                         if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
-                            ModBlocks.LISTENER.powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
+                            ModBlocks.LISTENER.get().powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
                         }
                     });
                 }
@@ -66,7 +69,7 @@ public class MidiNotePacketHandler {
     }
 
     public static void handlePacketClient(final MidiNotePacket message) {
-        MIMIMod.proxy.getMidiSynth().handlePacket(message); 
+        if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
     }
 
     protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerLevel worldIn, BlockPos notePos, Integer range) {

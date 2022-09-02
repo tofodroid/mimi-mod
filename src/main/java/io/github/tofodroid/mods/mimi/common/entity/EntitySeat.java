@@ -8,13 +8,13 @@ import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkHooks;
 
 public class EntitySeat extends Entity {
     protected BlockPos source;
@@ -42,7 +42,7 @@ public class EntitySeat extends Entity {
         if(!this.level.isClientSide) {
             if(source == null || this.getPassengers().isEmpty() || this.level.getBlockEntity(this.source) == null || !(this.level.getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.ejectPassengers();
-                this.remove(RemovalReason.DISCARDED);
+                this.discard();
                 level.updateNeighbourForOutputSignal(source, level.getBlockState(source).getBlock());
             }
         }
@@ -99,7 +99,7 @@ public class EntitySeat extends Entity {
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

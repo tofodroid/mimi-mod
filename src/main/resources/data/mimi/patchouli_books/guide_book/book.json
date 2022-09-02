@@ -1,7 +1,7 @@
 {
 	"name": "MIMI and Me",
-	"landing_text": "$(l)M$()usical    ---> $(l)M$()usical$(br)$(l)I$()nstrument  ---> $(l)I$()nstrument$(br)$(l)D$()igital      ---> $(l)M$()inecraft$(br)$(l)I$()nterface     ---> $(l)I$()nterface$(br2)This guide will teach you all there is to know about using MIMI to play and make msuic in Minecraft!",
-	"version": 2,
+	"landing_text": "$(l)M$()usical    ---> $(l)M$()usical$(br)$(l)I$()nstrument  ---> $(l)I$()nstrument$(br)$(l)D$()igital      ---> $(l)M$()inecraft$(br)$(l)I$()nterface     ---> $(l)I$()nterface$(br2)This guide will teach you all there is to know about using MIMI to play music in Minecraft!$(br2)Have questions, ideas, or found a bug? Head to the $(l:https://github.com/tofodroid/mimi-mod/issues)Issues$() section of MIMI's $(l:https://github.com/tofodroid/mimi-mod)GitHub$() page!",
+	"version": 3,
 	"show_progress": false,
 	"creative_tab": "mimi.group",
 	"model": "mimi:guide"

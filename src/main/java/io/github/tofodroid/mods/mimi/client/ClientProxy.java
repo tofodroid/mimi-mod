@@ -19,19 +19,21 @@ public class ClientProxy implements Proxy {
         
         MIDI_INPUT = new MidiInputManager();
         MinecraftForge.EVENT_BUS.register(MIDI_INPUT);
-
+        
         // Keybinds
         ModBindings.register();
-        MinecraftForge.EVENT_BUS.register(new ModBindings());
     }
 
-    @Override
     public MidiMultiSynthManager getMidiSynth() {
         return MIDI_SYNTH;
     }
 
-    @Override
     public MidiInputManager getMidiInput() {
         return MIDI_INPUT;
+    }
+
+    @Override
+    public Boolean isClient() {
+        return true;
     }
 }

@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -33,8 +34,15 @@ public abstract class ANoteResponsiveTile extends ASwitchboardContainerEntity im
             }
         } else {
             tickCount ++;
-        }        
+        }
+
+        if(world instanceof ServerLevel) {
+            this.execServerTick(world, pos, state, self);
+        }
+        
     }
 
     protected abstract Boolean shouldHaveEntity();
+
+    protected void execServerTick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) { };
 }

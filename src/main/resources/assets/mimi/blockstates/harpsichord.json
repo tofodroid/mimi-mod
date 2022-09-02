@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "mimi:block/harpsichord" },
+    "facing=west": { "model": "mimi:block/harpsichord", "y": 90 },
+    "facing=north": { "model": "mimi:block/harpsichord", "y": 180 },
+    "facing=east": { "model": "mimi:block/harpsichord", "y": 270 }
+  }
+}

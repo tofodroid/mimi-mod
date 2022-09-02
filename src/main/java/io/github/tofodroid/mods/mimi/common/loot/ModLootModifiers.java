@@ -8,5 +8,5 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModLootModifiers {
     public static final DeferredRegister<GlobalLootModifierSerializer<?>> REGISTER = DeferredRegister.create(ForgeRegistries.Keys.LOOT_MODIFIER_SERIALIZERS, MIMIMod.MODID);
-    public static final RegistryObject<GlobalLootModifierSerializer<GenericAddDropLootModifier>> GENERIC_ADD_DROP = REGISTER.register("generic_add_drop", GenericAddDropLootModifier.Serializer::new);
+    public static final RegistryObject<GenericAddDropLootModifier.Serializer> GENERIC_ADD_DROP = REGISTER.register("generic_add_drop", GenericAddDropLootModifier.Serializer::new);
 }

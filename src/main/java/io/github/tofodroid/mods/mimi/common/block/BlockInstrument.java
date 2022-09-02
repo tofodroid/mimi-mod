@@ -7,7 +7,7 @@ import com.mojang.math.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
+import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
@@ -56,6 +56,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected final Byte instrumentId;
     protected final Boolean dyeable;
     protected final Integer defaultColor;
+    public final String REGISTRY_NAME;
 
     public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
         super(Properties.of(Material.WOOD).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
@@ -64,7 +65,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         this.defaultColor = defaultColor;
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
         this.SHAPES = this.generateShapes(collisionShape);
-        this.setRegistryName(registryName);
+        this.REGISTRY_NAME = registryName;
     }
 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
@@ -146,10 +147,10 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if(IDyeableInstrumentItem.isDyeableInstrument(stack) && ((IDyeableInstrumentItem)stack.getItem()).hasColor(stack)) {
+        if(IDyeableItem.isDyeableInstrument(stack) && ((IDyeableItem)stack.getItem()).hasColor(stack)) {
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
             if (tileentity instanceof TileInstrument) {
-                ((TileInstrument)tileentity).setColor(((IDyeableInstrumentItem)stack.getItem()).getColor(stack));
+                ((TileInstrument)tileentity).setColor(((IDyeableItem)stack.getItem()).getColor(stack));
             }
         }
     }
@@ -162,8 +163,8 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
         if(tileentity != null && tileentity instanceof TileInstrument && ((TileInstrument)tileentity).hasColor()) {
             for(ItemStack stack : drops) {
-                if(this.isDyeable() && stack.getItem() instanceof IDyeableInstrumentItem) {
-                    ((IDyeableInstrumentItem)stack.getItem()).setColor(stack, ((TileInstrument)tileentity).getColor());
+                if(this.isDyeable() && stack.getItem() instanceof IDyeableItem) {
+                    ((IDyeableItem)stack.getItem()).setColor(stack, ((TileInstrument)tileentity).getColor());
                 }
             }
         }

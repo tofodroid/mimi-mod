@@ -9,8 +9,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+
 import net.minecraft.world.entity.player.Player;
 
 public class GuiMidiInputConfig extends BaseGui {    
@@ -28,7 +30,7 @@ public class GuiMidiInputConfig extends BaseGui {
 
     public GuiMidiInputConfig(Player player) {
         super(300, 173, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
-        this.midiInputManager = (MidiInputManager)MIMIMod.proxy.getMidiInput();
+        this.midiInputManager = ((ClientProxy)MIMIMod.proxy).getMidiInput();
         availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
     }
 

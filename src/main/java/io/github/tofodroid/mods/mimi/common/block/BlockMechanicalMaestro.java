@@ -13,15 +13,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
 public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestro> {
+    public static final String REGISTRY_NAME = "mechanicalmaestro";
 
     public BlockMechanicalMaestro() {
         super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
-        this.setRegistryName("mechanicalmaestro");
     }
 
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        if(!worldIn.isClientSide && ! worldIn.hasNeighborSignal(pos)) {
+        if(!worldIn.isClientSide && !worldIn.hasNeighborSignal(pos)) {
             TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
             
             if(tile != null) {

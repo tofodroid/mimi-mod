@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -14,7 +15,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -24,7 +24,9 @@ import javax.annotation.Nonnull;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
 
-public class ItemInstrument extends Item implements IDyeableInstrumentItem {
+public class ItemInstrument extends Item implements IDyeableItem {
+    public final String REGISTRY_NAME;
+
     public static final String INVENTORY_TAG = "inventory";
 
     protected final Byte instrumentId;
@@ -33,10 +35,11 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
 
     public ItemInstrument(String name, Byte instrumentId, Boolean dyeable, Integer defaultColor) {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
-        this.setRegistryName(name);
+        this.REGISTRY_NAME = name;
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
         this.defaultColor = defaultColor;
+        setRegistryName(REGISTRY_NAME);
     }
 
     @Override
@@ -53,7 +56,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
     @Override
     @Nonnull
     public InteractionResult useOn(UseOnContext context) {
-        if(!context.getPlayer().isCrouching() && ((IDyeableInstrumentItem)context.getItemInHand().getItem()).hasColor(context.getItemInHand()) && context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof CauldronBlock) {
+        if(washItem(context)) {
             return InteractionResult.SUCCESS;
         }
 
@@ -83,7 +86,7 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
             }
     
             @Override
-            public TextComponent getDisplayName() {return new TextComponent("");}
+            public Component getDisplayName() {return new TextComponent("mimi.instrument");}
         };
     }
 
@@ -177,6 +180,6 @@ public class ItemInstrument extends Item implements IDyeableInstrumentItem {
         public AbstractContainerMenu createMenu(int p1, Inventory p2,  Player p3) {return null;}
 
         @Override
-        public TextComponent getDisplayName() {return null;}
+        public Component getDisplayName() {return null;}
     }
 }

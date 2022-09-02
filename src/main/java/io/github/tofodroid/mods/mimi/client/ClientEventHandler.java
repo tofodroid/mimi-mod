@@ -1,16 +1,20 @@
 package io.github.tofodroid.mods.mimi.client;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.client.renderer.EntitySeatRenderer;
 import io.github.tofodroid.mods.mimi.client.renderer.EntityNoteResponseTileRenderer;
+import io.github.tofodroid.mods.mimi.client.gui.*;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.item.IDyeableInstrumentItem;
+import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,18 +22,35 @@ import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventHandler {
+    
+    @SubscribeEvent
+    public static void registerScreens(FMLClientSetupEvent event) {
+        MenuScreens.register(ModContainers.RECEIVER, GuiReceiverContainerScreen::new);
+        MenuScreens.register(ModContainers.LISTENER, GuiListenerContainerScreen::new);
+        MenuScreens.register(ModContainers.INSTRUMENT, GuiInstrumentContainerScreen::new);
+        MenuScreens.register(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
+        MenuScreens.register(ModContainers.CONDUCTOR, GuiConductorContainerScreen::new);
+        MenuScreens.register(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
+        MenuScreens.register(ModContainers.DISKWRITER, GuiDiskWriterContainerScreen::new);
+        MenuScreens.register(ModContainers.BROADCASTER, GuiBroadcasterContainerScreen::new);
+        MenuScreens.register(ModContainers.TRANSMITTER, GuiTransmitterContainerScreen::new);
+    }
+
+
     @SubscribeEvent
     public static void register(ColorHandlerEvent.Item event) {
         registerItemColors(event, ModItems.INSTRUMENT_ITEMS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
         registerItemColors(event, ModItems.BLOCK_INSTRUMENT_ITEMS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
+        registerItemColors(event, Arrays.asList(ModItems.FLOPPYDISK));
     }
 
     @SubscribeEvent
     public static void register(ColorHandlerEvent.Block event) {
-        registerBlockColors(event, ModBlocks.INSTRUMENTS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
+        registerBlockColors(event, ModBlocks.getBlockInstruments().stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
     }
 
     @SubscribeEvent
@@ -40,7 +61,7 @@ public class ClientEventHandler {
 
     protected static void registerItemColors(ColorHandlerEvent.Item event, List<? extends Item> items) {
         event.getItemColors().register((stack, color) ->
-                    color > 0 ? -1 : ((IDyeableInstrumentItem) stack.getItem()).getColor(stack), items.toArray(new Item[items.size()]));
+                    color > 0 ? -1 : ((IDyeableItem) stack.getItem()).getColor(stack), items.toArray(new Item[items.size()]));
     }
 
     protected static void registerBlockColors(ColorHandlerEvent.Block event, List<? extends Block> blocks) {

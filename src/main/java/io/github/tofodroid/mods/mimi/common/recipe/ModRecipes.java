@@ -14,16 +14,18 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ModRecipes {
     public static final Supplier<RecipeType<TuningTableRecipe>> TUNING = register("mimi:tuning");
+    public static final Supplier<RecipeType<TuningTableRecipe>> DYEDITEM = register("mimi:dyeditem");
 
     public static void registerTypes() {
         TUNING.get();
+        DYEDITEM.get();
     }
 
     @SubscribeEvent
     public static void registerSerializers(final RegistryEvent.Register<RecipeSerializer<?>> event) {
         registerTypes();
         event.getRegistry().register(TuningTableRecipe.SERIALIZER);
-        event.getRegistry().register(DyedInstrumentRecipe.SERIALIZER);
+        event.getRegistry().register(DyedItemRecipe.SERIALIZER);
     }
 
     private static <R extends Recipe<?>> Supplier<RecipeType<R>> register(String name){
