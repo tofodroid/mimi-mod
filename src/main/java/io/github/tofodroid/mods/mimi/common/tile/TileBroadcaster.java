@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -54,12 +55,12 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
     }
 
     public Boolean isPublicBroadcast() {
-        return this.getPersistentData().contains(BROADCAST_PUBLIC_TAG) && this.getPersistentData().getBoolean(BROADCAST_PUBLIC_TAG);
+        return this.getTileData().contains(BROADCAST_PUBLIC_TAG) && this.getTileData().getBoolean(BROADCAST_PUBLIC_TAG);
     }
 
     public void togglePublicBroadcast() {
         if(this.hasLevel() && !this.level.isClientSide && this.level instanceof ServerLevel) {
-            this.getPersistentData().putBoolean(BROADCAST_PUBLIC_TAG, !this.isPublicBroadcast());
+            this.getTileData().putBoolean(BROADCAST_PUBLIC_TAG, !this.isPublicBroadcast());
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
         }
     }
@@ -84,7 +85,7 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
 
     @Override
     public Component getDefaultName() {
-		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
     @Override

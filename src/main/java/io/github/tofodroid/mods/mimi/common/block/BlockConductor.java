@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -68,7 +68,7 @@ public class BlockConductor extends AContainerBlock<TileConductor> {
                 if(ModItems.SWITCHBOARD.equals(stack.getItem())) {
                     ItemMidiSwitchboard.setMidiSource(stack, tile.getUniqueId(), "Cond. " + pos.toShortString());
                     player.setItemInHand(hand, stack);
-                    player.displayClientMessage(Component.literal("Set MIDI Source to Conductor at: " + pos.toShortString()), true);
+                    player.displayClientMessage(new TextComponent("Set MIDI Source to Conductor at: " + pos.toShortString()), true);
                     return InteractionResult.CONSUME;
                 }
             }

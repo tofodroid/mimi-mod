@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.common.block;
 import io.github.tofodroid.mods.mimi.common.container.ContainerDiskWriter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,7 +20,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 public class BlockDiskWriter extends Block {
     public static final String REGISTRY_NAME = "diskwriter";
-    private static final Component CONTAINER_TITLE = Component.translatable("container.diskwriter");
+    private static final Component CONTAINER_TITLE = new TranslatableComponent("container.diskwriter");
     
     protected BlockDiskWriter() {
        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
@@ -30,7 +31,7 @@ public class BlockDiskWriter extends Block {
        if (worldIn.isClientSide) {
           return InteractionResult.SUCCESS;
        } else {
-          NetworkHooks.openScreen((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {});
+          NetworkHooks.openGui((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {});
           return InteractionResult.CONSUME;
        }
     }

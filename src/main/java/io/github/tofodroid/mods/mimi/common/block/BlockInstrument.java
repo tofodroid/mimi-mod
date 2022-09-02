@@ -79,7 +79,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
                 if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    NetworkHooks.openScreen((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {
+                    NetworkHooks.openGui((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {
                         buffer.writeByte(this.instrumentId);
                         buffer.writeBoolean(false);
                         buffer.writeBlockPos(pos);

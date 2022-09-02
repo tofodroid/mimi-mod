@@ -13,6 +13,7 @@ public class ItemInstrumentBlock extends BlockItem implements IDyeableItem {
     public ItemInstrumentBlock(BlockInstrument blockIn, Properties builder, String name) {
         super(blockIn, builder);
         this.REGISTRY_NAME = name;
+        setRegistryName(REGISTRY_NAME);
     }
 
     public Byte getInstrumentId() {

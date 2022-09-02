@@ -12,6 +12,8 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -23,9 +25,14 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
     public static final RecipeType<TuningTableRecipe> RECIPE_TYPE = new RecipeType<TuningTableRecipe>(CATEGORY_UID, TuningTableRecipe.class);
 
 	public TuningTableRecipeCategory(IGuiHelper helper) {
-        title = Component.translatable("gui.jei." + MIMIMod.MODID + ".tuning").getString();
+        title = new TranslatableComponent("gui.jei." + MIMIMod.MODID + ".tuning").getString();
 		icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.TUNINGTABLE));
 		background = helper.createDrawable(new ResourceLocation(MIMIMod.MODID, "textures/jei/tuning.png"), 0, 0, 59, 40);
+	}
+
+	@Override
+	public ResourceLocation getUid() {
+		return new ResourceLocation(MIMIMod.MODID, "tuning");
 	}
 
 	@Override
@@ -34,8 +41,13 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 	}
 
 	@Override
+	public Class<? extends TuningTableRecipe> getRecipeClass() {
+		return TuningTableRecipe.class;
+	}
+
+	@Override
 	public Component getTitle() {
-		return Component.literal(this.title);
+		return new TextComponent(this.title);
 	}
 
 	@Override

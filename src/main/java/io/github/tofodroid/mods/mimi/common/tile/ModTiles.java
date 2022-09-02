@@ -4,7 +4,7 @@ import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.registries.RegisterEvent;
+import net.minecraftforge.event.RegistryEvent;
 
 public class ModTiles {
     public static BlockEntityType<TileInstrument> INSTRUMENT = null;
@@ -14,13 +14,14 @@ public class ModTiles {
     public static BlockEntityType<TileConductor> CONDUCTOR = null;
     public static BlockEntityType<TileBroadcaster> BROADCASTER = null;
     
-    private static <T extends BlockEntity> BlockEntityType<T> registerType(String id, BlockEntityType.Builder<T> builder, RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
+    private static <T extends BlockEntity> BlockEntityType<T> registerType(String id, BlockEntityType.Builder<T> builder, RegistryEvent.Register<BlockEntityType<?>> event) {
         BlockEntityType<T> type = builder.build(null);
-        event.register(id, type);
+        type.setRegistryName(id);
+        event.getRegistry().register(type);
         return type;
     }
 
-    public static void submitRegistrations(final RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
+    public static void submitRegistrations(final RegistryEvent.Register<BlockEntityType<?>> event) {
         INSTRUMENT = registerType("instrument", BlockEntityType.Builder.of(TileInstrument::new, ModBlocks.getBlockInstruments().toArray(new BlockInstrument[ModBlocks.getBlockInstruments().size()])), event);
         RECEIVER = registerType("receiver", BlockEntityType.Builder.of(TileReceiver::new, ModBlocks.RECEIVER.get()), event);
         LISTENER = registerType("listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER.get()), event);

@@ -23,7 +23,7 @@ public class KeybindOpenTransmitterPacketHandler {
     public static void handlePacketServer(final KeybindOpenTransmitterPacket message, ServerPlayer sender) {
         if(ServerMusicPlayerMidiManager.getTransmitter(sender.getUUID()) != null) {
             Integer invSlot = ServerMusicPlayerMidiManager.getTransmitter(sender.getUUID()).getLeft();
-            NetworkHooks.openScreen(sender, ModItems.TRANSMITTER.generateContainerProvider(
+            NetworkHooks.openGui(sender, ModItems.TRANSMITTER.generateContainerProvider(
                 invSlot
             ), buffer -> {
                 buffer.writeInt(invSlot);

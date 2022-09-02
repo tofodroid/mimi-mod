@@ -28,7 +28,7 @@ public class KeybindOpenInstrumentPacketHandler {
 
             if(instrumentId != null) {
                 ItemInstrument heldInstrument = (ItemInstrument) ItemInstrument.getEntityHeldInstrumentStack(sender, message.handIn).getItem();
-                NetworkHooks.openScreen(sender, heldInstrument.generateContainerProvider(message.handIn), buffer -> {
+                NetworkHooks.openGui(sender, heldInstrument.generateContainerProvider(message.handIn), buffer -> {
                     buffer.writeByte(instrumentId);
                     buffer.writeBoolean(true);
                     buffer.writeBoolean(InteractionHand.MAIN_HAND.equals(message.handIn));
@@ -38,7 +38,7 @@ public class KeybindOpenInstrumentPacketHandler {
             TileInstrument tile = BlockInstrument.getTileInstrumentForEntity(sender);
 
             if(tile != null) {
-                NetworkHooks.openScreen(sender, tile, buffer -> {
+                NetworkHooks.openGui(sender, tile, buffer -> {
                     buffer.writeByte(tile.getInstrumentId());
                     buffer.writeBoolean(false);
                     buffer.writeBlockPos(tile.getBlockPos());

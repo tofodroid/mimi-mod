@@ -14,6 +14,7 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -37,7 +38,7 @@ public class TileMechanicalMaestro extends ANoteResponsiveTile {
 
     @Override
     public Component getDefaultName() {
-		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
 
     public ItemStack getInstrumentStack() {

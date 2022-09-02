@@ -11,6 +11,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTransmitter;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -35,6 +36,7 @@ public class ItemTransmitter extends Item {
 
     public ItemTransmitter() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        setRegistryName(REGISTRY_NAME);
     }
     
     @Override
@@ -44,7 +46,7 @@ public class ItemTransmitter extends Item {
             Integer invSlot = InteractionHand.MAIN_HAND.equals(handIn) ? playerIn.getInventory().selected 
             : Inventory.SLOT_OFFHAND;
 
-            NetworkHooks.openScreen((ServerPlayer) playerIn, generateContainerProvider(
+            NetworkHooks.openGui((ServerPlayer) playerIn, generateContainerProvider(
                 invSlot
             ), buffer -> {
                 buffer.writeInt(invSlot);
@@ -62,23 +64,23 @@ public class ItemTransmitter extends Item {
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
             
-            tooltip.add(Component.literal("----------------"));
+            tooltip.add(new TextComponent("----------------"));
 
             if(stack.hasFoil()) {
-                tooltip.add(Component.literal("§2§lCurrently Playing§r"));
-                tooltip.add(Component.literal("§oMoving this Transmitter will stop playing§r"));
-                tooltip.add(Component.literal("----------------"));
+                tooltip.add(new TextComponent("§2§lCurrently Playing§r"));
+                tooltip.add(new TextComponent("§oMoving this Transmitter will stop playing§r"));
+                tooltip.add(new TextComponent("----------------"));
             }
 
             // Disk Title
             if(ItemTransmitter.hasActiveFloppyDisk(stack)) {
-                tooltip.add(Component.literal("Loaded Disk: " + ItemFloppyDisk.getDiskTitle(ItemTransmitter.getActiveFloppyDiskStack(stack))));
+                tooltip.add(new TextComponent("Loaded Disk: " + ItemFloppyDisk.getDiskTitle(ItemTransmitter.getActiveFloppyDiskStack(stack))));
             }
 
             // Transmit Mode
             String transmitModeString = ItemTransmitter.getTransmitMode(stack).name();
             transmitModeString = transmitModeString.substring(0,1).toUpperCase() + transmitModeString.substring(1).toLowerCase();
-            tooltip.add(Component.literal("Transmit Mode: " + transmitModeString));
+            tooltip.add(new TextComponent("Transmit Mode: " + transmitModeString));
         }
     }
 
@@ -109,7 +111,7 @@ public class ItemTransmitter extends Item {
             }
     
             @Override
-            public Component getDisplayName() {return Component.literal("mimi.transmitter");}
+            public Component getDisplayName() {return new TextComponent("mimi.transmitter");}
         };
     }
     

@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 
 import com.google.gson.JsonObject;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -58,7 +59,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipes.TUNING_TYPE;
+        return ModRecipes.TUNING.get();
     }
 
     @Override
@@ -74,9 +75,13 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
         return result;
     }
 
-    public static class Serializer implements RecipeSerializer<TuningTableRecipe> {
+    public static class Serializer extends net.minecraftforge.registries.ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<TuningTableRecipe> {
         public static final String REGISTRY_NAME = "tuning";
         
+        Serializer() {
+			this.setRegistryName(new ResourceLocation(MIMIMod.MODID, REGISTRY_NAME));
+		}
+
         @Override
         public TuningTableRecipe fromJson(ResourceLocation resource, JsonObject json) {
             Ingredient ingredient = Ingredient.fromJson(json.get("instrument"));

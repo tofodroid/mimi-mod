@@ -10,7 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -48,7 +48,7 @@ public class MidiInputManager {
     }
     
     @SubscribeEvent
-    public void handleSelfLogOut(LoggingOut event) {
+    public void handleSelfLogOut(LoggedOutEvent event) {
         if(event.getPlayer() != null && event.getPlayer().isLocalPlayer()) {
             this.fileCasterManager.stop();
         }

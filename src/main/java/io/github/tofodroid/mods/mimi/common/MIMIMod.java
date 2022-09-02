@@ -1,14 +1,17 @@
 package io.github.tofodroid.mods.mimi.common;
 
 import net.minecraft.core.Registry;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegisterEvent;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
@@ -20,7 +23,6 @@ import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
-import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;
 
@@ -68,18 +70,21 @@ public class MIMIMod {
     }
 
     @SubscribeEvent
-    public static void registerContent(final RegisterEvent event) {
+    @SuppressWarnings("unchecked")
+    public static void registerContent(final RegistryEvent.Register<?> event) {
         // Items
-        event.register(Registry.ITEM_REGISTRY, (reg) -> {ModItems.submitRegistrations(reg);});
+        if(event.getRegistry().getRegistryKey().equals(Registry.ITEM_REGISTRY)) {
+            ModItems.submitRegistrations((RegistryEvent.Register<Item>)event);
+        }
 
         // Tiles
-        event.register(Registry.BLOCK_ENTITY_TYPE_REGISTRY, (reg) -> {ModTiles.submitRegistrations(reg);});
-
-        // Recipes
-        event.register(Registry.RECIPE_TYPE_REGISTRY, (reg) -> {ModRecipes.submitTypeRegistrations(reg);});
-        event.register(Registry.RECIPE_SERIALIZER_REGISTRY, (reg) -> {ModRecipes.submitSerializerRegistrations(reg);});
+        if(event.getRegistry().getRegistryKey().equals(Registry.BLOCK_ENTITY_TYPE_REGISTRY)) {
+            ModTiles.submitRegistrations((RegistryEvent.Register<BlockEntityType<?>>)event);
+        }
 
         // Containers
-        event.register(Registry.MENU_REGISTRY, (reg) -> {ModContainers.submitRegistrations(reg);});
+        if(event.getRegistry().getRegistryKey().equals(Registry.MENU_REGISTRY)) {
+            ModContainers.submitRegistrations((RegistryEvent.Register<MenuType<?>>)event);       
+        }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -38,6 +39,7 @@ public class ItemInstrument extends Item implements IDyeableItem {
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
         this.defaultColor = defaultColor;
+        setRegistryName(REGISTRY_NAME);
     }
 
     @Override
@@ -65,7 +67,7 @@ public class ItemInstrument extends Item implements IDyeableItem {
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         if (!worldIn.isClientSide) {
-            NetworkHooks.openScreen((ServerPlayer) playerIn, generateContainerProvider(handIn), buffer -> {
+            NetworkHooks.openGui((ServerPlayer) playerIn, generateContainerProvider(handIn), buffer -> {
                 buffer.writeByte(this.instrumentId);
                 buffer.writeBoolean(true);
                 buffer.writeBoolean(InteractionHand.MAIN_HAND.equals(handIn));
@@ -84,7 +86,7 @@ public class ItemInstrument extends Item implements IDyeableItem {
             }
     
             @Override
-            public Component getDisplayName() {return Component.literal("mimi.instrument");}
+            public Component getDisplayName() {return new TextComponent("mimi.instrument");}
         };
     }
 

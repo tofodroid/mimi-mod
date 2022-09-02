@@ -9,6 +9,7 @@ import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -23,6 +24,7 @@ public class ItemFileCaster extends Item {
 
     public ItemFileCaster() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        setRegistryName(REGISTRY_NAME);
     }
     
     @Override
@@ -38,10 +40,10 @@ public class ItemFileCaster extends Item {
         if(worldIn != null && worldIn.isClientSide) {
             
             if(stack.hasFoil()) {
-                tooltip.add(Component.literal("----------------"));
-                tooltip.add(Component.literal("§2§lCurrently Playing§r"));
-                tooltip.add(Component.literal("§oMust keep one FileCaster in Hands§r"));
-                tooltip.add(Component.literal("§oor HotBar to keep playing§r"));
+                tooltip.add(new TextComponent("----------------"));
+                tooltip.add(new TextComponent("§2§lCurrently Playing§r"));
+                tooltip.add(new TextComponent("§oMust keep one FileCaster in Hands§r"));
+                tooltip.add(new TextComponent("§oor HotBar to keep playing§r"));
             }
         }
     }

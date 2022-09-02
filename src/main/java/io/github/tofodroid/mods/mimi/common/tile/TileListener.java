@@ -7,6 +7,7 @@ import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +26,7 @@ public class TileListener extends ANoteResponsiveTile {
 
     @Override
     public Component getDefaultName() {
-		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
+		return new TranslatableComponent(this.getBlockState().getBlock().asItem().getDescriptionId());
     }
     
     public Boolean shouldAcceptNote(Byte note, Byte instrumentId) {

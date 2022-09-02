@@ -14,8 +14,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.InputEvent.Key;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 
 @SuppressWarnings("resource")
 public class ModBindings {
@@ -27,7 +27,7 @@ public class ModBindings {
     public static KeyMapping MIDIGUIOFF;
     public static KeyMapping MIDIGUISEAT;
 
-    public static void register(RegisterKeyMappingsEvent event) {
+    public static void register() {
         GUIFILECASTER = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.filecaster", GLFW.GLFW_KEY_PERIOD, "key.categories." + MIMIMod.MODID);
         GUITRANSMITTER = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.transmitter", GLFW.GLFW_KEY_COMMA, "key.categories." + MIMIMod.MODID);
         MIDISETTINGS = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.settings", GLFW.GLFW_KEY_HOME, "key.categories." + MIMIMod.MODID);
@@ -36,16 +36,16 @@ public class ModBindings {
         MIDIGUIOFF = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.off", GLFW.GLFW_KEY_K, "key.categories." + MIMIMod.MODID);
         MIDIGUISEAT = new KeyMapping("key." + MIMIMod.MODID + ".midi.gui.seat", GLFW.GLFW_KEY_L, "key.categories." + MIMIMod.MODID);
 
-        event.register(GUIFILECASTER);
-        event.register(GUITRANSMITTER);
-        event.register(MIDISETTINGS);
-        event.register(MIDIALLOFF);
-        event.register(MIDIGUIMAIN);
-        event.register(MIDIGUIOFF);
-        event.register(MIDIGUISEAT);
+        ClientRegistry.registerKeyBinding(GUIFILECASTER);
+        ClientRegistry.registerKeyBinding(GUITRANSMITTER);
+        ClientRegistry.registerKeyBinding(MIDISETTINGS);
+        ClientRegistry.registerKeyBinding(MIDIALLOFF);
+        ClientRegistry.registerKeyBinding(MIDIGUIMAIN);
+        ClientRegistry.registerKeyBinding(MIDIGUIOFF);
+        ClientRegistry.registerKeyBinding(MIDIGUISEAT);
     }
     
-    public static void onKeyInput(Key event) {
+    public static void onKeyInput(KeyInputEvent event) {
         Level worldIn = Minecraft.getInstance().level;
         Player playerIn = Minecraft.getInstance().player;
 

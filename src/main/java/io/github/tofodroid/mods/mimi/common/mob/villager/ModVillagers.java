@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.common.mob.villager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.Random;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
@@ -24,7 +25,6 @@ import net.minecraft.data.worldgen.VillagePools;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 
@@ -43,20 +43,19 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModVillagers {
     // POIs (Workstations)
     public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(ForgeRegistries.POI_TYPES, MIMIMod.MODID);
-    public static final RegistryObject<PoiType> TUNINGTABLE_POI = POI_TYPES.register("tuningtable", () -> new PoiType(ImmutableSet.of(ModBlocks.TUNINGTABLE.get().defaultBlockState()), 1, 1));
+    public static final RegistryObject<PoiType> TUNINGTABLE_POI = POI_TYPES.register("tuningtable", () -> new PoiType("tuningtable", ImmutableSet.of(ModBlocks.TUNINGTABLE.get().defaultBlockState()), 1, 1));
     
     // Needed for backwards compat
-    public static final RegistryObject<PoiType> INSTRUMENTALIST_POI = POI_TYPES.register("instrumentalist", () -> new PoiType(ImmutableSet.of(), 0, 0));
+    public static final RegistryObject<PoiType> INSTRUMENTALIST_POI = POI_TYPES.register("instrumentalist", () -> new PoiType("instrumentalist", ImmutableSet.of(), 0, 0));
 
     // Professions
-    public static final DeferredRegister<VillagerProfession> PROFESSIONS = DeferredRegister.create(ForgeRegistries.VILLAGER_PROFESSIONS, MIMIMod.MODID);
+    public static final DeferredRegister<VillagerProfession> PROFESSIONS = DeferredRegister.create(ForgeRegistries.PROFESSIONS, MIMIMod.MODID);
     public static final RegistryObject<VillagerProfession> INSTRUMENTALIST = PROFESSIONS.register(
         "instrumentalist", 
         () -> {
             return new VillagerProfession(
                 "instrumentalist", 
-                holder -> holder.value().equals(TUNINGTABLE_POI.get()), 
-                holder -> holder.value().equals(TUNINGTABLE_POI.get()), 
+                TUNINGTABLE_POI.get(),
                 ImmutableSet.of(Items.NOTE_BLOCK), 
                 ImmutableSet.of(), 
                 SoundEvents.VILLAGER_WORK_TOOLSMITH
@@ -90,7 +89,7 @@ public class ModVillagers {
             ));
             
             event.getTrades().get(5).addAll(Arrays.asList(
-                new ItemsForItemsTrade(Arrays.asList(Items.DISC_FRAGMENT_5,Items.MUSIC_DISC_PIGSTEP,Items.MUSIC_DISC_STAL,Items.MUSIC_DISC_WAIT,Items.MUSIC_DISC_STRAD,Items.MUSIC_DISC_11,Items.MUSIC_DISC_WARD,Items.MUSIC_DISC_BLOCKS,Items.MUSIC_DISC_CHIRP,Items.MUSIC_DISC_FAR,Items.MUSIC_DISC_MALL,Items.MUSIC_DISC_MELLOHI), 1, Arrays.asList(Items.EMERALD), 16, 1, 50),
+                new ItemsForItemsTrade(Arrays.asList(Items.MUSIC_DISC_PIGSTEP,Items.MUSIC_DISC_STAL,Items.MUSIC_DISC_WAIT,Items.MUSIC_DISC_STRAD,Items.MUSIC_DISC_11,Items.MUSIC_DISC_WARD,Items.MUSIC_DISC_BLOCKS,Items.MUSIC_DISC_CHIRP,Items.MUSIC_DISC_FAR,Items.MUSIC_DISC_MALL,Items.MUSIC_DISC_MELLOHI), 1, Arrays.asList(Items.EMERALD), 16, 1, 50),
                 new ItemsForItemsTrade(ModItems.BLOCK_INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
             ));
         }        
@@ -113,7 +112,7 @@ public class ModVillagers {
             int id = BuiltinRegistries.TEMPLATE_POOL.getId(patternPool);
             if (patternPool == null)
         	    return;
-            List<StructurePoolElement> poolElements = patternPool.getShuffledTemplates(RandomSource.create(0));
+            List<StructurePoolElement> poolElements = patternPool.getShuffledTemplates(new Random());
             Object2IntMap<StructurePoolElement> structurePoolElementMap = new Object2IntLinkedOpenHashMap<>();
             for(StructurePoolElement structurePoolElement : poolElements) {
                 structurePoolElementMap.computeInt(structurePoolElement, (StructurePoolElement p, Integer i) -> (i == null ? 0 : i) + 1);

@@ -20,8 +20,6 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-import net.minecraft.world.level.gameevent.GameEvent;
-
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
@@ -56,7 +54,8 @@ public class MidiNotePacketHandler {
                     if(lastPacketPos != packet.pos) {  
                         lastPacketPos = packet.pos;
                         entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
-                        worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, packet.pos, GameEvent.Context.of(worldIn.getBlockState(packet.pos)));
+                        // Unused below 1.19.x
+                        //worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, packet.pos, GameEvent.Context.of(worldIn.getBlockState(packet.pos)));
                     }
                     
                     getPotentialListeners(entities).forEach(listener -> {

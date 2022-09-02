@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -25,6 +26,7 @@ public class ItemFloppyDisk extends Item implements IDyeableItem {
 
     public ItemFloppyDisk() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
+        setRegistryName(REGISTRY_NAME);
     }
     
     @Override
@@ -55,16 +57,16 @@ public class ItemFloppyDisk extends Item implements IDyeableItem {
         // Client-side only
         if(worldIn != null && worldIn.isClientSide && ItemFloppyDisk.getDiskAuthor(stack) != null) {
             
-            tooltip.add(Component.literal("----------------"));
+            tooltip.add(new TextComponent("----------------"));
 
             // Disk Title
-            tooltip.add(Component.literal("Disk Title: " + ItemFloppyDisk.getDiskTitle(stack)));
+            tooltip.add(new TextComponent("Disk Title: " + ItemFloppyDisk.getDiskTitle(stack)));
 
             // Disk Author
-            tooltip.add(Component.literal("Author: " + ItemFloppyDisk.getDiskAuthor(stack)));
+            tooltip.add(new TextComponent("Author: " + ItemFloppyDisk.getDiskAuthor(stack)));
 
             // MIDI URL
-            tooltip.add(Component.literal("MIDI URL: " + ItemFloppyDisk.getMidiUrl(stack)));
+            tooltip.add(new TextComponent("MIDI URL: " + ItemFloppyDisk.getMidiUrl(stack)));
         }
     }
     

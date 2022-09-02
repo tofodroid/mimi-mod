@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -108,15 +108,15 @@ public class ModCommands {
         List<String> fileNames = MidiFileCacheManager.getServerFileNames(5, pageNum);
 
         if(fileNames.isEmpty()) {
-            source.sendSuccess(Component.literal("No files found"), false);
+            source.sendSuccess(new TextComponent("No files found"), false);
         } else if(pageNum >= numPages) {
-            source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
+            source.sendFailure(new TextComponent("Invalid page number. Max: " + numPages));
             return 1;
         } else {
-            source.sendSuccess(Component.literal("Server Music (" + (pageNum+1) + "/" + numPages + ")"), false);
+            source.sendSuccess(new TextComponent("Server Music (" + (pageNum+1) + "/" + numPages + ")"), false);
             Integer resultNum = pageNum * 5;
             for(String file : fileNames) {
-                source.sendSuccess(Component.literal((resultNum+1) + ". " + file), false);
+                source.sendSuccess(new TextComponent((resultNum+1) + ". " + file), false);
                 resultNum++;
             }
         }
@@ -125,7 +125,7 @@ public class ModCommands {
 
     private static int reloadServerMusicList(CommandSourceStack source) {
         MidiFileCacheManager.refreshServerSequenceMap();
-        source.sendSuccess(Component.literal("Server saved music reloaded. Found " + MidiFileCacheManager.getServerFileNamesPages(1) + " files"), true);
+        source.sendSuccess(new TextComponent("Server saved music reloaded. Found " + MidiFileCacheManager.getServerFileNamesPages(1) + " files"), true);
         return 0;
     }
 
@@ -135,33 +135,33 @@ public class ModCommands {
         name = name.strip();
 
         if(!ModConfigs.COMMON.allowServerCommands.get()) {
-            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            source.sendFailure(new TextComponent("This command is currently disabled by the config file."));
             return 1;
         } else if(url.isEmpty() || url.length() > 256) {
-            source.sendFailure(Component.literal("Supplied URL has invalid length. Max: 256 characters"));
+            source.sendFailure(new TextComponent("Supplied URL has invalid length. Max: 256 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateMidiUrl(url)) {
-            source.sendFailure(Component.literal("Supplied URL is not a valid MIDI URL"));
+            source.sendFailure(new TextComponent("Supplied URL is not a valid MIDI URL"));
             return 1;
         } else if(name.length() < 3 || name.length() > 64) {
-            source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
+            source.sendFailure(new TextComponent("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
-            source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_', and must start and end with a letter or number."));
+            source.sendFailure(new TextComponent("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_', and must start and end with a letter or number."));
             return 1;
         } else if(MidiFileCacheManager.hasServerFile(name)) {
-            source.sendFailure(Component.literal("A server MIDI file already exists with that name."));
+            source.sendFailure(new TextComponent("A server MIDI file already exists with that name."));
             return 1;
         }
 
         String resultName = MidiFileCacheManager.loadNewServerMusic(url, name);
 
         if(resultName == null) {
-            source.sendFailure(Component.literal("Failed to download and save MIDI from supplied URL"));
+            source.sendFailure(new TextComponent("Failed to download and save MIDI from supplied URL"));
             return 1;
         }
 
-        source.sendSuccess(Component.literal("New Server MIDI downloaded and saved as '" + name + "'"), true);
+        source.sendSuccess(new TextComponent("New Server MIDI downloaded and saved as '" + name + "'"), true);
         return 0;
     }
 
@@ -169,54 +169,54 @@ public class ModCommands {
         name = name.strip();
 
         if(!ModConfigs.COMMON.allowServerCommands.get()) {
-            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            source.sendFailure(new TextComponent("This command is currently disabled by the config file."));
             return 1;
         } else if(name.length() < 3 || name.length() > 64) {
-            source.sendFailure(Component.literal("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
+            source.sendFailure(new TextComponent("Supplied name has invalid length. Min: 3 characters. Max: 64 characters"));
             return 1;
         } else if(!RemoteMidiUrlUtils.validateFilename(name)) {
-            source.sendFailure(Component.literal("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_'"));
+            source.sendFailure(new TextComponent("Supplied name is not a valid name. Name must use only letters, numbers, '-', and '_'"));
             return 1;
         } else if(!MidiFileCacheManager.hasServerFile(name)) {
-            source.sendFailure(Component.literal("No server MIDI found with supplied name."));
+            source.sendFailure(new TextComponent("No server MIDI found with supplied name."));
             return 1;
         }
 
         if(!MidiFileCacheManager.removeServerMusic(name)) {
-            source.sendFailure(Component.literal("Failed to delete server MIDI file. Check the logs for more info"));
+            source.sendFailure(new TextComponent("Failed to delete server MIDI file. Check the logs for more info"));
             return 1;
         }
         
-        source.sendSuccess(Component.literal("Successfully deleted server MIDI '" + name + "'"), true);
+        source.sendSuccess(new TextComponent("Successfully deleted server MIDI '" + name + "'"), true);
         return 0;
     }
 
     private static int getServerCacheSize(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server music cache: " + MidiFileCacheManager.getCachedFileNamePages(1) + "/" + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), false);
+        source.sendSuccess(new TextComponent("Server music cache: " + MidiFileCacheManager.getCachedFileNamePages(1) + "/" + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), false);
         return 0;
     }
 
     private static int setServerCacheSize(CommandSourceStack source, Integer size) {
         ModConfigs.COMMON.serverMusicCacheSize.set(size);
-        source.sendSuccess(Component.literal("Server music cache size set to: " + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), true);
+        source.sendSuccess(new TextComponent("Server music cache size set to: " + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), true);
         return 0;
     }
 
     private static int pruneServerCache(CommandSourceStack source) {
         MidiFileCacheManager.pruneSequenceCache();
-        source.sendSuccess(Component.literal("Server music cache pruned."), true);
+        source.sendSuccess(new TextComponent("Server music cache pruned."), true);
         return 0;
     }
 
     private static int emptyServerCache(CommandSourceStack source) {
         MidiFileCacheManager.pruneSequenceCache();
-        source.sendSuccess(Component.literal("Server music cache cleared"), true);
+        source.sendSuccess(new TextComponent("Server music cache cleared"), true);
         return 0;
     }
 
     private static int reloadServerCache(CommandSourceStack source) {
         MidiFileCacheManager.refreshSequenceCacheMaps();
-        source.sendSuccess(Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files"), true);
+        source.sendSuccess(new TextComponent("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files"), true);
         return 0;
     }
 
@@ -227,26 +227,26 @@ public class ModCommands {
         Integer numPages = Double.valueOf(Math.ceil((double)hosts.size() / 5d)).intValue();
         
         if(hosts.isEmpty()) {
-            source.sendSuccess(Component.literal("Server allows all web hosts"), false);
+            source.sendSuccess(new TextComponent("Server allows all web hosts"), false);
             return 0;
         } else if(pageNum >= numPages) {
-            source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
+            source.sendFailure(new TextComponent("Invalid page number. Max: " + numPages));
             return 1;
         }
 
-        source.sendSuccess(Component.literal("Allowed Hosts (" + (pageNum+1) + "/" + numPages + ")"), false);
+        source.sendSuccess(new TextComponent("Allowed Hosts (" + (pageNum+1) + "/" + numPages + ")"), false);
         for(int i = pageNum*5; i < (pageNum*5 + 5); i++) {
             if(i >= hosts.size()) {
                 return 0;
             }
-            source.sendSuccess(Component.literal((i+1) + ". " + hosts.get(i)), false);
+            source.sendSuccess(new TextComponent((i+1) + ". " + hosts.get(i)), false);
         }
         
         return 0;
     }
 
     private static int getWebStatus(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
+        source.sendSuccess(new TextComponent("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
         return 0;
     }
 
@@ -254,14 +254,14 @@ public class ModCommands {
         host = host.strip();
 
         if(!ModConfigs.COMMON.allowWebCommands.get()) {
-            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            source.sendFailure(new TextComponent("This command is currently disabled by the config file."));
             return 1;
         } else if(!RemoteMidiUrlUtils.validHostString(host)) {
-            source.sendFailure(Component.literal("Provided host is invalid. Host must use the format of: http[s]://<host>.<extension>. Ex: https://bitmidi.com"));
+            source.sendFailure(new TextComponent("Provided host is invalid. Host must use the format of: http[s]://<host>.<extension>. Ex: https://bitmidi.com"));
             return 1;
         }
         ModConfigs.COMMON.addAllowedHost(host);
-        source.sendSuccess(Component.literal("Host '" + host + "' added to Allowed Hosts."), true);
+        source.sendSuccess(new TextComponent("Host '" + host + "' added to Allowed Hosts."), true);
         return 0;
     }
 
@@ -269,28 +269,28 @@ public class ModCommands {
         number--;
 
         if(!ModConfigs.COMMON.allowWebCommands.get()) {
-            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            source.sendFailure(new TextComponent("This command is currently disabled by the config file."));
             return 1;
         } else if(ModConfigs.COMMON.getAllowedHostsList().isEmpty()) {
-            source.sendFailure(Component.literal("Allowed hosts list is already empty"));
+            source.sendFailure(new TextComponent("Allowed hosts list is already empty"));
             return 1;
         } else if(number >= ModConfigs.COMMON.getAllowedHostsList().size()) {
-            source.sendFailure(Component.literal("Provided host number is too large. Max: " + ModConfigs.COMMON.getAllowedHostsList().size()));
+            source.sendFailure(new TextComponent("Provided host number is too large. Max: " + ModConfigs.COMMON.getAllowedHostsList().size()));
             return 1;
         }
         String removedHost = ModConfigs.COMMON.getAllowedHostsList().get(number);
         ModConfigs.COMMON.removeAllowedHost(number);
-        source.sendSuccess(Component.literal("Allowed Host '" + removedHost + "' removed."), true);
+        source.sendSuccess(new TextComponent("Allowed Host '" + removedHost + "' removed."), true);
         return 0;
     }
     
     private static int setWebStatus(CommandSourceStack source, Boolean enable) {
         if(!ModConfigs.COMMON.allowWebCommands.get()) {
-            source.sendFailure(Component.literal("This command is currently disabled by the config file."));
+            source.sendFailure(new TextComponent("This command is currently disabled by the config file."));
             return 1;
         }
 
-        source.sendSuccess(Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
+        source.sendSuccess(new TextComponent("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
         return 0;
     }
 }

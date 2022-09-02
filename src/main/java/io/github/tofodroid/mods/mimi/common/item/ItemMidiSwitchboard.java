@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -52,6 +53,7 @@ public class ItemMidiSwitchboard extends Item {
 
     public ItemMidiSwitchboard() {
         super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
+        setRegistryName(REGISTRY_NAME);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class ItemMidiSwitchboard extends Item {
             if(target instanceof Player) {
                 ItemMidiSwitchboard.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 playerIn.setItemInHand(hand, stack);
-                playerIn.displayClientMessage(Component.literal("Set MIDI Source to: " +  target.getName().getString()), true);
+                playerIn.displayClientMessage(new TextComponent("Set MIDI Source to: " +  target.getName().getString()), true);
                 return InteractionResult.CONSUME;
             }
         } else {
@@ -81,37 +83,37 @@ public class ItemMidiSwitchboard extends Item {
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
             
-            tooltip.add(Component.literal("----------------"));
+            tooltip.add(new TextComponent("----------------"));
 
             // MIDI Source Filter
-            tooltip.add(Component.literal("Transmitter: " + ItemMidiSwitchboard.getMidiSourceName(stack)));
+            tooltip.add(new TextComponent("Transmitter: " + ItemMidiSwitchboard.getMidiSourceName(stack)));
 
             if(ItemMidiSwitchboard.getSysInput(stack)) {
-                tooltip.add(Component.literal("System MIDI Device: Enabled"));
+                tooltip.add(new TextComponent("System MIDI Device: Enabled"));
             } else {
-                tooltip.add(Component.literal("System MIDI Device: Disabled"));
+                tooltip.add(new TextComponent("System MIDI Device: Disabled"));
             }
 
             // MIDI Channels Filter
             SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(stack);
             if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
                 if(acceptedChannels.size() == 16) {
-                    tooltip.add(Component.literal("Channels: All"));
+                    tooltip.add(new TextComponent("Channels: All"));
                 } else {
-                    tooltip.add(Component.literal("Channels: " + acceptedChannels.stream().map(c -> Integer.valueOf(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
+                    tooltip.add(new TextComponent("Channels: " + acceptedChannels.stream().map(c -> Integer.valueOf(c.intValue()+1).toString()).collect(Collectors.joining(", "))));
                 }
             } else {
-                tooltip.add(Component.literal("Channels: None"));
+                tooltip.add(new TextComponent("Channels: None"));
             }
 
             // MIDI Note Filter
-            tooltip.add(Component.literal("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
+            tooltip.add(new TextComponent("Note Filter: " + (ItemMidiSwitchboard.getInvertNoteOct(stack) ? "All except " : "") + ItemMidiSwitchboard.getFilteredNotesAsString(stack)));
 
             // Instrument Filter
-            tooltip.add(Component.literal("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
+            tooltip.add(new TextComponent("Instrument Filter: " + (ItemMidiSwitchboard.getInvertInstrument(stack) ? "All except " : "") + getInstrumentName(stack)));
 
             // Instrument Volume
-            tooltip.add(Component.literal("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
+            tooltip.add(new TextComponent("Instrument Volume: " + ItemMidiSwitchboard.getInstrumentVolumePercent(stack)));
         }
     }
 

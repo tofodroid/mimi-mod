@@ -44,7 +44,7 @@ public abstract class AContainerBlock<T extends AContainerTile> extends BaseEnti
             T tile = getTileForBlock(worldIn, pos);
             if(tile != null) {
                 ServerPlayer serverPlayerEntity = (ServerPlayer) player;
-                NetworkHooks.openScreen(serverPlayerEntity, this.getMenuProvider(state, worldIn, pos), (FriendlyByteBuf -> {
+                NetworkHooks.openGui(serverPlayerEntity, this.getMenuProvider(state, worldIn, pos), (FriendlyByteBuf -> {
                     writeGuiFriendlyByteBuf(state, worldIn, pos, player, hand, FriendlyByteBuf);
                 }));
                 return InteractionResult.CONSUME;

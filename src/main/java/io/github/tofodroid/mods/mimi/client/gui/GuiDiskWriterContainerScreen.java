@@ -10,10 +10,10 @@ import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.WriteDiskPacket;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.CommonComponents;
 
 public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDiskWriter> {
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
@@ -36,13 +36,13 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
         super.init();
 
         // Fields
-        diskTitleField = this.addWidget(new EditBox(this.font, this.START_X + 34, this.START_Y + 24, 134, 10, CommonComponents.EMPTY));
+        diskTitleField = this.addWidget(new EditBox(this.font, this.START_X + 34, this.START_Y + 24, 134, 10, TextComponent.EMPTY));
         diskTitleField.setValue(diskTitleString);
         diskTitleField.setMaxLength(64);
         diskTitleField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
         diskTitleField.setResponder(this::handleTitleChange);
 
-        midiUrlField = this.addWidget(new EditBox(this.font, this.START_X + 34, this.START_Y + 39, 134, 10, CommonComponents.EMPTY));
+        midiUrlField = this.addWidget(new EditBox(this.font, this.START_X + 34, this.START_Y + 39, 134, 10, TextComponent.EMPTY));
         midiUrlField.setValue(midiUrlString);
         midiUrlField.setMaxLength(256);
         midiUrlField.setTextColor(DEFAULT_TEXT_FIELD_COLOR);
