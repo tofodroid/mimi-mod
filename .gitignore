@@ -5,6 +5,8 @@ bin
 .metadata
 .classpath
 .project
+.idea
+.iml
 
 # Gradle
 .gradle
