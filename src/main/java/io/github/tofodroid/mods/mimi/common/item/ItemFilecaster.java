@@ -38,7 +38,7 @@ public class ItemFileCaster extends Item {
         if(worldIn != null && worldIn.isClientSide) {
             
             if(stack.hasFoil()) {
-                tooltip.add(Component.literal("----------------"));
+                tooltip.add(Component.literal("-----------------"));
                 tooltip.add(Component.literal("§2§lCurrently Playing§r"));
                 tooltip.add(Component.literal("§oMust keep one FileCaster in Hands§r"));
                 tooltip.add(Component.literal("§oor HotBar to keep playing§r"));
