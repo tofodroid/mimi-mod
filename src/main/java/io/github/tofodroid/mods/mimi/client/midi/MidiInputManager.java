@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -27,7 +28,9 @@ public class MidiInputManager {
 
     public MidiInputManager() {
         this.inputDeviceManager = new MidiInputDeviceManager();
+        MinecraftForge.EVENT_BUS.register(this.inputDeviceManager);
         this.fileCasterManager = new MidiFileCasterManager();
+        MinecraftForge.EVENT_BUS.register(this.fileCasterManager);
         this.fileCasterManager.open();
         this.inputDeviceManager.open();
     }
