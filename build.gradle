@@ -133,9 +133,9 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven { 
+    maven {
         name = "Patchouli"
-        url 'https://maven.blamejared.com' 
+        url 'https://maven.blamejared.com'
     }
     maven {
         name = "JEI"
@@ -153,11 +153,13 @@ dependencies {
     // JEI
     compileOnly fg.deobf("mezz.jei:jei-1.18.2-common-api:10.1.3.240")
     compileOnly fg.deobf("mezz.jei:jei-1.18.2-forge-api:10.1.3.240")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-common:11.2.0.246")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.246")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2-forge:10.1.3.240")
+//    runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-common:11.2.0.246")
+//    runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.246")
 
     // Patchouli
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.18.2-71.1:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.18.2-71.1")
     //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.2-76")
 }
 
@@ -175,7 +177,7 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar')
 
 publishing {
     publications {
