@@ -11,6 +11,8 @@ import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
 import com.google.common.collect.BiMap;
@@ -24,6 +26,7 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable {
@@ -137,8 +140,32 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    // Unused in 1.18.x
+    @SuppressWarnings("resource")
     public static SourceDataLine getDeviceOutLine(AudioFormat format) {
+        String mcDevice = Minecraft.getInstance().options.soundDevice;
+
+        // Minecraft device name is "<Driver> on <Device>" and we only want device
+        if(mcDevice.toLowerCase().indexOf(" on ") >= 0) {
+            mcDevice = mcDevice.substring(mcDevice.toLowerCase().indexOf(" on ")+4);
+        }
+
+        if(mcDevice.equals(MC_DEFAULT_DEVICE)) {
+            return null;
+        } else {
+            try {
+                MIMIMod.LOGGER.info("Looking for Device: '" + mcDevice + "'");
+                for(Mixer.Info info : AudioSystem.getMixerInfo()) {
+                    if(info.getClass().getName().contains("DirectAudioDevice") 
+                        && info.getName().equals(mcDevice)
+                    ) {
+                        return AudioSystem.getSourceDataLine(format, info);
+                    }
+                }
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to open target AudioOut Device. Falling back to default. Error: ", e);
+            }
+        }
+
         return null;
     }
 

@@ -36,6 +36,7 @@ public class MidiMultiSynthManager {
     @SuppressWarnings("resource")
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
+        this.lastSoundDevice = Minecraft.getInstance().options.soundDevice;
 
         if(this.soundbank != null) {
             MIMIMod.LOGGER.debug("Loaded Soundbank:\n\n" +
@@ -62,6 +63,17 @@ public class MidiMultiSynthManager {
 
         // Tick synths every N tickets
         if(midiTickCounter >= MIDI_TICK_FREQUENCY) {
+            // If sound device changes, create new synths
+            if(!lastSoundDevice.equals(Minecraft.getInstance().options.soundDevice)) {
+                localSynth.close();
+                mechSynth.close();
+                playerSynth.close();
+                this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+                this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+                this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+                this.lastSoundDevice = Minecraft.getInstance().options.soundDevice;
+            }
+
             if(Minecraft.getInstance().player != null) {
                 // Local
                 localSynth.tick(Minecraft.getInstance().player);
