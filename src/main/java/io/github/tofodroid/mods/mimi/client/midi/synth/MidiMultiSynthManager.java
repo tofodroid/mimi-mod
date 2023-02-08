@@ -46,7 +46,7 @@ public class MidiMultiSynthManager {
             );
         }
 
-        //this.reloadSynths();
+        this.reloadSynths();
     }
 
     @SubscribeEvent
