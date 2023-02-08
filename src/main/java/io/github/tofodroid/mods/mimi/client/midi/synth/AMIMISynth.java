@@ -15,6 +15,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
@@ -132,7 +134,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
             mcDevice = mcDevice.substring(mcDevice.toLowerCase().indexOf(" on ")+4);
         }
 
-        if(mcDevice.equals(MC_DEFAULT_DEVICE)) {
+        if(StringUtils.isBlank(mcDevice) || mcDevice.equals(MC_DEFAULT_DEVICE)) {
             return null;
         } else {
             try {

@@ -16,6 +16,7 @@ import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
+import net.minecraftforge.client.event.sound.SoundLoadEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -36,7 +37,6 @@ public class MidiMultiSynthManager {
     @SuppressWarnings("resource")
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
-        this.lastSoundDevice = Minecraft.getInstance().options.soundDevice().get();
 
         if(this.soundbank != null) {
             MIMIMod.LOGGER.debug("Loaded Soundbank:\n\n" +
@@ -47,9 +47,7 @@ public class MidiMultiSynthManager {
             );
         }
 
-        this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+        this.reloadSynths();
     }
 
     @SubscribeEvent
@@ -63,18 +61,6 @@ public class MidiMultiSynthManager {
 
         // Tick synths every N tickets
         if(midiTickCounter >= MIDI_TICK_FREQUENCY) {
-
-            // If sound device changes, create new synths
-            if(!lastSoundDevice.equals(Minecraft.getInstance().options.soundDevice().get())) {
-                localSynth.close();
-                mechSynth.close();
-                playerSynth.close();
-                this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-                this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-                this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
-                this.lastSoundDevice = Minecraft.getInstance().options.soundDevice().get();
-            }
-
             if(Minecraft.getInstance().player != null) {
                 // Local
                 localSynth.tick(Minecraft.getInstance().player);
@@ -88,6 +74,25 @@ public class MidiMultiSynthManager {
 
            
         }
+    }
+
+    @SuppressWarnings("resource")
+    private void reloadSynths() {
+        if(localSynth != null)
+            localSynth.close();
+        if(mechSynth != null)
+            mechSynth.close();
+        if(playerSynth != null)
+            playerSynth.close();
+        this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+        this.lastSoundDevice = Minecraft.getInstance().options.soundDevice;
+    }
+
+    @SubscribeEvent
+    public void handleSoundReload(SoundLoadEvent event) {
+        this.reloadSynths();
     }
 
     @SubscribeEvent
@@ -130,9 +135,12 @@ public class MidiMultiSynthManager {
     }
 
     public void allNotesOff() {
-        localSynth.allNotesOff();
-        mechSynth.allNotesOff();
-        playerSynth.allNotesOff();
+        if(localSynth != null)
+            localSynth.allNotesOff();
+        if(mechSynth != null)
+            mechSynth.allNotesOff();
+        if(playerSynth != null)
+            playerSynth.allNotesOff();
     }
 
     protected AMIMISynth<?> getSynthForMessage(MidiNotePacket message) {

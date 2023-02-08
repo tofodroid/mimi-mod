@@ -24,15 +24,6 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
        super(jitterCorrection, latency, sounds);
     }
 
-    @Override
-    public void close() {
-        // Close Midi
-        if(internalSynth != null && internalSynth.isOpen()) {
-            this.allNotesOff();
-            internalSynth.close();
-        }
-    }
-
     public Boolean tick(Player clientPlayer) {
         if(!this.channelAssignmentMap.isEmpty()) {
             // Generate player data

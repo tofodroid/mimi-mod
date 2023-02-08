@@ -65,7 +65,14 @@ public final class SoftAudioPusher implements Runnable {
             return;
         active = false;
         try {
-            audiothread.join();
+            if(audiothread.isAlive()) {  
+                audiothread.join(2000);
+            }
+
+            if(audiothread.isAlive()) {
+                //audiothread.dumpStack();
+                audiothread.interrupt();
+            }
         } catch (InterruptedException e) {
             //e.printStackTrace();
         }
