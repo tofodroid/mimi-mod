@@ -16,7 +16,7 @@ import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
-import net.minecraftforge.client.event.sound.SoundLoadEvent;
+import net.minecraftforge.client.event.sound.SoundEngineLoadEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,7 +27,6 @@ import net.minecraftforge.fml.common.Mod;
 public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 4;
     
-    protected String lastSoundDevice = null;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     protected LocalPlayerMIMISynth localSynth;
@@ -47,7 +46,7 @@ public class MidiMultiSynthManager {
             );
         }
 
-        this.reloadSynths();
+        //this.reloadSynths();
     }
 
     @SubscribeEvent
@@ -87,11 +86,10 @@ public class MidiMultiSynthManager {
         this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
-        this.lastSoundDevice = Minecraft.getInstance().options.soundDevice;
     }
 
     @SubscribeEvent
-    public void handleSoundReload(SoundLoadEvent event) {
+    public void handleSoundReload(SoundEngineLoadEvent event) {
         this.reloadSynths();
     }
 
