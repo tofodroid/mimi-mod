@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
@@ -29,19 +29,19 @@ public class GuiMidiFileCaster extends BaseGui {
     private String folderPathString;
     
     // Button Boxes
-    private static final Vector3f LOAD_FOLDER_BUTTON = new Vector3f(301,37,0);
-    private static final Vector3f SAVE_DEFAULT_BUTTON = new Vector3f(320,37,0);
-    private static final Vector3f LOAD_DEFAULT_BUTTON = new Vector3f(339,37,0);
-    private static final Vector3f PREVIOUS_BUTTON = new Vector3f(14,271,0);
-    private static final Vector3f STOP_BUTTON = new Vector3f(33,271,0);
-    private static final Vector3f PLAY_PAUSE_BUTTON = new Vector3f(52,271,0);
-    private static final Vector3f NEXT_BUTTON = new Vector3f(71,271,0);
-    private static final Vector3f LOOP_BUTTON = new Vector3f(90,271,0);
-    private static final Vector3f LOOP_SCREEN = new Vector3f(108,272,0);
-    private static final Vector3f SHUFFLE_BUTTON = new Vector3f(125,271,0);
-    private static final Vector3f SHUFFLE_SCREEN = new Vector3f(143,272,0);
-    private static final Vector3f TRANSMIT_BUTTON = new Vector3f(160,271,0);
-    private static final Vector3f TRANSMIT_SCREEN = new Vector3f(178,272,0);
+    private static final Vector2f LOAD_FOLDER_BUTTON = new Vector2f(301,37);
+    private static final Vector2f SAVE_DEFAULT_BUTTON = new Vector2f(320,37);
+    private static final Vector2f LOAD_DEFAULT_BUTTON = new Vector2f(339,37);
+    private static final Vector2f PREVIOUS_BUTTON = new Vector2f(14,271);
+    private static final Vector2f STOP_BUTTON = new Vector2f(33,271);
+    private static final Vector2f PLAY_PAUSE_BUTTON = new Vector2f(52,271);
+    private static final Vector2f NEXT_BUTTON = new Vector2f(71,271);
+    private static final Vector2f LOOP_BUTTON = new Vector2f(90,271);
+    private static final Vector2f LOOP_SCREEN = new Vector2f(108,272);
+    private static final Vector2f SHUFFLE_BUTTON = new Vector2f(125,271);
+    private static final Vector2f SHUFFLE_SCREEN = new Vector2f(143,272);
+    private static final Vector2f TRANSMIT_BUTTON = new Vector2f(160,271);
+    private static final Vector2f TRANSMIT_SCREEN = new Vector2f(178,272);
 
     // Time Slider
     private static final Integer SLIDE_Y = 270;

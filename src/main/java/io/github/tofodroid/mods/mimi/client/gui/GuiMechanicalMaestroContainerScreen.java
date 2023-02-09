@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -28,27 +28,27 @@ public class GuiMechanicalMaestroContainerScreen extends ASwitchboardBlockGui<Co
 	}
     
     @Override
-    protected Vector3f titleBoxPos() {
-        return new Vector3f(78,8,0);
+    protected Vector2f titleBoxPos() {
+        return new Vector2f(78,8);
 	}
 
     @Override
-    protected Vector3f titleBoxBlit() {
-        return new Vector3f(0,265,0);
+    protected Vector2f titleBoxBlit() {
+        return new Vector2f(0,265);
     }
 
     @Override
-    protected Vector3f titleBoxSize() {
-        return new Vector3f(171,16,0);
+    protected Vector2f titleBoxSize() {
+        return new Vector2f(171,16);
     }
     
     @Override
-    protected Vector3f switchboardSlotPos() {
-        return new Vector3f(9,205,0);
+    protected Vector2f switchboardSlotPos() {
+        return new Vector2f(9,205);
     }
 
-    protected Vector3f instrumentSlotPos() {
-        return new Vector3f(9,168,0);
+    protected Vector2f instrumentSlotPos() {
+        return new Vector2f(9,168);
     }
     
     @Override

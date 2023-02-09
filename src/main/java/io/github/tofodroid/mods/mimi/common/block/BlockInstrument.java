@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.block;
 import java.util.List;
 import java.util.Map;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;

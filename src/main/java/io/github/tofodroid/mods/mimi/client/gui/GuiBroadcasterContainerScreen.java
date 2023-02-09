@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
@@ -31,11 +31,11 @@ public class GuiBroadcasterContainerScreen extends BaseContainerGui<ContainerBro
     private ItemStack lastDiskStack = null;
 
     // Button Boxes
-    private static final Vector3f STOP_BUTTON = new Vector3f(28,190,0);
-    private static final Vector3f PLAY_PAUSE_BUTTON = new Vector3f(48,190,0);
-    private static final Vector3f TRANSMIT_BUTTON = new Vector3f(145,190,0);
-    private static final Vector3f TRANSMIT_SCREEN = new Vector3f(163,191,0);
-    private static final Vector3f TRANSMIT_LIGHT = new Vector3f(338,33,0);
+    private static final Vector2f STOP_BUTTON = new Vector2f(28,190);
+    private static final Vector2f PLAY_PAUSE_BUTTON = new Vector2f(48,190);
+    private static final Vector2f TRANSMIT_BUTTON = new Vector2f(145,190);
+    private static final Vector2f TRANSMIT_SCREEN = new Vector2f(163,191);
+    private static final Vector2f TRANSMIT_LIGHT = new Vector2f(338,33);
 
     // Time Slider
     private static final Integer SLIDE_Y = 189;

@@ -15,7 +15,7 @@ public class ItemMidiDeviceConfig extends Item {
     public static final String REGISTRY_NAME = "deviceconfig";
 
     public ItemMidiDeviceConfig() {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        super(new Properties().stacksTo(1));
     }
 
     @Override

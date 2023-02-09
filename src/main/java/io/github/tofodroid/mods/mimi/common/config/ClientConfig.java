@@ -36,6 +36,16 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
     public ForgeConfigSpec.BooleanValue raytraceSound;
+    
+    // DEBUG
+    public ForgeConfigSpec.IntValue quatX;
+    public ForgeConfigSpec.IntValue quatY;
+    public ForgeConfigSpec.IntValue quatZ;
+    public ForgeConfigSpec.IntValue quatW;
+    public ForgeConfigSpec.IntValue xOffset;
+    public ForgeConfigSpec.IntValue xMult;
+    public ForgeConfigSpec.IntValue yOffset;
+    public ForgeConfigSpec.IntValue yMult;
 
     public ClientConfig(ForgeConfigSpec.Builder builder) {
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
@@ -78,6 +88,32 @@ public class ClientConfig {
         soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
+        builder.pop();
+        builder.push("DEBUG");
+        quatX = builder.comment("QX")
+            .translation(MIMIMod.MODID + ".config.debug.qx")
+            .defineInRange("quatX", 0, -360, 360);
+        quatY = builder.comment("QY")
+            .translation(MIMIMod.MODID + ".config.debug.qy")
+            .defineInRange("quatY", 0, -360, 360);
+        quatZ = builder.comment("QX")
+            .translation(MIMIMod.MODID + ".config.debug.qz")
+            .defineInRange("quatZ", 1, -360, 360);
+        quatW = builder.comment("QW")
+            .translation(MIMIMod.MODID + ".config.debug.qw")
+            .defineInRange("quatW", -90, -360, 360);
+        xOffset = builder.comment("XO")
+            .translation(MIMIMod.MODID + ".config.debug.xo")
+            .defineInRange("xOffset", 11, -99999, 99999);
+        yOffset = builder.comment("YO")
+            .translation(MIMIMod.MODID + ".config.debug.yo")
+            .defineInRange("yOffset", 29+126, -99999, 99999);
+        xMult = builder.comment("XM")
+            .translation(MIMIMod.MODID + ".config.debug.xm")
+            .defineInRange("xMult", 1, -1, 1);
+        yMult = builder.comment("YM")
+            .translation(MIMIMod.MODID + ".config.debug.ym")
+            .defineInRange("yMult", -1, -1, 1);
         builder.pop();
     }
 }

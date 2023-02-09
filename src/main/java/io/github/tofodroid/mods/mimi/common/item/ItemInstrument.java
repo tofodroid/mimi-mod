@@ -33,7 +33,7 @@ public class ItemInstrument extends Item implements IDyeableItem {
     protected final Integer defaultColor;
 
     public ItemInstrument(String name, Byte instrumentId, Boolean dyeable, Integer defaultColor) {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        super(new Properties().stacksTo(1));
         this.REGISTRY_NAME = name;
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;

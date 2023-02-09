@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -85,7 +85,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     protected abstract PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
     protected abstract PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY);
 
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector3f buttonPos) {
+    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
         Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
         Integer buttonMaxX = buttonMinX + STANDARD_BUTTON_SIZE;
         Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();
@@ -100,7 +100,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
         return result;
     }
     
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector3f buttonPos, Vector3f buttonSize) {
+    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos, Vector2f buttonSize) {
         Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
         Integer buttonMaxX = buttonMinX + Float.valueOf(buttonSize.x()).intValue();
         Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();

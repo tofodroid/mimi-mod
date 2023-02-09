@@ -22,7 +22,7 @@ public class ItemFileCaster extends Item {
     public static final String REGISTRY_NAME = "filecaster";
 
     public ItemFileCaster() {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        super(new Properties().stacksTo(1));
     }
     
     @Override

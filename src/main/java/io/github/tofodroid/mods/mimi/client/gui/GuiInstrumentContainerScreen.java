@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -45,21 +45,21 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     private static final Integer NOTE_OFFSET_Y = 29;
 
     // GUI
-    private static final Vector3f SYS_DEVICE_BUTTON_COORDS = new Vector3f(105,84,0);
-    private static final Vector3f SOURCE_SELF_BUTTON_COORDS = new Vector3f(47,133,0);
-    private static final Vector3f SOURCE_PUBLIC_BUTTON_COORDS = new Vector3f(66,133,0);
-    private static final Vector3f SOURCE_CLEAR_BUTTON_COORDS = new Vector3f(85,133,0);
-    private static final Vector3f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector3f(300,31,0);
-    private static final Vector3f ALL_MIDI_BUTTON_COORDS = new Vector3f(141,101,0);
-    private static final Vector3f CLEAR_MIDI_BUTTON_COORDS = new Vector3f(141,126,0);
-    private static final Vector3f GEN_MIDI_BUTTON_COORDS = new Vector3f(160,101,0);
-    private static final Vector3f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector3f(14,177,0);
-    private static final Vector3f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector3f(59,177,0);
-    private static final Vector3f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector3f(84,177,0);
-    private static final Vector3f OCT_SHIFT_UP_BUTTON_COORDS = new Vector3f(129,177,0);
-    private static final Vector3f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector3f(105,219,0);
-    private static final Vector3f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector3f(202,58,0);
-    private static final Vector3f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector3f(155,58,0);
+    private static final Vector2f SYS_DEVICE_BUTTON_COORDS = new Vector2f(105,84);
+    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(47,133);
+    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(66,133);
+    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(85,133);
+    private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(300,31);
+    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(141,101);
+    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(141,126);
+    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(160,101);
+    private static final Vector2f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(14,177);
+    private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(59,177);
+    private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(84,177);
+    private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(129,177);
+    private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(105,219);
+    private static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(202,58);
+    private static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(155,58);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
@@ -284,10 +284,9 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
             } else {
                 // Individual Midi Channel Buttons
                 for(int i = 0; i < 16; i++) {
-                    Vector3f buttonCoords = new Vector3f(
+                    Vector2f buttonCoords = new Vector2f(
                         GEN_MIDI_BUTTON_COORDS.x() + (i % 8) * 19,
-                        GEN_MIDI_BUTTON_COORDS.y() + (i / 8) * 25,
-                        0
+                        GEN_MIDI_BUTTON_COORDS.y() + (i / 8) * 25
                     );
 
                     if(clickedBox(imouseX, imouseY, buttonCoords)) {
@@ -579,7 +578,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         if(editMode) {
             // Switchboard Background Panel
             matrixStack.pushPose();
-            matrixStack.mulPose(new Quaternion(new Vector3f(0,0,1),-90,true));
+            matrixStack.mulPose(Axis.ZN.rotationDegrees(90.0F));
             blit(matrixStack, -(START_Y + 29 + 126),  START_X + 11, this.getBlitOffset(), 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
             matrixStack.popPose();
 

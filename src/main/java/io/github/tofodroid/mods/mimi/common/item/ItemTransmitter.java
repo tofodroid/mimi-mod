@@ -34,7 +34,7 @@ public class ItemTransmitter extends Item {
     public static final String INVENTORY_TAG = "inventory";
 
     public ItemTransmitter() {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(1));
+        super(new Properties().stacksTo(1));
     }
     
     @Override

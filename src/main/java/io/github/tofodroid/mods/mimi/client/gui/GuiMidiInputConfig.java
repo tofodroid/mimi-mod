@@ -7,7 +7,7 @@ import javax.sound.midi.MidiDevice.Info;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
@@ -17,11 +17,11 @@ import net.minecraft.world.entity.player.Player;
 
 public class GuiMidiInputConfig extends BaseGui {    
     // Button Boxes
-    private static final Vector3f CLEAR_DEVICE_BUTTON = new Vector3f(272,36,0);
-    private static final Vector3f REFRESH_DEVICES_BUTTON = new Vector3f(271,94,0);
-    private static final Vector3f SHIFT_DEVICE_DOWN_BUTTON = new Vector3f(110,94,0);
-    private static final Vector3f SHIFT_DEVICE_UP_BUTTON = new Vector3f(252,94,0);
-    private static final Vector3f SAVE_DEVICE_BUTTON = new Vector3f(271,144,0);
+    private static final Vector2f CLEAR_DEVICE_BUTTON = new Vector2f(272,36);
+    private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(271,94);
+    private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(110,94);
+    private static final Vector2f SHIFT_DEVICE_UP_BUTTON = new Vector2f(252,94);
+    private static final Vector2f SAVE_DEVICE_BUTTON = new Vector2f(271,144);
 
     // MIDI
     private MidiInputManager midiInputManager;

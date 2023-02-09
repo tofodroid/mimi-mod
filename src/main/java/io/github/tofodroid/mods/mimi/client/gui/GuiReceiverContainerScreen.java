@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
 import net.minecraft.network.chat.Component;
@@ -12,18 +12,18 @@ public class GuiReceiverContainerScreen extends ASwitchboardBlockGui<ContainerRe
     }
     
     @Override
-    protected Vector3f titleBoxPos() {
-        return new Vector3f(129,8,0);
+    protected Vector2f titleBoxPos() {
+        return new Vector2f(129,8);
     }
 
     @Override
-    protected Vector3f titleBoxBlit() {
-        return new Vector3f(95,250,0);
+    protected Vector2f titleBoxBlit() {
+        return new Vector2f(95,250);
     }
 
     @Override
-    protected Vector3f titleBoxSize() {
-        return new Vector3f(71,16,0);
+    protected Vector2f titleBoxSize() {
+        return new Vector2f(71,16);
     }
     
     @Override

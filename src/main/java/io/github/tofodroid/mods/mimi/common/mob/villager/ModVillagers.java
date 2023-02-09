@@ -1,45 +1,27 @@
 package io.github.tofodroid.mods.mimi.common.mob.villager;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.OptionalInt;
-import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Lifecycle;
-
-import org.apache.commons.lang3.tuple.Triple;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.core.Holder;
-import net.minecraft.core.WritableRegistry;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.ProcessorLists;
-import net.minecraft.data.worldgen.VillagePools;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
-import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
-import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
-import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.Projection;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraftforge.event.village.VillagerTradesEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModVillagers {
     // POIs (Workstations)
     public static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(ForgeRegistries.POI_TYPES, MIMIMod.MODID);
@@ -65,6 +47,8 @@ public class ModVillagers {
     );
 
     // Villager Trades
+
+	@SubscribeEvent
     public static void registerTrades(VillagerTradesEvent event) {
         // Instrumentalist
         if(event.getType() == INSTRUMENTALIST.get()) {
@@ -94,42 +78,5 @@ public class ModVillagers {
                 new ItemsForItemsTrade(ModItems.BLOCK_INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
             ));
         }        
-    }
-
-    // Structures
-    public static final List<Triple<ResourceLocation,ResourceLocation,Holder<StructureProcessorList>>> JIGSAW_PIECES = Arrays.asList(
-        createJigsawPiece("village/plains/houses", "instrumentalist_house", ProcessorLists.STREET_PLAINS),
-        createJigsawPiece("village/snowy/houses", "instrumentalist_house", ProcessorLists.STREET_SNOWY_OR_TAIGA),
-        createJigsawPiece("village/savanna/houses", "instrumentalist_house", ProcessorLists.STREET_SAVANNA),
-        createJigsawPiece("village/desert/houses", "instrumentalist_house", ProcessorLists.EMPTY),
-        createJigsawPiece("village/taiga/houses", "instrumentalist_house",  ProcessorLists.STREET_SNOWY_OR_TAIGA)
-    );
-
-    public static void injectStructures() {
-		VillagePools.bootstrap();
-
-        JIGSAW_PIECES.forEach(pieceTriple -> {
-            StructureTemplatePool patternPool = BuiltinRegistries.TEMPLATE_POOL.get(pieceTriple.getLeft());
-            int id = BuiltinRegistries.TEMPLATE_POOL.getId(patternPool);
-            if (patternPool == null)
-        	    return;
-            List<StructurePoolElement> poolElements = patternPool.getShuffledTemplates(RandomSource.create(0));
-            Object2IntMap<StructurePoolElement> structurePoolElementMap = new Object2IntLinkedOpenHashMap<>();
-            for(StructurePoolElement structurePoolElement : poolElements) {
-                structurePoolElementMap.computeInt(structurePoolElement, (StructurePoolElement p, Integer i) -> (i == null ? 0 : i) + 1);
-            }
-            
-            Function<Projection, SinglePoolElement> projectableTemplate = StructurePoolElement.single(pieceTriple.getMiddle().toString(), pieceTriple.getRight());
-            StructurePoolElement piece = projectableTemplate.apply(Projection.RIGID);
-            structurePoolElementMap.put(piece, 4);
-            patternPool.rawTemplates.add(Pair.of(piece, 4));
-            ((WritableRegistry<StructureTemplatePool>)BuiltinRegistries.TEMPLATE_POOL).registerOrOverride(OptionalInt.of(id), ResourceKey.create(BuiltinRegistries.TEMPLATE_POOL.key(), patternPool.getName()), patternPool, Lifecycle.stable());
-        });
-	}
-
-
-
-    public static Triple<ResourceLocation,ResourceLocation,Holder<StructureProcessorList>> createJigsawPiece(String poolName, String entryName, Holder<StructureProcessorList> processorList) {
-        return Triple.of(new ResourceLocation(poolName), new ResourceLocation(MIMIMod.MODID, poolName + "/" + entryName), processorList);
     }
 }

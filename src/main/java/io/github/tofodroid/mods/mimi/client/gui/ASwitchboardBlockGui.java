@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ASwitchboardContainer;
 import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
@@ -16,36 +16,36 @@ import net.minecraft.world.entity.player.Inventory;
 
 public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> extends ASwitchboardGui<T> {
     // Button Boxes
-    protected static final Vector3f ALL_MIDI_BUTTON_COORDS = new Vector3f(16,48,0);
-    protected static final Vector3f GEN_MIDI_BUTTON_COORDS = new Vector3f(35,48,0);
-    protected static final Vector3f CLEAR_MIDI_BUTTON_COORDS = new Vector3f(16,73,0);
-    protected static final Vector3f FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector3f(211,48,0);
-    protected static final Vector3f FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector3f(192,48,0);
-    protected static final Vector3f FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector3f(275,48,0);
-    protected static final Vector3f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector3f(16,113,0);
-    protected static final Vector3f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector3f(150,113,0);
-    protected static final Vector3f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector3f(168,113,0);
-    protected static final Vector3f TRANSMIT_SELF_BUTTON_COORDS = new Vector3f(218,97,0);
-    protected static final Vector3f TRANSMIT_PUBLIC_BUTTON_COORDS = new Vector3f(237,97,0);
-    protected static final Vector3f TRANSMIT_CLEAR_BUTTON_COORDS = new Vector3f(256,97,0);
-    protected static final Vector3f BROADCAST_MODE_BUTTON_COORDS = new Vector3f(143,135,0);
-    protected static final Vector3f BROADCAST_NOTE_OCTAVE_BUTTON_COORDS = new Vector3f(211,134,0);
-    protected static final Vector3f BROADCAST_NOTE_LETTER_BUTTON_COORDS = new Vector3f(192,134,0);
-    protected static final Vector3f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector3f(306,74,0);
-    protected static final Vector3f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector3f(306,110,0);
+    protected static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(16,48);
+    protected static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(35,48);
+    protected static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(16,73);
+    protected static final Vector2f FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(211,48);
+    protected static final Vector2f FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector2f(192,48);
+    protected static final Vector2f FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector2f(275,48);
+    protected static final Vector2f FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2f(16,113);
+    protected static final Vector2f FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2f(150,113);
+    protected static final Vector2f FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2f(168,113);
+    protected static final Vector2f TRANSMIT_SELF_BUTTON_COORDS = new Vector2f(218,97);
+    protected static final Vector2f TRANSMIT_PUBLIC_BUTTON_COORDS = new Vector2f(237,97);
+    protected static final Vector2f TRANSMIT_CLEAR_BUTTON_COORDS = new Vector2f(256,97);
+    protected static final Vector2f BROADCAST_MODE_BUTTON_COORDS = new Vector2f(143,135);
+    protected static final Vector2f BROADCAST_NOTE_OCTAVE_BUTTON_COORDS = new Vector2f(211,134);
+    protected static final Vector2f BROADCAST_NOTE_LETTER_BUTTON_COORDS = new Vector2f(192,134);
+    protected static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(306,74);
+    protected static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(306,110);
 
     // Text Boxes
-    protected static final Vector3f FILTER_NOTE_TEXTBOX_COORDS = new Vector3f(232,52,0);
-    protected static final Vector3f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector3f(35,117,0);
-    protected static final Vector3f LINKED_TRANSMITTER_TEXTBOX_COORDS = new Vector3f(194,85,0);
-    protected static final Vector3f BROADCAST_NOTE_TEXTBOX_COORDS = new Vector3f(232,138,0);
-    protected static final Vector3f INSTRUMENT_VOLUME_TEXTBOX_COORDS = new Vector3f(308,96,0);
+    protected static final Vector2f FILTER_NOTE_TEXTBOX_COORDS = new Vector2f(232,52);
+    protected static final Vector2f FILTER_INSTRUMENT_TEXTBOX_COORDS = new Vector2f(35,117);
+    protected static final Vector2f LINKED_TRANSMITTER_TEXTBOX_COORDS = new Vector2f(194,85);
+    protected static final Vector2f BROADCAST_NOTE_TEXTBOX_COORDS = new Vector2f(232,138);
+    protected static final Vector2f INSTRUMENT_VOLUME_TEXTBOX_COORDS = new Vector2f(308,96);
 
     // Status Boxes
-    protected static final Vector3f MIDI_STATUSBOX_COORDS = new Vector3f(41,66,0);
-    protected static final Vector3f FILTER_NOTE_STATUSBOX_COORDS = new Vector3f(294,54,0);
-    protected static final Vector3f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector3f(174,107,0);
-    protected static final Vector3f BROADCAST_MODE_STATUSBOX_COORDS = new Vector3f(161,136,0);
+    protected static final Vector2f MIDI_STATUSBOX_COORDS = new Vector2f(41,66);
+    protected static final Vector2f FILTER_NOTE_STATUSBOX_COORDS = new Vector2f(294,54);
+    protected static final Vector2f FILTER_INSTRUMENT_STATUSBOX_COORDS = new Vector2f(174,107);
+    protected static final Vector2f BROADCAST_MODE_STATUSBOX_COORDS = new Vector2f(161,136);
 
     // Runtime Data
     protected List<Byte> INSTRUMENT_ID_LIST;
@@ -115,10 +115,9 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 			} else if(channelWidgetEnabled()) {
 				// Individual Midi Channel Buttons
 				for(int i = 0; i < 16; i++) {
-					Vector3f buttonCoords = new Vector3f(
+					Vector2f buttonCoords = new Vector2f(
 						GEN_MIDI_BUTTON_COORDS.x() + (i % 8) * 19,
-						GEN_MIDI_BUTTON_COORDS.y() + (i / 8) * 27,
-                        0
+						GEN_MIDI_BUTTON_COORDS.y() + (i / 8) * 27
 					);
 
 					if(clickedBox(imouseX, imouseY, buttonCoords)) {
@@ -349,8 +348,8 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
     protected Boolean broadcastModeWidgetEnabled() {return false;}
     protected Boolean broadcastNoteWidgetEnabled() {return false;}
     protected Boolean instrumentVolumeWidgetEnabled() {return false;}
-    protected abstract Vector3f titleBoxPos();
-    protected abstract Vector3f titleBoxBlit();
-    protected abstract Vector3f titleBoxSize();
-    protected Vector3f switchboardSlotPos() {return new Vector3f(9,187,0);}
+    protected abstract Vector2f titleBoxPos();
+    protected abstract Vector2f titleBoxBlit();
+    protected abstract Vector2f titleBoxSize();
+    protected Vector2f switchboardSlotPos() {return new Vector2f(9,187);}
 }

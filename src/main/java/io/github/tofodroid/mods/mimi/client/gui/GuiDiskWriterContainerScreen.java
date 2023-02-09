@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerDiskWriter;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
@@ -18,8 +18,8 @@ import net.minecraft.network.chat.CommonComponents;
 public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDiskWriter> {
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
 
-    protected static final Vector3f WRITE_BUTTON_COORDS = new Vector3f(55,58,0);
-    protected static final Vector3f WRITE_BUTTON_SIZE = new Vector3f(37,16,0);
+    protected static final Vector2f WRITE_BUTTON_COORDS = new Vector2f(55,58);
+    protected static final Vector2f WRITE_BUTTON_SIZE = new Vector2f(37,16);
 
     // Data
     private EditBox diskTitleField;

@@ -2,12 +2,13 @@ package io.github.tofodroid.mods.mimi.common.entity;
 
 import java.util.List;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -98,7 +99,7 @@ public class EntitySeat extends Entity {
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 

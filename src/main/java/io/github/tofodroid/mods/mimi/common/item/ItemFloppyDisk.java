@@ -24,7 +24,7 @@ public class ItemFloppyDisk extends Item implements IDyeableItem {
     public static final String DISK_AUTHOR_TAG = "disk_author";
 
     public ItemFloppyDisk() {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
+        super(new Properties().stacksTo(64));
     }
     
     @Override

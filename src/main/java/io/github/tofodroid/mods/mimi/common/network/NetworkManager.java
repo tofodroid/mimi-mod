@@ -2,10 +2,13 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
+@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NetworkManager {
     private static final String NET_PROTOCOL = "2";
 
@@ -30,6 +33,7 @@ public class NetworkManager {
             .serverAcceptedVersions(NET_PROTOCOL::equals)
             .simpleChannel();
 
+    @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
         NOTE_CHANNEL.registerMessage(0, MidiNotePacket.class, MidiNotePacket::encodePacket, MidiNotePacket::decodePacket, MidiNotePacketHandler::handlePacket);
         
