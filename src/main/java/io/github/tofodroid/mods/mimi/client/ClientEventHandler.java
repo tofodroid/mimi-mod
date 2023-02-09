@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.sound.SoundEngineLoadEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -64,6 +65,12 @@ public class ClientEventHandler {
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.SEAT.get(), EntitySeatRenderer::new);
         event.registerEntityRenderer(ModEntities.NOTERESPONSIVETILE.get(), EntityNoteResponseTileRenderer::new);
+    }
+    
+    @SubscribeEvent
+    public static void handleSoundReload(SoundEngineLoadEvent event) {
+        MIMIMod.LOGGER.info("EVENT");
+        if(MIMIMod.proxy.isClient() && ((ClientProxy)MIMIMod.proxy).getMidiSynth() != null) ((ClientProxy)MIMIMod.proxy).getMidiSynth().reloadSynths();
     }
 
     protected static void registerItemColors(RegisterColorHandlersEvent.Item event, List<? extends Item> items) {

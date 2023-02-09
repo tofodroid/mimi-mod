@@ -12,7 +12,6 @@ public class ClientProxy implements Proxy {
 
     @Override
     public void init(final FMLCommonSetupEvent event) {
-        // MIDI
         MIDI_SYNTH = new MidiMultiSynthManager();
         MinecraftForge.EVENT_BUS.register(MIDI_SYNTH);
         

@@ -16,7 +16,6 @@ import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
-import net.minecraftforge.client.event.sound.SoundEngineLoadEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -76,7 +75,7 @@ public class MidiMultiSynthManager {
     }
 
     @SuppressWarnings("resource")
-    private void reloadSynths() {
+    public void reloadSynths() {
         if(localSynth != null)
             localSynth.close();
         if(mechSynth != null)
@@ -86,11 +85,6 @@ public class MidiMultiSynthManager {
         this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
-    }
-
-    @SubscribeEvent
-    public void handleSoundReload(SoundEngineLoadEvent event) {
-        this.reloadSynths();
     }
 
     @SubscribeEvent

@@ -145,6 +145,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
                         return AudioSystem.getSourceDataLine(format, info);
                     }
                 }
+                MIMIMod.LOGGER.error("Failed to find target AudioOut Device '" + mcDevice + "'. Falling back to default.");
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to open target AudioOut Device. Falling back to default. Error: ", e);
             }
