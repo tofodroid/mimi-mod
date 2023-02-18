@@ -34,7 +34,7 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, Player player) {
         if(MIMIMod.proxy.isClient()) {
-            MidiNotePacket packet = new MidiNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos());
+            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         }
@@ -42,7 +42,7 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
     
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, Player player) {
         if(MIMIMod.proxy.isClient()) {
-            MidiNotePacket packet = new MidiNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos());
+            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
         }

@@ -27,14 +27,14 @@ public class MidiFileCasterInputReceiver extends MidiInputReceiver {
     
     public void sendTransmitterNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
         if(MIMIMod.proxy.isClient()) {
-            TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, velocity, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
+            TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, velocity, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
             NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }
     
     public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
         if(MIMIMod.proxy.isClient()) {
-            TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
+            TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
             NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }

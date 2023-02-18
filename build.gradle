@@ -6,7 +6,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '5.+'
 }
 
-version = '1.19.3-3.0.3'
+version = '1.19.3-3.1.0'
 group = 'io.github.tofodroid.mods.mimi'
 archivesBaseName = 'mimimod'
 
@@ -157,8 +157,8 @@ dependencies {
     //runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.246")
 
     // Patchouli
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.3-78-SNAPSHOT:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.3-78-SNAPSHOT")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.3-78:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.3-78")
 }
 
 jar {

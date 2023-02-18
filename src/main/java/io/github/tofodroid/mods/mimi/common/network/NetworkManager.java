@@ -48,5 +48,6 @@ public class NetworkManager {
         INFO_CHANNEL.registerMessage(6, ServerMidiInfoPacket.class, ServerMidiInfoPacket::encodePacket, ServerMidiInfoPacket::decodePacket, ServerMidiInfoPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(7, BroadcastControlPacket.class, BroadcastControlPacket::encodePacket, BroadcastControlPacket::decodePacket, BroadcastControlPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(8, ActiveTransmitterIdPacket.class, ActiveTransmitterIdPacket::encodePacket, ActiveTransmitterIdPacket::decodePacket, ActiveTransmitterIdPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(9, ServerTimeSyncPacket.class, ServerTimeSyncPacket::encodePacket, ServerTimeSyncPacket::decodePacket, ServerTimeSyncPacketHandler::handlePacket);
     }
 }
