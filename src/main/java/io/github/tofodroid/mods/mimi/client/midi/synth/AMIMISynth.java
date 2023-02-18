@@ -9,6 +9,8 @@ import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -28,13 +30,16 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable {
     public static final String MC_DEFAULT_DEVICE="Device";
     protected SoftSynthesizer internalSynth;
+    protected Receiver internalSynthReceiver;
     protected AudioFormat format;
+    protected Boolean closing = false;
     protected final ImmutableList<T> midiChannelSet;
     protected final BiMap<T, String> channelAssignmentMap;
 
@@ -46,10 +51,11 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
                 2, true, false
             );
             this.internalSynth = createSynth(getDeviceOutLine(this.format), this.format, jitterCorrection, false, latency, sounds);
-            
+            this.internalSynthReceiver = this.internalSynth.getReceiver();
         } catch(Exception e) {
             MIMIMod.LOGGER.error("FAILED TO CREATE SYNTH: ",e);
             this.internalSynth = null;
+            this.internalSynthReceiver = null;
         }
 
         if(internalSynth != null) {
@@ -73,15 +79,27 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     
     @Override
     public void close() {
+        closing = true;
+
         // Close Midi
         if(internalSynth != null && internalSynth.isOpen()) {
             this.allNotesOff();
+
+            if(this.internalSynthReceiver != null) {
+                this.internalSynthReceiver.close();
+            }
+
             internalSynth.close();
         }
     }
 
-    public void noteOn(MidiNotePacket message) {
-        if(this.channelAssignmentMap == null) {
+    public long getSynthEventTimestamp(Long systemEventMillis) {
+        Long synthOffsetMicros = this.internalSynth.getMicrosecondPosition() - Util.getEpochMillis()*1000;
+        return Math.max(systemEventMillis*1000 + synthOffsetMicros, this.internalSynth.getMicrosecondPosition());
+    }
+
+    public void noteOn(MidiNotePacket message, Long timestamp) {
+        if(this.channelAssignmentMap == null || closing) {
             return;
         }
 
@@ -99,23 +117,32 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
 
         if(channel != null) {
-            channel.noteOn(instrument, message.note, message.velocity, message.pos);
+            try {
+                channel.noteOn(message.pos);
+                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_ON, channel.getChannelNumber(), message.note, message.velocity), getSynthEventTimestamp(timestamp));
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to handle note on: ", e);
+            }
         }
     }
 
-    public void noteOff(MidiNotePacket message) {
-        if(this.channelAssignmentMap == null) {
+    public void noteOff(MidiNotePacket message, Long timestamp) {
+        if(this.channelAssignmentMap == null || closing) {
             return;
         }
 
-        InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
+        //InstrumentSpec instrument = InstrumentConfig.getBydId(message.instrumentId);
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
         
         if(channel != null) {
             if(message.isAllNotesOffPacket()) {
                 channel.allNotesOff();
             } else {
-                channel.noteOff(instrument, message.note);
+                try {
+                    this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.note, 0), getSynthEventTimestamp(timestamp));
+                } catch(Exception e) {
+                    MIMIMod.LOGGER.error("Failed to handle note off: ", e);
+                }
             }
         }
     }
@@ -127,6 +154,10 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         
         for(T channel : this.channelAssignmentMap.keySet()) {
             channel.allNotesOff();
+
+            if(this.internalSynth != null && this.internalSynth.isOpen() && this.internalSynth.getMainMixer() != null) {
+                this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
+            }
         }
     }
 
@@ -155,7 +186,6 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
             return null;
         } else {
             try {
-                MIMIMod.LOGGER.info("Looking for Device: '" + mcDevice + "'");
                 for(Mixer.Info info : AudioSystem.getMixerInfo()) {
                     if(info.getClass().getName().contains("DirectAudioDevice") 
                         && info.getName().equals(mcDevice)
