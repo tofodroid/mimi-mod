@@ -32,6 +32,10 @@ public class ClientProxy implements Proxy {
         return MIDI_INPUT;
     }
 
+    public Long getServerTime() {
+        return getMidiSynth().getServerTime();
+    }
+
     @Override
     public Boolean isClient() {
         return true;
