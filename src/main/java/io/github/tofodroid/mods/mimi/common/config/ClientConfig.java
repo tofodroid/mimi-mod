@@ -29,6 +29,7 @@ public class ClientConfig {
     public ForgeConfigSpec.BooleanValue enableMidiLogs;
 
     // SYNTH
+    public ForgeConfigSpec.IntValue noteBufferMs;
     public ForgeConfigSpec.BooleanValue jitterCorrection;
     public ForgeConfigSpec.IntValue latency;
     public ForgeConfigSpec.IntValue localLatency;
@@ -73,11 +74,14 @@ public class ClientConfig {
             .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
             .defineInList("synthSampleRate", 44100, Arrays.asList(8000,11025,16000,22050,44100,48000,96000));
         synthBitRate = builder.comment("What bitrate should the built-in midi synthesizer use (bits)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8,16,24,32]")
-            .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
+            .translation(MIMIMod.MODID + ".config.midi.synth.bitrate")
             .defineInList("synthBitRate", 16, Arrays.asList(8,16,24,32));
         soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
+        noteBufferMs = builder.comment("How many milliseconds should notes from a server buffer before playing locally? Smaller values will decrease latency but may cause stuttering.","Allowed values: 0-5000")
+            .translation(MIMIMod.MODID + ".config.midi.synth.bufferms")
+            .defineInRange("synthBufferMillis",250, 0, 5000);
         builder.pop();
     }
 }

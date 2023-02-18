@@ -37,7 +37,7 @@ public class TileConductor extends ASwitchboardContainerEntity {
 
                 for(Byte channel : ItemMidiSwitchboard.getEnabledChannelsSet(switchStack)) {
                     lastChannels.add(channel);
-                    TransmitterNotePacket packet =  new TransmitterNotePacket(channel, lastNote, Byte.MAX_VALUE, lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
+                    TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, lastNote, Byte.MAX_VALUE, lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
                     TransmitterNotePacketHandler.handlePacketServer(packet, this.getBlockPos(), (ServerLevel)worldIn, getUniqueId(), null);
                 }
             }
@@ -48,7 +48,7 @@ public class TileConductor extends ASwitchboardContainerEntity {
         if(!worldIn.isClientSide && worldIn instanceof ServerLevel) {
             if(!lastChannels.isEmpty() && lastNote != null) {
                 for(Byte channel : lastChannels) {
-                    TransmitterNotePacket packet =  new TransmitterNotePacket(channel, lastNote, Integer.valueOf(-1).byteValue(), lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
+                    TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, lastNote, Integer.valueOf(-1).byteValue(), lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
                     TransmitterNotePacketHandler.handlePacketServer(packet, this.getBlockPos(), (ServerLevel)worldIn, getUniqueId(), null);
                 }
             }
