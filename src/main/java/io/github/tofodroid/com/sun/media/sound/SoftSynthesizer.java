@@ -388,7 +388,7 @@ public final class SoftSynthesizer implements AudioSynthesizer,
             close();
     }
 
-    SoftMainMixer getMainMixer() {
+    public SoftMainMixer getMainMixer() {
         if (!isOpen())
             return null;
         return mainmixer;

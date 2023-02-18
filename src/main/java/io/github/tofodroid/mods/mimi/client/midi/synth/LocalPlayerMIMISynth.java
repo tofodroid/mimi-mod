@@ -39,7 +39,7 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
             for(Entry<MIMIChannel,String> entry : channelAssignmentMap.entrySet()) {
                 Byte instrumentId = Byte.parseByte(entry.getValue());
 
-                if(!entry.getKey().tick(clientPlayer) || (instrumentId == null || !playerInstruments.contains(instrumentId))) {
+                if(!entry.getKey().tick(clientPlayer, true) || (instrumentId == null || !playerInstruments.contains(instrumentId))) {
                     toRemove.add(entry.getKey());
                 } else {
                     entry.getKey().setVolume(MIMISynthUtils.getVolumeForRelativeNoteDistance(0d));

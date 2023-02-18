@@ -292,7 +292,6 @@ public class MidiFileCacheManager {
     }
 
     protected static Sequence downloadSequence(String midiUrl) throws IOException, InvalidMidiDataException {
-        MIMIMod.LOGGER.info("Downloading new MIDI from URL: '" + midiUrl + "'");
         URL url = new URL(midiUrl);
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(2000);
@@ -321,7 +320,6 @@ public class MidiFileCacheManager {
             }
             
             for(String removeKey : toRemove) {
-                MIMIMod.LOGGER.info("Pruning cached song: '" + removeKey + "'");
                 SEQUENCE_CACHE_VALUE_MAP.remove(removeKey);
                 try {
                     Files.deleteIfExists(new File(SEQUENCE_CACHE_FOLDER, removeKey).toPath());
@@ -337,7 +335,6 @@ public class MidiFileCacheManager {
             List<String> toRemove = new ArrayList<>(SEQUENCE_CACHE_VALUE_MAP.keySet());
             
             for(String removeKey : toRemove) {
-                MIMIMod.LOGGER.info("Deleting cached song: '" + removeKey + "'");
                 try {
                     Files.deleteIfExists(new File(SEQUENCE_CACHE_FOLDER, removeKey).toPath());
                 } catch(IOException e) {

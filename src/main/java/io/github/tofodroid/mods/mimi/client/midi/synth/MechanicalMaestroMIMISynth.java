@@ -20,7 +20,7 @@ public class MechanicalMaestroMIMISynth extends AMIMISynth<PositionalMIMIChannel
             // Tick channels
             List<PositionalMIMIChannel> toRemove = new ArrayList<>();
             for(PositionalMIMIChannel channel : channelAssignmentMap.keySet()) {
-                if(!channel.tick(clientPlayer)) {
+                if(!channel.tick(clientPlayer, false)) {
                     toRemove.add(channel);
                 }
             }
