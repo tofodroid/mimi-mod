@@ -24,7 +24,7 @@ public class TransmitterNotePacket {
     }
 
     public static TransmitterNotePacket createNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, note, Integer.valueOf(0).byteValue(), transmitMode, MIMIMod.proxy.getServerTime());
+        return new TransmitterNotePacket(channel, note, velocity, transmitMode, MIMIMod.proxy.getServerTime());
     }
 
     public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, TransmitMode transmitMode) {
