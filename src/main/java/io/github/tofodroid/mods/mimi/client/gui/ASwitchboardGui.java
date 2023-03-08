@@ -16,6 +16,7 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
     protected final Player player;
     protected final T container;
 	protected ItemStack selectedSwitchboardStack;
+    protected Boolean firstLoad = true;
 
     public ASwitchboardGui(T container, Inventory inv, Integer width, Integer height, Integer textureSize, String textureResource, Component textComponent) {
         super(container, inv, width, height, textureSize, textureResource, textComponent);
@@ -27,6 +28,7 @@ public abstract class ASwitchboardGui<T extends ASwitchboardContainer> extends B
             this.selectedSwitchboardStack = container.getSlot(ContainerListener.TARGET_CONTAINER_MIN_SLOT_ID).getItem();
             loadSelectedSwitchboard();
         }
+        firstLoad = false;
     }
 
     @Override

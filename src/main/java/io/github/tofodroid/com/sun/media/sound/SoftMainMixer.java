@@ -422,21 +422,25 @@ public final class SoftMainMixer {
     }
 
     public void clearQueuedChannelEvents(int channel) {
-        synchronized (synth.control_mutex) {
-            Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
-            while (iter.hasNext()) {
-                Entry<Long, Object> entry = iter.next();
+        Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry<Long, Object> entry = iter.next();
+            byte[] data = null;
 
-                if(entry.getValue() instanceof MidiMessage) {
-                    byte[] data = ((MidiMessage)entry.getValue()).getMessage();
-                    int status = 0;
-                    if (data.length > 0)
-                        status = data[0] & 0xFF;
-                    int ch = (status & 0x0F);
+            if(entry.getValue() instanceof MidiMessage) {
+                data = ((MidiMessage)entry.getValue()).getMessage();
+            } else if(entry.getValue() instanceof byte[]) {
+                data = (byte[])entry.getValue();
+            }
 
-                    if(ch == channel) {
-                        iter.remove();
-                    }
+            if(data != null) {
+                int status = 0;
+                if (data.length > 0)
+                    status = data[0] & 0xFF;
+                int ch = (status & 0x0F);
+
+                if(ch == channel) {
+                    iter.remove();
                 }
             }
         }

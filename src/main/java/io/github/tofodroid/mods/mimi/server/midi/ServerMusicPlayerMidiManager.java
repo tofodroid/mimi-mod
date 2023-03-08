@@ -14,6 +14,7 @@ import io.github.tofodroid.mods.mimi.common.item.ItemTransmitter;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
 import io.github.tofodroid.mods.mimi.common.network.ActiveTransmitterIdPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
@@ -238,6 +239,10 @@ public class ServerMusicPlayerMidiManager {
         NetworkManager.INFO_CHANNEL.send(
             PacketDistributor.PLAYER.with(() -> (ServerPlayer)event.getEntity()),
             new ActiveTransmitterIdPacket(null)
+        );
+        NetworkManager.INFO_CHANNEL.send(
+            PacketDistributor.PLAYER.with(() -> (ServerPlayer)event.getEntity()),
+            new ServerTimeSyncPacket(0l, true)
         );
     }
 
