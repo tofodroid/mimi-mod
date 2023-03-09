@@ -25,7 +25,8 @@ public class BroadcasterReceiver extends MidiInputReceiver {
         } else if(isNoteOffMessage(message)) {
             this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);
         } else if(isAllNotesOffMessage(message)) {
-            this.sendTransmitterAllNotesOffPacket(Integer.valueOf(message.getChannel()).byteValue());
+            this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
+            //this.sendTransmitterAllNotesOffPacket(Integer.valueOf(message.getChannel()).byteValue());
         } else if(isSupportedControlMessage(message)) {
             this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         }

@@ -4,19 +4,23 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class ServerTimeSyncPacket {
-    public final long timestamp;
-    public final Boolean isRequest;
+    public final long currentServerMilli;
+    public final Boolean firstRequest;
 
-    public ServerTimeSyncPacket(long timestamp, Boolean isRequest) {
-        this.timestamp = timestamp;
-        this.isRequest = isRequest;
+    public ServerTimeSyncPacket() {
+        this(0l, true);
+    }
+
+    public ServerTimeSyncPacket(long currentServerMilli, Boolean firstRequest) {
+        this.currentServerMilli = currentServerMilli;
+        this.firstRequest = firstRequest;
     }
 
     public static ServerTimeSyncPacket decodePacket(FriendlyByteBuf buf) {
         try {
-            Long timestamp = buf.readLong();
-            Boolean isRequest = buf.readBoolean();
-            return new ServerTimeSyncPacket(timestamp, isRequest);
+            Long currentServerMilli = buf.readLong();
+            Boolean firstRequest = buf.readBoolean();
+            return new ServerTimeSyncPacket(currentServerMilli, firstRequest);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ServerTimeSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -24,7 +28,7 @@ public class ServerTimeSyncPacket {
     }
 
     public static void encodePacket(ServerTimeSyncPacket pkt, FriendlyByteBuf buf) {
-        buf.writeLong(pkt.timestamp);
-        buf.writeBoolean(pkt.isRequest);
+        buf.writeLong(pkt.currentServerMilli);
+        buf.writeBoolean(pkt.firstRequest);
     }
 }

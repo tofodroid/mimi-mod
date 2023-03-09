@@ -17,15 +17,15 @@ public class MidiNotePacket {
     public final long noteServerTime;
     
     public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos) {
-        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, MIMIMod.proxy.getServerTime());
+        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
     }
     
     public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos) {
-        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos, MIMIMod.proxy.getServerTime());
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
     }
 
     public static MidiNotePacket createNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos) {
-        return new MidiNotePacket(note, velocity, instrumentId, player, pos, MIMIMod.proxy.getServerTime());
+        return new MidiNotePacket(note, velocity, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
     }
 
     public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime) {

@@ -24,15 +24,15 @@ public class TransmitterNotePacket {
     }
 
     public static TransmitterNotePacket createNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, note, velocity, transmitMode, MIMIMod.proxy.getServerTime());
+        return new TransmitterNotePacket(channel, note, velocity, transmitMode, MIMIMod.proxy.getCurrentServerMillis());
     }
 
     public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), transmitMode, MIMIMod.proxy.getServerTime());
+        return new TransmitterNotePacket(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), transmitMode, MIMIMod.proxy.getCurrentServerMillis());
     }
     
     public static TransmitterNotePacket createControllerPacket(Byte channel, Byte controller, Byte value, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, transmitMode, MIMIMod.proxy.getServerTime());
+        return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, transmitMode, MIMIMod.proxy.getCurrentServerMillis());
     }
 
     private TransmitterNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode, Long noteServerTime) {

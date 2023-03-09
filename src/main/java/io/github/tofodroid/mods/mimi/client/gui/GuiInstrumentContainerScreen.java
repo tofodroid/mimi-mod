@@ -382,7 +382,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
 
     private void toggleHoldPedal(Boolean on) {
         Byte controller = 64;
-        Byte value = on ? Byte.MAX_VALUE : Byte.MIN_VALUE;
+        Byte value = on ? Byte.MAX_VALUE : 0;
         MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NOTE_CHANNEL.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
