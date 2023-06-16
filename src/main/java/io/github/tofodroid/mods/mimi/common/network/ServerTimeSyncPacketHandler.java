@@ -21,10 +21,14 @@ public class ServerTimeSyncPacketHandler {
     }
 
     public static void handlePacketClient(final ServerTimeSyncPacket message) {
-        if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
+        if(message.isRequest) {
+            NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket(0l, false));
+        } else if(MIMIMod.proxy.isClient()) {
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message);
+        }
     }
     
     public static void handlePacketServer(final ServerTimeSyncPacket message, ServerPlayer sender) {
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerTimeSyncPacket(message.clientTime, Util.getEpochMillis() - message.clientTime));
+        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerTimeSyncPacket(Util.getEpochMillis(), false));
     }
 }

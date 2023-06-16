@@ -161,6 +161,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     public GuiInstrumentContainerScreen(ContainerInstrument container, Inventory inv, Component textComponent) {
         super(container, inv, 328, 250, 530, "textures/gui/container_instrument.png", textComponent);
         this.instrumentId = container.getInstrumentId();
+        this.firstLoad = true;
 
         if(container.isHandheld()) {
             this.handIn = container.getHandIn();
@@ -197,7 +198,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     @Override
     public void onClose() {
         this.toggleHoldPedal(false);
-        this.allNotesOff();
+        this.releaseHeldNotes();
         super.onClose();
     }
 
@@ -221,7 +222,7 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
                     } else {
                         ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[0]);
                     }
-                    this.allNotesOff();
+                    this.releaseHeldNotes();
                 }
 
                 return super.mouseClicked(dmouseX, dmouseY, mouseButton);
@@ -362,8 +363,12 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
     @Override
     public void loadSelectedSwitchboard() {
         super.loadSelectedSwitchboard();
-        this.allNotesOff();
         this.syncInstrumentToServer();
+
+        // Don't turn off all notes when GUI first opened, only if switchboard changes
+        if(this.firstLoad == false) { 
+            this.allNotesOff();
+        }
     }
 
     @Override
@@ -429,21 +434,26 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         this.noteIdString = buildNoteIdString();
     }
 
-    public void onMidiNoteOn(Byte channel, Byte midiNote, Byte velocity) {
-        this.holdNote(midiNote, velocity);
-    }
+    private void releaseHeldNotes() {
+        // Release all notes
+        if(this.heldNotes != null && this.instrumentId != null) {
+            List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
+            for(Byte note : notesToRemove) {
+                this.onGuiNoteRelease(note);
+            }
 
-    public void onMidiNoteOff(Byte channel, Byte midiNote) {
-        this.releaseNote(midiNote);
+            MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos());
+            NetworkManager.NOTE_CHANNEL.sendToServer(packet);
+            // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+        }
     }
 
     private void allNotesOff() {
         // Release all notes
         if(this.heldNotes != null && this.instrumentId != null) {
-            List<Byte> notesToRemove = new ArrayList<>(this.heldNotes.keySet());
-            for(Byte note : notesToRemove) {
-                this.releaseNote(note);
-            }
+            this.releaseHeldNotes();
 
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
@@ -457,27 +467,20 @@ public class GuiInstrumentContainerScreen extends ASwitchboardGui<ContainerInstr
         MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, ItemMidiSwitchboard.applyVolume(selectedSwitchboardStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NOTE_CHANNEL.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
-        this.onMidiNoteOn(null, midiNote, velocity);
+        this.releasedNotes.remove(midiNote);
+        this.heldNotes.put(midiNote, Instant.now());
     }
 
     private void onGuiNoteRelease(Byte midiNote) {
         MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NOTE_CHANNEL.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
-        this.onMidiNoteOff(null, midiNote);
-    }
 
-    private void holdNote(Byte midiNote, Byte velocity) {
-        this.releasedNotes.remove(midiNote);
-        this.heldNotes.put(midiNote, Instant.now());
-    }
-
-    private void releaseNote(Byte midiNote) {
         if(this.heldNotes.remove(midiNote) != null) {
             this.releasedNotes.put(midiNote, Instant.now());
         }
     }
-
+    
     // Keyboard Input Functions
     private Set<Byte> getMidiNoteFromScanCode(Integer scanCode, Boolean modifier, Boolean ignoreModifier) {
         switch(ModConfigs.CLIENT.keyboardLayout.get()) {

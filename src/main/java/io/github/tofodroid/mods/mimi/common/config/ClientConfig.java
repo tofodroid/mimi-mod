@@ -89,9 +89,9 @@ public class ClientConfig {
         soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
-        noteBufferMs = builder.comment("How many milliseconds should notes from a server buffer before playing locally? Smaller values will decrease latency but may cause stuttering.","Allowed values: 0-5000")
+        noteBufferMs = builder.comment("How many milliseconds should notes from a server buffer before playing locally? Smaller values will decrease latency but may result in stuttering when the server is under heavy load.","Allowed values: 0-999")
             .translation(MIMIMod.MODID + ".config.midi.synth.bufferms")
-            .defineInRange("synthBufferMillis",250, 0, 5000);
+            .defineInRange("synthBufferMillis",100, 0, 999);
         builder.pop();
         builder.push("DEBUG");
         quatX = builder.comment("QX")

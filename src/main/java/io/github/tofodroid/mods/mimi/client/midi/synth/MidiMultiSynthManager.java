@@ -12,7 +12,6 @@ import javax.sound.midi.Soundbank;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.Util;
@@ -101,7 +100,6 @@ public class MidiMultiSynthManager {
     public void handleSelfLogin(LoggingIn event) {
         this.loggingOff = false;
         this.reloadSynths();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket(Util.getEpochMillis(), 0l));
     }
 
     public Long getServerTime() {
@@ -131,7 +129,7 @@ public class MidiMultiSynthManager {
 
     public void handlePacket(ServerTimeSyncPacket message) {
         if(Minecraft.getInstance().getCurrentServer() != null) {
-            this.serverClockOffsetMillis = message.offset - Minecraft.getInstance().getCurrentServer().ping/2;
+            this.serverClockOffsetMillis = (Util.getEpochMillis() - message.timestamp) - Math.max(0, Minecraft.getInstance().getCurrentServer().ping)/2;
         } else {
             this.serverClockOffsetMillis = 0l;
         }
