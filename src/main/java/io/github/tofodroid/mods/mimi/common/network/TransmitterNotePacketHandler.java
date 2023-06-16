@@ -29,7 +29,7 @@ import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 public class TransmitterNotePacketHandler {
     public static void handlePacket(final TransmitterNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender().getOnPos(), ctx.get().getSender().getLevel(),  ctx.get().getSender().getUUID(), ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender().getOnPos(), (ServerLevel)ctx.get().getSender().level(),  ctx.get().getSender().getUUID(), ctx.get().getSender()));
         }
 
         ctx.get().setPacketHandled(true);

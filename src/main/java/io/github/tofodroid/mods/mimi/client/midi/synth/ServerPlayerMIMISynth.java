@@ -39,7 +39,7 @@ public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
 
                 // Generate new data for players we haven't already seen
                 if(playerInstrumentsMap.get(playerId) == null) {
-                    Player assignedPlayer = clientPlayer.level.getPlayerByUUID(playerId);
+                    Player assignedPlayer = clientPlayer.level().getPlayerByUUID(playerId);
 
                     if(assignedPlayer == null) {
                         toRemove.add(entry.getKey());

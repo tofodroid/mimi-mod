@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerTransmitter;
@@ -16,6 +15,7 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMidiInfoPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
 import io.github.tofodroid.mods.mimi.common.network.BroadcastControlPacket.CONTROL;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiStatus.STATUS_CODE;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -105,22 +105,22 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
     }
 
     @Override
-    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        blit(matrixStack, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Play/Pause Button
-        blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * this.menu.getTransmitMode().ordinal()), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * this.menu.getTransmitMode().ordinal()), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Transmit Light
         if(this.playerInfo != null && this.playerInfo.running) {
-            blit(matrixStack, START_X + Float.valueOf(TRANSMIT_LIGHT.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_LIGHT.y()).intValue(), 8, 225, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_LIGHT.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_LIGHT.y()).intValue(), 8, 225, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Time Slider
@@ -129,47 +129,47 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
             Integer slideProgress = this.playerInfo.songPositionSeconds >= 0 ? this.playerInfo.songPositionSeconds : 0;
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             Integer slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
-            blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.blit(guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
-        return matrixStack;
+        return graphics;
     }
 
     @Override
-    protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY) {
+    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY) {
         if(this.menu.hasActiveFloppy()) {
             if(this.midiInfo != null) {
                 switch(this.midiInfo.status) {
                     case ERROR_OTHER:
-                        this.font.draw(matrixStack,"Failed to load MIDI file from Disk URL.", 7, 33, 0xFF00E600);
+                        graphics.drawString(this.font,"Failed to load MIDI file from Disk URL.", 7, 33, 0xFF00E600);
                         break;
                     case ERROR_URL:
-                        this.font.draw(matrixStack,"Disk has invalid or inaccessible URL.", 7, 33, 0xFF00E600);
+                        graphics.drawString(this.font,"Disk has invalid or inaccessible URL.", 7, 33, 0xFF00E600);
                         break;
                     case ERROR_DISABLED:
-                        this.font.draw(matrixStack,"Web MIDI files are disabled by this server.", 7, 33, 0xFF00E600);
+                        graphics.drawString(this.font,"Web MIDI files are disabled by this server.", 7, 33, 0xFF00E600);
                         break;
                     case ERROR_HOST:
-                        this.font.draw(matrixStack,"Disk URL points to a website not allowed by this server.", 7, 33, 0xFF00E600);
+                        graphics.drawString(this.font,"Disk URL points to a website not allowed by this server.", 7, 33, 0xFF00E600);
                         break;
                     case ERROR_NOT_FOUND:
-                        this.font.draw(matrixStack,"Disk URL points to a server MIDI file that does not exist.", 7, 33, 0xFF00E600);
+                        graphics.drawString(this.font,"Disk URL points to a server MIDI file that does not exist.", 7, 33, 0xFF00E600);
                         break;
                     case SUCCESS:
                         if(this.instrumentMap != null) {
-                            this.font.draw(matrixStack, "Channel Instruments: ", 7, 33, 0xFF00E600);
+                            graphics.drawString(font, "Channel Instruments: ", 7, 33, 0xFF00E600);
                         
                             Integer index = 0;
                             for(Integer i = 0; i < 16; i+=2) {
                                 String name = instrumentMap.get(i) == null ? "None" : instrumentMap.get(i);
-                                this.font.draw(matrixStack, (i+1) + ": " + name, 7, 47 + 10*index, 0xFF00E600);
+                                graphics.drawString(font, (i+1) + ": " + name, 7, 47 + 10*index, 0xFF00E600);
                                 index++;
                             }
     
                             index = 0;
                             for(Integer i = 1; i < 16; i+=2) {
                                 String name = instrumentMap.get(i) == null ? "None" : instrumentMap.get(i);
-                                this.font.draw(matrixStack, (i+1) + ": " + name, 175, 47 + 10*index, 0xFF00E600);
+                                graphics.drawString(font, (i+1) + ": " + name, 175, 47 + 10*index, 0xFF00E600);
                                 index++;
                             }
                         }
@@ -178,25 +178,25 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
                         break;
                 }
             } else {
-                this.font.draw(matrixStack,"Loading MIDI from Disk...", 7, 33, 0xFF00E600);
+                graphics.drawString(this.font,"Loading MIDI from Disk...", 7, 33, 0xFF00E600);
             }
-            this.font.draw(matrixStack, this.font.substrByWidth(FormattedText.of("Title: " + ItemFloppyDisk.getDiskTitle(this.menu.getActiveFloppyStack())), 169).getString(), 7, 131, 0xFF00E600);
-            this.font.draw(matrixStack, this.font.substrByWidth(FormattedText.of("Author: " + ItemFloppyDisk.getDiskAuthor(this.menu.getActiveFloppyStack())), 169).getString(), 7, 141, 0xFF00E600);
+            graphics.drawString(font, this.font.substrByWidth(FormattedText.of("Title: " + ItemFloppyDisk.getDiskTitle(this.menu.getActiveFloppyStack())), 169).getString(), 7, 131, 0xFF00E600);
+            graphics.drawString(font, this.font.substrByWidth(FormattedText.of("Author: " + ItemFloppyDisk.getDiskAuthor(this.menu.getActiveFloppyStack())), 169).getString(), 7, 141, 0xFF00E600);
 
             List<FormattedCharSequence> urlLines = this.font.split(FormattedText.of("URL: " + ItemFloppyDisk.getMidiUrl(this.menu.getActiveFloppyStack())), 165);
             int i = 0;
             for(FormattedCharSequence seq : urlLines) {
                 if(i < 3) {
-                    this.font.draw(matrixStack, seq, i == 0 ? 7 : 11, 151 + (i*10), 0xFF00E600);
+                    graphics.drawString(font, seq, i == 0 ? 7 : 11, 151 + (i*10), 0xFF00E600);
                     i++;
                 } else {
                     break;
                 }
             }
         } else {
-            this.font.draw(matrixStack,"Insert a Floppy Disk", 7, 33, 0xFF00E600);
+            graphics.drawString(this.font,"Insert a Floppy Disk", 7, 33, 0xFF00E600);
         }
-        return matrixStack;
+        return graphics;
     }
 
     public void handlePlayerStatusPacket(ServerMusicPlayerStatusPacket packet) {

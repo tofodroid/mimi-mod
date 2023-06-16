@@ -3,11 +3,11 @@ package io.github.tofodroid.mods.mimi.common.item;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator;
+import net.minecraft.world.item.CreativeModeTab.Builder;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 
@@ -51,32 +51,32 @@ public final class ModItems {
     public static BlockItem DISKWRITER;
     public static BlockItem BROADCASTER;
 
-    public static void registerCreativeTab(final CreativeModeTabEvent.Register event) {
-        event.registerCreativeModeTab(new ResourceLocation(MIMIMod.MODID, "group"), builder ->
-            // Set name of tab to display
-            builder.title(Component.translatable("itemGroup." + MIMIMod.MODID + ".group"))
-            // Set icon of creative tab
-            .icon(() -> new ItemStack(ModBlocks.getBlockInstruments().get(0)))
-            // Add default items to tab
-            .displayItems((parameters, output) -> {
-                output.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
-                output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
-                output.acceptAll(getStacksForItems(Arrays.asList(
-                    DEVICECONFIG,
-                    TRANSMITTER,
-                    FILECASTER,
-                    SWITCHBOARD,
-                    FLOPPYDISK,
-                    LISTENER,
-                    RECEIVER,
-                    MECHANICALMAESTRO,
-                    CONDUCTOR,
-                    TUNINGTABLE,
-                    DISKWRITER,
-                    BROADCASTER
-                )));
-            })
-        );
+    public static void registerCreativeTab(final RegisterEvent.RegisterHelper<CreativeModeTab> event) {
+        Builder builder = CreativeModeTab.builder();
+        // Set name of tab to display
+        builder.title(Component.translatable("itemGroup." + MIMIMod.MODID + ".group"))
+        // Set icon of creative tab
+        .icon(() -> new ItemStack(ModBlocks.getBlockInstruments().get(0)))
+        // Add default items to tab
+        .displayItems((parameters, output) -> {
+            output.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
+            output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
+            output.acceptAll(getStacksForItems(Arrays.asList(
+                DEVICECONFIG,
+                TRANSMITTER,
+                FILECASTER,
+                SWITCHBOARD,
+                FLOPPYDISK,
+                LISTENER,
+                RECEIVER,
+                MECHANICALMAESTRO,
+                CONDUCTOR,
+                TUNINGTABLE,
+                DISKWRITER,
+                BROADCASTER
+            )));
+        });
+        event.register(new ResourceLocation(MIMIMod.MODID, "group"), builder.build());
     }
 
     public static List<ItemStack> getStacksForItems(List<? extends Item> items) {

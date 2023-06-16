@@ -10,13 +10,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestro> {
     public static final String REGISTRY_NAME = "mechanicalmaestro";
 
     public BlockMechanicalMaestro() {
-        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
     }
 
     @Override

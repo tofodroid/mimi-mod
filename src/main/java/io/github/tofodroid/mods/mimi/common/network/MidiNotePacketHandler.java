@@ -25,7 +25,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 public class MidiNotePacketHandler {
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketsServer(Arrays.asList(message),ctx.get().getSender().getLevel(), ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handlePacketsServer(Arrays.asList(message),(ServerLevel)ctx.get().getSender().level(), ctx.get().getSender()));
         } else {
             ctx.get().enqueueWork(() -> handlePacketClient(message));
         }

@@ -36,7 +36,7 @@ public class TransmitterReceiver extends MidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, velocity, ItemTransmitter.getTransmitMode(ServerMusicPlayerMidiManager.getTransmitterStack(player.getUUID())));
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.getLevel(), player.getUUID(), null);
+            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID(), null);
         });        
     }
     
@@ -44,7 +44,7 @@ public class TransmitterReceiver extends MidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), ItemTransmitter.getTransmitMode(ServerMusicPlayerMidiManager.getTransmitterStack(player.getUUID())));
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.getLevel(), player.getUUID(), null);
+            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID(), null);
         });     
     }
 
@@ -52,7 +52,7 @@ public class TransmitterReceiver extends MidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createAllNotesOffPacket(channel, ItemTransmitter.getTransmitMode(ServerMusicPlayerMidiManager.getTransmitterStack(player.getUUID())));
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.getLevel(), player.getUUID(), null);
+            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID(), null);
         });     
     }
 
@@ -60,7 +60,7 @@ public class TransmitterReceiver extends MidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createControllerPacket(channel, controller, value, ItemTransmitter.getTransmitMode(ServerMusicPlayerMidiManager.getTransmitterStack(player.getUUID())));
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.getLevel(), player.getUUID(), null);
+            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID(), null);
         });     
     }
     

@@ -57,7 +57,7 @@ public class ItemMidiSwitchboard extends Item {
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
         // Server-side only
-        if(!playerIn.getLevel().isClientSide()) {  
+        if(!playerIn.level().isClientSide()) {  
             if(target instanceof Player) {
                 ItemMidiSwitchboard.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 playerIn.setItemInHand(hand, stack);

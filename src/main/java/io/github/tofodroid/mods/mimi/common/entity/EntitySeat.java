@@ -40,11 +40,11 @@ public class EntitySeat extends Entity {
     public void tick() {
         super.tick();
 
-        if(!this.level.isClientSide) {
-            if(source == null || this.getPassengers().isEmpty() || this.level.getBlockEntity(this.source) == null || !(this.level.getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
+        if(!this.level().isClientSide) {
+            if(source == null || this.getPassengers().isEmpty() || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.ejectPassengers();
                 this.discard();
-                level.updateNeighbourForOutputSignal(source, level.getBlockState(source).getBlock());
+                this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());
             }
         }
 

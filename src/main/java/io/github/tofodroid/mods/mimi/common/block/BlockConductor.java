@@ -18,13 +18,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 
 public class BlockConductor extends AContainerBlock<TileConductor> {
     public static final String REGISTRY_NAME = "conductor";
 
     public BlockConductor() {
-        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
     }
     
     @Override

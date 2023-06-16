@@ -1,12 +1,12 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Vector2f;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -29,7 +29,6 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
         super(container, inv, textComponent);
         this.guiTexture = new ResourceLocation(MIMIMod.MODID, textureResource);
         this.TEXTURE_SIZE = textureSize;
-        this.passEvents = false;
         this.GUI_HEIGHT = gHeight;
         this.GUI_WIDTH = gWidth;
         this.imageWidth = textureSize;
@@ -45,22 +44,22 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        matrixStack = renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
+        graphics = renderGraphics(graphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        matrixStack = renderText(matrixStack, mouseX, mouseY);
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        graphics = renderText(graphics, mouseX, mouseY);
     }
 
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if(shouldRenderBackground()) {
-            this.renderBackground(matrixStack);
+            this.renderBackground(graphics);
         }
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderTooltip(matrixStack, mouseX, mouseY);
+		super.render(graphics, mouseX, mouseY, partialTicks);
+		this.renderTooltip(graphics, mouseX, mouseY);
 	}
 
     protected Boolean shouldRenderBackground() {
@@ -82,8 +81,8 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
     }
 
-    protected abstract PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
-    protected abstract PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY);
+    protected abstract GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks);
+    protected abstract GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY);
 
     protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
         Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();

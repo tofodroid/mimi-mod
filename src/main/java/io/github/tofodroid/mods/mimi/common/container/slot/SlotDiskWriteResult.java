@@ -39,7 +39,7 @@ public class SlotDiskWriteResult extends Slot {
 
     protected void checkTakeAchievements(ItemStack p_40185_) {
         if (this.removeCount > 0) {
-            p_40185_.onCraftedBy(this.player.level, this.player, this.removeCount);
+            p_40185_.onCraftedBy(this.player.level(), this.player, this.removeCount);
             net.minecraftforge.event.ForgeEventFactory.firePlayerCraftingEvent(this.player, p_40185_, this.craftSlots);
         }
 

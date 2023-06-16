@@ -16,14 +16,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.material.Material;
 
 public class BlockListener extends AContainerBlock<TileListener> {
     public static final String REGISTRY_NAME = "listener";
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
 
     public BlockListener() {
-        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
     }
 

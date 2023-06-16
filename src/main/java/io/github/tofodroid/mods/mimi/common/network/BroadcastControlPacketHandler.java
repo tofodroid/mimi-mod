@@ -110,7 +110,7 @@ public class BroadcastControlPacketHandler {
                     container.saveToInventory(sender);
                     container.sendAllDataToRemote();
                     ServerMusicPlayerMidiManager.forceUpdateTransmitterStack(sender.getUUID(), container.getTransmitterStack());
-                    sendAllNotesOff(oldMode, sender.getOnPos(), sender.getLevel(), sender.getUUID(), sender);
+                    sendAllNotesOff(oldMode, sender.getOnPos(), (ServerLevel)sender.level(), sender.getUUID(), sender);
                     break;
                 default:
                     break;

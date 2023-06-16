@@ -1,7 +1,6 @@
 package io.github.tofodroid.mods.mimi.common;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -72,10 +71,7 @@ public class MIMIMod {
         // Containers
         event.register(Registries.MENU, (reg) -> {ModContainers.submitRegistrations(reg);});
 
-    }
+        event.register(Registries.CREATIVE_MODE_TAB, (reg) -> ModItems.registerCreativeTab(reg));
 
-    @SubscribeEvent
-    public static void creativeTabEvent(final CreativeModeTabEvent.Register event) {
-        ModItems.registerCreativeTab(event);
     }
 }
