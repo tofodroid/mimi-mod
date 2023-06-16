@@ -6,6 +6,7 @@ import java.util.List;
 import com.mojang.datafixers.util.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -32,8 +33,9 @@ public class ModStructures {
 
 	@SubscribeEvent
 	public static void serverAboutToStartEvent(final ServerAboutToStartEvent event) {
-		MIMIMod.LOGGER.error("EVENT!");
-		ModStructures.registerVillageStructures(event);
+		if(ModConfigs.COMMON.enableInstrumentalistShop.get()) {
+			ModStructures.registerVillageStructures(event);
+		}
 	}
     
 	public static void registerVillageStructures(ServerAboutToStartEvent event) {
