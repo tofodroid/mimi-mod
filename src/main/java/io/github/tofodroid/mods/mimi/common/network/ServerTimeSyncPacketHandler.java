@@ -11,7 +11,10 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 public class ServerTimeSyncPacketHandler {
+    public static Long lastHandleMillis = Util.getEpochMillis();
+
     public static void handlePacket(final ServerTimeSyncPacket message, Supplier<NetworkEvent.Context> ctx) {
+        lastHandleMillis = Util.getEpochMillis();
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
             ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
         } else {
@@ -21,10 +24,12 @@ public class ServerTimeSyncPacketHandler {
     }
 
     public static void handlePacketClient(final ServerTimeSyncPacket message) {
-        if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
+        if(MIMIMod.proxy.isClient()) {
+            ((ClientProxy)MIMIMod.proxy).handleTimeSyncPacket(message);
+        }
     }
     
     public static void handlePacketServer(final ServerTimeSyncPacket message, ServerPlayer sender) {
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerTimeSyncPacket(message.clientTime, Util.getEpochMillis() - message.clientTime));
+        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerTimeSyncPacket(MIMIMod.proxy.getCurrentServerMillis(), message.firstRequest));
     }
 }

@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common;
 
+import net.minecraft.Util;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public interface Proxy {    
@@ -7,5 +8,9 @@ public interface Proxy {
 
     public Boolean isClient();
 
-    public Long getServerTime();
+    public Long getServerStartEpoch();
+
+    default public Long getCurrentServerMillis() {
+        return Util.getEpochMillis() - getServerStartEpoch();
+    }
 }

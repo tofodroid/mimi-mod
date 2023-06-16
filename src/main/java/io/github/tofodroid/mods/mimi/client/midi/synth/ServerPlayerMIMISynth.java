@@ -13,7 +13,6 @@ import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;

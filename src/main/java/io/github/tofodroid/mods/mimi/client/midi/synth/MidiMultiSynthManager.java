@@ -28,16 +28,14 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MidiMultiSynthManager {
-    private static final Integer MIDI_TICK_FREQUENCY = 4;
+    private static final Integer MIDI_TICK_FREQUENCY = 2;
     protected Boolean loggingOff = false;
-    protected Long serverClockOffsetMillis = 0l;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     protected LocalPlayerMIMISynth localSynth;
     protected MechanicalMaestroMIMISynth mechSynth;
     protected ServerPlayerMIMISynth playerSynth;
 
-    @SuppressWarnings("resource")
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
 
@@ -94,22 +92,17 @@ public class MidiMultiSynthManager {
     public void handleSelfLogOut(LoggingOut event) {
         this.close();
         this.loggingOff = true;
-        this.serverClockOffsetMillis = 0l;
     }
 
     @SubscribeEvent
     public void handleSelfLogin(LoggingIn event) {
         this.loggingOff = false;
         this.reloadSynths();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket(Util.getEpochMillis(), 0l));
-    }
-
-    public Long getServerTime() {
-        return Util.getEpochMillis() + this.serverClockOffsetMillis;
+        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket());
     }
 
     public Long getBufferTime(Long noteServerTime) {
-        return (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0) + (noteServerTime + this.serverClockOffsetMillis);
+        return (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0) + (MIMIMod.proxy.getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {
@@ -129,16 +122,6 @@ public class MidiMultiSynthManager {
         }
     }
 
-    public void handlePacket(ServerTimeSyncPacket message) {
-        if(Minecraft.getInstance().getCurrentServer() != null) {
-            this.serverClockOffsetMillis = message.offset - Minecraft.getInstance().getCurrentServer().ping/2;
-        } else {
-            this.serverClockOffsetMillis = 0l;
-        }
-
-        MIMIMod.LOGGER.info("Server Clock Offset Millis: " + this.serverClockOffsetMillis);
-    }
-
     public void handlePacket(MidiNotePacket message) {
         if(loggingOff) return;
 
@@ -151,8 +134,8 @@ public class MidiMultiSynthManager {
                 } else if(message.velocity <= 0) {
                     targetSynth.noteOff(message, getBufferTime(message.noteServerTime));
                 }
-            } else {
-                targetSynth.controlChange(message);
+            } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
+                targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }
         }
     }
@@ -167,8 +150,8 @@ public class MidiMultiSynthManager {
                 } else if(message.velocity <= 0) {
                     localSynth.noteOff(message, Util.getEpochMillis());
                 }
-            } else {
-                localSynth.controlChange(message);
+            } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
+                localSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }
         }
     }

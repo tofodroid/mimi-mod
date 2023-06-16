@@ -63,6 +63,7 @@
 ##############################################################################
 
 # Attempt to set APP_HOME
+export TERM=cygwin
 
 # Resolve links: $0 may be a link
 app_path=$0

@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.client.midi.synth;
 
 import javax.sound.midi.MidiChannel;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 

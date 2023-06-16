@@ -135,6 +135,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(channel != null) {
             if(message.isAllNotesOffPacket()) {
                 channel.allNotesOff();
+                this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
             } else {
                 try {
                     this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.note, 0), getSynthEventTimestamp(timestamp));
@@ -155,10 +156,15 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    public void controlChange(MidiNotePacket message) {
+    public void controlChange(MidiNotePacket message, Long timestamp) {
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
         
         if(channel != null) {
+            try {
+                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel.getChannelNumber(), message.getControllerNumber(), message.getControllerValue()), getSynthEventTimestamp(timestamp));
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to handle control change. Packet: " + message.note + " | " + message.getControllerValue(), e);
+            }
             channel.controlChange(message.getControllerNumber(), message.getControllerValue());
         }
     }
