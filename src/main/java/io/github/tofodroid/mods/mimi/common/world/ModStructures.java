@@ -7,11 +7,11 @@ import com.mojang.datafixers.util.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -42,28 +42,28 @@ public class ModStructures {
 		Registry<StructureProcessorList> structureProcessorList = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
 		Registry<StructureTemplatePool> structureTemplatePool = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
 
-		addPieceToPool(structureProcessorList, structureTemplatePool, desertHouse, new ResourceLocation("minecraft:village/desert/houses"), 1);
-		addPieceToPool(structureProcessorList, structureTemplatePool, plainsHouse, new ResourceLocation("minecraft:village/plains/houses"), 1);
-		addPieceToPool(structureProcessorList, structureTemplatePool, savannaHouse, new ResourceLocation("minecraft:village/savanna/houses"), 1);
-		addPieceToPool(structureProcessorList, structureTemplatePool, snowyHouse, new ResourceLocation("minecraft:village/snowy/houses"), 1);
-		addPieceToPool(structureProcessorList, structureTemplatePool, taigaHouse, new ResourceLocation("minecraft:village/taiga/houses"), 1);
+		addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/desert/houses"), desertHouse.toString(), 2);
+		addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/plains/houses"), plainsHouse.toString(), 2);
+		addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/savanna/houses"), savannaHouse.toString(),2);
+		addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/snowy/houses"), snowyHouse.toString(), 2);
+		addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/taiga/houses"), taigaHouse.toString(), 2);
 	}
     
-	public static void addPieceToPool(Registry<StructureProcessorList> structureProcessorList, Registry<StructureTemplatePool> structureTemplatePool, ResourceLocation sourcePiece, ResourceLocation targetPool, int weight) {
-		LegacySinglePoolElement singlePoolElement = SinglePoolElement.legacy(sourcePiece.toString(), structureProcessorList.getHolderOrThrow(EMPTY_PROCESSOR_LIST_KEY)).apply(StructureTemplatePool.Projection.RIGID);
-		StructureTemplatePool modPool = structureTemplatePool.get(targetPool);
+	public static void addBuildingToPool(Registry<StructureTemplatePool> templatePoolRegistry, Registry<StructureProcessorList> processorListRegistry, ResourceLocation poolRL, String nbtPieceRL, int weight) {
+		StructureTemplatePool pool = templatePoolRegistry.get(poolRL);
+		
+		if (pool != null) {
+			Holder<StructureProcessorList> processorHolder = processorListRegistry.getHolderOrThrow(EMPTY_PROCESSOR_LIST_KEY);
 
-		if (modPool != null) {
-			List<Pair<StructurePoolElement, Integer>> list = new ArrayList<>(modPool.rawTemplates);
+			SinglePoolElement piece = SinglePoolElement.single(nbtPieceRL, processorHolder).apply(StructureTemplatePool.Projection.RIGID);
 
-			if(!list.stream().anyMatch(p -> p.getFirst().toString().equals(singlePoolElement.toString()))) {
-				for (int i = 0; i < weight; i++) {
-					modPool.templates.add(singlePoolElement);
-				}
-
-				list.add(new Pair<>(singlePoolElement, weight));
-				modPool.rawTemplates = list;
+			for (int i = 0; i < weight; i++) {
+				pool.templates.add(piece);
 			}
+
+			List<Pair<StructurePoolElement, Integer>> listOfPieceEntries = new ArrayList<>(pool.rawTemplates);
+			listOfPieceEntries.add(new Pair<>(piece, weight));
+			pool.rawTemplates = listOfPieceEntries;
 		}
 	}
 }
