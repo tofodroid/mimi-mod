@@ -110,17 +110,17 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Play/Pause Button
-        blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, this.getBlitOffset(), 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.menu.getTransmitMode().ordinal()), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * this.menu.getTransmitMode().ordinal()), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Transmit Light
         if(this.playerInfo != null && this.playerInfo.running) {
-            blit(matrixStack, START_X + Float.valueOf(TRANSMIT_LIGHT.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_LIGHT.y()).intValue(), this.getBlitOffset(), 8, 225, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + Float.valueOf(TRANSMIT_LIGHT.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_LIGHT.y()).intValue(), 8, 225, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Time Slider
@@ -129,7 +129,7 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
             Integer slideProgress = this.playerInfo.songPositionSeconds >= 0 ? this.playerInfo.songPositionSeconds : 0;
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             Integer slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
-            blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, 0, 213, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         return matrixStack;

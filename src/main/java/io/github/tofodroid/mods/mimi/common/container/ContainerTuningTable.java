@@ -110,7 +110,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
             if (optional.isPresent()) {
                 TuningTableRecipe recipe = optional.get();
                if (this.resultInventory.setRecipeUsed(serverplayer.level, serverplayer, recipe)) {
-                  itemstack = recipe.assemble(this.craftingInventory);
+                  itemstack = recipe.assemble(this.craftingInventory, null);
                }
             }
    

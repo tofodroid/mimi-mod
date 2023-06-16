@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
 import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeItem;
@@ -40,7 +41,7 @@ public class DyedItemRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv) {
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
         ItemStack instrument = ItemStack.EMPTY;
         List<DyeItem> dyes = new ArrayList<>();
 

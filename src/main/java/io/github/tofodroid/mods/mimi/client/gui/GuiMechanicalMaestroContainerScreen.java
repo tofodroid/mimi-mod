@@ -71,7 +71,7 @@ public class GuiMechanicalMaestroContainerScreen extends ASwitchboardBlockGui<Co
         matrixStack = super.renderGraphics(matrixStack, mouseX, mouseY, partialTicks);
 
         // Instrument Slot
-        blit(matrixStack, START_X + Float.valueOf(instrumentSlotPos().x()).intValue(), START_Y + Float.valueOf(instrumentSlotPos().y()).intValue(), this.getBlitOffset(), 1, 367, 140, 28, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(instrumentSlotPos().x()).intValue(), START_Y + Float.valueOf(instrumentSlotPos().y()).intValue(), 1, 367, 140, 28, TEXTURE_SIZE, TEXTURE_SIZE);
 
         return matrixStack;
     }

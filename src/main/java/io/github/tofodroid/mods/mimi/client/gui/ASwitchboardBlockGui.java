@@ -144,13 +144,13 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // GUI Title
-        blit(matrixStack, START_X + Float.valueOf(titleBoxPos().x()).intValue(), START_Y + Float.valueOf(titleBoxPos().y()).intValue(), this.getBlitOffset(), Float.valueOf(titleBoxBlit().x()).intValue(), Float.valueOf(titleBoxBlit().y()).intValue(), Float.valueOf(titleBoxSize().x()).intValue(), Float.valueOf(titleBoxSize().y()).intValue(), TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(titleBoxPos().x()).intValue(), START_Y + Float.valueOf(titleBoxPos().y()).intValue(), Float.valueOf(titleBoxBlit().x()).intValue(), Float.valueOf(titleBoxBlit().y()).intValue(), Float.valueOf(titleBoxSize().x()).intValue(), Float.valueOf(titleBoxSize().y()).intValue(), TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Switchboard Slot
-        blit(matrixStack, START_X + Float.valueOf(switchboardSlotPos().x()).intValue(), START_Y + Float.valueOf(switchboardSlotPos().y()).intValue(), this.getBlitOffset(), 143, 367, 140, 28, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X + Float.valueOf(switchboardSlotPos().x()).intValue(), START_Y + Float.valueOf(switchboardSlotPos().y()).intValue(), 143, 367, 140, 28, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Widgets
         if(this.selectedSwitchboardStack != null) {
@@ -158,55 +158,55 @@ public abstract class ASwitchboardBlockGui<T extends ASwitchboardContainer> exte
 			SortedArraySet<Byte> acceptedChannels = ItemMidiSwitchboard.getEnabledChannelsSet(this.selectedSwitchboardStack);
 			if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
 				for(Byte channelId : acceptedChannels) {
-                    blit(matrixStack, START_X + Float.valueOf(MIDI_STATUSBOX_COORDS.x()).intValue() + 19 * (channelId % 8), START_Y + Float.valueOf(MIDI_STATUSBOX_COORDS.y()).intValue() + (channelId / 8) * 25, this.getBlitOffset(), 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                    blit(matrixStack, START_X + Float.valueOf(MIDI_STATUSBOX_COORDS.x()).intValue() + 19 * (channelId % 8), START_Y + Float.valueOf(MIDI_STATUSBOX_COORDS.y()).intValue() + (channelId / 8) * 25, 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
                 }
 			}
 
             // Broadcast Mode
             if(ItemMidiSwitchboard.getPublicBroadcast(selectedSwitchboardStack)) {
-                blit(matrixStack, START_X + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.y()).intValue(), this.getBlitOffset(), 173, 281, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.y()).intValue(), 173, 281, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
             } else {
-                blit(matrixStack, START_X + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.y()).intValue(), this.getBlitOffset(), 186, 281, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(BROADCAST_MODE_STATUSBOX_COORDS.y()).intValue(), 186, 281, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
             }
 			
         	// Filter Note Invert Status Light
 			if(ItemMidiSwitchboard.getInvertNoteOct(selectedSwitchboardStack)) {
-				blit(matrixStack, START_X + Float.valueOf(FILTER_NOTE_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(FILTER_NOTE_STATUSBOX_COORDS.y()).intValue(), this.getBlitOffset(), 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+				blit(matrixStack, START_X + Float.valueOf(FILTER_NOTE_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(FILTER_NOTE_STATUSBOX_COORDS.y()).intValue(), 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
 			}
 
             // Filter Instrument Invert Status Light
             if(ItemMidiSwitchboard.getInvertInstrument(selectedSwitchboardStack)) {
-                blit(matrixStack, START_X + Float.valueOf(FILTER_INSTRUMENT_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(FILTER_INSTRUMENT_STATUSBOX_COORDS.y()).intValue(), this.getBlitOffset(), 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, START_X + Float.valueOf(FILTER_INSTRUMENT_STATUSBOX_COORDS.x()).intValue(), START_Y + Float.valueOf(FILTER_INSTRUMENT_STATUSBOX_COORDS.y()).intValue(), 213, 281, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
 		}
 
         // Disabled Widgets
         if(!channelWidgetEnabled()) {
-            blit(matrixStack, START_X + 14, START_Y + 32, this.getBlitOffset(), 1, 281, 171, 65, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 14, START_Y + 32, 1, 281, 171, 65, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!noteFilterWidgetEnabled()) {
-            blit(matrixStack, START_X + 189, START_Y + 32, this.getBlitOffset(), 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 189, START_Y + 32, 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!instrumentFilterWidgetEnabled()) {
-            blit(matrixStack, START_X + 14, START_Y + 100, this.getBlitOffset(), 177, 336, 171, 30, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 14, START_Y + 100, 177, 336, 171, 30, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!linkedTransmitterWidgetEnabled()) {
-            blit(matrixStack, START_X + 189, START_Y + 69, this.getBlitOffset(), 237, 289, 111, 46, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 189, START_Y + 69, 237, 289, 111, 46, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!broadcastModeWidgetEnabled()) {
-            blit(matrixStack, START_X + 14, START_Y + 133, this.getBlitOffset(), 1, 347, 171, 19, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 14, START_Y + 133, 1, 347, 171, 19, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!broadcastNoteWidgetEnabled()) {
-            blit(matrixStack, START_X + 189, START_Y + 118, this.getBlitOffset(), 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 189, START_Y + 118, 237, 254, 111, 34, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         if(!instrumentVolumeWidgetEnabled()) {
-            blit(matrixStack, START_X + 304, START_Y + 58, this.getBlitOffset(), 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, START_X + 304, START_Y + 58, 217, 266, 19, 69, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         return matrixStack;

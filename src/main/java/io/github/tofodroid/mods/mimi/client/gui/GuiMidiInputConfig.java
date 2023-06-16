@@ -61,16 +61,16 @@ public class GuiMidiInputConfig extends BaseGui {
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Device Status Light
         Integer statusX = START_X + 265;
         Integer statusY = START_Y + 42;
 
         if(this.midiInputManager.inputDeviceManager.isDirtyStatus()) {
-                blit(matrixStack, statusX, statusY, this.getBlitOffset(), 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(matrixStack, statusX, statusY, 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
-            blit(matrixStack, statusX, statusY, this.getBlitOffset(), this.midiInputManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(matrixStack, statusX, statusY, this.midiInputManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         return matrixStack;

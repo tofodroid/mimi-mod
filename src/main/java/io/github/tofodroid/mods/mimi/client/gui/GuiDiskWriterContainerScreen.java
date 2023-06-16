@@ -55,7 +55,7 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(matrixStack, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
         this.midiUrlField.render(matrixStack, mouseX, mouseY, partialTicks);
         this.diskTitleField.render(matrixStack, mouseX, mouseY, partialTicks);

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -57,10 +58,10 @@ public final class ModItems {
             // Set icon of creative tab
             .icon(() -> new ItemStack(ModBlocks.getBlockInstruments().get(0)))
             // Add default items to tab
-            .displayItems((enabledFlags, populator, hasPermissions) -> {
-                populator.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
-                populator.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
-                populator.acceptAll(getStacksForItems(Arrays.asList(
+            .displayItems((parameters, output) -> {
+                output.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
+                output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
+                output.acceptAll(getStacksForItems(Arrays.asList(
                     DEVICECONFIG,
                     TRANSMITTER,
                     FILECASTER,
