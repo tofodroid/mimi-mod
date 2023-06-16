@@ -19,7 +19,6 @@ public class MidiFileCasterInputReceiver extends MidiInputReceiver {
                 this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);
             } else if(isAllNotesOffMessage(message)) {
                 this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
-                //this.sendTransmitterAllNotesOffPacket(Integer.valueOf(message.getChannel()).byteValue());
             } else if(isSupportedControlMessage(message)) {
                 this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
             }
