@@ -61,7 +61,10 @@ public class MIMIMod {
         // Village Stuff
         ModVillagers.POI_TYPES.register(fmlContext.getModEventBus());
         ModVillagers.PROFESSIONS.register(fmlContext.getModEventBus());
-        ModVillagers.injectStructures();
+
+        if(ModConfigs.COMMON.enableInstrumentalistShop.get()) {
+            ModVillagers.injectStructures();
+        }
     }
    
     public static void init(final FMLCommonSetupEvent event) {
