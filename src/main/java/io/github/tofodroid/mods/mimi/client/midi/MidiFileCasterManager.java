@@ -19,6 +19,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 
 public class MidiFileCasterManager extends MidiInputSourceManager {
@@ -222,6 +223,7 @@ public class MidiFileCasterManager extends MidiInputSourceManager {
             this.pausedTickPosition = this.activeSequencer.getTickPosition();
             this.pausedMicrosecond = this.activeSequencer.getMicrosecondPosition();
             this.activeSequencer.stop();
+            this.activeReceiver.sendTransmitterAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS);
         }
     }
 
@@ -232,6 +234,7 @@ public class MidiFileCasterManager extends MidiInputSourceManager {
         if(isSongLoaded()) {
             this.activeSequencer.stop();
             this.activeSequencer.setTickPosition(0);
+            this.activeReceiver.sendTransmitterAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS);
         }
     }
 
