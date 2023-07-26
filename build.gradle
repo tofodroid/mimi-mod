@@ -133,9 +133,11 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven { 
-        name = "JaredMaven"
-        url 'https://maven.blamejared.com' 
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
     }
 }
 
@@ -143,18 +145,14 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.20.1-47.0.3'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.1.1'
 
     // Mod Integrations
     // JEI
-    compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:15.0.0.12")
-    compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.0.0.12")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.19.4-common:15.0.0.12")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.19.4-forge:15.0.0.12")
+    //implementation fg.deobf("curse.maven:jei-238222:4644453")
 
     // Patchouli
-    //compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.20.1-79-FORGE")
-    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.19.4-79-FORGE")
+    //implementation fg.deobf("curse.maven:patchouli-306770:4636277")
 }
 
 jar {
