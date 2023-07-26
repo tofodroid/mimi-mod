@@ -4,5 +4,6 @@
 	"version": 3,
 	"show_progress": false,
 	"creative_tab": "mimi:group",
-	"model": "mimi:guide"
+	"model": "mimi:guide",
+	"use_resource_pack": "true"
 }
