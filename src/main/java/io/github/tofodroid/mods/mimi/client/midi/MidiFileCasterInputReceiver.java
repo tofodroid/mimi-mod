@@ -18,7 +18,7 @@ public class MidiFileCasterInputReceiver extends MidiInputReceiver {
             } else if(isNoteOffMessage(message)) {
                 this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);
             } else if(isAllNotesOffMessage(message)) {
-                this.sendTransmitterAllNotesOffPacket(Integer.valueOf(message.getChannel()).byteValue());
+                this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
             } else if(isSupportedControlMessage(message)) {
                 this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
             }
@@ -27,14 +27,14 @@ public class MidiFileCasterInputReceiver extends MidiInputReceiver {
     
     public void sendTransmitterNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
         if(MIMIMod.proxy.isClient()) {
-            TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, velocity, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
+            TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, velocity, ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
             NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }
     
     public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
         if(MIMIMod.proxy.isClient()) {
-            TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
+            TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), ((ClientProxy)MIMIMod.proxy).getMidiInput().getTransmitMode());
             NetworkManager.BROADCAST_CHANNEL.sendToServer(packet);
         }
     }

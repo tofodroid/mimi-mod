@@ -13,7 +13,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -22,7 +21,7 @@ public class BlockDiskWriter extends Block {
     private static final Component CONTAINER_TITLE = Component.translatable("container.diskwriter");
     
     protected BlockDiskWriter() {
-       super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+       super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
     }
  
     @Override

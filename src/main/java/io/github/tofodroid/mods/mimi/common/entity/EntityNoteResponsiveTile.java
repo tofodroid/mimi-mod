@@ -6,6 +6,7 @@ import io.github.tofodroid.mods.mimi.common.tile.ANoteResponsiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -36,8 +37,8 @@ public class EntityNoteResponsiveTile extends Entity {
     public void tick() {
         super.tick();
 
-        if(!this.level.isClientSide && !this.isRemoved()) {
-            if(source == null || this.level.getBlockEntity(this.source) == null || !(this.level.getBlockEntity(this.source) instanceof ANoteResponsiveTile)) {
+        if(!this.level().isClientSide && !this.isRemoved()) {
+            if(source == null || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(this.source) instanceof ANoteResponsiveTile)) {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
@@ -48,7 +49,7 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     public ANoteResponsiveTile getTile() {
-        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.source) : null;
+        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.level().getBlockEntity(this.source) : null;
         return tile != null && tile instanceof ANoteResponsiveTile ? (ANoteResponsiveTile) tile : null;
     }
     
@@ -102,7 +103,7 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -26,14 +26,14 @@ public class ContainerBroadcaster extends APlayerInventoryContainer {
 	public ContainerBroadcaster(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
 		super(ModContainers.BROADCASTER, id, playerInventory);
 		tilePos = extraData.readBlockPos();
-		this.targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
+		this.targetInventory =  playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
 		this.addSlot(buildFloppySlot());
 	}
 
 	public ContainerBroadcaster(int id, Inventory playerInventory, BlockPos pos) {
 		super(ModContainers.BROADCASTER, id, playerInventory);
 		tilePos = pos;
-		this.targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
+		this.targetInventory =  playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
 		this.addSlot(buildFloppySlot());
 	}
 
@@ -50,7 +50,7 @@ public class ContainerBroadcaster extends APlayerInventoryContainer {
 	}
 
 	public TileBroadcaster getBroadcasterTile() {
-		BlockEntity ent = playerInventory.player.level.getBlockEntity(tilePos);
+		BlockEntity ent = playerInventory.player.level().getBlockEntity(tilePos);
 
 		if(ent != null && ent instanceof TileBroadcaster) {
 			return (TileBroadcaster)ent;

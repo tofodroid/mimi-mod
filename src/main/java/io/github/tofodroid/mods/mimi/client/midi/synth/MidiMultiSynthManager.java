@@ -12,10 +12,14 @@ import javax.sound.midi.Soundbank;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,15 +28,14 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MidiMultiSynthManager {
-    private static final Integer MIDI_TICK_FREQUENCY = 4;
-    
+    private static final Integer MIDI_TICK_FREQUENCY = 2;
+    protected Boolean loggingOff = false;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     protected LocalPlayerMIMISynth localSynth;
     protected MechanicalMaestroMIMISynth mechSynth;
     protected ServerPlayerMIMISynth playerSynth;
 
-    @SuppressWarnings("resource")
     public MidiMultiSynthManager() {
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
 
@@ -44,8 +47,6 @@ public class MidiMultiSynthManager {
                 "\tVend: " + this.soundbank.getVendor() + "\n"
             );
         }
-
-        this.reloadSynths();
     }
 
     @SubscribeEvent
@@ -90,38 +91,67 @@ public class MidiMultiSynthManager {
     @SubscribeEvent
     public void handleSelfLogOut(LoggingOut event) {
         this.close();
+        this.loggingOff = true;
+    }
+
+    @SubscribeEvent
+    public void handleSelfLogin(LoggingIn event) {
+        this.loggingOff = false;
+        this.reloadSynths();
+        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket());
+    }
+
+    public Long getBufferTime(Long noteServerTime) {
+        return (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0) + (MIMIMod.proxy.getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {
-        this.allNotesOff();
+        if(localSynth != null) {
+            localSynth.allNotesOff();
+            localSynth.close();
+        }
+
+        if(mechSynth != null) {
+            mechSynth.allNotesOff();
+            mechSynth.close();
+        }
+
+        if(playerSynth != null) {
+            playerSynth.allNotesOff();
+            playerSynth.close();
+        }
     }
 
     public void handlePacket(MidiNotePacket message) {
+        if(loggingOff) return;
+
         AMIMISynth<?> targetSynth = getSynthForMessage(message);
 
         if(targetSynth != null) {
             if(!message.isControlPacket()) {
                 if(message.velocity > 0) {
-                    targetSynth.noteOn(message);
+                    targetSynth.noteOn(message, getBufferTime(message.noteServerTime));
                 } else if(message.velocity <= 0) {
-                    targetSynth.noteOff(message);
+                    targetSynth.noteOff(message, getBufferTime(message.noteServerTime));
                 }
-            } else {
-                targetSynth.controlChange(message);
+            } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
+                targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }
         }
     }
     
     public void handleLocalPacket(MidiNotePacket message) {
+        if(loggingOff) return;
+
         if(localSynth != null) {
             if(!message.isControlPacket()) {
                 if(message.velocity > 0) {
-                    localSynth.noteOn(message);
+                    localSynth.noteOn(message, Util.getEpochMillis());
                 } else if(message.velocity <= 0) {
-                    localSynth.noteOff(message);
+                    localSynth.noteOff(message, Util.getEpochMillis());
                 }
-            } else {
-                localSynth.controlChange(message);
+            } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
+                localSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }
         }
     }

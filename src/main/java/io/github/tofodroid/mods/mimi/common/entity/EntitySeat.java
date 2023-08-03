@@ -2,12 +2,13 @@ package io.github.tofodroid.mods.mimi.common.entity;
 
 import java.util.List;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -39,11 +40,11 @@ public class EntitySeat extends Entity {
     public void tick() {
         super.tick();
 
-        if(!this.level.isClientSide) {
-            if(source == null || this.getPassengers().isEmpty() || this.level.getBlockEntity(this.source) == null || !(this.level.getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
+        if(!this.level().isClientSide) {
+            if(source == null || this.getPassengers().isEmpty() || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.ejectPassengers();
                 this.discard();
-                level.updateNeighbourForOutputSignal(source, level.getBlockState(source).getBlock());
+                this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());
             }
         }
 
@@ -98,7 +99,7 @@ public class EntitySeat extends Entity {
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 

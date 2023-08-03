@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerDiskWriter extends APlayerInventoryContainer {
@@ -20,7 +21,7 @@ public class ContainerDiskWriter extends APlayerInventoryContainer {
     private static final int RESULT_SLOT_POS_X = 134;
     private static final int RESULT_SLOT_POS_Y = 58;
 
-    private CraftingContainer craftingInventory = new CraftingContainer(this, 1, 1);
+    private CraftingContainer craftingInventory = new TransientCraftingContainer(this, 1, 1);
     private ResultContainer resultInventory = new ResultContainer();
 
     public ContainerDiskWriter(MenuType<?> type, int id, Inventory playerInventory) {
@@ -55,7 +56,7 @@ public class ContainerDiskWriter extends APlayerInventoryContainer {
             itemstack = itemstack1.copy();
 
             if (index == TARGET_CONTAINER_MIN_SLOT_ID + 1) {
-                itemstack1.getItem().onCraftedBy(itemstack1, playerIn.level, playerIn);
+                itemstack1.getItem().onCraftedBy(itemstack1, playerIn.level(), playerIn);
                 if (!this.moveItemStackTo(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -93,7 +94,7 @@ public class ContainerDiskWriter extends APlayerInventoryContainer {
     
     @Override
     public void slotsChanged(Container container) {
-        if (container == craftingInventory && !this.playerInventory.player.level.isClientSide) {
+        if (container == craftingInventory && !this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
             
@@ -108,7 +109,7 @@ public class ContainerDiskWriter extends APlayerInventoryContainer {
     }
   
     public void writeDisk(String midiUrl, String diskTitle, String diskAuthor) {
-        if (!this.playerInventory.player.level.isClientSide) {
+        if (!this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = craftingInventory.getItem(0).copy();   
             ItemFloppyDisk.setMidiUrl(itemstack, midiUrl);

@@ -3,12 +3,8 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MidiNotePacket {
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
@@ -18,42 +14,39 @@ public class MidiNotePacket {
     public final Byte instrumentId;
     public final UUID player;
     public final BlockPos pos;
-
-    @SuppressWarnings("resource")
-    @OnlyIn(Dist.CLIENT)
-    public static MidiNotePacket createClientAllNotesOffPacket(Byte instrumentId) {
-        Player player = Minecraft.getInstance().player;
-        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
-    }
+    public final long noteServerTime;
     
-    @SuppressWarnings("resource")
-    @OnlyIn(Dist.CLIENT)
-    public static MidiNotePacket createClientControlPacket(Byte controller, Byte value, Byte instrumentId) {
-        Player player = Minecraft.getInstance().player;
-        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
-    }
-    
-    @SuppressWarnings("resource")
-    @OnlyIn(Dist.CLIENT)
-    public static MidiNotePacket createClientNotePacket(Byte note, Byte velocity, Byte instrumentId) {
-        Player player = Minecraft.getInstance().player;
-        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
-    }
-
-    public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos) {
-        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos);
-    }
-
     public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos) {
-        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos);
+        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
     }
     
-    public MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos) {
+    public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos) {
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
+    }
+
+    public static MidiNotePacket createNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos) {
+        return new MidiNotePacket(note, velocity, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
+    }
+
+    public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime) {
+        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, noteServerTime);
+    }
+    
+    public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime) {
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos, noteServerTime);
+    }
+
+    public static MidiNotePacket createNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime) {
+        return new MidiNotePacket(note, velocity, instrumentId, player, pos, noteServerTime);
+    }
+
+    private MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime) {
         this.note = note;
         this.velocity = velocity;
         this.instrumentId = instrumentId;
         this.player = player;
         this.pos = pos;
+        this.noteServerTime = noteServerTime;
     }
 
     public static MidiNotePacket decodePacket(FriendlyByteBuf buf) {
@@ -63,7 +56,8 @@ public class MidiNotePacket {
             byte instrumentId = buf.readByte();
             UUID player = buf.readUUID();
             BlockPos pos = buf.readBlockPos();
-            return new MidiNotePacket(note, velocity, instrumentId, player, pos);
+            Long noteServerTime = buf.readLong();
+            return new MidiNotePacket(note, velocity, instrumentId, player, pos, noteServerTime);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("MidiNoteOnPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -76,6 +70,7 @@ public class MidiNotePacket {
         buf.writeByte(pkt.instrumentId);
         buf.writeUUID(pkt.player);
         buf.writeBlockPos(pkt.pos);
+        buf.writeLong(pkt.noteServerTime);
     }
 
     public Boolean isAllNotesOffPacket() {

@@ -1,8 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.container.ContainerDiskWriter;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
@@ -12,14 +11,15 @@ import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.CommonComponents;
 
 public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDiskWriter> {
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
 
-    protected static final Vector3f WRITE_BUTTON_COORDS = new Vector3f(55,58,0);
-    protected static final Vector3f WRITE_BUTTON_SIZE = new Vector3f(37,16,0);
+    protected static final Vector2f WRITE_BUTTON_COORDS = new Vector2f(55,58);
+    protected static final Vector2f WRITE_BUTTON_SIZE = new Vector2f(37,16);
 
     // Data
     private EditBox diskTitleField;
@@ -50,17 +50,17 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
     }
 
     @Override
-    protected PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
-        this.midiUrlField.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.diskTitleField.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.midiUrlField.render(graphics, mouseX, mouseY, partialTicks);
+        this.diskTitleField.render(graphics, mouseX, mouseY, partialTicks);
 
-        return matrixStack;
+        return graphics;
     }
     
     @Override
@@ -89,8 +89,8 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
     }
 
     @Override
-    protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY) {
-        return matrixStack;
+    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY) {
+        return graphics;
     }
     
     protected void handleUrlChange(String newUrl) {

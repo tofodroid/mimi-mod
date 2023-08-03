@@ -11,8 +11,10 @@ import net.minecraftforge.common.ForgeConfigSpec;
 // 1. Default MIDI Input Device
 
 public class CommonConfig {
+    public static final String WORLD_CATEGORY_NAME = "World Generation";
     public static final String MUSIC_PLAYER_CATEGORY_NAME = "Server Music";
 
+    public ForgeConfigSpec.BooleanValue enableInstrumentalistShop;
     public ForgeConfigSpec.IntValue serverMusicCacheSize;
     public ForgeConfigSpec.BooleanValue allowWebMidi;
     public ForgeConfigSpec.BooleanValue allowWebCommands;
@@ -21,6 +23,11 @@ public class CommonConfig {
     protected List<String> allowedHostsList = null;
 
     public CommonConfig(ForgeConfigSpec.Builder builder) {
+        builder.push(WORLD_CATEGORY_NAME);
+        enableInstrumentalistShop = builder.comment("Toggles whether Instrumentalist shops should generate in villages.")
+            .translation(MIMIMod.MODID + ".config.server.world.village.instrumentalist")
+            .define("enableInstrumentalistShop", true);
+        builder.pop();
         builder.push(MUSIC_PLAYER_CATEGORY_NAME);
         serverMusicCacheSize = builder.comment("Server music cache limit. The maximum number of MIDI files (from Floppy Disks) to keep in the server-side music cache.")
             .translation(MIMIMod.MODID + ".config.server.cache.music.size")

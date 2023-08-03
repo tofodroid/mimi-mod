@@ -25,14 +25,14 @@ public class BroadcasterReceiver extends MidiInputReceiver {
         } else if(isNoteOffMessage(message)) {
             this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);
         } else if(isAllNotesOffMessage(message)) {
-            this.sendTransmitterAllNotesOffPacket(Integer.valueOf(message.getChannel()).byteValue());
+            this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         } else if(isSupportedControlMessage(message)) {
             this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         }
     }
     
     public void sendTransmitterNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
-        TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, velocity, tile.getTransmitMode());
+        TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, velocity, tile.getTransmitMode());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
             TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), null);
@@ -40,7 +40,7 @@ public class BroadcasterReceiver extends MidiInputReceiver {
     }
     
     public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
-        TransmitterNotePacket packet = new TransmitterNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), tile.getTransmitMode());
+        TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), tile.getTransmitMode());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
             TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), null);

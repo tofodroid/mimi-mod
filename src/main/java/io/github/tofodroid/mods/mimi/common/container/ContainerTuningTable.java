@@ -17,6 +17,7 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerTuningTable extends APlayerInventoryContainer {
@@ -27,7 +28,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     private static final int RESULT_SLOT_POS_X = 134;
     private static final int RESULT_SLOT_POS_Y = 38;
 
-    private CraftingContainer craftingInventory = new CraftingContainer(this, 1, 2);
+    private CraftingContainer craftingInventory = new TransientCraftingContainer(this, 1, 2);
     private ResultContainer resultInventory = new ResultContainer();
 
     public ContainerTuningTable(MenuType<?> type, int id, Inventory playerInventory) {
@@ -64,7 +65,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
             itemstack = itemstack1.copy();
 
             if (index == TARGET_CONTAINER_MIN_SLOT_ID + 2) {
-                itemstack1.getItem().onCraftedBy(itemstack1, playerIn.level, playerIn);
+                itemstack1.getItem().onCraftedBy(itemstack1, playerIn.level(), playerIn);
                 if (!this.moveItemStackTo(itemstack1, 0, TARGET_CONTAINER_MIN_SLOT_ID - 1, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -102,15 +103,15 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
   
     @Override
     public void slotsChanged(Container container) {
-        if (container == craftingInventory && !this.playerInventory.player.level.isClientSide) {
+        if (container == craftingInventory && !this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
-            Optional<TuningTableRecipe> optional = serverplayer.level.getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level);
+            Optional<TuningTableRecipe> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level());
             
             if (optional.isPresent()) {
                 TuningTableRecipe recipe = optional.get();
-               if (this.resultInventory.setRecipeUsed(serverplayer.level, serverplayer, recipe)) {
-                  itemstack = recipe.assemble(this.craftingInventory);
+               if (this.resultInventory.setRecipeUsed(serverplayer.level(), serverplayer, recipe)) {
+                  itemstack = recipe.assemble(this.craftingInventory, null);
                }
             }
    

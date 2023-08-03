@@ -108,15 +108,17 @@ public class ModCommands {
         List<String> fileNames = MidiFileCacheManager.getServerFileNames(5, pageNum);
 
         if(fileNames.isEmpty()) {
-            source.sendSuccess(Component.literal("No files found"), false);
+            source.sendSuccess(() -> Component.literal("No files found"), false);
         } else if(pageNum >= numPages) {
             source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
             return 1;
         } else {
-            source.sendSuccess(Component.literal("Server Music (" + (pageNum+1) + "/" + numPages + ")"), false);
+            Integer responsePage = pageNum+1;
+            source.sendSuccess(() -> Component.literal("Server Music (" + (responsePage) + "/" + numPages + ")"), false);
             Integer resultNum = pageNum * 5;
+            Integer responseNum = resultNum+1;
             for(String file : fileNames) {
-                source.sendSuccess(Component.literal((resultNum+1) + ". " + file), false);
+                source.sendSuccess(() -> Component.literal((responseNum) + ". " + file), false);
                 resultNum++;
             }
         }
@@ -125,7 +127,7 @@ public class ModCommands {
 
     private static int reloadServerMusicList(CommandSourceStack source) {
         MidiFileCacheManager.refreshServerSequenceMap();
-        source.sendSuccess(Component.literal("Server saved music reloaded. Found " + MidiFileCacheManager.getServerFileNamesPages(1) + " files"), true);
+        source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + MidiFileCacheManager.getServerFileNamesPages(1) + " files"), true);
         return 0;
     }
 
@@ -160,8 +162,8 @@ public class ModCommands {
             source.sendFailure(Component.literal("Failed to download and save MIDI from supplied URL"));
             return 1;
         }
-
-        source.sendSuccess(Component.literal("New Server MIDI downloaded and saved as '" + name + "'"), true);
+        String responseName = name;
+        source.sendSuccess(() -> Component.literal("New Server MIDI downloaded and saved as '" + responseName + "'"), true);
         return 0;
     }
 
@@ -187,36 +189,37 @@ public class ModCommands {
             return 1;
         }
         
-        source.sendSuccess(Component.literal("Successfully deleted server MIDI '" + name + "'"), true);
+        String responseName = name;
+        source.sendSuccess(() -> Component.literal("Successfully deleted server MIDI '" + responseName + "'"), true);
         return 0;
     }
 
     private static int getServerCacheSize(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server music cache: " + MidiFileCacheManager.getCachedFileNamePages(1) + "/" + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), false);
+        source.sendSuccess(() -> Component.literal("Server music cache: " + MidiFileCacheManager.getCachedFileNamePages(1) + "/" + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), false);
         return 0;
     }
 
     private static int setServerCacheSize(CommandSourceStack source, Integer size) {
         ModConfigs.COMMON.serverMusicCacheSize.set(size);
-        source.sendSuccess(Component.literal("Server music cache size set to: " + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), true);
+        source.sendSuccess(() -> Component.literal("Server music cache size set to: " + ModConfigs.COMMON.serverMusicCacheSize.get() + " files"), true);
         return 0;
     }
 
     private static int pruneServerCache(CommandSourceStack source) {
         MidiFileCacheManager.pruneSequenceCache();
-        source.sendSuccess(Component.literal("Server music cache pruned."), true);
+        source.sendSuccess(() -> Component.literal("Server music cache pruned."), true);
         return 0;
     }
 
     private static int emptyServerCache(CommandSourceStack source) {
         MidiFileCacheManager.pruneSequenceCache();
-        source.sendSuccess(Component.literal("Server music cache cleared"), true);
+        source.sendSuccess(() -> Component.literal("Server music cache cleared"), true);
         return 0;
     }
 
     private static int reloadServerCache(CommandSourceStack source) {
         MidiFileCacheManager.refreshSequenceCacheMaps();
-        source.sendSuccess(Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files"), true);
+        source.sendSuccess(() -> Component.literal("Server music cache reloaded. Found " + MidiFileCacheManager.getCachedFileNamePages(1) + " files"), true);
         return 0;
     }
 
@@ -227,26 +230,29 @@ public class ModCommands {
         Integer numPages = Double.valueOf(Math.ceil((double)hosts.size() / 5d)).intValue();
         
         if(hosts.isEmpty()) {
-            source.sendSuccess(Component.literal("Server allows all web hosts"), false);
+            source.sendSuccess(() -> Component.literal("Server allows all web hosts"), false);
             return 0;
         } else if(pageNum >= numPages) {
             source.sendFailure(Component.literal("Invalid page number. Max: " + numPages));
             return 1;
         }
 
-        source.sendSuccess(Component.literal("Allowed Hosts (" + (pageNum+1) + "/" + numPages + ")"), false);
+        Integer responseNum = pageNum+1;
+        source.sendSuccess(() -> Component.literal("Allowed Hosts (" + (responseNum) + "/" + numPages + ")"), false);
         for(int i = pageNum*5; i < (pageNum*5 + 5); i++) {
             if(i >= hosts.size()) {
                 return 0;
             }
-            source.sendSuccess(Component.literal((i+1) + ". " + hosts.get(i)), false);
+            Integer responseI = i+1;
+            String responseHost = hosts.get(i);
+            source.sendSuccess(() -> Component.literal((responseI) + ". " + responseHost), false);
         }
         
         return 0;
     }
 
     private static int getWebStatus(CommandSourceStack source) {
-        source.sendSuccess(Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
+        source.sendSuccess(() -> Component.literal("Server Web MIDI is: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), false);
         return 0;
     }
 
@@ -261,7 +267,8 @@ public class ModCommands {
             return 1;
         }
         ModConfigs.COMMON.addAllowedHost(host);
-        source.sendSuccess(Component.literal("Host '" + host + "' added to Allowed Hosts."), true);
+        String responseHost = host;
+        source.sendSuccess(() -> Component.literal("Host '" + responseHost + "' added to Allowed Hosts."), true);
         return 0;
     }
 
@@ -280,7 +287,7 @@ public class ModCommands {
         }
         String removedHost = ModConfigs.COMMON.getAllowedHostsList().get(number);
         ModConfigs.COMMON.removeAllowedHost(number);
-        source.sendSuccess(Component.literal("Allowed Host '" + removedHost + "' removed."), true);
+        source.sendSuccess(() -> Component.literal("Allowed Host '" + removedHost + "' removed."), true);
         return 0;
     }
     
@@ -290,7 +297,7 @@ public class ModCommands {
             return 1;
         }
 
-        source.sendSuccess(Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
+        source.sendSuccess(() -> Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
         return 0;
     }
 }

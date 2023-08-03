@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.UUID;
@@ -48,7 +48,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 		} else {
 			handIn = null;
 			tilePos = extraData.readBlockPos();
-			targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
+			targetInventory =  playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
 		}
 		
 		this.addSlot(buildSwitchboardSlot());
@@ -71,7 +71,7 @@ public class ContainerInstrument extends ASwitchboardContainer {
 		this.instrumentId = instrumentId;
 		this.tilePos = tilPos;
 		handIn = null;
-		targetInventory =  playerInventory.player.level.getBlockEntity(tilePos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(NullPointerException::new);
+		targetInventory =  playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
 		
 		this.addSlot(buildSwitchboardSlot());
 	}

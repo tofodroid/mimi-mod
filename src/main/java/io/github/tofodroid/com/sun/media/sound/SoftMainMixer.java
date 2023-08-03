@@ -421,6 +421,31 @@ public final class SoftMainMixer {
         }
     }
 
+    public void clearQueuedChannelEvents(int channel) {
+        Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry<Long, Object> entry = iter.next();
+            byte[] data = null;
+
+            if(entry.getValue() instanceof MidiMessage) {
+                data = ((MidiMessage)entry.getValue()).getMessage();
+            } else if(entry.getValue() instanceof byte[]) {
+                data = (byte[])entry.getValue();
+            }
+
+            if(data != null) {
+                int status = 0;
+                if (data.length > 0)
+                    status = data[0] & 0xFF;
+                int ch = (status & 0x0F);
+
+                if(ch == channel) {
+                    iter.remove();
+                }
+            }
+        }
+    }
+
     private void processMessages(long timeStamp) {
         Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
         while (iter.hasNext()) {

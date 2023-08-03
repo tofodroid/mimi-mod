@@ -1,5 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.container.slot;
 
+import java.util.List;
+
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
@@ -42,12 +44,12 @@ public class SlotTuningResult extends Slot {
 
     protected void checkTakeAchievements(ItemStack p_40185_) {
         if (this.removeCount > 0) {
-            p_40185_.onCraftedBy(this.player.level, this.player, this.removeCount);
+            p_40185_.onCraftedBy(this.player.level(), this.player, this.removeCount);
             net.minecraftforge.event.ForgeEventFactory.firePlayerCraftingEvent(this.player, p_40185_, this.craftSlots);
         }
 
         if (this.container instanceof RecipeHolder) {
-            ((RecipeHolder)this.container).awardUsedRecipes(this.player);
+            ((RecipeHolder)this.container).awardUsedRecipes(player, List.of(p_40185_));
         }
 
         this.removeCount = 0;
@@ -56,7 +58,7 @@ public class SlotTuningResult extends Slot {
     public void onTake(Player p_150638_, ItemStack p_150639_) {
         this.checkTakeAchievements(p_150639_);
         net.minecraftforge.common.ForgeHooks.setCraftingPlayer(p_150638_);
-        NonNullList<ItemStack> nonnulllist = p_150638_.level.getRecipeManager().getRemainingItemsFor(ModRecipes.TUNING_TYPE, this.craftSlots, p_150638_.level);
+        NonNullList<ItemStack> nonnulllist = p_150638_.level().getRecipeManager().getRemainingItemsFor(ModRecipes.TUNING_TYPE, this.craftSlots, p_150638_.level());
         net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
         
         for(int i = 0; i < nonnulllist.size(); ++i) {
@@ -71,7 +73,7 @@ public class SlotTuningResult extends Slot {
             if (!itemstack1.isEmpty()) {
                 if (itemstack.isEmpty()) {
                     
-                } else if (ItemStack.isSame(itemstack, itemstack1) && ItemStack.tagMatches(itemstack, itemstack1)) {
+                } else if (ItemStack.isSameItemSameTags(itemstack, itemstack1)) {
                     itemstack1.grow(itemstack.getCount());
                     this.craftSlots.setItem(i, itemstack1);
                 } else if (!this.player.getInventory().add(itemstack1)) {

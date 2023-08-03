@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.block;
 import java.util.List;
 import java.util.Map;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
@@ -38,8 +38,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -59,7 +58,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public final String REGISTRY_NAME;
 
     public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
-        super(Properties.of(Material.WOOD).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
         this.instrumentId = instrumentId;
         this.dyeable = dyeable;
         this.defaultColor = defaultColor;
@@ -157,7 +156,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     
     @Override
     @SuppressWarnings("deprecation")
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         List<ItemStack> drops = super.getDrops(state, builder);
         BlockEntity tileentity = builder.getParameter(LootContextParams.BLOCK_ENTITY);
 
@@ -216,7 +215,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
             BlockPos pos = getSeatForEntity(entity).getSource();
 
             if(pos != null && Level.isInSpawnableBounds(pos)) {
-                BlockEntity sourceEntity = entity.getLevel().getBlockEntity(getSeatForEntity(entity).getSource());
+                BlockEntity sourceEntity = entity.level().getBlockEntity(getSeatForEntity(entity).getSource());
                 return sourceEntity != null && sourceEntity instanceof TileInstrument ? (TileInstrument) sourceEntity : null;
             }
         }

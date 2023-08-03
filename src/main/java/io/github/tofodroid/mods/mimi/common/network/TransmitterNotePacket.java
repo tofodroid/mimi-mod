@@ -1,7 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
 import net.minecraft.network.FriendlyByteBuf;
 
 public class TransmitterNotePacket {
@@ -12,6 +11,7 @@ public class TransmitterNotePacket {
     public final Byte note;
     public final Byte velocity;
     public final TransmitMode transmitMode;
+    public final Long noteServerTime;
     
     public static enum TransmitMode {
         PUBLIC,
@@ -23,19 +23,24 @@ public class TransmitterNotePacket {
         }
     }
 
+    public static TransmitterNotePacket createNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode) {
+        return new TransmitterNotePacket(channel, note, velocity, transmitMode, MIMIMod.proxy.getCurrentServerMillis());
+    }
+
     public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), transmitMode);
+        return new TransmitterNotePacket(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), transmitMode, MIMIMod.proxy.getCurrentServerMillis());
     }
     
     public static TransmitterNotePacket createControllerPacket(Byte channel, Byte controller, Byte value, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, transmitMode);
+        return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, transmitMode, MIMIMod.proxy.getCurrentServerMillis());
     }
 
-    public TransmitterNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode) {
+    private TransmitterNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode, Long noteServerTime) {
         this.channel = channel;
         this.note = note;
         this.velocity = velocity;
         this.transmitMode = transmitMode;
+        this.noteServerTime = noteServerTime;
     }
 
     public static TransmitterNotePacket decodePacket(FriendlyByteBuf buf) {
@@ -44,7 +49,8 @@ public class TransmitterNotePacket {
             byte note = buf.readByte();
             byte velocity = buf.readByte();
             TransmitMode transmitMode = TransmitMode.values()[Byte.valueOf(buf.readByte()).intValue()];
-            return new TransmitterNotePacket(channel, note, velocity, transmitMode);
+            Long noteServerTime = buf.readLong();
+            return new TransmitterNotePacket(channel, note, velocity, transmitMode, noteServerTime);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("TransmitterNotePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -56,7 +62,9 @@ public class TransmitterNotePacket {
         buf.writeByte(pkt.note);
         buf.writeByte(pkt.velocity);
         buf.writeByte(Integer.valueOf(pkt.transmitMode.ordinal()).byteValue());
+        buf.writeLong(pkt.noteServerTime);
     }
+
     public Boolean isAllNotesOffPacket() {
         return this.note == ALL_NOTES_OFF;
     }

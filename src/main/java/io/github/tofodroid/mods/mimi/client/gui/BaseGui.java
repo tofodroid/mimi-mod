@@ -1,12 +1,12 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -43,19 +43,19 @@ public abstract class BaseGui extends Screen {
     }
     
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
-        stack = renderGraphics(stack, mouseX, mouseY, partialTicks);
-        stack = renderText(stack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        graphics = renderGraphics(graphics, mouseX, mouseY, partialTicks);
+        graphics = renderText(graphics, mouseX, mouseY, partialTicks);
     }
     
     protected void setAlpha(float alpha) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
     }
 
-    protected abstract PoseStack renderGraphics(PoseStack stack, int mouseX, int mouseY, float partialTicks);
-    protected abstract PoseStack renderText(PoseStack stack, int mouseX, int mouseY, float partialTicks);
+    protected abstract GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks);
+    protected abstract GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks);
 
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector3f buttonPos) {
+    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
         Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
         Integer buttonMaxX = buttonMinX + STANDARD_BUTTON_SIZE;
         Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();
@@ -70,7 +70,7 @@ public abstract class BaseGui extends Screen {
         return result;
     }
     
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector3f buttonPos, Vector3f buttonSize) {
+    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos, Vector2f buttonSize) {
         Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
         Integer buttonMaxX = buttonMinX + Float.valueOf(buttonSize.x()).intValue();
         Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();

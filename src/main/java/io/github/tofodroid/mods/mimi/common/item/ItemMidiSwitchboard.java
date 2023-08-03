@@ -51,13 +51,13 @@ public class ItemMidiSwitchboard extends Item {
     private Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
     public ItemMidiSwitchboard() {
-        super(new Properties().tab(ModItems.ITEM_GROUP).stacksTo(64));
+        super(new Properties().stacksTo(64));
     }
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
         // Server-side only
-        if(!playerIn.getLevel().isClientSide()) {  
+        if(!playerIn.level().isClientSide()) {  
             if(target instanceof Player) {
                 ItemMidiSwitchboard.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 playerIn.setItemInHand(hand, stack);

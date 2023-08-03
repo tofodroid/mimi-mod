@@ -36,22 +36,15 @@ public class MIMIChannel {
         this.channel.resetAllControllers();
     }
 
-    public void noteOn(InstrumentSpec instrument, Byte note, Byte velocity, BlockPos notePos) {
-        this.channel.noteOn(note, velocity);
+    public void noteOn(BlockPos notePos) {
         this.lastNoteTime = Instant.now();
     }
 
-    public void noteOff(InstrumentSpec instrument, Byte note) {
-        if(note != null && note.equals(Byte.MIN_VALUE)) {
-            this.channel.allSoundOff();
-        } else { 
-            this.channel.noteOff(note);
-        }
-    }
-
     public void allNotesOff() {
-        this.channel.resetAllControllers();
-        this.channel.allSoundOff();
+        if(this.channel != null) {
+            this.channel.resetAllControllers();
+            this.channel.allSoundOff();
+        }
     }
 
     public void controlChange(Byte controller, Byte value) {
@@ -66,7 +59,7 @@ public class MIMIChannel {
         this.channel.controlChange(10, lrPan);
     }
 
-    public Boolean tick(Player clientPlayer) {
+    public Boolean tick(Player clientPlayer, Boolean isClientChannel) {
         if(!this.isIdle()) {
             return true;
         } else if(this.lastNoteTime != null) {

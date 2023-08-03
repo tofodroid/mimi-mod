@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockBroadcaster extends AContainerBlock<TileBroadcaster> {
@@ -33,7 +32,7 @@ public class BlockBroadcaster extends AContainerBlock<TileBroadcaster> {
     public static final String REGISTRY_NAME = "broadcaster";
 
     public BlockBroadcaster() {
-        super(Properties.of(Material.METAL).explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
     }
     

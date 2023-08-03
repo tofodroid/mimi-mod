@@ -50,7 +50,7 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 
 	@Override
     public void setRecipe(IRecipeLayoutBuilder recipeLayout, TuningTableRecipe recipe, IFocusGroup focusGroup) {
-        recipeLayout.addSlot(RecipeIngredientRole.OUTPUT, 41, 22).addItemStack(recipe.getResultItem());
+        recipeLayout.addSlot(RecipeIngredientRole.OUTPUT, 41, 22).addItemStack(recipe.getResultItem(null));
         recipeLayout.addSlot(RecipeIngredientRole.INPUT, 2, 2).addIngredients(recipe.getIngredients().get(0));
         recipeLayout.addSlot(RecipeIngredientRole.INPUT, 35, 2).addIngredients(recipe.getIngredients().get(1));
     }

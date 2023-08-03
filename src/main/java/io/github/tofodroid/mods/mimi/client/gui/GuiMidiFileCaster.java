@@ -5,8 +5,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
@@ -17,6 +16,7 @@ import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.Transm
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.CommonComponents;
 
@@ -29,19 +29,19 @@ public class GuiMidiFileCaster extends BaseGui {
     private String folderPathString;
     
     // Button Boxes
-    private static final Vector3f LOAD_FOLDER_BUTTON = new Vector3f(301,37,0);
-    private static final Vector3f SAVE_DEFAULT_BUTTON = new Vector3f(320,37,0);
-    private static final Vector3f LOAD_DEFAULT_BUTTON = new Vector3f(339,37,0);
-    private static final Vector3f PREVIOUS_BUTTON = new Vector3f(14,271,0);
-    private static final Vector3f STOP_BUTTON = new Vector3f(33,271,0);
-    private static final Vector3f PLAY_PAUSE_BUTTON = new Vector3f(52,271,0);
-    private static final Vector3f NEXT_BUTTON = new Vector3f(71,271,0);
-    private static final Vector3f LOOP_BUTTON = new Vector3f(90,271,0);
-    private static final Vector3f LOOP_SCREEN = new Vector3f(108,272,0);
-    private static final Vector3f SHUFFLE_BUTTON = new Vector3f(125,271,0);
-    private static final Vector3f SHUFFLE_SCREEN = new Vector3f(143,272,0);
-    private static final Vector3f TRANSMIT_BUTTON = new Vector3f(160,271,0);
-    private static final Vector3f TRANSMIT_SCREEN = new Vector3f(178,272,0);
+    private static final Vector2f LOAD_FOLDER_BUTTON = new Vector2f(301,37);
+    private static final Vector2f SAVE_DEFAULT_BUTTON = new Vector2f(320,37);
+    private static final Vector2f LOAD_DEFAULT_BUTTON = new Vector2f(339,37);
+    private static final Vector2f PREVIOUS_BUTTON = new Vector2f(14,271);
+    private static final Vector2f STOP_BUTTON = new Vector2f(33,271);
+    private static final Vector2f PLAY_PAUSE_BUTTON = new Vector2f(52,271);
+    private static final Vector2f NEXT_BUTTON = new Vector2f(71,271);
+    private static final Vector2f LOOP_BUTTON = new Vector2f(90,271);
+    private static final Vector2f LOOP_SCREEN = new Vector2f(108,272);
+    private static final Vector2f SHUFFLE_BUTTON = new Vector2f(125,271);
+    private static final Vector2f SHUFFLE_SCREEN = new Vector2f(143,272);
+    private static final Vector2f TRANSMIT_BUTTON = new Vector2f(160,271);
+    private static final Vector2f TRANSMIT_SCREEN = new Vector2f(178,272);
 
     // Time Slider
     private static final Integer SLIDE_Y = 270;
@@ -127,12 +127,12 @@ public class GuiMidiFileCaster extends BaseGui {
     }
 
     @Override
-    protected  PoseStack renderGraphics(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected  GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // Background
-        blit(matrixStack, START_X, START_Y, this.getBlitOffset(), 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Selected Song Box
         if(this.midiInputManager.fileCasterManager.isSongSelected()) {
@@ -147,20 +147,20 @@ public class GuiMidiFileCaster extends BaseGui {
             }
             
             Integer boxY = 82 + 10 * songOffset;
-            blit(matrixStack, START_X + 15, START_Y + boxY, this.getBlitOffset(), 1, 301, 338, 11, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.blit(guiTexture, START_X + 15, START_Y + boxY, 1, 301, 338, 11, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Play/Pause Button
-        blit(matrixStack, START_X + 53, START_Y + 272, this.getBlitOffset(), 1 + this.midiInputManager.fileCasterManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + 53, START_Y + 272, 1 + this.midiInputManager.fileCasterManager.isPlaying().compareTo(false) * 13, 355, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Loop Screen
-        blit(matrixStack, START_X + Float.valueOf(LOOP_SCREEN.x()).intValue(), START_Y + Float.valueOf(LOOP_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.fileCasterManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(LOOP_SCREEN.x()).intValue(), START_Y + Float.valueOf(LOOP_SCREEN.y()).intValue(), 1 + (13 * this.midiInputManager.fileCasterManager.getLoopMode()), 313, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Shuffle Screen    
-        blit(matrixStack, START_X + Float.valueOf(SHUFFLE_SCREEN.x()).intValue(), START_Y + Float.valueOf(SHUFFLE_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.fileCasterManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(SHUFFLE_SCREEN.x()).intValue(), START_Y + Float.valueOf(SHUFFLE_SCREEN.y()).intValue(), 1 + (13 * this.midiInputManager.fileCasterManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        blit(matrixStack, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), this.getBlitOffset(), 1 + (13 * this.midiInputManager.fileCasterManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * this.midiInputManager.fileCasterManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;
@@ -171,16 +171,16 @@ public class GuiMidiFileCaster extends BaseGui {
             slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
 
-        blit(matrixStack, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, this.getBlitOffset(), 43, 313, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, 43, 313, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Text Field
-        this.folderPathField.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.folderPathField.render(graphics, mouseX, mouseY, partialTicks);
         
-        return matrixStack;
+        return graphics;
     }
 
     @Override
-    protected PoseStack renderText(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Playlist
         if(this.midiInputManager.fileCasterManager.getSongCount() > 0) {
             Integer minSong;
@@ -195,7 +195,7 @@ public class GuiMidiFileCaster extends BaseGui {
             for(int i = 0; i < 6; i++) {
                 if(this.midiInputManager.fileCasterManager.getSongCount() > (minSong + i)) {
                     MidiFileInfo info = this.midiInputManager.fileCasterManager.getLoadedPlaylist().get(minSong + i);
-                    this.font.draw(matrixStack, (minSong + i + 1) + "). " + (info.fileName.length() > 50 ? info.fileName.substring(0,50) + "..." : info.fileName), START_X + 18, START_Y + 84 + i * 10, 0xFF00E600);
+                    graphics.drawString(font, (minSong + i + 1) + "). " + (info.fileName.length() > 50 ? info.fileName.substring(0,50) + "..." : info.fileName), START_X + 18, START_Y + 84 + i * 10, 0xFF00E600);
                 } else {
                     break;
                 }            
@@ -205,24 +205,24 @@ public class GuiMidiFileCaster extends BaseGui {
         // Current Song
         MidiFileInfo info = this.midiInputManager.fileCasterManager.getSelectedSongInfo();
         if(info != null) {
-            this.font.draw(matrixStack, "Channel Instruments: ", START_X + 16, START_Y + 174, 0xFF00E600);
+            graphics.drawString(font, "Channel Instruments: ", START_X + 16, START_Y + 174, 0xFF00E600);
             
             Integer index = 0;
             for(Integer i = 0; i < 16; i+=2) {
                 String name = info.instrumentMapping.get(i) == null ? "None" : info.instrumentMapping.get(i);
-                this.font.draw(matrixStack, (i+1) + ": " + name, START_X + 16, START_Y + 188 + 10*index, 0xFF00E600);
+                graphics.drawString(font, (i+1) + ": " + name, START_X + 16, START_Y + 188 + 10*index, 0xFF00E600);
                 index++;
             }
 
             index = 0;
             for(Integer i = 1; i < 16; i+=2) {
                 String name = info.instrumentMapping.get(i) == null ? "None" : info.instrumentMapping.get(i);
-                this.font.draw(matrixStack, (i+1) + ": " + name, START_X + 184, START_Y + 188 + 10*index, 0xFF00E600);
+                graphics.drawString(font, (i+1) + ": " + name, START_X + 184, START_Y + 188 + 10*index, 0xFF00E600);
                 index++;
             }
         }
         
-        return matrixStack;
+        return graphics;
     }
 
     protected void handlePathChange(String folderPath) {

@@ -1,7 +1,6 @@
 package io.github.tofodroid.mods.mimi.common;
 
-import net.minecraft.core.Registry;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.core.registries.Registries;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -19,7 +18,6 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.server.ServerProxy;
@@ -44,24 +42,15 @@ public class MIMIMod {
         ModConfigs.preInit(modContext);
         InstrumentConfig.preInit();
 
-        // Event Listener Registration
-        fmlContext.getModEventBus().addListener(MIMIMod::init);
-        fmlContext.getModEventBus().addListener(NetworkManager::init);
-        MinecraftForge.EVENT_BUS.addListener(ModVillagers::registerTrades);
-
         // Deferred Registrations
         ModEntities.ENTITY_TYPES.register(fmlContext.getModEventBus());
         ModLootModifiers.REGISTER.register(fmlContext.getModEventBus());
-
-        // Blocks
         ModBlocks.BLOCKS.register(fmlContext.getModEventBus());
-
-        // Village Stuff
         ModVillagers.POI_TYPES.register(fmlContext.getModEventBus());
         ModVillagers.PROFESSIONS.register(fmlContext.getModEventBus());
-        ModVillagers.injectStructures();
     }
    
+    @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
         proxy.init(event);
         MidiFileCacheManager.init();
@@ -70,16 +59,19 @@ public class MIMIMod {
     @SubscribeEvent
     public static void registerContent(final RegisterEvent event) {
         // Items
-        event.register(Registry.ITEM_REGISTRY, (reg) -> {ModItems.submitRegistrations(reg);});
+        event.register(Registries.ITEM, (reg) -> {ModItems.submitRegistrations(reg);});
 
         // Tiles
-        event.register(Registry.BLOCK_ENTITY_TYPE_REGISTRY, (reg) -> {ModTiles.submitRegistrations(reg);});
+        event.register(Registries.BLOCK_ENTITY_TYPE, (reg) -> {ModTiles.submitRegistrations(reg);});
 
         // Recipes
-        event.register(Registry.RECIPE_TYPE_REGISTRY, (reg) -> {ModRecipes.submitTypeRegistrations(reg);});
-        event.register(Registry.RECIPE_SERIALIZER_REGISTRY, (reg) -> {ModRecipes.submitSerializerRegistrations(reg);});
+        event.register(Registries.RECIPE_TYPE, (reg) -> {ModRecipes.submitTypeRegistrations(reg);});
+        event.register(Registries.RECIPE_SERIALIZER, (reg) -> {ModRecipes.submitSerializerRegistrations(reg);});
 
         // Containers
-        event.register(Registry.MENU_REGISTRY, (reg) -> {ModContainers.submitRegistrations(reg);});
+        event.register(Registries.MENU, (reg) -> {ModContainers.submitRegistrations(reg);});
+
+        event.register(Registries.CREATIVE_MODE_TAB, (reg) -> ModItems.registerCreativeTab(reg));
+
     }
 }
