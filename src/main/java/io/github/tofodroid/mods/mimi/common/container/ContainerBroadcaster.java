@@ -23,6 +23,7 @@ public class ContainerBroadcaster extends APlayerInventoryContainer {
 	protected IItemHandler targetInventory;
 	private final BlockPos tilePos;
 
+    @SuppressWarnings("null")
 	public ContainerBroadcaster(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
 		super(ModContainers.BROADCASTER, id, playerInventory);
 		tilePos = extraData.readBlockPos();
@@ -30,6 +31,7 @@ public class ContainerBroadcaster extends APlayerInventoryContainer {
 		this.addSlot(buildFloppySlot());
 	}
 
+    @SuppressWarnings("null")
 	public ContainerBroadcaster(int id, Inventory playerInventory, BlockPos pos) {
 		super(ModContainers.BROADCASTER, id, playerInventory);
 		tilePos = pos;

@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.container;
 import java.util.Optional;
 
 import io.github.tofodroid.mods.mimi.common.container.slot.SlotTuningResult;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
@@ -102,6 +102,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     }
   
     @Override
+    @SuppressWarnings("null")
     public void slotsChanged(Container container) {
         if (container == craftingInventory && !this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
@@ -139,7 +140,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
         return new Slot(craftingInventory, 0, xPos, yPos) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.getItem() instanceof ItemInstrument || stack.getItem() instanceof ItemInstrumentBlock;
+                return stack.getItem() instanceof ItemInstrumentHandheld || stack.getItem() instanceof ItemInstrumentBlock;
             }
         };
     }

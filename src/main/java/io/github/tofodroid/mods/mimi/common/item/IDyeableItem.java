@@ -44,6 +44,7 @@ public interface IDyeableItem extends DyeableLeatherItem {
         }
     }
     
+    @SuppressWarnings("null")
     default Boolean washItem(UseOnContext context) {
         if(!context.getPlayer().isCrouching() && ((IDyeableItem)context.getItemInHand().getItem()).hasColor(context.getItemInHand()) && context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof LayeredCauldronBlock) {
             if(context.getPlayer() instanceof ServerPlayer) {

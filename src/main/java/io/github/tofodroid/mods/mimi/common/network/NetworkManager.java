@@ -40,8 +40,7 @@ public class NetworkManager {
         BROADCAST_CHANNEL.registerMessage(0, TransmitterNotePacket.class, TransmitterNotePacket::encodePacket, TransmitterNotePacket::decodePacket, TransmitterNotePacketHandler::handlePacket);
         
         INFO_CHANNEL.registerMessage(0, SwitchboardStackUpdatePacket.class, SwitchboardStackUpdatePacket::encodePacket, SwitchboardStackUpdatePacket::decodePacket, SwitchboardStackUpdatePacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(1, SyncItemInstrumentSwitchboardPacket.class, SyncItemInstrumentSwitchboardPacket::encodePacket, SyncItemInstrumentSwitchboardPacket::decodePacket, SyncItemInstrumentSwitchboardPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(2, KeybindOpenInstrumentPacket.class, KeybindOpenInstrumentPacket::encodePacket, KeybindOpenInstrumentPacket::decodePacket, KeybindOpenInstrumentPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(1, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, SyncInstrumentPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(3, KeybindOpenTransmitterPacket.class, KeybindOpenTransmitterPacket::encodePacket, KeybindOpenTransmitterPacket::decodePacket, KeybindOpenTransmitterPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(4, WriteDiskPacket.class, WriteDiskPacket::encodePacket, WriteDiskPacket::decodePacket, WriteDiskPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(5, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, ServerMusicPlayerStatusPacketHandler::handlePacket);

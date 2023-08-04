@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.container.ASwitchboardContainer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -20,9 +19,7 @@ public class SwitchboardStackUpdatePacketHandler {
     
     public static void handlePacketServer(final SwitchboardStackUpdatePacket message, ServerPlayer sender) {
         if(sender.containerMenu != null) {
-            if(sender.containerMenu instanceof ASwitchboardContainer) {
-                ((ASwitchboardContainer)sender.containerMenu).updateSelectedSwitchboard(sender, message.midiSource, message.midiSourceName, message.filterOct, message.filterNote, message.invertNoteOct, message.enabledChannelsString, message.instrumentId, message.invertInstrument, message.sysInput, message.publicBroadcast, message.broadcastNote, message.volume);
-            }
+            
         }
     }
 }

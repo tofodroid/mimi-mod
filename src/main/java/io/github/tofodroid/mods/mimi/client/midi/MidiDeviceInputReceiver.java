@@ -4,10 +4,10 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -18,15 +18,16 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
         Player player = Minecraft.getInstance().player;
 
         if(player != null && MIMIMod.proxy.isClient()) {
-            ((ClientProxy)MIMIMod.proxy).getMidiInput().inputDeviceManager.getLocalInstrumentsForMidiDevice(player, Integer.valueOf(message.getChannel()).byteValue()).forEach(pair -> {
+            ((ClientProxy)MIMIMod.proxy).getMidiInput().inputDeviceManager.getLocalInstrumentsForMidiDevice(player, Integer.valueOf(message.getChannel()).byteValue()).forEach(instrumentStack -> {
+                Byte instrumentId = InstrumentDataUtils.getInstrumentId(instrumentStack);
                 if(isNoteOnMessage(message)) {
-                    handleMidiNoteOn(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), message.getMessage()[1], ItemMidiSwitchboard.applyVolume(pair.getRight(), message.getMessage()[2]), player);
+                    handleMidiNoteOn(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], InstrumentDataUtils.applyVolume(instrumentStack, message.getMessage()[2]), player);
                 } else if(isNoteOffMessage(message)) {
-                    handleMidiNoteOff(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), message.getMessage()[1], player);
+                    handleMidiNoteOff(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], player);
                 } else if(isAllNotesOffMessage(message)) {
-                    handleAllNotesOff(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), player);
+                    handleAllNotesOff(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, player);
                 } else if(isSupportedControlMessage(message)) {
-                    handleControlMessage(Integer.valueOf(message.getChannel()).byteValue(), pair.getLeft(), message.getMessage()[1], message.getMessage()[2], player);
+                    handleControlMessage(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], message.getMessage()[2], player);
                 }
             });
         }

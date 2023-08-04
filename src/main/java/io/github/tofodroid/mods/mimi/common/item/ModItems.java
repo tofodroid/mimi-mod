@@ -30,14 +30,13 @@ import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 
 public final class ModItems {
     // Instruments
-    public static List<ItemInstrument> INSTRUMENT_ITEMS;
+    public static List<ItemInstrumentHandheld> INSTRUMENT_ITEMS;
     public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS;
 
     // Other
     public static ItemMidiDeviceConfig DEVICECONFIG;
     public static ItemTransmitter TRANSMITTER;
     public static ItemFileCaster FILECASTER;
-    public static ItemMidiSwitchboard SWITCHBOARD;
     public static ItemFloppyDisk FLOPPYDISK;
 
     // Blocks - Redstone
@@ -65,7 +64,6 @@ public final class ModItems {
                 DEVICECONFIG,
                 TRANSMITTER,
                 FILECASTER,
-                SWITCHBOARD,
                 FLOPPYDISK,
                 LISTENER,
                 RECEIVER,
@@ -93,9 +91,6 @@ public final class ModItems {
 
         FILECASTER = new ItemFileCaster();
         event.register(ItemFileCaster.REGISTRY_NAME, FILECASTER);
-
-        SWITCHBOARD = new ItemMidiSwitchboard();
-        event.register(ItemMidiSwitchboard.REGISTRY_NAME, SWITCHBOARD);
 
         FLOPPYDISK = new ItemFloppyDisk();
         event.register(ItemFloppyDisk.REGISTRY_NAME, FLOPPYDISK);
@@ -125,7 +120,7 @@ public final class ModItems {
 
         // Instrument Items
         INSTRUMENT_ITEMS = buildInstruments();
-        INSTRUMENT_ITEMS.forEach((ItemInstrument instrument) -> {
+        INSTRUMENT_ITEMS.forEach((ItemInstrumentHandheld instrument) -> {
             event.register(instrument.REGISTRY_NAME, instrument);
         });
 
@@ -136,10 +131,10 @@ public final class ModItems {
         });
     }
 
-    public static List<ItemInstrument> buildInstruments() {
-        List<ItemInstrument> list = new ArrayList<>();
+    public static List<ItemInstrumentHandheld> buildInstruments() {
+        List<ItemInstrumentHandheld> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
-            list.add(new ItemInstrument(instrument.registryName, instrument.instrumentId, instrument.isDyeable(), instrument.defaultColor()));
+            list.add(new ItemInstrumentHandheld(instrument.registryName, instrument.instrumentId, instrument.isDyeable(), instrument.defaultColor()));
         }
         return list;
     }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.joml.Vector3d;
 
-import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -37,11 +36,12 @@ public class EntitySeat extends Entity {
     }
 
     @Override
+    @SuppressWarnings("resource")
     public void tick() {
         super.tick();
 
         if(!this.level().isClientSide) {
-            if(source == null || this.getPassengers().isEmpty() || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(source) instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
+            if(source == null || this.getPassengers().isEmpty() || this.level().getBlockEntity(this.source) == null /*|| !(this.level().getBlockEntity(source) instanceof TileInstrument)*/ || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.ejectPassengers();
                 this.discard();
                 this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());

@@ -4,17 +4,18 @@ import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class ANoteResponsiveTile extends ASwitchboardContainerEntity implements BlockEntityTicker<ANoteResponsiveTile> {
+public abstract class ANoteResponsiveTile extends BaseContainerBlockEntity implements BlockEntityTicker<ANoteResponsiveTile> {
     public static final Integer UPDATE_EVERY_TICKS = 8;
 
     protected Integer tickCount = 0;
 
-    public ANoteResponsiveTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
-        super(type, pos, state, inventorySize);
+    public ANoteResponsiveTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     public static void doTick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {

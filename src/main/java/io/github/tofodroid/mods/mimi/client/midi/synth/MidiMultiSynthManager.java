@@ -14,7 +14,6 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -166,7 +165,7 @@ public class MidiMultiSynthManager {
     }
 
     protected AMIMISynth<?> getSynthForMessage(MidiNotePacket message) {
-        if(message.player.equals(TileMechanicalMaestro.MECH_UUID)) {
+        if(false/*message.player.equals(TileMechanicalMaestro.MECH_UUID)*/) {
             return mechSynth;
         } else {
             return playerSynth;

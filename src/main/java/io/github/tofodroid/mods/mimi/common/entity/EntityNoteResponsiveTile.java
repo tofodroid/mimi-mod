@@ -34,6 +34,7 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     @Override
+    @SuppressWarnings("resource")
     public void tick() {
         super.tick();
 

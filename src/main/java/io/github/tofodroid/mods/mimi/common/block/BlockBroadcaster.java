@@ -1,10 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.block;
-
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -56,8 +55,8 @@ public class BlockBroadcaster extends AContainerBlock<TileBroadcaster> {
             if(tile != null) {
                ItemStack stack = player.getItemInHand(hand);
 
-                if(ModItems.SWITCHBOARD.equals(stack.getItem())) {
-                    ItemMidiSwitchboard.setMidiSource(stack, tile.getMusicPlayerId(), "Broad. " + pos.toShortString());
+                if(stack.getItem() instanceof IInstrumentItem) {
+                    InstrumentDataUtils.setMidiSource(stack, tile.getMusicPlayerId(), "Broad. " + pos.toShortString());
                     player.setItemInHand(hand, stack);
                     player.displayClientMessage(Component.literal("Set MIDI Source to Broadcaster at: " + pos.toShortString()), true);
                     return InteractionResult.CONSUME;

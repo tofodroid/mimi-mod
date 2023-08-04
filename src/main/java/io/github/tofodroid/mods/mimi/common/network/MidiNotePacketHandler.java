@@ -10,7 +10,6 @@ import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,11 +58,13 @@ public class MidiNotePacketHandler {
                         worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, packet.pos, GameEvent.Context.of(worldIn.getBlockState(packet.pos)));
                     }
                     
+                    /*
                     getPotentialListeners(entities).forEach(listener -> {
                         if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
                             ModBlocks.LISTENER.get().powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
                         }
                     });
+                    */
                 }
             }
         }
@@ -85,9 +86,11 @@ public class MidiNotePacketHandler {
         return potentialEntites;
     }
 
+    /*
     protected static List<TileListener> getPotentialListeners(List<EntityNoteResponsiveTile> entities) {
         return entities.stream().filter(e -> e.getTile() instanceof TileListener).map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
     }
+    */
     
     protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerLevel worldIn, ServerPlayer excludePlayer, Double range) {
         return PacketDistributor.NEAR.with(() -> {

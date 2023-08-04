@@ -1,20 +1,22 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.joml.Vector3d;
 
+import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,11 +41,9 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.NetworkHooks;
 
 public class BlockInstrument extends AContainerBlock<TileInstrument> implements SimpleWaterloggedBlock {
     public static final ResourceLocation CONTENTS = new ResourceLocation("contents");
@@ -77,14 +77,12 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
-                if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    NetworkHooks.openScreen((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {
-                        buffer.writeByte(this.instrumentId);
-                        buffer.writeBoolean(false);
-                        buffer.writeBlockPos(pos);
-                    });
-                } else {
+                if(!tileInstrument.equals(getTileInstrumentForEntity(player))) {
                     return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
+                }
+            } else {
+                if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
+                    ClientGuiWrapper.openInstrumentGui(worldIn, player, null);
                 }
             }
         }
@@ -145,30 +143,16 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 	}
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if(IDyeableItem.isDyeableInstrument(stack) && ((IDyeableItem)stack.getItem()).hasColor(stack)) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-            if (tileentity instanceof TileInstrument) {
-                ((TileInstrument)tileentity).setColor(((IDyeableItem)stack.getItem()).getColor(stack));
-            }
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        BlockEntity tileentity = worldIn.getBlockEntity(pos);
+        if (tileentity instanceof TileInstrument) {
+            ((TileInstrument)tileentity).setInstrumentStack(new ItemStack(stack.getItem(), stack.getCount(), stack.getOrCreateTag()));
         }
     }
     
     @Override
-    @SuppressWarnings("deprecation")
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-        List<ItemStack> drops = super.getDrops(state, builder);
-        BlockEntity tileentity = builder.getParameter(LootContextParams.BLOCK_ENTITY);
-
-        if(tileentity != null && tileentity instanceof TileInstrument && ((TileInstrument)tileentity).hasColor()) {
-            for(ItemStack stack : drops) {
-                if(this.isDyeable() && stack.getItem() instanceof IDyeableItem) {
-                    ((IDyeableItem)stack.getItem()).setColor(stack, ((TileInstrument)tileentity).getColor());
-                }
-            }
-        }
-
-        return drops;
+        return Arrays.asList();
     }
 
     public Boolean isDyeable() {
@@ -198,8 +182,9 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         }
     }
 
+    @SuppressWarnings("null")
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
-        return entity.isPassenger() && ModEntities.SEAT.get().equals(entity.getVehicle().getType());
+        return entity.isPassenger() && entity.getVehicle() != null && ModEntities.SEAT.get().equals(entity.getVehicle().getType());
     }
     
     public static EntitySeat getSeatForEntity(LivingEntity entity) {

@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.StackedContentsCompatible;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -24,11 +24,11 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-public abstract class AContainerTile extends BaseContainerBlockEntity implements WorldlyContainer, StackedContentsCompatible {
+public class AInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
     protected final Integer INVENTORY_SIZE;
     protected NonNullList<ItemStack> items;
 
-    public AContainerTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
+    public AInventoryTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
         super(type, pos, state);
         this.INVENTORY_SIZE = inventorySize;
 
@@ -116,16 +116,6 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
         }
         return slots;
     }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return true;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int p_19235_, ItemStack p_19236_, @Nullable Direction p_19237_) {
-        return true;
-    }
     
     @Override
     public CompoundTag getUpdateTag() {
@@ -146,6 +136,7 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
         return this.items;
     }
 
+    
     LazyOptional<? extends IItemHandler> handlers[] = SidedInvWrapper.create(this, Direction.UP);
 
     @Override
@@ -168,5 +159,15 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
         for(ItemStack itemstack : this.items) {
             helper.accountStack(itemstack);
         }
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+        return true;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int p_19235_, ItemStack p_19236_, @Nullable Direction p_19237_) {
+        return true;
     }
 }

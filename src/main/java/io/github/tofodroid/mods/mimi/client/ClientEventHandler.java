@@ -33,11 +33,6 @@ public class ClientEventHandler {
     
     @SubscribeEvent
     public static void registerScreens(FMLClientSetupEvent event) {
-        MenuScreens.register(ModContainers.RECEIVER, GuiReceiverContainerScreen::new);
-        MenuScreens.register(ModContainers.LISTENER, GuiListenerContainerScreen::new);
-        MenuScreens.register(ModContainers.INSTRUMENT, GuiInstrumentContainerScreen::new);
-        MenuScreens.register(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
-        MenuScreens.register(ModContainers.CONDUCTOR, GuiConductorContainerScreen::new);
         MenuScreens.register(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
         MenuScreens.register(ModContainers.DISKWRITER, GuiDiskWriterContainerScreen::new);
         MenuScreens.register(ModContainers.BROADCASTER, GuiBroadcasterContainerScreen::new);
@@ -78,6 +73,7 @@ public class ClientEventHandler {
                     color > 0 ? -1 : ((IDyeableItem) stack.getItem()).getColor(stack), items.toArray(new Item[items.size()]));
     }
 
+    @SuppressWarnings("null")
     protected static void registerBlockColors(RegisterColorHandlersEvent.Block event, List<? extends Block> blocks) {
         event.getBlockColors().register((state, reader, pos, color) -> {
             return reader != null && pos != null && reader.getBlockEntity(pos) != null && reader.getBlockEntity(pos) instanceof TileInstrument ? 

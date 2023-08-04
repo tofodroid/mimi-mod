@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -40,7 +40,7 @@ public class SwitchboardStackUpdatePacket {
         try {
             UUID midiSource = buf.readUUID();
             String midiSourceName = buf.readUtf(64);
-            if(ItemMidiSwitchboard.NONE_SOURCE_ID.equals(midiSource)) {
+            if(InstrumentDataUtils.NONE_SOURCE_ID.equals(midiSource)) {
                 midiSource = null;
             }
 
@@ -72,7 +72,7 @@ public class SwitchboardStackUpdatePacket {
     }
 
     public static void encodePacket(SwitchboardStackUpdatePacket pkt, FriendlyByteBuf buf) {
-        buf.writeUUID(pkt.midiSource != null ? pkt.midiSource : ItemMidiSwitchboard.NONE_SOURCE_ID);
+        buf.writeUUID(pkt.midiSource != null ? pkt.midiSource : InstrumentDataUtils.NONE_SOURCE_ID);
         buf.writeUtf(pkt.midiSourceName, 64);
         buf.writeByte(pkt.filterOct);
         buf.writeByte(pkt.filterNote);

@@ -7,11 +7,6 @@ import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.RegisterEvent;
 
 public class ModContainers {
-    public static MenuType<ContainerListener> LISTENER = null;
-    public static MenuType<ContainerReceiver> RECEIVER = null;
-    public static MenuType<ContainerInstrument> INSTRUMENT = null;
-    public static MenuType<ContainerMechanicalMaestro> MECHANICALMAESTRO = null;
-    public static MenuType<ContainerConductor> CONDUCTOR = null;
     public static MenuType<ContainerTuningTable> TUNINGTABLE = null;
     public static MenuType<ContainerDiskWriter> DISKWRITER = null;
     public static MenuType<ContainerBroadcaster> BROADCASTER = null;
@@ -24,11 +19,6 @@ public class ModContainers {
     }
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<MenuType<?>> event) {
-        LISTENER = registerType("listener", ContainerListener::new, event);
-        RECEIVER = registerType("receiver", ContainerReceiver::new, event);
-        INSTRUMENT = registerType("instrument", ContainerInstrument::new, event);
-        MECHANICALMAESTRO = registerType("mechanicalmaestro", ContainerMechanicalMaestro::new, event);
-        CONDUCTOR = registerType("conductor", ContainerConductor::new, event);
         TUNINGTABLE = registerType("tuningtable", ContainerTuningTable::new, event);
         DISKWRITER = registerType("diskwriter", ContainerDiskWriter::new, event);
         BROADCASTER = registerType("broadcaster", ContainerBroadcaster::new, event);

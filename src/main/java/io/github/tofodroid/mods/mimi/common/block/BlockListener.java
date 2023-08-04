@@ -1,7 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
-import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -17,7 +16,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public class BlockListener extends AContainerBlock<TileListener> {
+public class BlockListener extends Block {
     public static final String REGISTRY_NAME = "listener";
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
 
@@ -26,11 +25,7 @@ public class BlockListener extends AContainerBlock<TileListener> {
         this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
     }
 
-    @Override
-    public BlockEntityType<TileListener> getTileType() {
-        return ModTiles.LISTENER;
-    }
-    
+   
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(POWER, Integer.valueOf(0));
@@ -41,10 +36,12 @@ public class BlockListener extends AContainerBlock<TileListener> {
         state.add(POWER);
     }
     
+    /* TODO
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, ModTiles.LISTENER, TileListener::doTick);
     }
+    */
 
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {

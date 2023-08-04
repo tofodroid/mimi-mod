@@ -28,7 +28,6 @@ public class ItemFloppyDisk extends Item implements IDyeableItem {
     }
     
     @Override
-    @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         return InteractionResultHolder.pass(playerIn.getItemInHand(handIn));
     }

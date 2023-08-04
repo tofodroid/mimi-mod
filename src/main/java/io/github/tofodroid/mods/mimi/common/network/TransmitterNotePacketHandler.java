@@ -17,14 +17,11 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
-import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
-import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
-import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
 public class TransmitterNotePacketHandler {
     public static void handlePacket(final TransmitterNotePacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -53,20 +50,23 @@ public class TransmitterNotePacketHandler {
         }
 
         // Handle Mechanical Maestros
+        /* TODO
         notePackets.put(TileMechanicalMaestro.MECH_UUID, new ArrayList<>());
         for(TileMechanicalMaestro maestro : getPotentialMechMaestros(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(message.velocity <= 0)))) {
             if(maestro.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
                 if(message.isControlPacket()) {
                     notePackets.get(TileMechanicalMaestro.MECH_UUID).add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), maestro.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, maestro.getBlockPos(), message.noteServerTime));
                 } else {
-                    notePackets.get(TileMechanicalMaestro.MECH_UUID).add(MidiNotePacket.createNotePacket(message.note, ItemMidiSwitchboard.applyVolume(maestro.getSwitchboardStack(), message.velocity), maestro.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, maestro.getBlockPos(), message.noteServerTime));
+                    notePackets.get(TileMechanicalMaestro.MECH_UUID).add(MidiNotePacket.createNotePacket(message.note, InstrumentDataUtils.applyVolume(maestro.getSwitchboardStack(), message.velocity), maestro.getInstrumentId(), TileMechanicalMaestro.MECH_UUID, maestro.getBlockPos(), message.noteServerTime));
                 }
             }
         }
+        */
 
         sendPlayerOnPackets(notePackets, worldIn);
 
         // Handle Receivers
+        /* TODO
         if(!message.isControlPacket() && message.velocity > 0) {
             for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(false)))) {
                 if(receiver.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
@@ -74,6 +74,7 @@ public class TransmitterNotePacketHandler {
                 }
             }
         }
+        */
     }
     
     // Tile Entity Functions
@@ -82,25 +83,34 @@ public class TransmitterNotePacketHandler {
 
         if(instrumentEntity != null) { 
             Byte instrumentId = instrumentEntity.getInstrumentId();
-            if(instrumentId != null && instrumentEntity.shouldHandleMessage(sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+            if(instrumentId != null && ItemInstrumentHandheld.shouldHandleMessage(instrumentEntity.getInstrumentStack(), sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
                 if(message.isControlPacket()) {
                     packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), instrumentId, target.getUUID(), target.getOnPos(), message.noteServerTime));
                 } else {
-                    packetList.add(MidiNotePacket.createNotePacket(message.note, ItemMidiSwitchboard.applyVolume(instrumentEntity.getSwitchboardStack(), message.velocity), instrumentId, target.getUUID(), target.getOnPos(), message.noteServerTime));
+                    packetList.add(MidiNotePacket.createNotePacket(message.note, InstrumentDataUtils.applyVolume(instrumentEntity.getInstrumentStack(), message.velocity), instrumentId, target.getUUID(), target.getOnPos(), message.noteServerTime));
                 }
             }
         }
     }
+    
+    /*
+    protected static List<TileMechanicalMaestro> getPotentialMechMaestros(List<EntityNoteResponsiveTile> entities) {
+        return entities.stream().filter(e -> e.getTile() instanceof TileMechanicalMaestro).map(e -> (TileMechanicalMaestro)e.getTile()).collect(Collectors.toList());
+    }
+
+    protected static List<TileReceiver> getPotentialReceivers(List<EntityNoteResponsiveTile> entities) {
+        return entities.stream().filter(e -> e.getTile() instanceof TileReceiver).map(e -> (TileReceiver)e.getTile()).collect(Collectors.toList());
+    }
+    */
 
     // Item Stack Functions
     protected static void handleHeldInstrumentRelayNote(ServerPlayer target, UUID sourceId, InteractionHand handIn, final TransmitterNotePacket message, List<MidiNotePacket> packetList) {
-        ItemStack stack = ItemInstrument.getEntityHeldInstrumentStack(target, handIn);
-        Byte instrumentId = ItemInstrument.getInstrumentId(stack);
-        if(instrumentId != null && stack != null && ItemInstrument.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+        ItemStack stack = ItemInstrumentHandheld.getEntityHeldInstrumentStack(target, handIn);
+        if(stack != null && ItemInstrumentHandheld.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
             if(message.isControlPacket()) {
-                packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), instrumentId, target.getUUID(), target.getOnPos(), message.noteServerTime));
+                packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), InstrumentDataUtils.getInstrumentId(stack), target.getUUID(), target.getOnPos(), message.noteServerTime));
             } else {
-                packetList.add(MidiNotePacket.createNotePacket(message.note, ItemMidiSwitchboard.applyVolume(ItemInstrument.getSwitchboardStack(stack), message.velocity), instrumentId, target.getUUID(), target.getOnPos(), message.noteServerTime));
+                packetList.add(MidiNotePacket.createNotePacket(message.note, InstrumentDataUtils.applyVolume(stack, message.velocity), InstrumentDataUtils.getInstrumentId(stack), target.getUUID(), target.getOnPos(), message.noteServerTime));
             }
         }
     }
@@ -113,7 +123,7 @@ public class TransmitterNotePacketHandler {
             AABB queryBox = new AABB(sourcePos.getX() - range, sourcePos.getY() - range, sourcePos.getZ() - range, 
                                                 sourcePos.getX() + range, sourcePos.getY() + range, sourcePos.getZ() + range);
             potentialPlayers = worldIn.getEntitiesOfClass(ServerPlayer.class, queryBox, entity -> {
-                return ItemInstrument.isEntityHoldingInstrument(entity) || BlockInstrument.isEntitySittingAtInstrument(entity);
+                return ItemInstrumentHandheld.isEntityHoldingInstrument(entity) || BlockInstrument.isEntitySittingAtInstrument(entity);
             });
         } else if(sender != null) {
             potentialPlayers.add(sender);
@@ -134,14 +144,6 @@ public class TransmitterNotePacketHandler {
         }
 
         return potentialEntites;
-    }
-
-    protected static List<TileMechanicalMaestro> getPotentialMechMaestros(List<EntityNoteResponsiveTile> entities) {
-        return entities.stream().filter(e -> e.getTile() instanceof TileMechanicalMaestro).map(e -> (TileMechanicalMaestro)e.getTile()).collect(Collectors.toList());
-    }
-
-    protected static List<TileReceiver> getPotentialReceivers(List<EntityNoteResponsiveTile> entities) {
-        return entities.stream().filter(e -> e.getTile() instanceof TileReceiver).map(e -> (TileReceiver)e.getTile()).collect(Collectors.toList());
     }
 
     protected static void sendPlayerOnPackets(HashMap<UUID, List<MidiNotePacket>> notePackets, ServerLevel worldIn) {

@@ -12,13 +12,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 
-public abstract class AContainerBlock<T extends AContainerTile> extends BaseEntityBlock {
+public abstract class AContainerBlock<T extends BlockEntity & Container> extends BaseEntityBlock {
     protected AContainerBlock(Properties builder) {
         super(builder);
     }
@@ -68,7 +69,7 @@ public abstract class AContainerBlock<T extends AContainerTile> extends BaseEnti
     @SuppressWarnings("unchecked")
     public T getTileForBlock(Level worldIn, BlockPos pos) {
         BlockEntity entity = worldIn.getBlockEntity(pos);
-        return entity != null && entity instanceof AContainerTile ? (T)entity : null;
+        return entity != null && entity instanceof BlockEntity && entity instanceof Container ? (T)entity : null;
     }
     
     @Override

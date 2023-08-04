@@ -108,6 +108,7 @@ public class ContainerDiskWriter extends APlayerInventoryContainer {
         }
     }
   
+    @SuppressWarnings("resource")
     public void writeDisk(String midiUrl, String diskTitle, String diskAuthor) {
         if (!this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;

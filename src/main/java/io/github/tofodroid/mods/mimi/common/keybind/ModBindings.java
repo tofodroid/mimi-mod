@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.keybind;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.network.KeybindOpenInstrumentPacket;
 import io.github.tofodroid.mods.mimi.common.network.KeybindOpenTransmitterPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 
@@ -63,11 +62,11 @@ public class ModBindings {
             }else if(GUITRANSMITTER.isDown()) {
                 NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenTransmitterPacket());
             } else if(MIDIGUIMAIN.isDown()) {
-                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.MAIN_HAND));
+                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND);
             } else if(MIDIGUIOFF.isDown()) {
-                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(true, InteractionHand.OFF_HAND));
+                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.OFF_HAND);
             } else if(MIDIGUISEAT.isDown()) {
-                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenInstrumentPacket(false, null));
+                
             } else if(MIDISETTINGS.isDown()) {
                 ClientGuiWrapper.openConfigGui(worldIn, playerIn);
             }

@@ -14,7 +14,7 @@ import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.world.InteractionHand;
@@ -47,8 +47,8 @@ public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
                     } else {
                         TileInstrument instrumentTile = BlockInstrument.getTileInstrumentForEntity(assignedPlayer);
                         playerInstrumentsMap.put(playerId, Arrays.asList(
-                            ItemInstrument.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.MAIN_HAND),
-                            ItemInstrument.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.OFF_HAND),
+                            ItemInstrumentHandheld.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.MAIN_HAND),
+                            ItemInstrumentHandheld.getEntityHeldInstrumentId(assignedPlayer, InteractionHand.OFF_HAND),
                             instrumentTile != null ? instrumentTile.getInstrumentId() : null
                         ));
                     }

@@ -1,25 +1,62 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.UUID;
+import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.container.ContainerInstrument;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
+import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 
-public class TileInstrument extends ASwitchboardContainerEntity {
+public class TileInstrument extends AInventoryTile {
     public static final String COLOR_TAG = "color";
-
     protected Integer color;
 
     public TileInstrument(BlockPos pos, BlockState state) {
         super(ModTiles.INSTRUMENT, pos, state, 1);
+        items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
+    }
+
+    public void setInstrumentStack(ItemStack stack) {
+        if(stack.getItem() instanceof IInstrumentItem) {
+            this.setItem(0, stack);
+            
+            if(this.blockInstrument().isDyeable()) {
+                this.color = ((IDyeableItem)stack.getItem()).getColor(stack);
+            }
+        }
+    }
+
+    public ItemStack getInstrumentStack() {
+        if(items.isEmpty() || items.get(0) == null) {
+            return ItemStack.EMPTY;
+        } else {
+            return items.get(0);
+        }
+    }
+
+    public Byte getInstrumentId() {
+        return this.blockInstrument().getInstrumentId();
+    }
+
+    public Boolean hasColor() {
+        return color != null && this.blockInstrument().isDyeable();
+    }
+
+    public Integer getColor() { 
+        if(!this.blockInstrument().isDyeable()) {
+            return -1;
+        }
+
+        return hasColor() ? color : this.blockInstrument().getDefaultColor();
+    }
+
+    private BlockInstrument blockInstrument() {
+        return (BlockInstrument)getBlockState().getBlock();
     }
 
     @Override
@@ -40,51 +77,28 @@ public class TileInstrument extends ASwitchboardContainerEntity {
         }
     }
 
-    public Byte getInstrumentId() {
-        return ((BlockInstrument)getBlockState().getBlock()).getInstrumentId();
-    }
-
-    public void setColor(Integer color) {
-        if(((BlockInstrument)getBlockState().getBlock()).isDyeable()) {
-            this.color = color;
-        }
-    }
-
-    public Boolean hasColor() {
-        return color != null && ((BlockInstrument)getBlockState().getBlock()).isDyeable();
-    }
-
-    public Integer getColor() { 
-        if(!((BlockInstrument)getBlockState().getBlock()).isDyeable()) {
-            return -1;
-        }
-
-        return hasColor() ? color : ((BlockInstrument)getBlockState().getBlock()).getDefaultColor();
-    }
-
-    public String getInstrumentName() {
-        return getBlockState().getBlock().asItem().getDescription().getString();
-    }
-
-    public Boolean shouldHandleMessage(UUID sender, Byte channel, Boolean publicTransmit) {
-        ItemStack switchStack = getSwitchboardStack();
-        if(!switchStack.isEmpty()) {
-            return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && 
-                ( 
-                    (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
-                    || (sender != null && sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack)))
-                );
-        }
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
         return false;
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
-        return new ContainerInstrument(id, playerInventory, this.getInstrumentId(), this.getBlockPos());
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+        return false;
     }
 
     @Override
-    public Component getDefaultName() {
-		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
+    public ItemStack removeItem(int i, int count) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int i) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
     }
 }

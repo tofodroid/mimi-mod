@@ -11,7 +11,7 @@ import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.world.InteractionHand;
@@ -30,8 +30,8 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
             List<MIMIChannel> toRemove = new ArrayList<>();
             TileInstrument instrumentTile = BlockInstrument.getTileInstrumentForEntity(clientPlayer);
             List<Byte> playerInstruments = Arrays.asList(
-                ItemInstrument.getEntityHeldInstrumentId(clientPlayer, InteractionHand.MAIN_HAND),
-                ItemInstrument.getEntityHeldInstrumentId(clientPlayer, InteractionHand.OFF_HAND),
+                ItemInstrumentHandheld.getEntityHeldInstrumentId(clientPlayer, InteractionHand.MAIN_HAND),
+                ItemInstrumentHandheld.getEntityHeldInstrumentId(clientPlayer, InteractionHand.OFF_HAND),
                 instrumentTile != null ? instrumentTile.getInstrumentId() : null
             );
 
