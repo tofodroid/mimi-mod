@@ -15,7 +15,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class TileInstrument extends AInventoryTile {
     public static final String COLOR_TAG = "color";
@@ -30,7 +29,7 @@ public class TileInstrument extends AInventoryTile {
         if(stack.getItem() instanceof IInstrumentItem) {
             this.setItem(0, stack);
             
-            if(this.blockInstrument().isDyeable()) {
+            if(this.blockInstrument().isDyeable() && ((IDyeableItem)stack.getItem()).hasColor(stack)) {
                 this.color = ((IDyeableItem)stack.getItem()).getColor(stack);
             }
         }

@@ -146,7 +146,9 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         BlockEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof TileInstrument) {
-            ((TileInstrument)tileEntity).setInstrumentStack(new ItemStack(stack.getItem(), stack.getCount(), stack.getOrCreateTag()));
+            ItemStack newStack = new ItemStack(stack.getItem(), stack.getCount());
+            newStack.setTag(stack.getOrCreateTag().copy());
+            ((TileInstrument)tileEntity).setInstrumentStack(newStack);
         }
     }
     
