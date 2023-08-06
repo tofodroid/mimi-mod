@@ -48,9 +48,13 @@ public class AInventoryTile extends BlockEntity implements WorldlyContainer, Sta
 	@Override
 	public void load(CompoundTag nbt) {
         super.load(nbt);
+        this.loadItems(nbt);
+	}
+
+    public void loadItems(CompoundTag nbt) {
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         ContainerHelper.loadAllItems(nbt, this.items);
-	}
+    }
     
     @Override
     public int getContainerSize() {

@@ -75,12 +75,22 @@ public class TileInstrument extends AInventoryTile {
 
     @Override
     public void load(CompoundTag compound) {
+        super.load(compound);
+        
+        // Fallback for missing stack data
+        if(this.items.get(0) == null || this.items.get(0).isEmpty()) {
+            MIMIMod.LOGGER.warn("TileInstrument had no saved instrument stack! Re-initializing.");
+            this.initializeInstrumentStack();
+        }
+
+        if(compound.contains(COLOR_TAG)) {
+            this.color = compound.getInt(COLOR_TAG);
+        }
+    }
+
+    @Override
+    public void loadItems(CompoundTag compound) {
         // START TEMPORARY LEGACY COMPATIBILITY CODE
-        // Bypass AInventoryTile behavior
-        ((BlockEntity)this).load(compound);
-
-        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-
         // Filter out switchboard items so that we can convert them
         ListTag listtag = compound.getList("Items", 10);
 
@@ -97,18 +107,7 @@ public class TileInstrument extends AInventoryTile {
         }
 
         ContainerHelper.loadAllItems(compound, this.items);
-
         // END TEMPORARY LEGACY COMPATIBILITY CODE
-
-        // Fallback for missing stack data
-        if(this.items.get(0) == null || this.items.get(0).isEmpty()) {
-            MIMIMod.LOGGER.warn("TileInstrument had no saved instrument stack! Re-initializing.");
-            this.initializeInstrumentStack();
-        }
-
-        if(compound.contains(COLOR_TAG)) {
-            this.color = compound.getInt(COLOR_TAG);
-        }
     }
 
     @Override
