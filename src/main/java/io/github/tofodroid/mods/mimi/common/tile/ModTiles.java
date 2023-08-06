@@ -18,6 +18,6 @@ public class ModTiles {
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
         BROADCASTER = registerType("broadcaster", BlockEntityType.Builder.of(TileBroadcaster::new, ModBlocks.BROADCASTER.get()), event);
-        INSTRUMENT = registerType("blockinstrument", BlockEntityType.Builder.of(TileInstrument::new, ModBlocks.getBlockInstruments().toArray(new BlockInstrument[ModBlocks.getBlockInstruments().size()])), event);
+        INSTRUMENT = registerType("instrument", BlockEntityType.Builder.of(TileInstrument::new, ModBlocks.getBlockInstruments().toArray(new BlockInstrument[ModBlocks.getBlockInstruments().size()])), event);
     }
 }

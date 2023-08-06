@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.joml.Vector2f;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
@@ -52,11 +51,11 @@ public class GuiInstrument extends BaseGui {
     private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(141,101);
     private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(141,126);
     private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(160,101);
-    private static final Vector2f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(14,177);
-    private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(59,177);
-    private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(84,177);
-    private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(129,177);
-    private static final Vector2f SWITCHBOARD_EDIT_BUTTON_COORDS = new Vector2f(105,219);
+    private static final Vector2f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(33,163);
+    private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(52,163);
+    private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(14,163);
+    private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(71,163);
+    private static final Vector2f MIDI_EDIT_BUTTON_COORDS = new Vector2f(299,163);
     private static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(202,58);
     private static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(155,58);
 
@@ -190,14 +189,6 @@ public class GuiInstrument extends BaseGui {
         this.releasedNotes = new ConcurrentHashMap<>();
     }
 
-    /*
-     * ABSTRACT
-     */
-
-    /*
-     * END ABSTRACT
-     */
-
     public void syncInstrumentToServer() {
         NetworkManager.INFO_CHANNEL.sendToServer(new SyncInstrumentPacket(instrumentStack, this.handIn));
     }
@@ -218,9 +209,20 @@ public class GuiInstrument extends BaseGui {
         int relativeMouseX = imouseX - firstNoteX;
         int relativeMouseY = imouseY - firstNoteY;
 
-        if(clickedBox(imouseX, imouseY, SWITCHBOARD_EDIT_BUTTON_COORDS)) {
+        // Keyboard Controls
+        if(clickedBox(imouseX, imouseY, NOTE_SHIFT_UP_BUTTON_COORDS)) {
+            this.shiftVisibleNotes(true, 1);
+        } else if(clickedBox(imouseX, imouseY, NOTE_SHIFT_DOWN_BUTTON_COORDS)) {
+            this.shiftVisibleNotes(false, 1);
+        } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_UP_BUTTON_COORDS)) {
+            this.shiftVisibleNotes(true, 7);
+        } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_DOWN_BUTTON_COORDS)) {
+            this.shiftVisibleNotes(false, 7);
+        } else if(clickedBox(imouseX, imouseY, MIDI_EDIT_BUTTON_COORDS)) {
             editMode = !editMode;
-        } else if(!editMode) {
+        }
+        
+        if(!editMode) {
             // Keyboard Layout Hover Box
             if(imouseX >= 220 && imouseY >= 28 && imouseX < (START_X + this.GUI_WIDTH) && imouseY < (START_Y + 50)) {
                 if(clickedBox(imouseX, imouseY, KEYBOARD_LAYOUT_BUTTON_COORDS)) {
@@ -252,17 +254,6 @@ public class GuiInstrument extends BaseGui {
                     this.onGuiNotePress(midiNote, Byte.MAX_VALUE);
                 }
             }
-
-            // Keyboard Controls
-            if(clickedBox(imouseX, imouseY, NOTE_SHIFT_UP_BUTTON_COORDS)) {
-                this.shiftVisibleNotes(true, 1);
-            } else if(clickedBox(imouseX, imouseY, NOTE_SHIFT_DOWN_BUTTON_COORDS)) {
-                this.shiftVisibleNotes(false, 1);
-            } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_UP_BUTTON_COORDS)) {
-                this.shiftVisibleNotes(true, 7);
-            } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_DOWN_BUTTON_COORDS)) {
-                this.shiftVisibleNotes(false, 7);
-            } 
         } else {
             // Switchboard MIDI Controls
             if(clickedBox(imouseX, imouseY, SYS_DEVICE_BUTTON_COORDS)) {
@@ -652,29 +643,29 @@ public class GuiInstrument extends BaseGui {
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Instrument Name
-        graphics.drawString(font, this.instrumentNameString, 198, 13, 0xFF00E600);
+        graphics.drawString(font, this.instrumentNameString, START_X + 198, START_Y + 13, 0xFF00E600);
 
         // Note Text: Left
-        graphics.drawString(font, this.noteIdString.split(",")[0], 22, 197, 0xFF00E600);
+        graphics.drawString(font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 167, 0xFF00E600);
 
         // Note Text: Middle
-        graphics.drawString(font, this.noteIdString.split(",")[1], 67, 197, 0xFF00E600);
+        graphics.drawString(font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 167, 0xFF00E600);
 
         // Note Text: Right
-        graphics.drawString(font, this.noteIdString.split(",")[2], 126, 197, 0xFF00E600);
+        graphics.drawString(font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 167, 0xFF00E600);
 
         // MIDI Source Name & Volume
         if(editMode) {
             String selectedSourceName = InstrumentDataUtils.getMidiSourceName(this.instrumentStack);
-            graphics.drawString(font, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", 21, 122, 0xFF00E600);
-            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolumePercent(this.instrumentStack).toString(), 180, 62, 0xFF00E600);
+            graphics.drawString(font, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", START_X + 21, START_Y + 122, 0xFF00E600);
+            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolumePercent(this.instrumentStack).toString(), START_X + 180, START_Y + 62, 0xFF00E600);
         }
 
         // Keyboard Layout
         if(editMode) {
-            graphics.drawString(font, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF003600);
+            graphics.drawString(font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF003600);
         } else { 
-            graphics.drawString(font, ModConfigs.CLIENT.keyboardLayout.get().toString(), 264, 35, 0xFF00E600);
+            graphics.drawString(font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF00E600);
         }
 
         return graphics;

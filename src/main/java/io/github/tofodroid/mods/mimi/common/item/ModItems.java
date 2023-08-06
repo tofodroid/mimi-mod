@@ -119,7 +119,7 @@ public final class ModItems {
         event.register(BlockBroadcaster.REGISTRY_NAME, BROADCASTER);
 
         // Instrument Items
-        INSTRUMENT_ITEMS = buildInstruments();
+        INSTRUMENT_ITEMS = buildHandheldInstruments();
         INSTRUMENT_ITEMS.forEach((ItemInstrumentHandheld instrument) -> {
             event.register(instrument.REGISTRY_NAME, instrument);
         });
@@ -131,7 +131,7 @@ public final class ModItems {
         });
     }
 
-    public static List<ItemInstrumentHandheld> buildInstruments() {
+    public static List<ItemInstrumentHandheld> buildHandheldInstruments() {
         List<ItemInstrumentHandheld> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
             list.add(new ItemInstrumentHandheld(instrument.registryName, instrument.instrumentId, instrument.isDyeable(), instrument.defaultColor()));

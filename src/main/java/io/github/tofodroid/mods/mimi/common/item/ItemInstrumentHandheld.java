@@ -1,5 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -15,6 +17,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
@@ -66,6 +69,28 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
         }
 
 		return new InteractionResultHolder<>(InteractionResult.PASS, playerIn.getItemInHand(handIn));
+    }
+
+    @Override
+    public void verifyTagAfterLoad(CompoundTag tag) {
+        if(tag == null) return;
+
+        if(tag.contains("Items")) {
+            ListTag listtag = tag.getList("Items", 10);
+
+            if(listtag.size() > 0) {
+                for(int i = 0; i < listtag.size(); ++i) {
+                    CompoundTag stackTag = listtag.getCompound(i);
+                    String itemId = stackTag.getString("id");
+
+                    if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
+                        MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
+                        tag.merge(stackTag);
+                        tag.remove("Items");
+                    }
+                }
+            }
+        }
     }
 
     public static ItemStack getEntityHeldInstrumentStack(LivingEntity entity, InteractionHand handIn) {

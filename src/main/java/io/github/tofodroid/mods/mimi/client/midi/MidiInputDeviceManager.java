@@ -9,9 +9,11 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
+import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -100,12 +102,10 @@ public class MidiInputDeviceManager extends MidiInputSourceManager {
         List<ItemStack> result = new ArrayList<>();
 
         // Check for seated instrument
-        /* TDOD
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
-        if(instrumentEntity != null && instrumentEntity.hasSwitchboard()) {
-            result.add(instrumentEntity);
+        if(instrumentEntity != null) {
+            result.add(instrumentEntity.getInstrumentStack());
         }
-        */
 
         // Check for held instruments
         ItemStack mainHand = ItemInstrumentHandheld.getEntityHeldInstrumentStack(player, InteractionHand.MAIN_HAND);

@@ -39,14 +39,13 @@ public class NetworkManager {
         
         BROADCAST_CHANNEL.registerMessage(0, TransmitterNotePacket.class, TransmitterNotePacket::encodePacket, TransmitterNotePacket::decodePacket, TransmitterNotePacketHandler::handlePacket);
         
-        INFO_CHANNEL.registerMessage(0, SwitchboardStackUpdatePacket.class, SwitchboardStackUpdatePacket::encodePacket, SwitchboardStackUpdatePacket::decodePacket, SwitchboardStackUpdatePacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(1, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, SyncInstrumentPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(3, KeybindOpenTransmitterPacket.class, KeybindOpenTransmitterPacket::encodePacket, KeybindOpenTransmitterPacket::decodePacket, KeybindOpenTransmitterPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(4, WriteDiskPacket.class, WriteDiskPacket::encodePacket, WriteDiskPacket::decodePacket, WriteDiskPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(5, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, ServerMusicPlayerStatusPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(6, ServerMidiInfoPacket.class, ServerMidiInfoPacket::encodePacket, ServerMidiInfoPacket::decodePacket, ServerMidiInfoPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(7, BroadcastControlPacket.class, BroadcastControlPacket::encodePacket, BroadcastControlPacket::decodePacket, BroadcastControlPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(8, ActiveTransmitterIdPacket.class, ActiveTransmitterIdPacket::encodePacket, ActiveTransmitterIdPacket::decodePacket, ActiveTransmitterIdPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(9, ServerTimeSyncPacket.class, ServerTimeSyncPacket::encodePacket, ServerTimeSyncPacket::decodePacket, ServerTimeSyncPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(0, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, SyncInstrumentPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(1, KeybindOpenTransmitterPacket.class, KeybindOpenTransmitterPacket::encodePacket, KeybindOpenTransmitterPacket::decodePacket, KeybindOpenTransmitterPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(2, WriteDiskPacket.class, WriteDiskPacket::encodePacket, WriteDiskPacket::decodePacket, WriteDiskPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(3, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, ServerMusicPlayerStatusPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(4, ServerMidiInfoPacket.class, ServerMidiInfoPacket::encodePacket, ServerMidiInfoPacket::decodePacket, ServerMidiInfoPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(5, BroadcastControlPacket.class, BroadcastControlPacket::encodePacket, BroadcastControlPacket::decodePacket, BroadcastControlPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(6, ActiveTransmitterIdPacket.class, ActiveTransmitterIdPacket::encodePacket, ActiveTransmitterIdPacket::decodePacket, ActiveTransmitterIdPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(7, ServerTimeSyncPacket.class, ServerTimeSyncPacket::encodePacket, ServerTimeSyncPacket::decodePacket, ServerTimeSyncPacketHandler::handlePacket);
     }
 }

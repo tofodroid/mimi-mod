@@ -16,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 @SuppressWarnings("null")
 public abstract class InstrumentDataUtils {
     public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
-    public static final String REGISTRY_NAME = "switchboard";
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
