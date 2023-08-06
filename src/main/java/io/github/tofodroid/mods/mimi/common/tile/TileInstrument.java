@@ -100,7 +100,7 @@ public class TileInstrument extends AInventoryTile {
 
                 if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
                     MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
-                    this.initializeInstrumentStack(stackTag);
+                    this.initializeInstrumentStack(stackTag.getCompound("tag"));
                 }
             }
         }

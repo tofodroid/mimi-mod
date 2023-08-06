@@ -80,7 +80,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
                 if(!tileInstrument.equals(getTileInstrumentForEntity(player))) {
                     return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
                 }
-            } else {
+            } else if(worldIn.isClientSide) {
                 if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
                     ClientGuiWrapper.openInstrumentGui(worldIn, player, null);
                 }

@@ -75,18 +75,18 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     public void verifyTagAfterLoad(CompoundTag tag) {
         if(tag == null) return;
 
-        if(tag.contains("Items")) {
-            ListTag listtag = tag.getList("Items", 10);
+        if(tag.contains("inventory")) {
+            ListTag listtag = tag.getCompound("inventory").getList("Items", 10);
 
-            if(listtag.size() > 0) {
+            if(listtag != null && listtag.size() > 0) {
                 for(int i = 0; i < listtag.size(); ++i) {
                     CompoundTag stackTag = listtag.getCompound(i);
                     String itemId = stackTag.getString("id");
 
                     if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
-                        MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
-                        tag.merge(stackTag);
-                        tag.remove("Items");
+                        MIMIMod.LOGGER.info("Converting ItemInstrument from Switchboard.");
+                        tag = tag.merge(stackTag.getCompound("tag"));
+                        //tag.remove("Items");
                     }
                 }
             }
