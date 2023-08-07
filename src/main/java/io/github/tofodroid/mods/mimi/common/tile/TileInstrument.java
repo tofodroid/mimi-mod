@@ -93,18 +93,21 @@ public class TileInstrument extends AInventoryTile {
         ListTag listtag = compound.getList("Items", 10);
 
         if(listtag.size() > 0) {
-            for(int i = 0; i < listtag.size(); ++i) {
-                CompoundTag stackTag = listtag.getCompound(i);
-                String itemId = stackTag.getString("id");
+            CompoundTag stackTag = listtag.getCompound(0);
+            String itemId = stackTag.getString("id");
 
-                if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
-                    MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
-                    this.initializeInstrumentStack(stackTag);
-                }
+            if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
+                MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
+                compound.put(
+                    "Items",
+                    ContainerHelper.saveAllItems(
+                        new CompoundTag(),
+                        NonNullList.of(initializeInstrumentStack(stackTag))
+                    ).get("Items")
+                );
             }
         }
-
-        ContainerHelper.loadAllItems(compound, this.items);
+        ContainerHelper.loadAllItems(compound, items);        
         // END TEMPORARY LEGACY COMPATIBILITY CODE
     }
 
@@ -133,17 +136,17 @@ public class TileInstrument extends AInventoryTile {
         super.onChunkUnloaded();
     }
 
-    private void initializeInstrumentStack() {
-        this.initializeInstrumentStack(null);
+    private ItemStack initializeInstrumentStack() {
+        return this.initializeInstrumentStack(null);
     }
 
-    private void initializeInstrumentStack(CompoundTag stackTag) {
+    private ItemStack initializeInstrumentStack(CompoundTag stackTag) {
         ItemStack instrumentStack = new ItemStack(this.blockInstrument().asItem(), 1);
 
         if(stackTag != null && stackTag.contains("tag")) {
             instrumentStack.setTag(stackTag.getCompound("tag").copy());
         }
 
-        this.setInstrumentStack(instrumentStack);
+        return instrumentStack;
     }
 }
