@@ -9,10 +9,12 @@ import javax.annotation.Nullable;
 import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,19 +54,17 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
     protected final Map<Direction, VoxelShape> SHAPES;
-    protected final Byte instrumentId;
-    protected final Boolean dyeable;
-    protected final Integer defaultColor;
+    protected final InstrumentSpec spec;
+    protected final String defaultChannels;
     public final String REGISTRY_NAME;
 
-    public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
+    public BlockInstrument(InstrumentSpec spec) {
         super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
-        this.instrumentId = instrumentId;
-        this.dyeable = dyeable;
-        this.defaultColor = defaultColor;
+        this.spec = spec;
+        this.defaultChannels = InstrumentDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.REGISTRY_NAME = spec.registryName;
+        this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
-        this.SHAPES = this.generateShapes(collisionShape);
-        this.REGISTRY_NAME = registryName;
     }
 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
@@ -158,15 +158,19 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     public Boolean isDyeable() {
-        return this.dyeable;
+        return this.spec.isDyeable();
     }
 
     public Integer getDefaultColor() {
-        return this.defaultColor;
+        return this.spec.defaultColor();
     }
 
     public Byte getInstrumentId() {
-        return instrumentId;
+        return spec.instrumentId;
+    }
+
+    public String getDefaultChannels() {
+        return this.defaultChannels;
     }
 
     protected Vector3d getSeatOffset(BlockState state) {

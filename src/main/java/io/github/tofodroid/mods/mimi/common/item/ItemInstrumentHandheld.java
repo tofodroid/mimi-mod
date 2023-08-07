@@ -18,36 +18,35 @@ import javax.annotation.Nonnull;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     public final String REGISTRY_NAME;
-    protected final Byte instrumentId;
-    protected final Boolean dyeable;
-    protected final Integer defaultColor;
+    protected final String defaultChannels;
+    protected final InstrumentSpec spec;
 
-    public ItemInstrumentHandheld(String name, Byte instrumentId, Boolean dyeable, Integer defaultColor) {
+    public ItemInstrumentHandheld(InstrumentSpec spec) {
         super(new Properties().stacksTo(1));
-        this.REGISTRY_NAME = name;
-        this.instrumentId = instrumentId;
-        this.dyeable = dyeable;
-        this.defaultColor = defaultColor;
+        this.spec = spec;
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = InstrumentDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
     }
 
     @Override
     public Boolean isDyeable() {
-        return this.dyeable;
+        return this.spec.isDyeable();
 
     }
 
     @Override
     public Integer getDefaultColor() {
-        return this.defaultColor;
+        return this.spec.defaultColor();
     }
 
     @Override
     public Byte getInstrumentId() {
-        return this.instrumentId;
+        return this.spec.instrumentId;
     }
 
     @Override
@@ -124,5 +123,10 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
                 (publicTransmit && InstrumentDataUtils.PUBLIC_SOURCE_ID.equals(InstrumentDataUtils.getMidiSource(stack))) 
                 || (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(stack)))
             );
+    }
+
+    @Override
+    public String getDefaultChannels() {
+        return this.defaultChannels;
     }
 }

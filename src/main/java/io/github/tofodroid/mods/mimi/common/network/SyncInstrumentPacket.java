@@ -57,15 +57,7 @@ public class SyncInstrumentPacket {
         try {
             UUID midiSource = buf.readUUID();
             String midiSourceName = buf.readUtf(64);
-            if(InstrumentDataUtils.NONE_SOURCE_ID.equals(midiSource)) {
-                midiSource = null;
-            }
-
             String enabledChannelsString = buf.readUtf(38);
-            if(enabledChannelsString.trim().isEmpty()) {
-                enabledChannelsString = null;
-            }
-
             Boolean sysInput = buf.readBoolean();
             Byte volume = buf.readByte();
             InteractionHand handIn = getInstrumentLocationHand(buf.readByte());
@@ -81,9 +73,9 @@ public class SyncInstrumentPacket {
     }
 
     public static void encodePacket(SyncInstrumentPacket pkt, FriendlyByteBuf buf) {
-        buf.writeUUID(pkt.midiSource != null ? pkt.midiSource : InstrumentDataUtils.NONE_SOURCE_ID);
+        buf.writeUUID(pkt.midiSource);
         buf.writeUtf(pkt.midiSourceName, 64);
-        buf.writeUtf(pkt.enabledChannelsString != null ? pkt.enabledChannelsString : "", 38);
+        buf.writeUtf(pkt.enabledChannelsString, 38);
         buf.writeBoolean(pkt.sysInput);
         buf.writeByte(pkt.volume);
         buf.writeByte(getInstrumentLocationByte(pkt.handIn));

@@ -26,6 +26,11 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     public Integer getDefaultColor() {
         return ((BlockInstrument)getBlock()).getDefaultColor();
     }
+
+    @Override
+    public String getDefaultChannels() {
+        return ((BlockInstrument)getBlock()).getDefaultChannels();
+    }
     
     @Override
     public InteractionResult useOn(UseOnContext context) {

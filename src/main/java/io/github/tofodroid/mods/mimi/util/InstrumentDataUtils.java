@@ -31,12 +31,14 @@ public abstract class InstrumentDataUtils {
     public static final String VOLUME_TAG = "instrument_volume";
     public static final Byte INSTRUMENT_ALL = -1;
     public static final Byte MAX_INSTRUMENT_VOLUME = 5;
+    public static final Integer PERCUSSION_BANK = 120;
     public static final Byte DEFAULT_INSTRUMENT_VOLUME = 3;
     public static final Byte MIN_INSTRUMENT_VOLUME = 0;
 
-    public static final UUID NONE_SOURCE_ID = new UUID(0,0);
     public static final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
+    public static final UUID NONE_SOURCE_ID = new UUID(0,0);
     public static final String ALL_CHANNELS_STRING = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16";
+    public static final String NONE_CHANNELS_STRING = "NONE";
     
     private static Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
@@ -61,12 +63,14 @@ public abstract class InstrumentDataUtils {
     }
 
     public static void setMidiSource(ItemStack stack, UUID sourceId, String sourceName) {
-        if (sourceId != null && sourceName != null) {
+        if (sourceId != null) {
             stack.getOrCreateTag().putUUID(SOURCE_TAG, sourceId);
+        } else {
+            stack.getOrCreateTag().putUUID(SOURCE_TAG, NONE_SOURCE_ID);
+        }
+
+        if(sourceName != null) {
             stack.getOrCreateTag().putString(SOURCE_NAME_TAG, sourceName);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(SOURCE_TAG);
-            stack.getTag().remove(SOURCE_NAME_TAG);
         }
     }
 
@@ -75,33 +79,37 @@ public abstract class InstrumentDataUtils {
             return stack.getTag().getUUID(SOURCE_TAG);
         }
 
-        return null;
+        return PUBLIC_SOURCE_ID;
     }
 
     public static String getMidiSourceName(ItemStack stack) {
+        UUID sourceId = getMidiSource(stack);
+
         if(stackTagContainsKey(stack, SOURCE_NAME_TAG)) {
             return stack.getTag().getString(SOURCE_NAME_TAG);
-        }else if(getMidiSource(stack) != null) {
-            return "Player";
+        } else if(sourceId == PUBLIC_SOURCE_ID) {
+            return "Public";
+        } else if(sourceId == NONE_SOURCE_ID) {
+            return "None";
         }
 
-        return "None";
+        return "Unknown";
     }
 
     public static void setEnabledChannelsString(ItemStack stack, String enabledChannelsString) {
         if (enabledChannelsString != null && !enabledChannelsString.trim().isEmpty()) {
             stack.getOrCreateTag().putString(ENABLED_CHANNELS_TAG, enabledChannelsString);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(ENABLED_CHANNELS_TAG);
+        } else {
+            stack.getOrCreateTag().putString(ENABLED_CHANNELS_TAG, NONE_CHANNELS_STRING);
         }
     }
 
     public static String getEnabledChannelsString(ItemStack stack) {
-        if (stackTagContainsKey(stack, ENABLED_CHANNELS_TAG)) {
-            return stack.getTag().getString(ENABLED_CHANNELS_TAG);
+        if (!stackTagContainsKey(stack, ENABLED_CHANNELS_TAG) || stack.getTag().getString(ENABLED_CHANNELS_TAG).isEmpty()) {
+            setEnabledChannelsString(stack, getDefaultChannels(stack));
         }
 
-        return null;
+        return stack.getTag().getString(ENABLED_CHANNELS_TAG);
     }
 
     public static void toggleChannel(ItemStack switchStack, Byte channelId) {
@@ -112,7 +120,7 @@ public abstract class InstrumentDataUtils {
                 acceptedChannels = SortedArraySet.create(16);
             }
 
-            if(isChannelEnabled(switchStack, channelId)) {
+            if(acceptedChannels.contains(channelId)) {
                 acceptedChannels.remove(channelId);
             } else {
                 acceptedChannels.add(channelId);
@@ -132,13 +140,18 @@ public abstract class InstrumentDataUtils {
     }
 
     public static Boolean isChannelEnabled(ItemStack switchStack, Byte channelId) {
-        return ALL_CHANNELS.equals(channelId) || getEnabledChannelsSet(switchStack).contains(channelId);
+        if(ALL_CHANNELS.equals(channelId)) {
+            return true;
+        }
+
+        String enabledChannels = getEnabledChannelsString(switchStack);
+        return !NONE_CHANNELS_STRING.equals(enabledChannels) && Arrays.asList(enabledChannels.split(",", -1)).contains(String.valueOf((channelId+1)));
     }
     
     public static SortedArraySet<Byte> getEnabledChannelsSet(ItemStack switchStack) {
         String acceptedChannelString = getEnabledChannelsString(switchStack);
 
-        if(acceptedChannelString != null && !acceptedChannelString.isEmpty()) {
+        if(!acceptedChannelString.isBlank() && !NONE_CHANNELS_STRING.equals(acceptedChannelString)) {
             SortedArraySet<Byte> result = SortedArraySet.create(16);
             result.addAll(Arrays.asList(acceptedChannelString.split(",", -1)).stream().map(b -> Integer.valueOf(Byte.valueOf(b) - 1).byteValue()).collect(Collectors.toSet()));
             return result;
@@ -335,6 +348,17 @@ public abstract class InstrumentDataUtils {
         }
 
         return result;
+    }
+
+    public static String getDefaultChannels(ItemStack stack) {
+        return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+    }
+
+    public static String getDefaultChannelsForBank(Integer bankNumber) {
+        if(bankNumber == PERCUSSION_BANK) {
+            return "10";
+        }
+        return "1,2,3,4,5,6,7,8,9,11,12,13,14,15,16";
     }
     
     public static String getFilteredNotesAsString(ItemStack stack) {

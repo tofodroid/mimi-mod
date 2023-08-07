@@ -134,7 +134,7 @@ public final class ModItems {
     public static List<ItemInstrumentHandheld> buildHandheldInstruments() {
         List<ItemInstrumentHandheld> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
-            list.add(new ItemInstrumentHandheld(instrument.registryName, instrument.instrumentId, instrument.isDyeable(), instrument.defaultColor()));
+            list.add(new ItemInstrumentHandheld(instrument));
         }
         return list;
     }

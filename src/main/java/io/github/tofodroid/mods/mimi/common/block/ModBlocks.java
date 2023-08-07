@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
-import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -44,7 +43,7 @@ public class ModBlocks {
             result.add(
                 BLOCKS.register(
                     instrument.registryName, 
-                    () -> new BlockInstrument(instrument.instrumentId, instrument.registryName, instrument.isDyeable(), instrument.defaultColor(), VoxelShapeUtils.loadFromStrings(instrument.collisionShapes))
+                    () -> new BlockInstrument(instrument)
                 )
             );
         }
