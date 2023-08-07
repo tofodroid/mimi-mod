@@ -6,6 +6,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -99,7 +100,11 @@ public class TileInstrument extends AInventoryTile {
 
             if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
                 MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
-                convertStack = initializeInstrumentStack(stackTag);
+                convertStack = initializeInstrumentStack(InstrumentDataUtils.convertSwitchboardToInstrumentTag(stackTag.getCompound("tag")));
+
+                if(compound.contains(COLOR_TAG)) {
+                    ((IDyeableItem)convertStack.getItem()).setColor(convertStack, compound.getInt(COLOR_TAG));
+                }
             }
         }
 
@@ -143,8 +148,8 @@ public class TileInstrument extends AInventoryTile {
     private ItemStack initializeInstrumentStack(CompoundTag stackTag) {
         ItemStack instrumentStack = new ItemStack(this.blockInstrument().asItem(), 1);
 
-        if(stackTag != null && stackTag.contains("tag")) {
-            instrumentStack.setTag(stackTag.getCompound("tag").copy());
+        if(stackTag != null) {
+            instrumentStack.setTag(stackTag);
         }
 
         return instrumentStack;

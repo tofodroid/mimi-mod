@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
@@ -425,5 +426,21 @@ public abstract class InstrumentDataUtils {
 
     protected static Boolean stackTagContainsKey(ItemStack stack, String tag) {
         return stack != null && stack.getTag() != null && stack.getTag().contains(tag);
+    }
+
+    public static CompoundTag convertSwitchboardToInstrumentTag(CompoundTag switchTag) {
+        CompoundTag instrumentTag = switchTag.copy();
+
+        // OLD DEFAULT CHANNEL --> NONE
+        if(!instrumentTag.contains(ENABLED_CHANNELS_TAG)) {
+            instrumentTag.putString(ENABLED_CHANNELS_TAG, NONE_CHANNELS_STRING);
+        }
+
+        // OLD DEFAULT SOURCE ID --> NONE
+        if(!instrumentTag.contains(SOURCE_TAG)) {
+            instrumentTag.putUUID(SOURCE_TAG, NONE_SOURCE_ID);
+        }
+
+        return instrumentTag;
     }
 }
