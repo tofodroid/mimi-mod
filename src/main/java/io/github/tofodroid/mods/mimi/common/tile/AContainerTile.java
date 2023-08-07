@@ -87,8 +87,9 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
     }
 
     @Override
+    @SuppressWarnings("null")
     public boolean stillValid(Player playerEntity) {
-        if (this.level.getBlockEntity(this.worldPosition) != this) {
+        if (this.level != null && this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
             return !(playerEntity.distanceToSqr((double)this.worldPosition.getX() + 0.5D, (double)this.worldPosition.getY() + 0.5D, (double)this.worldPosition.getZ() + 0.5D) > 64.0D);

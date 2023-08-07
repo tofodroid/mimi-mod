@@ -78,7 +78,7 @@ public class TileInstrument extends AInventoryTile {
         // Fallback for missing stack data
         if(this.items.get(0) == null || this.items.get(0).isEmpty()) {
             MIMIMod.LOGGER.warn("TileInstrument had no saved instrument stack! Re-initializing.");
-            this.initializeInstrumentStack();
+            this.setInstrumentStack(this.initializeInstrumentStack());
         }
 
         if(compound.contains(COLOR_TAG)) {
@@ -91,6 +91,7 @@ public class TileInstrument extends AInventoryTile {
         // START TEMPORARY LEGACY COMPATIBILITY CODE
         // Filter out switchboard items so that we can convert them
         ListTag listtag = compound.getList("Items", 10);
+        ItemStack convertStack = null;
 
         if(listtag.size() > 0) {
             CompoundTag stackTag = listtag.getCompound(0);
@@ -98,16 +99,15 @@ public class TileInstrument extends AInventoryTile {
 
             if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
                 MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
-                compound.put(
-                    "Items",
-                    ContainerHelper.saveAllItems(
-                        new CompoundTag(),
-                        NonNullList.of(initializeInstrumentStack(stackTag))
-                    ).get("Items")
-                );
+                convertStack = initializeInstrumentStack(stackTag);
             }
         }
-        ContainerHelper.loadAllItems(compound, items);        
+
+        ContainerHelper.loadAllItems(compound, items);
+
+        if(convertStack != null) {  
+            this.setInstrumentStack(convertStack);
+        }
         // END TEMPORARY LEGACY COMPATIBILITY CODE
     }
 

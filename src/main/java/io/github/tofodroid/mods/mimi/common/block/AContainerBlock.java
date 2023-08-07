@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
 import io.github.tofodroid.mods.mimi.common.tile.AContainerTile;
-
+import io.github.tofodroid.mods.mimi.common.tile.AInventoryTile;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
@@ -33,6 +33,9 @@ public abstract class AContainerBlock<T extends BlockEntity & Container> extends
         
         if (blockEntity instanceof AContainerTile) {
             ((AContainerTile)blockEntity).dropContent();
+            worldIn.updateNeighbourForOutputSignal(pos, this);
+        } else if (blockEntity instanceof AInventoryTile) {
+            ((AInventoryTile)blockEntity).dropContent();
             worldIn.updateNeighbourForOutputSignal(pos, this);
         }
 
