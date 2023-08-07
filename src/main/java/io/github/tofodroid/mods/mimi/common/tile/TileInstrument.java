@@ -6,7 +6,6 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -139,12 +138,12 @@ public class TileInstrument extends AInventoryTile {
     }
 
     private void initializeInstrumentStack(CompoundTag stackTag) {
-        if(stackTag == null) {
-            stackTag = new CompoundTag();
+        ItemStack instrumentStack = new ItemStack(this.blockInstrument().asItem(), 1);
+
+        if(stackTag != null && stackTag.contains("tag")) {
+            instrumentStack.setTag(stackTag.getCompound("tag").copy());
         }
 
-        String instrumentItemId = ((ItemInstrumentBlock)this.blockInstrument().asItem()).REGISTRY_NAME;
-        stackTag.putString("id", instrumentItemId);
-        this.setInstrumentStack(ItemStack.of(stackTag));
+        this.setInstrumentStack(instrumentStack);
     }
 }
