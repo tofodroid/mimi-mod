@@ -86,7 +86,9 @@ public class TileInstrument extends AInventoryTile {
         if(compound.contains(COLOR_TAG)) {
             this.color = compound.getInt(COLOR_TAG);
         } else if(this.hasColor()) {
-            IDyeableItem.saveColorToTag(compound, this.color);
+            ItemStack stack = this.getInstrumentStack();
+            ((IDyeableItem)stack.getItem()).setColor(stack, this.color);
+            this.setInstrumentStack(stack);
         }
     }
 
@@ -101,7 +103,7 @@ public class TileInstrument extends AInventoryTile {
             CompoundTag stackTag = listtag.getCompound(0);
             String itemId = stackTag.getString("id");
 
-            if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
+            if(itemId.equalsIgnoreCase("mimi:switchboard")) {
                 MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
                 convertStack = initializeInstrumentStack(InstrumentDataUtils.convertSwitchboardToInstrumentTag(stackTag.getCompound("tag")));
 

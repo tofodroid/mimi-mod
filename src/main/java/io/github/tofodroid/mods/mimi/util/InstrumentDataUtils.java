@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.nbt.CompoundTag;
@@ -429,20 +428,20 @@ public abstract class InstrumentDataUtils {
     }
 
     public static CompoundTag convertSwitchboardToInstrumentTag(CompoundTag switchTag) {
-        CompoundTag instrumentTag = switchTag.copy();
+        CompoundTag instrumentTag = switchTag != null ? switchTag.copy() : new CompoundTag();
 
         // OLD DEFAULT CHANNEL --> NONE
-        if(!instrumentTag.contains(ENABLED_CHANNELS_TAG)) {
+        if(!instrumentTag.contains(ENABLED_CHANNELS_TAG) || instrumentTag.getString(ENABLED_CHANNELS_TAG).isBlank()) {
             instrumentTag.putString(ENABLED_CHANNELS_TAG, NONE_CHANNELS_STRING);
         }
 
         // OLD DEFAULT SOURCE ID --> NONE
-        if(!instrumentTag.contains(SOURCE_TAG)) {
+        if(!instrumentTag.contains(SOURCE_TAG) || instrumentTag.getUUID(SOURCE_TAG) == null) {
             instrumentTag.putUUID(SOURCE_TAG, NONE_SOURCE_ID);
         }
 
         // OLD DEFAULT SOURCE NAME --> NONE
-        if(!instrumentTag.contains(SOURCE_NAME_TAG)) {
+        if(!instrumentTag.contains(SOURCE_NAME_TAG)|| instrumentTag.getString(SOURCE_NAME_TAG).isBlank()) {
             instrumentTag.putString(SOURCE_NAME_TAG, "None");
         }
 
