@@ -88,9 +88,9 @@ public abstract class InstrumentDataUtils {
 
         if(stackTagContainsKey(stack, SOURCE_NAME_TAG)) {
             return stack.getTag().getString(SOURCE_NAME_TAG);
-        } else if(sourceId == PUBLIC_SOURCE_ID) {
+        } else if(sourceId.equals(PUBLIC_SOURCE_ID)) {
             return "Public";
-        } else if(sourceId == NONE_SOURCE_ID) {
+        } else if(sourceId.equals(NONE_SOURCE_ID)) {
             return "None";
         }
 
@@ -439,6 +439,11 @@ public abstract class InstrumentDataUtils {
         // OLD DEFAULT SOURCE ID --> NONE
         if(!instrumentTag.contains(SOURCE_TAG)) {
             instrumentTag.putUUID(SOURCE_TAG, NONE_SOURCE_ID);
+        }
+
+        // OLD DEFAULT SOURCE NAME --> NONE
+        if(!instrumentTag.contains(SOURCE_NAME_TAG)) {
+            instrumentTag.putString(SOURCE_NAME_TAG, "None");
         }
 
         return instrumentTag;
