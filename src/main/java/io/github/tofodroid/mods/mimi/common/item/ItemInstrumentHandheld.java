@@ -86,7 +86,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
                     if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
                         MIMIMod.LOGGER.info("Converting ItemInstrument from Switchboard.");
                         tag = tag.merge(stackTag.getCompound("tag"));
-                        //tag.remove("Items");
+                        tag.remove("inventory");
                     }
                 }
             }

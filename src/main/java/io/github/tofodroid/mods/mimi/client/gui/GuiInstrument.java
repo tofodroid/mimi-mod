@@ -170,7 +170,8 @@ public class GuiInstrument extends BaseGui {
             this.instrumentId = null;
             this.instrumentNameString = null;
         } else {
-            this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount(), instrumentStack.getTag());
+            this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount());
+            this.instrumentStack.setTag(instrumentStack.getOrCreateTag().copy());
             this.instrumentId = InstrumentDataUtils.getInstrumentId(this.instrumentStack);
             this.instrumentNameString = InstrumentDataUtils.getInstrumentName(this.instrumentStack);
         }
