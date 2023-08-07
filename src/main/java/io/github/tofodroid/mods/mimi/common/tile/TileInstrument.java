@@ -82,14 +82,15 @@ public class TileInstrument extends AInventoryTile {
             this.setInstrumentStack(this.initializeInstrumentStack());
         }
 
+        // START TEMPORARY LEGACY COMPATIBILITY CODE
         // Fallback for stack missing color
-        if(compound.contains(COLOR_TAG)) {
+        if(compound.contains(COLOR_TAG) && !this.hasColor()) {
             this.color = compound.getInt(COLOR_TAG);
-        } else if(this.hasColor()) {
             ItemStack stack = this.getInstrumentStack();
             ((IDyeableItem)stack.getItem()).setColor(stack, this.color);
             this.setInstrumentStack(stack);
         }
+        // END TEMPORARY LEGACY COMPATIBILITY CODE
     }
 
     @Override
