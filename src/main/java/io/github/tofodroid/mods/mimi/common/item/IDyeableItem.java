@@ -40,7 +40,15 @@ public interface IDyeableItem extends DyeableLeatherItem {
 
     default void setColor(ItemStack stack, int color) {
         if(isDyeable() && color >= 0) {
-            stack.getOrCreateTagElement("display").putInt("color", color);
+            IDyeableItem.saveColorToTag(stack.getOrCreateTag(), color);
+        }
+    }
+
+    public static void saveColorToTag(CompoundTag tag, int color) {
+        if(color >= 0) {
+            CompoundTag colorT = new CompoundTag();
+            colorT.putInt("color", color);
+            tag.put("display", colorT);
         }
     }
     

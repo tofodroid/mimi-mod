@@ -82,8 +82,11 @@ public class TileInstrument extends AInventoryTile {
             this.setInstrumentStack(this.initializeInstrumentStack());
         }
 
+        // Fallback for stack missing color
         if(compound.contains(COLOR_TAG)) {
             this.color = compound.getInt(COLOR_TAG);
+        } else if(this.hasColor()) {
+            IDyeableItem.saveColorToTag(compound, this.color);
         }
     }
 
