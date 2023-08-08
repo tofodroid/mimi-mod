@@ -116,7 +116,7 @@ public class GuiTransmitterContainerScreen extends BaseContainerGui<ContainerTra
         graphics.blit(guiTexture, START_X + Float.valueOf(PLAY_PAUSE_BUTTON.x()).intValue() + 1, START_Y + Float.valueOf(PLAY_PAUSE_BUTTON.y()).intValue() + 1, 1 + (this.playerInfo != null ? this.playerInfo.running.compareTo(false) : 0) * 13, 245, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * this.menu.getTransmitMode().ordinal()), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * (this.menu.getPublicTransmit() ? 0 : 1)), 231, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Transmit Light
         if(this.playerInfo != null && this.playerInfo.running) {

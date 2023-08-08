@@ -12,7 +12,6 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.world.entity.player.Player;
@@ -109,9 +108,8 @@ public class GuiMidiFileCaster extends BaseGui {
         } else if(clickedBox(imouseX, imouseY, SHUFFLE_BUTTON)) {
             this.midiInputManager.fileCasterManager.toggleShuffle();
         } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
-            TransmitMode oldMode = this.midiInputManager.fileCasterManager.getTransmitMode();
-            this.midiInputManager.fileCasterManager.shiftTransmitMode();
-            NetworkManager.BROADCAST_CHANNEL.sendToServer(TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, oldMode));
+            this.midiInputManager.fileCasterManager.toggleTransmitMode();
+            NetworkManager.BROADCAST_CHANNEL.sendToServer(TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, !this.midiInputManager.getPublicTransmit()));
         }
         
         return super.mouseClicked(mouseX, mouseY, button);
@@ -160,7 +158,7 @@ public class GuiMidiFileCaster extends BaseGui {
         graphics.blit(guiTexture, START_X + Float.valueOf(SHUFFLE_SCREEN.x()).intValue(), START_Y + Float.valueOf(SHUFFLE_SCREEN.y()).intValue(), 1 + (13 * this.midiInputManager.fileCasterManager.getShuffleMode()), 327, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Transmit Screen    
-        graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * this.midiInputManager.fileCasterManager.getTransmitModeInt()), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + Float.valueOf(TRANSMIT_SCREEN.x()).intValue(), START_Y + Float.valueOf(TRANSMIT_SCREEN.y()).intValue(), 1 + (13 * (this.midiInputManager.getPublicTransmit() ? 0 : 1)), 341, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;

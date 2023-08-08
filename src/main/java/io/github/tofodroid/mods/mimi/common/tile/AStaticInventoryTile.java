@@ -19,16 +19,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-public class AInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
+public class AStaticInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
     protected final Integer INVENTORY_SIZE;
     protected NonNullList<ItemStack> items;
 
-    public AInventoryTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
+    public AStaticInventoryTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
         super(type, pos, state);
         this.INVENTORY_SIZE = inventorySize;
 
@@ -114,12 +111,7 @@ public class AInventoryTile extends BlockEntity implements WorldlyContainer, Sta
 
     @Override
     public int[] getSlotsForFace(Direction p_19238_) {
-        int[] slots = new int[INVENTORY_SIZE];
-        
-        for(int i = 0; i < INVENTORY_SIZE; i++) {
-            slots[i] = i;
-        }
-        return slots;
+        return new int[]{};
     }
     
     @Override
@@ -141,22 +133,14 @@ public class AInventoryTile extends BlockEntity implements WorldlyContainer, Sta
         return this.items;
     }
 
-    
-    LazyOptional<? extends IItemHandler> handlers[] = SidedInvWrapper.create(this, Direction.UP);
-
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-        if (!this.remove && facing != null && capability == ForgeCapabilities.ITEM_HANDLER) {
-            if (facing == Direction.UP)
-                return handlers[0].cast();
-        }
         return super.getCapability(capability, facing);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        for (LazyOptional<? extends IItemHandler> handler : handlers) handler.invalidate();
     }
 
     @Override

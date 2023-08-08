@@ -37,7 +37,7 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
         if(MIMIMod.proxy.isClient()) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
     
@@ -45,7 +45,7 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
         if(MIMIMod.proxy.isClient()) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 
@@ -53,7 +53,7 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
         if(MIMIMod.proxy.isClient()) {
             MidiNotePacket packet =MidiNotePacket.createAllNotesOffPacket(instrument, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
     
@@ -61,7 +61,7 @@ public class MidiDeviceInputReceiver extends MidiInputReceiver {
         if(MIMIMod.proxy.isClient()) {
             MidiNotePacket packet =MidiNotePacket.createControlPacket(controller, value, instrument, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 

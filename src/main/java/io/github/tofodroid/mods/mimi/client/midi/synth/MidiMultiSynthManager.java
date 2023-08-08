@@ -101,7 +101,7 @@ public class MidiMultiSynthManager {
     }
 
     public Long getBufferTime(Long noteServerTime) {
-        return (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0) + (MIMIMod.proxy.getServerStartEpoch() + noteServerTime);
+        return (MIMIMod.proxy.getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0)) + (MIMIMod.proxy.getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {
@@ -139,7 +139,7 @@ public class MidiMultiSynthManager {
         }
     }
     
-    public void handleLocalPacket(MidiNotePacket message) {
+    public void handleLocalPacketInstant(MidiNotePacket message) {
         if(loggingOff) return;
 
         if(localSynth != null) {
@@ -150,7 +150,7 @@ public class MidiMultiSynthManager {
                     localSynth.noteOff(message, Util.getEpochMillis());
                 }
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
-                localSynth.controlChange(message, getBufferTime(message.noteServerTime));
+                localSynth.controlChange(message, Util.getEpochMillis());
             }
         }
     }

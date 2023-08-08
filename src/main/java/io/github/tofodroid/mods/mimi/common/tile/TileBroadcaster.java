@@ -2,11 +2,12 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraft.core.BlockPos;
@@ -64,16 +65,12 @@ public class TileBroadcaster extends AContainerTile implements BlockEntityTicker
         }
     }
     
-    public TransmitMode getTransmitMode() {
-        return this.isPublicBroadcast() ? TransmitMode.PUBLIC : TransmitMode.LINKED;
-    }
-
     public Boolean isPowered() {
         return this.getBlockState().getValue(BlockBroadcaster.POWER) > 0;
     }
     
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
         return stack.getItem().equals(ModItems.FLOPPYDISK) && ItemFloppyDisk.isWritten(stack);
     }
     

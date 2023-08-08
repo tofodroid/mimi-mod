@@ -9,20 +9,18 @@ import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileInstrument extends AInventoryTile {
+public class TileInstrument extends AStaticInventoryTile {
     public static final String COLOR_TAG = "color";
     protected Integer color;
 
     public TileInstrument(BlockPos pos, BlockState state) {
         super(ModTiles.INSTRUMENT, pos, state, 1);
-        items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
     }
 
     public void setInstrumentStack(ItemStack stack) {
@@ -77,7 +75,7 @@ public class TileInstrument extends AInventoryTile {
         super.load(compound);
         
         // Fallback for missing stack data
-        if(this.items.get(0) == null || this.items.get(0).isEmpty()) {
+        if(this.items.get(0).isEmpty()) {
             MIMIMod.LOGGER.warn("TileInstrument had no saved instrument stack! Re-initializing.");
             this.setInstrumentStack(this.initializeInstrumentStack());
         }
@@ -156,6 +154,8 @@ public class TileInstrument extends AInventoryTile {
 
         if(stackTag != null) {
             instrumentStack.setTag(stackTag);
+        } else {
+            instrumentStack.setTag(new CompoundTag());
         }
 
         return instrumentStack;

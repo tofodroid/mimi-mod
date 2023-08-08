@@ -374,7 +374,7 @@ public class GuiInstrument extends BaseGui {
         Byte value = on ? Byte.MAX_VALUE : 0;
         MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos());
         NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
     }
 
     // Midi Functions
@@ -436,7 +436,7 @@ public class GuiInstrument extends BaseGui {
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 
@@ -449,7 +449,7 @@ public class GuiInstrument extends BaseGui {
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 
@@ -457,7 +457,7 @@ public class GuiInstrument extends BaseGui {
         if(this.instrumentId != null) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, InstrumentDataUtils.applyVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);
             this.heldNotes.put(midiNote, Instant.now());
         }
@@ -467,7 +467,7 @@ public class GuiInstrument extends BaseGui {
         if(this.instrumentId != null) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos());
             NetworkManager.NOTE_CHANNEL.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacket(packet);
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
 
             if(this.heldNotes.remove(midiNote) != null) {
                 this.releasedNotes.put(midiNote, Instant.now());

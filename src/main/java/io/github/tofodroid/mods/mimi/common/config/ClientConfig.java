@@ -26,7 +26,6 @@ public class ClientConfig {
 
     // INPUT
     public ForgeConfigSpec.ConfigValue<String> selectedMidiDevice;
-    public ForgeConfigSpec.BooleanValue enableMidiLogs;
 
     // SYNTH
     public ForgeConfigSpec.IntValue noteBufferMs;
@@ -36,17 +35,7 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<Integer> synthSampleRate;
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
-    public ForgeConfigSpec.BooleanValue raytraceSound;
-    
-    // DEBUG
-    public ForgeConfigSpec.IntValue quatX;
-    public ForgeConfigSpec.IntValue quatY;
-    public ForgeConfigSpec.IntValue quatZ;
-    public ForgeConfigSpec.IntValue quatW;
-    public ForgeConfigSpec.IntValue xOffset;
-    public ForgeConfigSpec.IntValue xMult;
-    public ForgeConfigSpec.IntValue yOffset;
-    public ForgeConfigSpec.IntValue yMult;
+
 
     public ClientConfig(ForgeConfigSpec.Builder builder) {
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
@@ -63,61 +52,29 @@ public class ClientConfig {
         selectedMidiDevice = builder.comment("What MIDI Input Device should be used (if available)? This can be set from the in-game MIDI Input Device Configuration menu. Changes require a game restart to take affect.")
             .translation(MIMIMod.MODID + ".config.midi.input.defaultdevice")
             .define("defaultMidiInputDevice", "");
-            enableMidiLogs = builder.comment("Should MIMI include detailed logs tracking MIDI note input and output?")
-            .translation(MIMIMod.MODID + ".config.midi.synth.enablemidilogs")
-            .define("enableMidiLogs", false);
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
-        raytraceSound = builder.comment("Should MIDI notes that are played take into account any blocks between you and the source and muffle the sound accordingly? Note that enabling this may impact performance on lower-end systems.")
-            .translation(MIMIMod.MODID + ".config.midi.synth.raytracesound")
-            .define("rayTraceSound", false);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
             .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrection")
             .define("synthJitterCorrection", true);
         latency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes from other players? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.latency")
-            .defineInRange("synthBaselineLatency", 250, 10, 800);
+            .defineInRange("synthBaselineLatency", 50, 10, 500);
         localLatency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes played by you? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.localLatency")
-            .defineInRange("synthBaselineLocalLatency", 30, 10, 800);
+            .defineInRange("synthBaselineLocalLatency", 30, 10, 500);
         synthSampleRate = builder.comment("What sample rate should the built-in midi synthesizer use (hz)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8000,11025,16000,22050,44100,48000,96000]")
             .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
-            .defineInList("synthSampleRate", 44100, Arrays.asList(8000,11025,16000,22050,44100,48000,96000));
+            .defineInList("synthSampleRate", 22050, Arrays.asList(8000,11025,16000,22050,44100,48000,96000));
         synthBitRate = builder.comment("What bitrate should the built-in midi synthesizer use (bits)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8,16,24,32]")
             .translation(MIMIMod.MODID + ".config.midi.synth.bitrate")
             .defineInList("synthBitRate", 16, Arrays.asList(8,16,24,32));
         soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
-        noteBufferMs = builder.comment("How many milliseconds should notes from a server buffer before playing locally? Smaller values will decrease latency but may result in stuttering when the server is under heavy load.","Allowed values: 0-999")
-            .translation(MIMIMod.MODID + ".config.midi.synth.bufferms")
-            .defineInRange("synthBufferMillis",100, 0, 999);
-        builder.pop();
-        builder.push("DEBUG");
-        quatX = builder.comment("QX")
-            .translation(MIMIMod.MODID + ".config.debug.qx")
-            .defineInRange("quatX", 0, -360, 360);
-        quatY = builder.comment("QY")
-            .translation(MIMIMod.MODID + ".config.debug.qy")
-            .defineInRange("quatY", 0, -360, 360);
-        quatZ = builder.comment("QX")
-            .translation(MIMIMod.MODID + ".config.debug.qz")
-            .defineInRange("quatZ", 1, -360, 360);
-        quatW = builder.comment("QW")
-            .translation(MIMIMod.MODID + ".config.debug.qw")
-            .defineInRange("quatW", -90, -360, 360);
-        xOffset = builder.comment("XO")
-            .translation(MIMIMod.MODID + ".config.debug.xo")
-            .defineInRange("xOffset", 11, -99999, 99999);
-        yOffset = builder.comment("YO")
-            .translation(MIMIMod.MODID + ".config.debug.yo")
-            .defineInRange("yOffset", 29+126, -99999, 99999);
-        xMult = builder.comment("XM")
-            .translation(MIMIMod.MODID + ".config.debug.xm")
-            .defineInRange("xMult", 1, -1, 1);
-        yMult = builder.comment("YM")
-            .translation(MIMIMod.MODID + ".config.debug.ym")
-            .defineInRange("yMult", -1, -1, 1);
+        noteBufferMs = builder.comment("How long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be slightly off-tempo.","Allowed values: 0-100")
+            .translation(MIMIMod.MODID + ".config.midi.synth.extrabufferms")
+            .defineInRange("synthBufferMillis",0, 0, 100);
         builder.pop();
     }
 }

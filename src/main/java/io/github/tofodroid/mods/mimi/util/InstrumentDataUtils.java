@@ -9,7 +9,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
@@ -446,5 +448,36 @@ public abstract class InstrumentDataUtils {
         }
 
         return instrumentTag;
+    }
+
+    public static void appendMidiSettings(ItemStack stack, List<Component> tooltip) {
+        tooltip.add(Component.literal(""));
+        tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+
+        String enabledChannels = getEnabledChannelsString(stack);
+        if(enabledChannels != null && !enabledChannels.isEmpty()) {
+            if(enabledChannels.equals(ALL_CHANNELS_STRING)) {
+                tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
+            } else if(enabledChannels.equals(NONE_CHANNELS_STRING)) {
+                tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
+            } else if(enabledChannels.equals(getDefaultChannels(stack))) {
+                tooltip.add(Component.literal("  Channels: Default").withStyle(ChatFormatting.GREEN));
+            } else {
+                tooltip.add(Component.literal("  Channels: " + enabledChannels).withStyle(ChatFormatting.GREEN));
+            }
+        }
+
+        // Note Source
+        tooltip.add(Component.literal("  Play Notes From: " + getMidiSourceName(stack)).withStyle(ChatFormatting.GREEN));
+
+        // Instrument Volume
+        tooltip.add(Component.literal("  Volume: " + getInstrumentVolumePercent(stack)).withStyle(ChatFormatting.GREEN));
+
+        // MIDI Device Input
+        if(getSysInput(stack)) {
+            tooltip.add(Component.literal("  Device Input: Enabled").withStyle(ChatFormatting.GREEN));
+        } else {
+            tooltip.add(Component.literal("  Device Input: Disabled").withStyle(ChatFormatting.GREEN));
+        }
     }
 }

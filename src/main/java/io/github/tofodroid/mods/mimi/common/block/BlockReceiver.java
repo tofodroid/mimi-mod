@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
+import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -16,7 +17,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public class BlockReceiver extends Block {
+public class BlockReceiver extends AContainerBlock<TileReceiver> {
     public static final String REGISTRY_NAME = "receiver";
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
 
@@ -35,12 +36,10 @@ public class BlockReceiver extends Block {
         state.add(POWER);
     }
 
-    /* TODO
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, ModTiles.RECEIVER, TileReceiver::doTick);
     }
-    */
 
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
@@ -55,6 +54,11 @@ public class BlockReceiver extends Block {
     @Override
     public boolean isSignalSource(BlockState p_55730_) {
         return true;
+    }
+
+    @Override
+    public BlockEntityType<TileReceiver> getTileType() {
+        return ModTiles.RECEIVER;
     }
 
     public void powerTarget(Level world, BlockState state, int power, BlockPos pos) {

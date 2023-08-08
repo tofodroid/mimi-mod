@@ -200,7 +200,7 @@ public class ServerMusicPlayerMidiManager {
             ItemStack newStack = event.player.getInventory().getItem(TRANSMITTER_MAP.get(event.player.getUUID()).getLeft()).copy();
 
             if(newStack.getItem() instanceof ItemTransmitter) {
-                ItemTransmitter.setTransmitMode(oldStack, ItemTransmitter.getTransmitMode(newStack));
+                ItemTransmitter.setPublicTransmit(oldStack, ItemTransmitter.getPublicTransmit(newStack));
 
                 if(ItemStack.matches(oldStack, newStack)) {
                     TRANSMITTER_STACK_MAP.put(event.player.getUUID(), newStack);

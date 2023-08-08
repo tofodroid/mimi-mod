@@ -20,7 +20,6 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 
 public class MidiFileCasterManager extends MidiInputSourceManager {
     // Playlist
@@ -32,7 +31,7 @@ public class MidiFileCasterManager extends MidiInputSourceManager {
     private Integer lastTempoBPM;
     private Integer selectedSongIndex;
     private LoopMode currentLoopMode = LoopMode.NONE;
-    private TransmitMode currentTransmitMode = TransmitMode.PUBLIC;
+    private Boolean publicTransmit = true;
     private Boolean shuffled = false;
         
     // MIDI Sequencer
@@ -292,23 +291,13 @@ public class MidiFileCasterManager extends MidiInputSourceManager {
         return currentLoopMode.ordinal();
     }
 
-    public TransmitMode shiftTransmitMode() {
-        if(currentTransmitMode == TransmitMode.PUBLIC) {
-            currentTransmitMode = TransmitMode.LINKED;
-        } else if(currentTransmitMode == TransmitMode.LINKED) {
-            currentTransmitMode = TransmitMode.SELF;
-        } else {
-            currentTransmitMode = TransmitMode.PUBLIC;
-        }
-        return currentTransmitMode;
+    public Boolean toggleTransmitMode() {
+        publicTransmit = !publicTransmit;
+        return publicTransmit;
     }
 
-    public TransmitMode getTransmitMode() {
-        return currentTransmitMode;
-    }
-
-    public Integer getTransmitModeInt() {
-        return currentTransmitMode.ordinal();
+    public Boolean getPublicTransmit() {
+        return publicTransmit;
     }
 
     public Integer getShuffleMode() {

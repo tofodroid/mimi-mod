@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTransmitter;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,7 +28,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 public class ItemTransmitter extends Item {
     public static final String REGISTRY_NAME = "transmitter";
-    public static final String TRANSMIT_MODE_TAG = "broadcastMode";
+    public static final String PUBLIC_TRANSMIT_TAG = "publicTransmit";
     public static final String TRANSMIT_ID_TAG = "transmit_id";
     public static final String INVENTORY_TAG = "inventory";
 
@@ -76,7 +75,7 @@ public class ItemTransmitter extends Item {
             }
 
             // Transmit Mode
-            String transmitModeString = ItemTransmitter.getTransmitMode(stack).name();
+            String transmitModeString = ItemTransmitter.getPublicTransmit(stack) ? "Public" : "Linked";
             transmitModeString = transmitModeString.substring(0,1).toUpperCase() + transmitModeString.substring(1).toLowerCase();
             tooltip.add(Component.literal("Transmit Mode: " + transmitModeString));
         }
@@ -122,20 +121,20 @@ public class ItemTransmitter extends Item {
         return ItemStack.EMPTY;
     }
 
-    public static void setTransmitMode(ItemStack stack, TransmitMode mode) {
-        if (mode != null) {
-            stack.getOrCreateTag().putInt(TRANSMIT_MODE_TAG, mode.ordinal());
+    public static void setPublicTransmit(ItemStack stack, Boolean pub) {
+        if (pub != null) {
+            stack.getOrCreateTag().putBoolean(PUBLIC_TRANSMIT_TAG, pub);
         } else if (stack.hasTag()) {
-            stack.getTag().remove(TRANSMIT_MODE_TAG);
+            stack.getTag().remove(PUBLIC_TRANSMIT_TAG);
         }
     }
 
-    public static TransmitMode getTransmitMode(ItemStack stack) {
-        if (stackTagContainsKey(stack, TRANSMIT_MODE_TAG)) {
-            return TransmitMode.fromInt(stack.getTag().getInt(TRANSMIT_MODE_TAG));
+    public static Boolean getPublicTransmit(ItemStack stack) {
+        if (stackTagContainsKey(stack, PUBLIC_TRANSMIT_TAG)) {
+            return stack.getTag().getBoolean(PUBLIC_TRANSMIT_TAG);
         }
 
-        return TransmitMode.SELF;
+        return true;
     }
     
     public static void setTransmitId(ItemStack stack, UUID transmitId) {

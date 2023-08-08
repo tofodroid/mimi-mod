@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -76,8 +75,8 @@ public class MidiInputManager {
         return this.hasActiveFileCaster;
     }
 
-    public TransmitMode getTransmitMode() {
-        return fileCasterManager.getTransmitMode();
+    public Boolean getPublicTransmit() {
+        return fileCasterManager.getPublicTransmit();
     }
 
     protected Boolean hasFileCaster(Player player) {

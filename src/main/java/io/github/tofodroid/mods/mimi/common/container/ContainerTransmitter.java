@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import io.github.tofodroid.mods.mimi.common.container.slot.SlotDisabled;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.item.ItemTransmitter;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 
 public class ContainerTransmitter extends APlayerInventoryContainer {
 	private static final int FLOPPY_SLOT_X = 8;
@@ -81,24 +80,14 @@ public class ContainerTransmitter extends APlayerInventoryContainer {
 		return this.playerInventory.getItem(this.playerInvSlot);
 	}
 
-	public TransmitMode getTransmitMode() {
-		return ItemTransmitter.getTransmitMode(this.playerInventory.getItem(this.playerInvSlot));
+	public Boolean getPublicTransmit() {
+		return ItemTransmitter.getPublicTransmit(this.playerInventory.getItem(this.playerInvSlot));
 	}
 
-	public TransmitMode toggleTransmitMode() {
-		TransmitMode oldMode = ItemTransmitter.getTransmitMode(this.playerInventory.getItem(this.playerInvSlot));
-		TransmitMode newMode;
-
-		if(TransmitMode.SELF.equals(oldMode)) {
-			newMode = TransmitMode.LINKED;
-		} else if(TransmitMode.LINKED.equals(oldMode)) {
-			newMode = TransmitMode.PUBLIC;
-		} else {
-			newMode = TransmitMode.SELF;
-		}
-
-		ItemTransmitter.setTransmitMode(this.playerInventory.getItem(this.playerInvSlot), newMode);
-		return newMode;
+	public Boolean toggleTransmitMode() {
+		Boolean newVal = !getPublicTransmit();
+		ItemTransmitter.setPublicTransmit(this.playerInventory.getItem(this.playerInvSlot), newVal);
+		return newVal;
 	}
 
 	public ItemStack getActiveFloppyStack() {

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -15,9 +16,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
@@ -25,17 +27,22 @@ import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 public class TransmitterNotePacketHandler {
     public static void handlePacket(final TransmitterNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender().getOnPos(), (ServerLevel)ctx.get().getSender().level(),  ctx.get().getSender().getUUID(), ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender().getOnPos(), (ServerLevel)ctx.get().getSender().level(), ctx.get().getSender().getUUID()));
         }
 
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacketServer(final TransmitterNotePacket message, BlockPos sourcePos, ServerLevel worldIn, UUID senderId, ServerPlayer sender) {
+    public static void handlePacketServer(final TransmitterNotePacket message, BlockPos sourcePos, ServerLevel worldIn, UUID senderId) {
         HashMap<UUID, List<MidiNotePacket>> notePackets = new HashMap<>();
 
+        // Override senderId for public
+        if(message.pub) {
+            senderId = InstrumentDataUtils.PUBLIC_SOURCE_ID;
+        }
+
         // Handle Players
-        for(ServerPlayer player : getPotentialPlayers(message.transmitMode, sourcePos, worldIn, sender, getQueryBoxRange(message.velocity <= 0))) {
+        for(ServerPlayer player : getPotentialPlayers(sourcePos, worldIn, getQueryBoxRange(message.velocity <= 0))) {
             List<MidiNotePacket> playerPackets = new ArrayList<>();
             
             // Held Instruments
@@ -65,15 +72,13 @@ public class TransmitterNotePacketHandler {
         sendPlayerOnPackets(notePackets, worldIn);
 
         // Handle Receivers
-        /* TODO
         if(!message.isControlPacket() && message.velocity > 0) {
-            for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(message.transmitMode, sourcePos, worldIn, getQueryBoxRange(false)))) {
-                if(receiver.shouldHandleMessage(senderId, message.channel, message.note, message.transmitMode == TransmitMode.PUBLIC)) {
+            for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(sourcePos, worldIn, getQueryBoxRange(false)))) {
+                if(receiver.shouldRespondToMessage(senderId, message.channel, message.note)) {
                     ModBlocks.RECEIVER.get().powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos());
                 }
             }
         }
-        */
     }
     
     // Tile Entity Functions
@@ -82,7 +87,7 @@ public class TransmitterNotePacketHandler {
 
         if(instrumentEntity != null) { 
             Byte instrumentId = instrumentEntity.getInstrumentId();
-            if(instrumentId != null && ItemInstrumentHandheld.shouldHandleMessage(instrumentEntity.getInstrumentStack(), sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+            if(instrumentId != null && ItemInstrumentHandheld.shouldRespondToMessage(instrumentEntity.getInstrumentStack(), sourceId, message.channel)) {
                 if(message.isControlPacket()) {
                     packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), instrumentId, target.getUUID(), target.getOnPos(), message.noteServerTime));
                 } else {
@@ -96,16 +101,16 @@ public class TransmitterNotePacketHandler {
     protected static List<TileMechanicalMaestro> getPotentialMechMaestros(List<EntityNoteResponsiveTile> entities) {
         return entities.stream().filter(e -> e.getTile() instanceof TileMechanicalMaestro).map(e -> (TileMechanicalMaestro)e.getTile()).collect(Collectors.toList());
     }
+    */
 
     protected static List<TileReceiver> getPotentialReceivers(List<EntityNoteResponsiveTile> entities) {
         return entities.stream().filter(e -> e.getTile() instanceof TileReceiver).map(e -> (TileReceiver)e.getTile()).collect(Collectors.toList());
     }
-    */
 
     // Item Stack Functions
     protected static void handleHeldInstrumentRelayNote(ServerPlayer target, UUID sourceId, InteractionHand handIn, final TransmitterNotePacket message, List<MidiNotePacket> packetList) {
         ItemStack stack = ItemInstrumentHandheld.getEntityHeldInstrumentStack(target, handIn);
-        if(stack != null && ItemInstrumentHandheld.shouldHandleMessage(stack, sourceId, message.channel, TransmitMode.PUBLIC.equals(message.transmitMode))) {
+        if(stack != null && ItemInstrumentHandheld.shouldRespondToMessage(stack, sourceId, message.channel)) {
             if(message.isControlPacket()) {
                 packetList.add(MidiNotePacket.createControlPacket(message.getControllerNumber(), message.getControllerValue(), InstrumentDataUtils.getInstrumentId(stack), target.getUUID(), target.getOnPos(), message.noteServerTime));
             } else {
@@ -115,32 +120,26 @@ public class TransmitterNotePacketHandler {
     }
     
     // Util
-    protected static List<ServerPlayer> getPotentialPlayers(TransmitMode transmitMode, BlockPos sourcePos, ServerLevel worldIn, ServerPlayer sender, Integer range) {
+    protected static List<ServerPlayer> getPotentialPlayers(BlockPos sourcePos, ServerLevel worldIn, Integer range) {
         List<ServerPlayer> potentialPlayers = new ArrayList<>();
 
-        if(transmitMode != TransmitMode.SELF) {
-            AABB queryBox = new AABB(sourcePos.getX() - range, sourcePos.getY() - range, sourcePos.getZ() - range, 
-                                                sourcePos.getX() + range, sourcePos.getY() + range, sourcePos.getZ() + range);
-            potentialPlayers = worldIn.getEntitiesOfClass(ServerPlayer.class, queryBox, entity -> {
-                return ItemInstrumentHandheld.isEntityHoldingInstrument(entity) || BlockInstrument.isEntitySittingAtInstrument(entity);
-            });
-        } else if(sender != null) {
-            potentialPlayers.add(sender);
-        }
+        AABB queryBox = new AABB(sourcePos.getX() - range, sourcePos.getY() - range, sourcePos.getZ() - range, 
+                                            sourcePos.getX() + range, sourcePos.getY() + range, sourcePos.getZ() + range);
+        potentialPlayers = worldIn.getEntitiesOfClass(ServerPlayer.class, queryBox, entity -> {
+            return ItemInstrumentHandheld.isEntityHoldingInstrument(entity) || BlockInstrument.isEntitySittingAtInstrument(entity);
+        });
 
         return potentialPlayers;
     }
 
-    protected static List<EntityNoteResponsiveTile> getPotentialEntities(TransmitMode transmitMode, BlockPos sourcePos, ServerLevel worldIn, Integer range) {
+    protected static List<EntityNoteResponsiveTile> getPotentialEntities(BlockPos sourcePos, ServerLevel worldIn, Integer range) {
         List<EntityNoteResponsiveTile> potentialEntites = new ArrayList<>();
         
-        if(transmitMode != TransmitMode.SELF) {
-            AABB queryBox = new AABB(sourcePos.getX() - range, sourcePos.getY() - range, sourcePos.getZ() - range, 
-                                                        sourcePos.getX() + range, sourcePos.getY() + range, sourcePos.getZ() + range);
-            potentialEntites = worldIn.getEntitiesOfClass(EntityNoteResponsiveTile.class, queryBox, entity -> {
-                return entity.getTile() != null;
-            });
-        }
+        AABB queryBox = new AABB(sourcePos.getX() - range, sourcePos.getY() - range, sourcePos.getZ() - range, 
+                                                    sourcePos.getX() + range, sourcePos.getY() + range, sourcePos.getZ() + range);
+        potentialEntites = worldIn.getEntitiesOfClass(EntityNoteResponsiveTile.class, queryBox, entity -> {
+            return entity.getTile() != null;
+        });
 
         return potentialEntites;
     }

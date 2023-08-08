@@ -10,36 +10,26 @@ public class TransmitterNotePacket {
     public final Byte channel;
     public final Byte note;
     public final Byte velocity;
-    public final TransmitMode transmitMode;
+    public final Boolean pub;
     public final Long noteServerTime;
     
-    public static enum TransmitMode {
-        PUBLIC,
-        LINKED,
-        SELF;
-
-        public static TransmitMode fromInt(Integer val) {
-            return val >=0 && TransmitMode.values().length > val ? TransmitMode.values()[val] : null;
-        }
+    public static TransmitterNotePacket createNotePacket(Byte channel, Byte note, Byte velocity, Boolean pub) {
+        return new TransmitterNotePacket(channel, note, velocity, pub, MIMIMod.proxy.getCurrentServerMillis());
     }
 
-    public static TransmitterNotePacket createNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, note, velocity, transmitMode, MIMIMod.proxy.getCurrentServerMillis());
-    }
-
-    public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), transmitMode, MIMIMod.proxy.getCurrentServerMillis());
+    public static TransmitterNotePacket createAllNotesOffPacket(Byte channel, Boolean pub) {
+        return new TransmitterNotePacket(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), pub, MIMIMod.proxy.getCurrentServerMillis());
     }
     
-    public static TransmitterNotePacket createControllerPacket(Byte channel, Byte controller, Byte value, TransmitMode transmitMode) {
-        return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, transmitMode, MIMIMod.proxy.getCurrentServerMillis());
+    public static TransmitterNotePacket createControllerPacket(Byte channel, Byte controller, Byte value, Boolean pub) {
+        return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, pub, MIMIMod.proxy.getCurrentServerMillis());
     }
 
-    private TransmitterNotePacket(Byte channel, Byte note, Byte velocity, TransmitMode transmitMode, Long noteServerTime) {
+    private TransmitterNotePacket(Byte channel, Byte note, Byte velocity, Boolean pub, Long noteServerTime) {
         this.channel = channel;
         this.note = note;
         this.velocity = velocity;
-        this.transmitMode = transmitMode;
+        this.pub = pub;
         this.noteServerTime = noteServerTime;
     }
 
@@ -48,9 +38,9 @@ public class TransmitterNotePacket {
             byte channel = buf.readByte();
             byte note = buf.readByte();
             byte velocity = buf.readByte();
-            TransmitMode transmitMode = TransmitMode.values()[Byte.valueOf(buf.readByte()).intValue()];
+            Boolean pub = buf.readBoolean();
             Long noteServerTime = buf.readLong();
-            return new TransmitterNotePacket(channel, note, velocity, transmitMode, noteServerTime);
+            return new TransmitterNotePacket(channel, note, velocity, pub, noteServerTime);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("TransmitterNotePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -61,7 +51,7 @@ public class TransmitterNotePacket {
         buf.writeByte(pkt.channel);
         buf.writeByte(pkt.note);
         buf.writeByte(pkt.velocity);
-        buf.writeByte(Integer.valueOf(pkt.transmitMode.ordinal()).byteValue());
+        buf.writeBoolean(pkt.pub);
         buf.writeLong(pkt.noteServerTime);
     }
 

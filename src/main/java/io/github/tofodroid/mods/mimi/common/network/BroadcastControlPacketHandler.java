@@ -10,7 +10,6 @@ import io.github.tofodroid.mods.mimi.common.container.ContainerBroadcaster;
 import io.github.tofodroid.mods.mimi.common.container.ContainerTransmitter;
 import io.github.tofodroid.mods.mimi.common.item.ItemFloppyDisk;
 import io.github.tofodroid.mods.mimi.common.item.ItemTransmitter;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
 import io.github.tofodroid.mods.mimi.common.tile.TileBroadcaster;
 import io.github.tofodroid.mods.mimi.server.midi.MusicPlayerMidiHandler;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
@@ -59,9 +58,8 @@ public class BroadcastControlPacketHandler {
                     tile.stopMusic();
                     break;
                 case TOGGLE_PUBLIC:
-                    TransmitMode oldMode = tile.getTransmitMode();
                     tile.togglePublicBroadcast();
-                    sendAllNotesOff(oldMode, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), sender);
+                    sendAllNotesOff(tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getMusicPlayerId(), !tile.isPublicBroadcast());
                     break;
                 default:
                     break;
@@ -105,24 +103,22 @@ public class BroadcastControlPacketHandler {
                     }
                     break;
                 case TOGGLE_PUBLIC:
-                    TransmitMode oldMode = container.getTransmitMode();
                     container.toggleTransmitMode();
                     container.saveToInventory(sender);
                     container.sendAllDataToRemote();
                     ServerMusicPlayerMidiManager.forceUpdateTransmitterStack(sender.getUUID(), container.getTransmitterStack());
-                    sendAllNotesOff(oldMode, sender.getOnPos(), (ServerLevel)sender.level(), sender.getUUID(), sender);
+                    sendAllNotesOff(sender.getOnPos(), (ServerLevel)sender.level(), sender.getUUID(), container.getPublicTransmit());
                     break;
                 default:
                     break;
-
             }
         }
     }
 
-    protected static void sendAllNotesOff(TransmitMode mode, BlockPos pos, ServerLevel level, UUID uuid, ServerPlayer sender) {
-        TransmitterNotePacket offPacket = TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, mode);
+    protected static void sendAllNotesOff(BlockPos pos, ServerLevel level, UUID uuid, Boolean pub) {
+        TransmitterNotePacket offPacket = TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, pub);
         ServerLifecycleHooks.getCurrentServer().execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(offPacket, pos, level, uuid, sender);
+            TransmitterNotePacketHandler.handlePacketServer(offPacket, pos, level, uuid);
         });
     }
 }
