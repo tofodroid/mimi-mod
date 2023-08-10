@@ -80,6 +80,7 @@ public class GuiDiskWriterContainerScreen extends BaseContainerGui<ContainerDisk
     }
 
     @Override
+    @SuppressWarnings("null")
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 256) {
            this.minecraft.player.closeContainer();

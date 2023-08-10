@@ -324,8 +324,8 @@ public abstract class InstrumentDataUtils {
         return Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
     }
 
-    public static String getInstrumentName(ItemStack stack) {
-        return INSTRUMENT_NAME_MAP().get(InstrumentDataUtils.getInstrumentId(stack));
+    public static String getInstrumentName(Byte instrumentId) {
+        return INSTRUMENT_NAME_MAP().get(instrumentId);
     }
 
     public static List<Byte> getFilterNotes(ItemStack stack) {

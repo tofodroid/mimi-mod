@@ -77,7 +77,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         if(worldIn.isClientSide && !playerIn.isCrouching()) {
-            ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, handIn);
+            ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, handIn, playerIn.getItemInHand(handIn));
 		    return new InteractionResultHolder<>(InteractionResult.SUCCESS, playerIn.getItemInHand(handIn));
         }
 

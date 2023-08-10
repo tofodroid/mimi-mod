@@ -67,6 +67,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     }
 
     @Override
+    @SuppressWarnings("null")
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         InputConstants.Key invKey = InputConstants.getKey(keyCode, scanCode);
 

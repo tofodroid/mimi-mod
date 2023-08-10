@@ -3,8 +3,10 @@ package io.github.tofodroid.mods.mimi.common.keybind;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.network.KeybindOpenTransmitterPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -62,11 +64,15 @@ public class ModBindings {
             }else if(GUITRANSMITTER.isDown()) {
                 NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenTransmitterPacket());
             } else if(MIDIGUIMAIN.isDown()) {
-                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND);
+                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND, playerIn.getItemInHand(InteractionHand.MAIN_HAND));
             } else if(MIDIGUIOFF.isDown()) {
-                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.OFF_HAND);
+                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.OFF_HAND, playerIn.getItemInHand(InteractionHand.OFF_HAND));
             } else if(MIDIGUISEAT.isDown()) {
-                
+                TileInstrument tile = BlockInstrument.getTileInstrumentForEntity(playerIn);
+
+                if(tile != null) {
+                    ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, tile.getInstrumentStack());
+                }
             } else if(MIDISETTINGS.isDown()) {
                 ClientGuiWrapper.openConfigGui(worldIn, playerIn);
             }

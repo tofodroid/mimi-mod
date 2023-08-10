@@ -16,9 +16,11 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 
-import org.joml.Vector2f;
+import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
+import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
+import io.github.tofodroid.mods.mimi.client.gui.widget.TransmitterSourceWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -29,7 +31,6 @@ import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -43,21 +44,17 @@ public class GuiInstrument extends BaseGui {
     private static final Integer NOTE_OFFSET_Y = 29;
 
     // GUI
-    private static final Vector2f SYS_DEVICE_BUTTON_COORDS = new Vector2f(105,84);
-    private static final Vector2f SOURCE_SELF_BUTTON_COORDS = new Vector2f(47,133);
-    private static final Vector2f SOURCE_PUBLIC_BUTTON_COORDS = new Vector2f(66,133);
-    private static final Vector2f SOURCE_CLEAR_BUTTON_COORDS = new Vector2f(85,133);
-    private static final Vector2f KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2f(300,31);
-    private static final Vector2f ALL_MIDI_BUTTON_COORDS = new Vector2f(141,101);
-    private static final Vector2f CLEAR_MIDI_BUTTON_COORDS = new Vector2f(141,126);
-    private static final Vector2f GEN_MIDI_BUTTON_COORDS = new Vector2f(160,101);
-    private static final Vector2f NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(33,163);
-    private static final Vector2f NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2f(52,163);
-    private static final Vector2f OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2f(14,163);
-    private static final Vector2f OCT_SHIFT_UP_BUTTON_COORDS = new Vector2f(71,163);
-    private static final Vector2f MIDI_EDIT_BUTTON_COORDS = new Vector2f(299,163);
-    private static final Vector2f INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2f(202,58);
-    private static final Vector2f INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2f(155,58);
+    private static final Vector2i MIDI_CHANNEL_WIDGET_COORDS = new Vector2i(137,71);
+    private static final Vector2i TRANSMIT_SOURCE_WIDGET_COORDS = new Vector2i(18,105);
+    private static final Vector2i SYS_DEVICE_BUTTON_COORDS = new Vector2i(108,85);
+    private static final Vector2i INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2i(114,62);
+    private static final Vector2i INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2i(67,62);
+    private static final Vector2i KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2i(300,31);
+    private static final Vector2i NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(33,163);
+    private static final Vector2i NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2i(52,163);
+    private static final Vector2i OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(14,163);
+    private static final Vector2i OCT_SHIFT_UP_BUTTON_COORDS = new Vector2i(71,163);
+    private static final Vector2i MIDI_EDIT_BUTTON_COORDS = new Vector2i(299,163);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
@@ -142,16 +139,20 @@ public class GuiInstrument extends BaseGui {
         {GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_M), 60}
     }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
+    // Widgets
+    private MidiChannelToggleWidget midiChannelToggle;
+    private TransmitterSourceWidget transmitSource;
+
     // Input Data
     private final ItemStack instrumentStack;
-    private final Player player;
-    private final InteractionHand handIn;
+    private Player player;
+    private InteractionHand handIn;
 
     // Runtime Data
     private ConcurrentHashMap<Byte, Instant> heldNotes;
     private ConcurrentHashMap<Byte, Instant> releasedNotes;
-    private String instrumentNameString;
-    private Byte instrumentId;
+    private String instrumentNameString = null;
+    private Byte instrumentId = null;
     private Boolean editMode = false;
     private Integer visibleNoteShift = KEYBOARD_START_NOTE;
     private String noteIdString = "C3,F4 | G4,C6";
@@ -160,27 +161,19 @@ public class GuiInstrument extends BaseGui {
     public GuiInstrument(Player player, ItemStack instrumentStack, InteractionHand handIn) {
         super(328, 250, 530, "textures/gui/container_instrument.png", "item.MIMIMod.gui_instrument");
 
-        this.player = player;
-        this.handIn = handIn;
-
         if(instrumentStack == null || instrumentStack.isEmpty()) {
             MIMIMod.LOGGER.error("Instrument stack is null or empty. Force closing GUI!");
             Minecraft.getInstance().forceSetScreen((Screen)null);
             this.instrumentStack = null;
-            this.instrumentId = null;
-            this.instrumentNameString = null;
-        } else {
-            this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount());
-            this.instrumentStack.setTag(instrumentStack.getOrCreateTag().copy());
-            this.instrumentId = InstrumentDataUtils.getInstrumentId(this.instrumentStack);
-            this.instrumentNameString = InstrumentDataUtils.getInstrumentName(this.instrumentStack);
+            return;
         }
 
-    }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
+        this.player = player;
+        this.handIn = handIn;
+        this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount());
+        this.instrumentStack.setTag(instrumentStack.getOrCreateTag().copy());
+        this.instrumentId = InstrumentDataUtils.getInstrumentId(this.instrumentStack);
+        this.instrumentNameString = InstrumentDataUtils.getInstrumentName(this.instrumentId);
     }
 
     @Override
@@ -188,6 +181,8 @@ public class GuiInstrument extends BaseGui {
         super.init();
         this.heldNotes = new ConcurrentHashMap<>();
         this.releasedNotes = new ConcurrentHashMap<>();
+        this.midiChannelToggle = new MidiChannelToggleWidget(instrumentStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
+        this.transmitSource = new TransmitterSourceWidget(instrumentStack, player.getUUID(), player.getName().getString(), new Vector2i(START_X, START_Y), TRANSMIT_SOURCE_WIDGET_COORDS);
     }
 
     public void syncInstrumentToServer() {
@@ -211,22 +206,22 @@ public class GuiInstrument extends BaseGui {
         int relativeMouseY = imouseY - firstNoteY;
 
         // Keyboard Controls
-        if(clickedBox(imouseX, imouseY, NOTE_SHIFT_UP_BUTTON_COORDS)) {
+        if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_UP_BUTTON_COORDS))) {
             this.shiftVisibleNotes(true, 1);
-        } else if(clickedBox(imouseX, imouseY, NOTE_SHIFT_DOWN_BUTTON_COORDS)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_DOWN_BUTTON_COORDS))) {
             this.shiftVisibleNotes(false, 1);
-        } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_UP_BUTTON_COORDS)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OCT_SHIFT_UP_BUTTON_COORDS))) {
             this.shiftVisibleNotes(true, 7);
-        } else if(clickedBox(imouseX, imouseY, OCT_SHIFT_DOWN_BUTTON_COORDS)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OCT_SHIFT_DOWN_BUTTON_COORDS))) {
             this.shiftVisibleNotes(false, 7);
-        } else if(clickedBox(imouseX, imouseY, MIDI_EDIT_BUTTON_COORDS)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(MIDI_EDIT_BUTTON_COORDS))) {
             editMode = !editMode;
         }
         
         if(!editMode) {
             // Keyboard Layout Hover Box
-            if(imouseX >= 220 && imouseY >= 28 && imouseX < (START_X + this.GUI_WIDTH) && imouseY < (START_Y + 50)) {
-                if(clickedBox(imouseX, imouseY, KEYBOARD_LAYOUT_BUTTON_COORDS)) {
+            if(imouseX >= 220 && imouseY >= 28 && imouseX < (this.GUI_WIDTH) && imouseY < (50)) {
+                if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(KEYBOARD_LAYOUT_BUTTON_COORDS))) {
                     if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
                         ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
                     } else {
@@ -256,53 +251,24 @@ public class GuiInstrument extends BaseGui {
                 }
             }
         } else {
-            // Switchboard MIDI Controls
-            if(clickedBox(imouseX, imouseY, SYS_DEVICE_BUTTON_COORDS)) {
+            // MIDI Controls
+            if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SYS_DEVICE_BUTTON_COORDS))) {
                 // Toggle Sys Device Button
                 InstrumentDataUtils.setSysInput(instrumentStack, !InstrumentDataUtils.getSysInput(instrumentStack));
                 this.syncInstrumentToServer();
                 this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, SOURCE_SELF_BUTTON_COORDS)) {
-                InstrumentDataUtils.setMidiSource(instrumentStack, player.getUUID(), player.getName().getString());
-                this.syncInstrumentToServer();
-               this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, SOURCE_PUBLIC_BUTTON_COORDS)) {
-                InstrumentDataUtils.setMidiSource(instrumentStack, InstrumentDataUtils.PUBLIC_SOURCE_ID, "Public");
-                this.syncInstrumentToServer();
-                this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, SOURCE_CLEAR_BUTTON_COORDS)) {
-                InstrumentDataUtils.setMidiSource(instrumentStack, null, "None");
-                this.syncInstrumentToServer();
-                this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_UP_BUTTON_COORDS)) {
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(INSTRUMENT_VOLUME_UP_BUTTON_COORDS))) {
                 InstrumentDataUtils.setInstrumentVolume(instrumentStack, Integer.valueOf(InstrumentDataUtils.getInstrumentVolume(instrumentStack) + 1).byteValue());
                 this.syncInstrumentToServer();
-            } else if(clickedBox(imouseX, imouseY, INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS)) {
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS))) {
                 InstrumentDataUtils.setInstrumentVolume(instrumentStack, Integer.valueOf(InstrumentDataUtils.getInstrumentVolume(instrumentStack) - 1).byteValue());
                 this.syncInstrumentToServer();
-            } else if(clickedBox(imouseX, imouseY, CLEAR_MIDI_BUTTON_COORDS)) {
-                InstrumentDataUtils.clearEnabledChannels(instrumentStack);
+            } else if(transmitSource.mouseClicked(imouseX, imouseY, mouseButton)) {
                 this.syncInstrumentToServer();
                 this.allNotesOff();
-            } else if(clickedBox(imouseX, imouseY, ALL_MIDI_BUTTON_COORDS)) {
-                InstrumentDataUtils.setEnableAllChannels(instrumentStack);
+            } else if(midiChannelToggle.mouseClicked(imouseX, imouseY, mouseButton)) {
                 this.syncInstrumentToServer();
                 this.allNotesOff();
-            } else {
-                // Individual Midi Channel Buttons
-                for(byte i = 0; i < 16; i++) {
-                    Vector2f buttonCoords = new Vector2f(
-                        GEN_MIDI_BUTTON_COORDS.x() + (i % 8) * 19,
-                        GEN_MIDI_BUTTON_COORDS.y() + (i / 8) * 25
-                    );
-
-                    if(clickedBox(imouseX, imouseY, buttonCoords)) {
-                        InstrumentDataUtils.toggleChannel(instrumentStack,i);
-                        this.syncInstrumentToServer();
-                        this.allNotesOff();
-                        return super.mouseClicked(dmouseX, dmouseY, mouseButton);
-                    }
-                }
             }
         }
         
@@ -581,17 +547,11 @@ public class GuiInstrument extends BaseGui {
 
             // Sys MIDI Device Status Light
             if(InstrumentDataUtils.getSysInput(this.instrumentStack)) {
-                graphics.blit(guiTexture, START_X + 124, START_Y + 90, 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                graphics.blit(guiTexture, START_X + 127, START_Y + 91, 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
 
-            // Channel Output Status Lights
-            SortedArraySet<Byte> acceptedChannels = InstrumentDataUtils.getEnabledChannelsSet(this.instrumentStack);
-
-            if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
-                for(Byte channelId : acceptedChannels) {
-                    graphics.blit(guiTexture, START_X + 166 + 19 * (channelId % 8), START_Y + 119 + (channelId / 8) * 25, 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-                }
-            }
+            this.midiChannelToggle.renderGraphics(graphics, mouseX, mouseY);
+            this.transmitSource.renderGraphics(graphics, mouseX, mouseY);
         }
         
         return graphics;
@@ -657,9 +617,9 @@ public class GuiInstrument extends BaseGui {
 
         // MIDI Source Name & Volume
         if(editMode) {
-            String selectedSourceName = InstrumentDataUtils.getMidiSourceName(this.instrumentStack);
-            graphics.drawString(font, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", START_X + 21, START_Y + 122, 0xFF00E600);
-            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolumePercent(this.instrumentStack).toString(), START_X + 180, START_Y + 62, 0xFF00E600);
+            this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
+            this.transmitSource.renderText(graphics, font, mouseX, mouseY);
+            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolumePercent(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
         }
 
         // Keyboard Layout

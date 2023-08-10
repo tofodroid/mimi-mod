@@ -82,7 +82,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
                 }
             } else if(worldIn.isClientSide) {
                 if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    ClientGuiWrapper.openInstrumentGui(worldIn, player, null);
+                    ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
                 }
             }
         }

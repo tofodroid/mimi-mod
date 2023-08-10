@@ -6,7 +6,7 @@ import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiDevice.Info;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import org.joml.Vector2f;
+import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
@@ -16,11 +16,11 @@ import net.minecraft.world.entity.player.Player;
 
 public class GuiMidiInputConfig extends BaseGui {    
     // Button Boxes
-    private static final Vector2f CLEAR_DEVICE_BUTTON = new Vector2f(272,36);
-    private static final Vector2f REFRESH_DEVICES_BUTTON = new Vector2f(271,94);
-    private static final Vector2f SHIFT_DEVICE_DOWN_BUTTON = new Vector2f(110,94);
-    private static final Vector2f SHIFT_DEVICE_UP_BUTTON = new Vector2f(252,94);
-    private static final Vector2f SAVE_DEVICE_BUTTON = new Vector2f(271,144);
+    private static final Vector2i CLEAR_DEVICE_BUTTON = new Vector2i(272,36);
+    private static final Vector2i REFRESH_DEVICES_BUTTON = new Vector2i(271,94);
+    private static final Vector2i SHIFT_DEVICE_DOWN_BUTTON = new Vector2i(110,94);
+    private static final Vector2i SHIFT_DEVICE_UP_BUTTON = new Vector2i(252,94);
+    private static final Vector2i SAVE_DEVICE_BUTTON = new Vector2i(271,144);
 
     // MIDI
     private MidiInputManager midiInputManager;
@@ -38,16 +38,16 @@ public class GuiMidiInputConfig extends BaseGui {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(clickedBox(imouseX, imouseY, REFRESH_DEVICES_BUTTON)) {
+        if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_DEVICES_BUTTON))) {
             visibleDeviceId = 0;
             availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
-        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected() && clickedBox(imouseX, imouseY, CLEAR_DEVICE_BUTTON)) {
+        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected() && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(CLEAR_DEVICE_BUTTON))) {
             this.midiInputManager.inputDeviceManager.clearDeviceSelection();
-        } else if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId && clickedBox(imouseX, imouseY, SAVE_DEVICE_BUTTON)) {
+        } else if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SAVE_DEVICE_BUTTON))) {
             this.midiInputManager.inputDeviceManager.saveDeviceSelection(availableDevices.get(visibleDeviceId));
-        } else if(this.availableDevices != null && clickedBox(imouseX, imouseY, SHIFT_DEVICE_UP_BUTTON)) {
+        } else if(this.availableDevices != null && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_UP_BUTTON))) {
             visibleDeviceId = visibleDeviceId < (this.availableDevices.size() - 1) ? visibleDeviceId + 1 : visibleDeviceId;
-        } else if(this.availableDevices != null  && clickedBox(imouseX, imouseY, SHIFT_DEVICE_DOWN_BUTTON)) {
+        } else if(this.availableDevices != null  && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_DOWN_BUTTON))) {
             visibleDeviceId = visibleDeviceId > 0 ? visibleDeviceId - 1 : visibleDeviceId;
         }
         

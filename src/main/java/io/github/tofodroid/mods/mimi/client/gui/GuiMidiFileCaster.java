@@ -5,7 +5,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import org.joml.Vector2f;
+import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
@@ -28,19 +28,19 @@ public class GuiMidiFileCaster extends BaseGui {
     private String folderPathString;
     
     // Button Boxes
-    private static final Vector2f LOAD_FOLDER_BUTTON = new Vector2f(301,37);
-    private static final Vector2f SAVE_DEFAULT_BUTTON = new Vector2f(320,37);
-    private static final Vector2f LOAD_DEFAULT_BUTTON = new Vector2f(339,37);
-    private static final Vector2f PREVIOUS_BUTTON = new Vector2f(14,271);
-    private static final Vector2f STOP_BUTTON = new Vector2f(33,271);
-    private static final Vector2f PLAY_PAUSE_BUTTON = new Vector2f(52,271);
-    private static final Vector2f NEXT_BUTTON = new Vector2f(71,271);
-    private static final Vector2f LOOP_BUTTON = new Vector2f(90,271);
-    private static final Vector2f LOOP_SCREEN = new Vector2f(108,272);
-    private static final Vector2f SHUFFLE_BUTTON = new Vector2f(125,271);
-    private static final Vector2f SHUFFLE_SCREEN = new Vector2f(143,272);
-    private static final Vector2f TRANSMIT_BUTTON = new Vector2f(160,271);
-    private static final Vector2f TRANSMIT_SCREEN = new Vector2f(178,272);
+    private static final Vector2i LOAD_FOLDER_BUTTON = new Vector2i(301,37);
+    private static final Vector2i SAVE_DEFAULT_BUTTON = new Vector2i(320,37);
+    private static final Vector2i LOAD_DEFAULT_BUTTON = new Vector2i(339,37);
+    private static final Vector2i PREVIOUS_BUTTON = new Vector2i(14,271);
+    private static final Vector2i STOP_BUTTON = new Vector2i(33,271);
+    private static final Vector2i PLAY_PAUSE_BUTTON = new Vector2i(52,271);
+    private static final Vector2i NEXT_BUTTON = new Vector2i(71,271);
+    private static final Vector2i LOOP_BUTTON = new Vector2i(90,271);
+    private static final Vector2i LOOP_SCREEN = new Vector2i(108,272);
+    private static final Vector2i SHUFFLE_BUTTON = new Vector2i(125,271);
+    private static final Vector2i SHUFFLE_SCREEN = new Vector2i(143,272);
+    private static final Vector2i TRANSMIT_BUTTON = new Vector2i(160,271);
+    private static final Vector2i TRANSMIT_SCREEN = new Vector2i(178,272);
 
     // Time Slider
     private static final Integer SLIDE_Y = 270;
@@ -73,15 +73,15 @@ public class GuiMidiFileCaster extends BaseGui {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(this.folderPathString != null && clickedBox(imouseX, imouseY, LOAD_FOLDER_BUTTON)) {
+        if(this.folderPathString != null && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(LOAD_FOLDER_BUTTON))) {
             this.midiInputManager.fileCasterManager.loadFromFolder(this.folderPathString);
-        } else if(this.folderPathString != null && clickedBox(imouseX, imouseY, SAVE_DEFAULT_BUTTON)) {
+        } else if(this.folderPathString != null && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SAVE_DEFAULT_BUTTON))) {
             ModConfigs.CLIENT.playlistFolderPath.set(this.folderPathString);
-        } else if(ModConfigs.CLIENT.playlistFolderPath.get() != null && !ModConfigs.CLIENT.playlistFolderPath.get().isEmpty() && clickedBox(imouseX, imouseY, LOAD_DEFAULT_BUTTON)) {
+        } else if(ModConfigs.CLIENT.playlistFolderPath.get() != null && !ModConfigs.CLIENT.playlistFolderPath.get().isEmpty() && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(LOAD_DEFAULT_BUTTON))) {
             this.folderPathString = ModConfigs.CLIENT.playlistFolderPath.get();
             this.folderPathField.setValue(this.folderPathString);
             this.midiInputManager.fileCasterManager.loadFromFolder(this.folderPathString);
-        } else if(clickedBox(imouseX, imouseY, PREVIOUS_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PREVIOUS_BUTTON))) {
             Double slidePercentage = null;
 
             if(this.midiInputManager.fileCasterManager.isSongLoaded()) {
@@ -93,21 +93,21 @@ public class GuiMidiFileCaster extends BaseGui {
             } else {
                 this.midiInputManager.fileCasterManager.shiftSong(false);
             }
-        } else if(clickedBox(imouseX, imouseY, STOP_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(STOP_BUTTON))) {
             this.midiInputManager.fileCasterManager.stop();
-        } else if(clickedBox(imouseX, imouseY, PLAY_PAUSE_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_PAUSE_BUTTON))) {
             if(this.midiInputManager.fileCasterManager.isPlaying()) { 
                 this.midiInputManager.fileCasterManager.pause();
             } else if(this.midiInputManager.fileCasterIsActive()) {
                 this.midiInputManager.fileCasterManager.playFromLastTickPosition();
             }
-        } else if(clickedBox(imouseX, imouseY, NEXT_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NEXT_BUTTON))) {
             this.midiInputManager.fileCasterManager.shiftSong(true);
-        } else if(clickedBox(imouseX, imouseY, LOOP_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(LOOP_BUTTON))) {
             this.midiInputManager.fileCasterManager.shiftLoopMode();
-        } else if(clickedBox(imouseX, imouseY, SHUFFLE_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHUFFLE_BUTTON))) {
             this.midiInputManager.fileCasterManager.toggleShuffle();
-        } else if(clickedBox(imouseX, imouseY, TRANSMIT_BUTTON)) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(TRANSMIT_BUTTON))) {
             this.midiInputManager.fileCasterManager.toggleTransmitMode();
             NetworkManager.BROADCAST_CHANNEL.sendToServer(TransmitterNotePacket.createAllNotesOffPacket(TransmitterNotePacket.ALL_CHANNELS, !this.midiInputManager.getPublicTransmit()));
         }
@@ -116,6 +116,7 @@ public class GuiMidiFileCaster extends BaseGui {
     }
 
     @Override
+    @SuppressWarnings("null")
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 256) {
            this.minecraft.player.closeContainer();
