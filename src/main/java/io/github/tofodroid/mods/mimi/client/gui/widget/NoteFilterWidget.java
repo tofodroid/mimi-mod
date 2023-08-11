@@ -34,7 +34,7 @@ public class NoteFilterWidget extends BaseWidget {
 
     @Override
     public void renderText(GuiGraphics graphics, Font font, Integer mouseX, Integer mouseY) {
-        graphics.drawString(font, InstrumentDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF005C00);
+        graphics.drawString(font, InstrumentDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
     }
 
     @Override

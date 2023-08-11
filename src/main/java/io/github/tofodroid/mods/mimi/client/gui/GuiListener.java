@@ -9,19 +9,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
 public class GuiListener extends BaseGui {
     // GUI
-    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(180,26);
+    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(188,26);
     private static final Vector2i FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2i(9,40);
-    private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(143,40);
-    private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(161,40);
+    private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(150,40);
+    private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(169,40);
 
     // Widgets
     private NoteFilterWidget noteFilter;
@@ -30,17 +32,19 @@ public class GuiListener extends BaseGui {
     protected List<Byte> INSTRUMENT_ID_LIST;
     protected Integer filterInstrumentIndex = 0;
     private final ItemStack listenerStack;
+    private final BlockPos tilePos;
 
-    public GuiListener(Player player, ItemStack listenerStack) {
-        super(302, 64, 302, "textures/gui/container_listener.png", "item.MIMIMod.gui_listener");
+    public GuiListener(BlockPos tilePos, ItemStack listenerStack) {
+        super(310, 64, 310, "textures/gui/container_listener.png", "item.MIMIMod.gui_listener");
 
         if(listenerStack == null || listenerStack.isEmpty()) {
             MIMIMod.LOGGER.error("Listener stack is null or empty. Force closing GUI!");
             Minecraft.getInstance().forceSetScreen((Screen)null);
             this.listenerStack = null;
+            this.tilePos = null;
             return;
         }
-        
+        this.tilePos = tilePos;
         this.listenerStack = new ItemStack(listenerStack.getItem(), listenerStack.getCount());
         this.listenerStack.setTag(listenerStack.getOrCreateTag().copy());
     }
@@ -48,11 +52,12 @@ public class GuiListener extends BaseGui {
     @Override
     public void init() {
         super.init();
+        this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(InstrumentDataUtils.getFilterInstrument(listenerStack));
         this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
     }
 
     public void syncListenerToServer() {
-        //NetworkManager.INFO_CHANNEL.sendToServer(new SyncInstrumentPacket(instrumentStack, this.handIn));
+        NetworkManager.INFO_CHANNEL.sendToServer(new ConfigurableMidiTileSyncPacket(listenerStack, tilePos));
     }
 
     @Override
@@ -87,7 +92,7 @@ public class GuiListener extends BaseGui {
         graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         if(InstrumentDataUtils.getInvertInstrument(listenerStack)) {
-            graphics.blit(guiTexture, START_X + 167, START_Y + 34, 0, 64, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.blit(guiTexture, START_X + 175, START_Y + 34, 0, 64, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
@@ -97,7 +102,7 @@ public class GuiListener extends BaseGui {
 
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        graphics.drawString(font, InstrumentDataUtils.getInstrumentName(InstrumentDataUtils.getFilterInstrument(listenerStack)), START_X + 29, START_Y + 44, 0xFF00E600);
+        graphics.drawString(font, InstrumentDataUtils.getInstrumentName(InstrumentDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         return graphics;
     }

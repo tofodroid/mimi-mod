@@ -4,6 +4,7 @@ import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -19,9 +20,9 @@ public abstract class ClientGuiWrapper {
         }
     }
 
-    public static void openListenerGui(Level world, Player player, ItemStack listenerStack) {
+    public static void openListenerGui(Level world, BlockPos tilePos, ItemStack listenerStack) {
         if(listenerStack.getItem().equals(ModBlocks.LISTENER.get().asItem())) {
-            openGui(world, new GuiListener(player, listenerStack));
+            openGui(world, new GuiListener(tilePos, listenerStack));
         }
     }
 

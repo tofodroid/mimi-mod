@@ -17,7 +17,7 @@ public class BlockListener extends APoweredConfigurableMidiBlock<TileListener> {
 
     @Override
     protected void openGui(Level worldIn, Player player, TileListener tile) {
-        ClientGuiWrapper.openListenerGui(worldIn, player, tile.getSourceStack());
+        ClientGuiWrapper.openListenerGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
     }
 
     @Override

@@ -34,14 +34,13 @@ public class SyncInstrumentPacketHandler {
         InstrumentDataUtils.setMidiSource(instrumentStack, message.midiSource, message.midiSourceName);
         InstrumentDataUtils.setEnabledChannelsString(instrumentStack, message.enabledChannelsString);
         InstrumentDataUtils.setSysInput(instrumentStack, message.sysInput);
-        InstrumentDataUtils.setEnabledChannelsString(instrumentStack, message.enabledChannelsString);
         InstrumentDataUtils.setInstrumentVolume(instrumentStack, message.volume);
         
         if(tileInstrument == null) {
             sender.setItemInHand(message.handIn, instrumentStack);
         } else {
             tileInstrument.setInstrumentStack(instrumentStack);
-            tileInstrument.getLevel().sendBlockUpdated(tileInstrument.getBlockPos(), tileInstrument.getBlockState(), tileInstrument.getBlockState(), 2);
+            sender.level().sendBlockUpdated(tileInstrument.getBlockPos(), tileInstrument.getBlockState(), tileInstrument.getBlockState(), 2);
         }
     }
 }

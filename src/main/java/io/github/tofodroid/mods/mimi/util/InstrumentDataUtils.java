@@ -353,7 +353,11 @@ public abstract class InstrumentDataUtils {
     }
 
     public static String getDefaultChannels(ItemStack stack) {
-        return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+        if(stack.getItem() instanceof IInstrumentItem) {
+            return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+        } else {
+            return NONE_CHANNELS_STRING;
+        }
     }
 
     public static String getDefaultChannelsForBank(Integer bankNumber) {
