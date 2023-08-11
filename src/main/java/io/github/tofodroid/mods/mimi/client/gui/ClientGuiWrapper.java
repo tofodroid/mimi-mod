@@ -26,6 +26,12 @@ public abstract class ClientGuiWrapper {
         }
     }
 
+    public static void openReceiverGui(Level world, Player player, BlockPos tilePos, ItemStack receiverStack) {
+        if(receiverStack.getItem().equals(ModBlocks.RECEIVER.get().asItem())) {
+            openGui(world, new GuiReceiver(player, tilePos, receiverStack));
+        }
+    }
+
     public static void openPlaylistGui(Level world, Player player) {
         openGui(world, new GuiMidiFileCaster(player));
     }

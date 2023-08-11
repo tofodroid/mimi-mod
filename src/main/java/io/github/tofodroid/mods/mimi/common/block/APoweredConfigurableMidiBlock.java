@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.block;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -13,18 +12,24 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiTile> extends AConfigurableMidiBlock<B> {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
 
     public APoweredConfigurableMidiBlock(Properties builder) {
-        this(builder, 0);
+        this(builder, 0, false);
     }
 
-    public APoweredConfigurableMidiBlock(Properties builder, Integer defaultPowerLevel) {
+    public APoweredConfigurableMidiBlock(Properties builder, Integer defaultPowerLevel, Boolean defaultTriggeredState) {
         super(builder);
-        this.registerDefaultState(this.stateDefinition.any().setValue(POWER, defaultPowerLevel));
+        this.registerDefaultState(
+            this.stateDefinition.any()
+                .setValue(POWER, defaultPowerLevel)
+                .setValue(TRIGGERED, defaultTriggeredState)
+        );
     }
 
     // POWER
@@ -34,13 +39,8 @@ public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiT
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(POWER, Integer.valueOf(0));
-    }
-    
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWER);
+        state.add(POWER, TRIGGERED);
     }
     
     @Override
@@ -59,6 +59,8 @@ public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiT
     }
 
     public void powerTarget(Level world, BlockState state, int power, BlockPos pos) {
+        //if(state.getValue(TRIGGERED))
+
         if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
             world.setBlock(pos, state.setValue(POWER, Integer.valueOf(power)), 3);
             

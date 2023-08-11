@@ -41,10 +41,13 @@ public class NoteFilterWidget extends BaseWidget {
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), FILTER_NOTE_OCTAVE_BUTTON_COORDS)) {
             this.shiftFilterNoteOctave();
+            return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), FILTER_NOTE_LETTER_BUTTON_COORDS)) {
             this.shiftFilterNoteLetter();
+            return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), FILTER_NOTE_INVERT_BUTTON_COORDS)) {
             InstrumentDataUtils.setInvertNoteOct(midiStack, !InstrumentDataUtils.getInvertNoteOct(midiStack));
+            return true;
         }
         
         return false;

@@ -8,4 +8,3 @@ public class TileReceiver extends AConfigurableMidiTile {
         super(ModTiles.RECEIVER, pos, state);
     }
 }
-

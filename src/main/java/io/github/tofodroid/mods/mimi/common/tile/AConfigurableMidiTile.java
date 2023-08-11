@@ -45,6 +45,7 @@ public abstract class AConfigurableMidiTile extends AStaticInventoryTile impleme
 
     @Override
     public void execServerTick(ServerLevel world, BlockPos pos, BlockState state, AConfigurableMidiTile self) {
+        MIMIMod.LOGGER.info("MIDIBLOCK SERVER TICK");
         if (state.getValue(BlockListener.POWER) != 0) {
             world.setBlock(pos, state.setValue(BlockListener.POWER, Integer.valueOf(0)), 3);
  

@@ -425,8 +425,8 @@ public abstract class InstrumentDataUtils {
     }
 
     public static Boolean isInstrumentFiltered(ItemStack stack, Byte instrument) {
-        Byte instrumentId = getInstrumentId(stack);
-        return instrumentId.equals(INSTRUMENT_ALL) ? !getInvertInstrument(stack) : getInvertInstrument(stack) ? instrumentId != instrument : instrumentId == instrument;
+        Byte filterInstrument = getFilterInstrument(stack);
+        return filterInstrument.equals(INSTRUMENT_ALL) ? !getInvertInstrument(stack) : getInvertInstrument(stack) ? filterInstrument != instrument : filterInstrument == instrument;
     }
 
     protected static Boolean stackTagContainsKey(ItemStack stack, String tag) {
@@ -454,7 +454,7 @@ public abstract class InstrumentDataUtils {
         return instrumentTag;
     }
 
-    public static void appendMidiSettings(ItemStack stack, List<Component> tooltip) {
+    public static void appendMidiSettingsTooltip(ItemStack stack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
