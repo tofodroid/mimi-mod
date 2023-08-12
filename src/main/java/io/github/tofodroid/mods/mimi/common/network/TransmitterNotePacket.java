@@ -1,5 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
+import javax.annotation.Nonnull;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -7,11 +9,11 @@ public class TransmitterNotePacket {
     public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
     
-    public final Byte channel;
-    public final Byte note;
-    public final Byte velocity;
-    public final Boolean pub;
-    public final Long noteServerTime;
+    public final @Nonnull Byte channel;
+    public final @Nonnull Byte note;
+    public final @Nonnull Byte velocity;
+    public final @Nonnull Boolean pub;
+    public final @Nonnull Long noteServerTime;
     
     public static TransmitterNotePacket createNotePacket(Byte channel, Byte note, Byte velocity, Boolean pub) {
         return new TransmitterNotePacket(channel, note, velocity, pub, MIMIMod.proxy.getCurrentServerMillis());
@@ -25,6 +27,7 @@ public class TransmitterNotePacket {
         return new TransmitterNotePacket(channel, Integer.valueOf(-controller).byteValue(), value, pub, MIMIMod.proxy.getCurrentServerMillis());
     }
 
+    @SuppressWarnings("null")
     private TransmitterNotePacket(Byte channel, Byte note, Byte velocity, Boolean pub, Long noteServerTime) {
         this.channel = channel;
         this.note = note;

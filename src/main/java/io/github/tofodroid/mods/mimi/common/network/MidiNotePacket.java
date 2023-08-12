@@ -2,6 +2,8 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -9,12 +11,12 @@ import net.minecraft.network.FriendlyByteBuf;
 public class MidiNotePacket {
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 
-    public final Byte note;
-    public final Byte velocity;
-    public final Byte instrumentId;
-    public final UUID player;
-    public final BlockPos pos;
-    public final long noteServerTime;
+    public final @Nonnull Byte note;
+    public final @Nonnull Byte velocity;
+    public final @Nonnull Byte instrumentId;
+    public final @Nonnull UUID player;
+    public final @Nonnull BlockPos pos;
+    public final @Nonnull Long noteServerTime;
     
     public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos) {
         return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis());
@@ -40,6 +42,7 @@ public class MidiNotePacket {
         return new MidiNotePacket(note, velocity, instrumentId, player, pos, noteServerTime);
     }
 
+    @SuppressWarnings("null")
     private MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime) {
         this.note = note;
         this.velocity = velocity;

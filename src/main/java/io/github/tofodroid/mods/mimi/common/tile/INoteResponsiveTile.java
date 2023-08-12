@@ -2,6 +2,9 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -32,13 +35,18 @@ public abstract interface INoteResponsiveTile<T extends BlockEntity> extends Blo
         }
     }
 
-    default Boolean shouldHaveEntity() {
-        return true;
+    default void execServerTick(ServerLevel world, BlockPos pos, BlockState state, T self) { /* Default no-op */ };
+
+    default Boolean onMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId) {
+        if(this.shouldTriggerFromMidiEvent(sender, channel, note, instrumentId)) {
+            return this.onTrigger(sender, channel, note, instrumentId);
+        }
+        return false;
     }
 
+    public Boolean shouldHaveEntity();
+    public Boolean onTrigger(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId);
+    public Boolean shouldTriggerFromMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId);
     public Integer getTickCount();
     public void setTickCount(Integer count);
-    public Boolean shouldRespondToNote(Byte note, Byte instrumentId);
-    public Boolean shouldRespondToMessage(UUID sender, Byte channel, Byte note);
-    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state, T self);
 }

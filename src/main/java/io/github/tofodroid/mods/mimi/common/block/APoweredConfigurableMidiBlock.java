@@ -57,17 +57,4 @@ public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiT
     public boolean isSignalSource(BlockState p_55730_) {
         return true;
     }
-
-    public void powerTarget(Level world, BlockState state, int power, BlockPos pos) {
-        //if(state.getValue(TRIGGERED))
-
-        if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-            world.setBlock(pos, state.setValue(POWER, Integer.valueOf(power)), 3);
-            
-            for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), this);
-            }
-            world.scheduleTick(pos, this, 4);
-        }
-    }
 }

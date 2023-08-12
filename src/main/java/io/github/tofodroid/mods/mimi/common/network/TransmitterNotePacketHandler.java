@@ -19,7 +19,6 @@ import net.minecraftforge.network.NetworkEvent;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
@@ -73,10 +72,8 @@ public class TransmitterNotePacketHandler {
 
         // Handle Receivers
         if(!message.isControlPacket() && message.velocity > 0) {
-            for(TileReceiver receiver : getPotentialReceivers(getPotentialEntities(sourcePos, worldIn, getQueryBoxRange(false)))) {
-                if(receiver.shouldRespondToMessage(senderId, message.channel, message.note)) {
-                    ModBlocks.RECEIVER.get().powerTarget(worldIn, receiver.getBlockState(), 15, receiver.getBlockPos());
-                }
+            for(TileReceiver receiver : filterToReceivers(getPotentialEntities(sourcePos, worldIn, getQueryBoxRange(false)))) {
+                receiver.onMidiEvent(senderId, message.channel, message.note, null);
             }
         }
     }
@@ -103,7 +100,7 @@ public class TransmitterNotePacketHandler {
     }
     */
 
-    protected static List<TileReceiver> getPotentialReceivers(List<EntityNoteResponsiveTile> entities) {
+    protected static List<TileReceiver> filterToReceivers(List<EntityNoteResponsiveTile> entities) {
         return entities.stream().filter(e -> e.getTile() instanceof TileReceiver).map(e -> (TileReceiver)e.getTile()).collect(Collectors.toList());
     }
 

@@ -1,17 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.UUID;
-
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.block.BlockListener;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -41,18 +35,6 @@ public abstract class AConfigurableMidiTile extends AStaticInventoryTile impleme
     @Override
     public Integer getTickCount() {
         return this.tickCount;
-    }
-
-    @Override
-    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state, AConfigurableMidiTile self) {
-        MIMIMod.LOGGER.info("MIDIBLOCK SERVER TICK");
-        if (state.getValue(BlockListener.POWER) != 0) {
-            world.setBlock(pos, state.setValue(BlockListener.POWER, Integer.valueOf(0)), 3);
- 
-            for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), ModBlocks.LISTENER.get());
-            }
-        }
     }
 
     public void setSourceStack(ItemStack stack) {
@@ -103,31 +85,6 @@ public abstract class AConfigurableMidiTile extends AStaticInventoryTile impleme
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
-    }
-    
-    @Override
-    public Boolean shouldRespondToNote(Byte note, Byte instrumentId) {
-        ItemStack sourceStack = getSourceStack();
-
-        if(!sourceStack.isEmpty()) {
-            return 
-                (note == null || InstrumentDataUtils.isNoteFiltered(sourceStack, note)) && 
-                (instrumentId == null || InstrumentDataUtils.isInstrumentFiltered(sourceStack, instrumentId))
-            ;
-        }
-
-        return false;
-    }
-
-    @Override
-    public Boolean shouldRespondToMessage(UUID sender, Byte channel, Byte note) {
-        ItemStack sourceStack = getSourceStack();
-        if(!sourceStack.isEmpty()) {
-            return 
-                InstrumentDataUtils.isChannelEnabled(sourceStack, channel) && shouldRespondToNote(note, null) 
-                && (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(sourceStack)));
-        }
-        return false;
     }
 
     protected ItemStack initializeSourceStack(CompoundTag stackTag) {
