@@ -19,8 +19,9 @@ public class ConfigurableMidiTileSyncPacket {
     public final Byte instrumentId;
     public final String enabledChannelsString;
     public final Boolean invertInstrument;
+    public final Boolean publicBroadcast;
 
-    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument) {
+    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument, Boolean publicBroadcast) {
         this.tilePos = tilePos;
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
@@ -30,6 +31,7 @@ public class ConfigurableMidiTileSyncPacket {
         this.enabledChannelsString = enabledChannelsString;
         this.instrumentId = instrumentId;
         this.invertInstrument = invertInstrument;
+        this.publicBroadcast = publicBroadcast;
     }
     
     public ConfigurableMidiTileSyncPacket(ItemStack sourceStack, BlockPos tilePos) {
@@ -42,6 +44,7 @@ public class ConfigurableMidiTileSyncPacket {
         this.enabledChannelsString = InstrumentDataUtils.getEnabledChannelsString(sourceStack);
         this.instrumentId = InstrumentDataUtils.getFilterInstrument(sourceStack);
         this.invertInstrument = InstrumentDataUtils.getInvertInstrument(sourceStack);
+        this.publicBroadcast = InstrumentDataUtils.getPublicBroadcast(sourceStack);
     }
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
@@ -55,8 +58,9 @@ public class ConfigurableMidiTileSyncPacket {
             String enabledChannelsString = buf.readUtf(38);
             Byte instrumentId = buf.readByte();
             Boolean invertInstrument = buf.readBoolean();
+            Boolean publicBroadcast = buf.readBoolean();
 
-            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument);
+            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument, publicBroadcast);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ConfigurableMidiTileSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -76,5 +80,6 @@ public class ConfigurableMidiTileSyncPacket {
         buf.writeUtf(pkt.enabledChannelsString, 38);
         buf.writeByte(pkt.instrumentId);
         buf.writeBoolean(pkt.invertInstrument);
+        buf.writeBoolean(pkt.publicBroadcast);
     }
 }

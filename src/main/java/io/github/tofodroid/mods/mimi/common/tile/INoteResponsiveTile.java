@@ -37,16 +37,16 @@ public abstract interface INoteResponsiveTile<T extends BlockEntity> extends Blo
 
     default void execServerTick(ServerLevel world, BlockPos pos, BlockState state, T self) { /* Default no-op */ };
 
-    default Boolean onMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId) {
-        if(this.shouldTriggerFromMidiEvent(sender, channel, note, instrumentId)) {
-            return this.onTrigger(sender, channel, note, instrumentId);
+    default Boolean onMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        if(this.shouldTriggerFromMidiEvent(sender, channel, note, velocity, instrumentId)) {
+            return this.onTrigger(sender, channel, note, velocity, instrumentId);
         }
         return false;
     }
 
     public Boolean shouldHaveEntity();
-    public Boolean onTrigger(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId);
-    public Boolean shouldTriggerFromMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId);
+    public Boolean onTrigger(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    public Boolean shouldTriggerFromMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
     public Integer getTickCount();
     public void setTickCount(Integer count);
 }

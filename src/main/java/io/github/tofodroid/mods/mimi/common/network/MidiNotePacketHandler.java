@@ -59,7 +59,7 @@ public class MidiNotePacketHandler {
                     }
                     
                     for(TileListener listener : filterToListeners(entities)) {
-                        listener.onMidiEvent(null, null, packet.note, packet.instrumentId);
+                        listener.onMidiEvent(null, null, packet.note, packet.velocity, packet.instrumentId);
                     };
                 }
             }

@@ -50,11 +50,11 @@ public class GuiInstrument extends BaseGui {
     private static final Vector2i INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2i(114,62);
     private static final Vector2i INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2i(67,62);
     private static final Vector2i KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2i(300,31);
-    private static final Vector2i NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(33,163);
-    private static final Vector2i NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2i(52,163);
-    private static final Vector2i OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(14,163);
-    private static final Vector2i OCT_SHIFT_UP_BUTTON_COORDS = new Vector2i(71,163);
-    private static final Vector2i MIDI_EDIT_BUTTON_COORDS = new Vector2i(299,163);
+    private static final Vector2i NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(33,161);
+    private static final Vector2i NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2i(52,161);
+    private static final Vector2i OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(14,161);
+    private static final Vector2i OCT_SHIFT_UP_BUTTON_COORDS = new Vector2i(71,161);
+    private static final Vector2i MIDI_EDIT_BUTTON_COORDS = new Vector2i(299,161);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
@@ -159,7 +159,7 @@ public class GuiInstrument extends BaseGui {
     private Byte mouseNote = null;
 
     public GuiInstrument(Player player, ItemStack instrumentStack, InteractionHand handIn) {
-        super(328, 250, 530, "textures/gui/container_instrument.png", "item.MIMIMod.gui_instrument");
+        super(328, 184, 530, "textures/gui/container_instrument.png", "item.MIMIMod.gui_instrument");
 
         if(instrumentStack == null || instrumentStack.isEmpty()) {
             MIMIMod.LOGGER.error("Instrument stack is null or empty. Force closing GUI!");
@@ -200,10 +200,6 @@ public class GuiInstrument extends BaseGui {
     public boolean mouseClicked(double dmouseX, double dmouseY, int mouseButton) {
         int imouseX = (int)Math.round(dmouseX);
         int imouseY = (int)Math.round(dmouseY);
-        int firstNoteX = START_X + NOTE_OFFSET_X;
-        int firstNoteY = START_Y + NOTE_OFFSET_Y;
-        int relativeMouseX = imouseX - firstNoteX;
-        int relativeMouseY = imouseY - firstNoteY;
 
         // Keyboard Controls
         if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_UP_BUTTON_COORDS))) {
@@ -220,7 +216,7 @@ public class GuiInstrument extends BaseGui {
         
         if(!editMode) {
             // Keyboard Layout Hover Box
-            if(imouseX >= 220 && imouseY >= 28 && imouseX < (this.GUI_WIDTH) && imouseY < (50)) {
+            if(imouseX >= (START_X + 222) && imouseY >= (START_Y + 28) && imouseX < (START_X + this.GUI_WIDTH) && imouseY < (START_Y + 50)) {
                 if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(KEYBOARD_LAYOUT_BUTTON_COORDS))) {
                     if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
                         ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
@@ -234,7 +230,10 @@ public class GuiInstrument extends BaseGui {
             }
             
             // Note Keys
-            if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (START_X + this.GUI_WIDTH - 11) && imouseY < (START_Y + this.GUI_HEIGHT - 95)) {
+            int relativeMouseX = imouseX - (START_X + NOTE_OFFSET_X);
+            int relativeMouseY = imouseY - (START_Y + NOTE_OFFSET_Y);
+
+            if(relativeMouseX >= 0 && relativeMouseY >= 0 && imouseX < (START_X + this.GUI_WIDTH - 11) && imouseY < (START_Y + this.GUI_HEIGHT - 28)) {
                 Byte midiNote = null;
                 
                 if(relativeMouseY <= 84) {
@@ -333,7 +332,6 @@ public class GuiInstrument extends BaseGui {
 
         return true;
     }
-
 
     private void toggleHoldPedal(Boolean on) {
         Byte controller = 64;
@@ -607,13 +605,13 @@ public class GuiInstrument extends BaseGui {
         graphics.drawString(font, this.instrumentNameString, START_X + 198, START_Y + 13, 0xFF00E600);
 
         // Note Text: Left
-        graphics.drawString(font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 167, 0xFF00E600);
+        graphics.drawString(font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 165, 0xFF00E600);
 
         // Note Text: Middle
-        graphics.drawString(font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 167, 0xFF00E600);
+        graphics.drawString(font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 165, 0xFF00E600);
 
         // Note Text: Right
-        graphics.drawString(font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 167, 0xFF00E600);
+        graphics.drawString(font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 165, 0xFF00E600);
 
         // MIDI Source Name & Volume
         if(editMode) {

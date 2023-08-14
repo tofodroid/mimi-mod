@@ -32,6 +32,13 @@ public abstract class ClientGuiWrapper {
         }
     }
 
+    public static void openConductorGui(Level world, BlockPos tilePos, ItemStack conductorStack) {
+        if(conductorStack.getItem().equals(ModBlocks.CONDUCTOR.get().asItem())) {
+            openGui(world, new GuiConductor(tilePos, conductorStack));
+        }
+    }
+
+
     public static void openPlaylistGui(Level world, Player player) {
         openGui(world, new GuiMidiFileCaster(player));
     }

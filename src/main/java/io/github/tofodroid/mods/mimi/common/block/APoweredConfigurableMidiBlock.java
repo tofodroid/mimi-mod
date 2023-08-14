@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiTile;
+import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiPowerSourceTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiTile> extends AConfigurableMidiBlock<B> {
+public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiPowerSourceTile> extends AConfigurableMidiBlock<B> {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
 

@@ -375,11 +375,15 @@ public abstract class InstrumentDataUtils {
     }
 
     public static String getBroadcastNoteAsString(ItemStack stack) {
+        return getMidiNoteAsString(getBroadcastNote(stack));
+    }
+
+    public static String getMidiNoteAsString(Byte note) {
         String result = "None";
 
-        if(getBroadcastNote(stack) != null) {
-            Byte filterNoteLetter = Integer.valueOf(getBroadcastNote(stack) % 12).byteValue();
-            Byte filterNoteOctave = Integer.valueOf(getBroadcastNote(stack) / 12).byteValue();
+        if(note != null) {
+            Byte filterNoteLetter = Integer.valueOf(note % 12).byteValue();
+            Byte filterNoteOctave = Integer.valueOf(note / 12).byteValue();
             result = noteLetterFromNum(filterNoteLetter) + filterNoteOctave;
         }
 
@@ -452,6 +456,11 @@ public abstract class InstrumentDataUtils {
         }
 
         return instrumentTag;
+    }
+    
+    public static Boolean shouldInstrumentRespondToMessage(ItemStack stack, UUID sender, Byte channel) {
+        return stack.getItem() instanceof IInstrumentItem && InstrumentDataUtils.isChannelEnabled(stack, channel) && 
+               (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(stack)));
     }
 
     public static void appendMidiSettingsTooltip(ItemStack stack, List<Component> tooltip) {

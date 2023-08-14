@@ -7,34 +7,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class AConfigurableMidiTile extends AStaticInventoryTile implements INoteResponsiveTile<AConfigurableMidiTile> {
+public abstract class AConfigurableMidiTile extends AStaticInventoryTile {
     public static final Integer SOURCE_STACK_SLOT = 0;
-    protected Integer tickCount = 0;
     
-    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiTile self) {
-        self.tick(world, pos, state, self);
-    }    
-
     public AConfigurableMidiTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 1);
     }
 
     protected AConfigurableMidiTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
         super(type, pos, state, inventorySize);
-    }
-
-    @Override
-    public void setTickCount(Integer count) {
-        this.tickCount = count;
-    }
-
-    @Override
-    public Integer getTickCount() {
-        return this.tickCount;
     }
 
     public void setSourceStack(ItemStack stack) {

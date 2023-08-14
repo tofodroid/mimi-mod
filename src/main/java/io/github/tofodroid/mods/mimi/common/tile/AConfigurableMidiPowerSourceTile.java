@@ -9,18 +9,20 @@ import io.github.tofodroid.mods.mimi.common.block.APoweredConfigurableMidiBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class APoweredConfigurableMidiTile extends AConfigurableMidiTile {
+public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiTile implements INoteResponsiveTile<AConfigurableMidiPowerSourceTile> {
+    private Integer updateTickCount = 0;
     private Integer triggeredTickCount = 0;
     private Integer poweredTickCount = 0;
 
-    public APoweredConfigurableMidiTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public AConfigurableMidiPowerSourceTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 1);
     }
 
-    protected APoweredConfigurableMidiTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
+    protected AConfigurableMidiPowerSourceTile(BlockEntityType<?> type, BlockPos pos, BlockState state, Integer inventorySize) {
         super(type, pos, state, inventorySize);
     }
 
@@ -58,8 +60,12 @@ public abstract class APoweredConfigurableMidiTile extends AConfigurableMidiTile
         }
     }
 
+    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
+        self.tick(world, pos, state, self);
+    }
+
     @Override
-    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state, AConfigurableMidiTile self) {
+    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
         if(this.isBlockValid()) {
             if(this.isPowered()) {
                 if(this.poweredTickCount > this.stayPoweredForTicks()) {
@@ -81,7 +87,7 @@ public abstract class APoweredConfigurableMidiTile extends AConfigurableMidiTile
     
     @Override
     @SuppressWarnings("null")
-    public Boolean onTrigger(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nullable Byte instrumentId) {
+    public Boolean onTrigger(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
         if(isBlockValid()) {
             if(isPowered()) {
                 this.poweredTickCount = 0;
@@ -92,5 +98,20 @@ public abstract class APoweredConfigurableMidiTile extends AConfigurableMidiTile
         }
         
         return false;
+    }
+    
+    @Override
+    public void setTickCount(Integer count) {
+        this.updateTickCount = count;
+    }
+
+    @Override
+    public Integer getTickCount() {
+        return this.updateTickCount;
+    }
+
+    @Override
+    public Boolean shouldHaveEntity() {
+        return true;
     }
 }
