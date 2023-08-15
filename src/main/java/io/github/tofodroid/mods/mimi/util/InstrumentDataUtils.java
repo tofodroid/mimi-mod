@@ -355,6 +355,8 @@ public abstract class InstrumentDataUtils {
     public static String getDefaultChannels(ItemStack stack) {
         if(stack.getItem() instanceof IInstrumentItem) {
             return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+        } else if(ModItems.RECEIVER.equals(stack.getItem())) {
+            return ALL_CHANNELS_STRING;
         } else {
             return NONE_CHANNELS_STRING;
         }
