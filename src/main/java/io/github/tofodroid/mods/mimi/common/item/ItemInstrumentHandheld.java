@@ -15,7 +15,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -129,11 +128,6 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
         }
 
         return null;
-    }
-    
-    public static Boolean shouldRespondToMessage(ItemStack stack, UUID sender, Byte channel) {
-        return stack.getItem() instanceof IInstrumentItem && InstrumentDataUtils.isChannelEnabled(stack, channel) && 
-               (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(stack)));
     }
 
     @Override

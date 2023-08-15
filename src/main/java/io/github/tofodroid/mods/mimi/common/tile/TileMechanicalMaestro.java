@@ -21,16 +21,19 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileMechanicalMaestro extends AContainerTile implements INoteResponsiveTile<TileMechanicalMaestro> {
     public static final UUID MECH_UUID = new UUID(0,3);
 
-    private Integer updateTickCount;
+    private Integer updateTickCount = 0;
 
-    public TileMechanicalMaestro(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 3);
+    public TileMechanicalMaestro(BlockPos pos, BlockState state) {
+        super(ModTiles.MECHANICALMAESTRO, pos, state, 3);
+    }
+
+    public static void doTick(Level world, BlockPos pos, BlockState state, TileMechanicalMaestro self) {
+        self.tick(world, pos, state, self);
     }
 
     @Override

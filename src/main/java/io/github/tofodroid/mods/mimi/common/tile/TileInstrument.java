@@ -104,7 +104,7 @@ public class TileInstrument extends AStaticInventoryTile {
 
             if(itemId.equalsIgnoreCase("mimi:switchboard")) {
                 MIMIMod.LOGGER.info("Converting TileInstrument from Switchboard.");
-                convertStack = initializeInstrumentStack(InstrumentDataUtils.convertSwitchboardToInstrumentTag(stackTag.getCompound("tag")));
+                convertStack = initializeInstrumentStack(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
 
                 if(compound.contains(COLOR_TAG)) {
                     ((IDyeableItem)convertStack.getItem()).setColor(convertStack, compound.getInt(COLOR_TAG));

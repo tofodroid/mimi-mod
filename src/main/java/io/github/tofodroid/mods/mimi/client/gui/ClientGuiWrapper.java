@@ -38,7 +38,6 @@ public abstract class ClientGuiWrapper {
         }
     }
 
-
     public static void openPlaylistGui(Level world, Player player) {
         openGui(world, new GuiMidiFileCaster(player));
     }

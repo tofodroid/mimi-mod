@@ -437,7 +437,7 @@ public abstract class InstrumentDataUtils {
         return stack != null && stack.getTag() != null && stack.getTag().contains(tag);
     }
 
-    public static CompoundTag convertSwitchboardToInstrumentTag(CompoundTag switchTag) {
+    public static CompoundTag convertSwitchboardToDataTag(CompoundTag switchTag) {
         CompoundTag instrumentTag = switchTag != null ? switchTag.copy() : new CompoundTag();
 
         // OLD DEFAULT CHANNEL --> NONE
@@ -457,7 +457,7 @@ public abstract class InstrumentDataUtils {
 
         return instrumentTag;
     }
-    
+
     public static Boolean shouldInstrumentRespondToMessage(ItemStack stack, UUID sender, Byte channel) {
         return stack.getItem() instanceof IInstrumentItem && InstrumentDataUtils.isChannelEnabled(stack, channel) && 
                (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(stack)));

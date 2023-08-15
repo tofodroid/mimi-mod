@@ -3,9 +3,12 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,6 +47,31 @@ public abstract class AConfigurableMidiTile extends AStaticInventoryTile {
             MIMIMod.LOGGER.warn("ConfigurableMidiTile had no saved source stack! Re-initializing.");
             this.setSourceStack(this.initializeSourceStack(null));
         }
+    }
+    
+    @Override
+    public void loadItems(CompoundTag compound) {
+        // START TEMPORARY LEGACY COMPATIBILITY CODE
+        // Filter out switchboard items so that we can convert them
+        ListTag listtag = compound.getList("Items", 10);
+        ItemStack convertStack = null;
+
+        if(listtag.size() > 0) {
+            CompoundTag stackTag = listtag.getCompound(0);
+            String itemId = stackTag.getString("id");
+
+            if(itemId.equalsIgnoreCase("mimi:switchboard")) {
+                MIMIMod.LOGGER.info("Converting Configurable MIDI Tile from Switchboard.");
+                convertStack = initializeSourceStack(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
+            }
+        }
+
+        ContainerHelper.loadAllItems(compound, items);
+
+        if(convertStack != null) {  
+            this.setSourceStack(convertStack);
+        }
+        // END TEMPORARY LEGACY COMPATIBILITY CODE
     }
 
     @Override

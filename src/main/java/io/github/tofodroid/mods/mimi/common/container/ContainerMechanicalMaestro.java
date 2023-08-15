@@ -26,22 +26,22 @@ public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 
     @SuppressWarnings("null")
 	public ContainerMechanicalMaestro(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
-		super(ModContainers.BROADCASTER, id, playerInventory);
+		super(ModContainers.MECHANICALMAESTRO, id, playerInventory);
 		tilePos = extraData.readBlockPos();
-		this.targetInventory =  playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y));
+		this.targetInventory = playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
+		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y, 0));
+		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y, 1));
+		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y, 2));
 	}
 
     @SuppressWarnings("null")
 	public ContainerMechanicalMaestro(int id, Inventory playerInventory, BlockPos pos) {
-		super(ModContainers.BROADCASTER, id, playerInventory);
+		super(ModContainers.MECHANICALMAESTRO, id, playerInventory);
 		tilePos = pos;
-		this.targetInventory =  playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y));
+		this.targetInventory = playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
+		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y, 0));
+		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y, 1));
+		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y, 2));
 	}
 
 	public TileMechanicalMaestro getMechanicalMaestroTile() {
@@ -53,9 +53,8 @@ public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 		return null;
 	}
 	
-	
-    protected Slot buildInstrumentSlot(int xPos, int yPos) {
-        return new SlotItemHandler(targetInventory, 1, xPos, yPos) {
+    protected Slot buildInstrumentSlot(int xPos, int yPos, int index) {
+        return new SlotItemHandler(targetInventory, index, xPos, yPos) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof IInstrumentItem;
@@ -65,12 +64,12 @@ public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 		
     @Override
     protected Integer getPlayerInventoryX() {
-        return 183;
+        return 10;
     }
 
     @Override
     protected Integer getPlayerInventoryY() {
-        return 149;
+        return 85;
     }
     
 	@Override
@@ -90,7 +89,7 @@ public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 				}
 			} else {
 				// Player --> Target
-				if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID + 1, false)) {
+				if (!this.moveItemStackTo(itemstack1, TARGET_CONTAINER_MIN_SLOT_ID, TARGET_CONTAINER_MIN_SLOT_ID + 2, false)) {
 					return ItemStack.EMPTY;
 				}
 			}
