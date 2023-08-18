@@ -26,11 +26,10 @@ public class TileConductor extends AConfigurableMidiTile {
             if(channels.size() > 0) {
                 Byte note = InstrumentDataUtils.getBroadcastNote(sourceStack);
                 Byte velocity = stop ? -1 : Byte.MAX_VALUE;
-                Boolean pub = InstrumentDataUtils.getPublicBroadcast(sourceStack);
                 
                 for(Byte channel : channels) {
                     TransmitterNotePacketHandler.handlePacketServer(
-                        TransmitterNotePacket.createNotePacket(channel, note, velocity, pub), 
+                        TransmitterNotePacket.createNotePacket(channel, note, velocity), 
                         getBlockPos(), 
                         (ServerLevel)level,
                         getUniqueId()

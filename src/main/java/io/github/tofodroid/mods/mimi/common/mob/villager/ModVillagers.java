@@ -59,13 +59,12 @@ public class ModVillagers {
             ));
 
             event.getTrades().get(2).addAll(Arrays.asList(
-                new ItemsForItemsTrade(ModItems.INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
-                new ItemsForItemsTrade(Arrays.asList(ModItems.FLOPPYDISK), 1, Arrays.asList(Items.EMERALD), 1, 32, 10)
+                new ItemsForItemsTrade(ModItems.INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25)
             ));
             
             event.getTrades().get(3).addAll(Arrays.asList(
                 new ItemsForItemsTrade(ModItems.BLOCK_INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
-                new ItemsForItemsTrade(Arrays.asList(ModItems.TRANSMITTER,ModItems.FILECASTER,ModItems.BROADCASTER), 4, Arrays.asList(Items.EMERALD), 1, 16, 30)
+                new ItemsForItemsTrade(Arrays.asList(ModItems.FILECASTER), 4, Arrays.asList(Items.EMERALD), 1, 16, 30)
             ));
             
             event.getTrades().get(4).addAll(Arrays.asList(

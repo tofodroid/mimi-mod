@@ -7,7 +7,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.RegisterEvent;
 
 public class ModTiles {
-    public static BlockEntityType<TileBroadcaster> BROADCASTER = null;
     public static BlockEntityType<TileInstrument> INSTRUMENT = null;
     public static BlockEntityType<TileListener> LISTENER = null;
     public static BlockEntityType<TileReceiver> RECEIVER = null;
@@ -21,7 +20,6 @@ public class ModTiles {
     }
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
-        BROADCASTER = registerType("broadcaster", BlockEntityType.Builder.of(TileBroadcaster::new, ModBlocks.BROADCASTER.get()), event);
         LISTENER = registerType("listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER.get()), event);
         RECEIVER = registerType("receiver", BlockEntityType.Builder.of(TileReceiver::new, ModBlocks.RECEIVER.get()), event);
         CONDUCTOR = registerType("conductor", BlockEntityType.Builder.of(TileConductor::new, ModBlocks.CONDUCTOR.get()), event);

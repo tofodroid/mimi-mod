@@ -17,11 +17,9 @@ import java.util.List;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockConductor;
-import io.github.tofodroid.mods.mimi.common.block.BlockDiskWriter;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.BlockListener;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
-import io.github.tofodroid.mods.mimi.common.block.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
@@ -35,9 +33,7 @@ public final class ModItems {
 
     // Other
     public static ItemMidiDeviceConfig DEVICECONFIG;
-    public static ItemTransmitter TRANSMITTER;
     public static ItemFileCaster FILECASTER;
-    public static ItemFloppyDisk FLOPPYDISK;
 
     // Blocks - Redstone
     public static BlockItem LISTENER;
@@ -47,8 +43,6 @@ public final class ModItems {
 
     // Blocks - Other
     public static BlockItem TUNINGTABLE;
-    public static BlockItem DISKWRITER;
-    public static BlockItem BROADCASTER;
 
     public static void registerCreativeTab(final RegisterEvent.RegisterHelper<CreativeModeTab> event) {
         Builder builder = CreativeModeTab.builder();
@@ -62,16 +56,12 @@ public final class ModItems {
             output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
             output.acceptAll(getStacksForItems(Arrays.asList(
                 DEVICECONFIG,
-                TRANSMITTER,
                 FILECASTER,
-                FLOPPYDISK,
                 LISTENER,
                 RECEIVER,
                 MECHANICALMAESTRO,
                 CONDUCTOR,
-                TUNINGTABLE,
-                DISKWRITER,
-                BROADCASTER
+                TUNINGTABLE
             )));
         });
         event.register(new ResourceLocation(MIMIMod.MODID, "group"), builder.build());
@@ -86,14 +76,8 @@ public final class ModItems {
         DEVICECONFIG = new ItemMidiDeviceConfig();
         event.register(ItemMidiDeviceConfig.REGISTRY_NAME, DEVICECONFIG);
 
-        TRANSMITTER = new ItemTransmitter();
-        event.register(ItemTransmitter.REGISTRY_NAME, TRANSMITTER);
-
         FILECASTER = new ItemFileCaster();
         event.register(ItemFileCaster.REGISTRY_NAME, FILECASTER);
-
-        FLOPPYDISK = new ItemFloppyDisk();
-        event.register(ItemFloppyDisk.REGISTRY_NAME, FLOPPYDISK);
 
         // Redstone Blocks
         LISTENER = new BlockItem(ModBlocks.LISTENER.get(), new Item.Properties().stacksTo(64));
@@ -112,12 +96,6 @@ public final class ModItems {
         TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE.get(), new Item.Properties().stacksTo(64));
         event.register(BlockTuningTable.REGISTRY_NAME, TUNINGTABLE);
         
-        DISKWRITER = new BlockItem(ModBlocks.DISKWRITER.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockDiskWriter.REGISTRY_NAME, DISKWRITER);
-
-        BROADCASTER = new BlockItem(ModBlocks.BROADCASTER.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockBroadcaster.REGISTRY_NAME, BROADCASTER);
-
         // Instrument Items
         INSTRUMENT_ITEMS = buildHandheldInstruments();
         INSTRUMENT_ITEMS.forEach((ItemInstrumentHandheld instrument) -> {

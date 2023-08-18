@@ -16,11 +16,11 @@ import net.minecraft.world.entity.player.Player;
 
 public class GuiMidiInputConfig extends BaseGui {    
     // Button Boxes
-    private static final Vector2i CLEAR_DEVICE_BUTTON = new Vector2i(272,36);
-    private static final Vector2i REFRESH_DEVICES_BUTTON = new Vector2i(271,94);
-    private static final Vector2i SHIFT_DEVICE_DOWN_BUTTON = new Vector2i(110,94);
-    private static final Vector2i SHIFT_DEVICE_UP_BUTTON = new Vector2i(252,94);
-    private static final Vector2i SAVE_DEVICE_BUTTON = new Vector2i(271,144);
+    private static final Vector2i CLEAR_DEVICE_BUTTON = new Vector2i(266,27);
+    private static final Vector2i REFRESH_DEVICES_BUTTON = new Vector2i(266,83);
+    private static final Vector2i SHIFT_DEVICE_DOWN_BUTTON = new Vector2i(104,83);
+    private static final Vector2i SHIFT_DEVICE_UP_BUTTON = new Vector2i(247,83);
+    private static final Vector2i SAVE_DEVICE_BUTTON = new Vector2i(266,133);
 
     // MIDI
     private MidiInputManager midiInputManager;
@@ -28,7 +28,7 @@ public class GuiMidiInputConfig extends BaseGui {
     private Integer visibleDeviceId = 0;
 
     public GuiMidiInputConfig(Player player) {
-        super(300, 173, 300, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
+        super(288, 156, 288, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
         this.midiInputManager = ((ClientProxy)MIMIMod.proxy).getMidiInput();
         availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
     }
@@ -63,11 +63,11 @@ public class GuiMidiInputConfig extends BaseGui {
         graphics.blit(guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Device Status Light
-        Integer statusX = START_X + 265;
-        Integer statusY = START_Y + 42;
+        Integer statusX = START_X + 259;
+        Integer statusY = START_Y + 33;
 
         if(this.midiInputManager.inputDeviceManager.isDirtyStatus()) {
-                graphics.blit(guiTexture, statusX, statusY, 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.blit(guiTexture, statusX, statusY, 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
             graphics.blit(guiTexture, statusX, statusY, this.midiInputManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
@@ -79,27 +79,27 @@ public class GuiMidiInputConfig extends BaseGui {
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Selected Device Name
         if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
-            graphics.drawString(font, this.midiInputManager.inputDeviceManager.getSelectedDeviceName(), START_X + 123, START_Y + 40, 0xFF00E600);
+            graphics.drawString(font, this.midiInputManager.inputDeviceManager.getSelectedDeviceName(), START_X + 117, START_Y + 40, 0xFF00E600);
         }
 
         // Available Device Info
         if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId) {
-            graphics.drawString(font, visibleDeviceId + ": " + this.availableDevices.get(visibleDeviceId).getDeviceInfo().getName(), START_X + 131, START_Y + 98, 0xFF00E600);
+            graphics.drawString(font, visibleDeviceId + ": " + this.availableDevices.get(visibleDeviceId).getDeviceInfo().getName(), START_X + 125, START_Y + 87, 0xFF00E600);
             Info info = this.availableDevices.get(visibleDeviceId).getDeviceInfo();
             if(info != null) {
                 String descString = "Description: " + info.getDescription();
                 Integer yOffset = 0;
 
                 if(descString.length() <= 45) {
-                    graphics.drawString(font, descString, START_X + 16, START_Y + 115, 0xFF00E600);
+                    graphics.drawString(font, descString, START_X + 10, START_Y + 104, 0xFF00E600);
                 } else {
                     yOffset = 16;
-                    graphics.drawString(font, descString.substring(0, 45), START_X + 16, START_Y + 115, 0xFF00E600);
-                    graphics.drawString(font, descString.substring(45), START_X + 16, START_Y + 131, 0xFF00E600);
+                    graphics.drawString(font, descString.substring(0, 45), START_X + 10, START_Y + 104, 0xFF00E600);
+                    graphics.drawString(font, descString.substring(45), START_X + 10, START_Y + 120, 0xFF00E600);
                 }
 
-                graphics.drawString(font, "Vendor: " + info.getVendor(), START_X + 16, START_Y + yOffset + 131, 0xFF00E600);
-                graphics.drawString(font, "Version: " + info.getVersion(), START_X + 16, START_Y + yOffset + 147, 0xFF00E600);  
+                graphics.drawString(font, "Vendor: " + info.getVendor(), START_X + 10, START_Y + yOffset + 120, 0xFF00E600);
+                graphics.drawString(font, "Version: " + info.getVersion(), START_X + 10, START_Y + yOffset + 136, 0xFF00E600);  
             }
         }
         

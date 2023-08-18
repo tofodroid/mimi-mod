@@ -20,7 +20,6 @@ public class GuiConductor extends BaseGui {
     private static final Vector2i MIDI_CHANNEL_WIDGET_COORDS = new Vector2i(6,26);
     private static final Vector2i NOTE_LETTER_BUTTON_COORDS = new Vector2i(181,41);
     private static final Vector2i NOTE_OCTAVE_BUTTON_COORDS = new Vector2i(203,41);
-    private static final Vector2i TRANSMIT_MODE_BUTTON_COORDS = new Vector2i(184,75);
 
     // Widgets
     private MidiChannelToggleWidget midiChannelToggle;
@@ -31,7 +30,6 @@ public class GuiConductor extends BaseGui {
 
     // Runtime Data
     private Byte broadcastNote;
-    private Boolean pub;
 
     public GuiConductor(BlockPos tilePos, ItemStack conductorStack) {
         super(272, 99, 272, "textures/gui/container_conductor.png", "item.MIMIMod.gui_conductor");
@@ -50,7 +48,6 @@ public class GuiConductor extends BaseGui {
     @Override
     public void init() {
         super.init();
-        this.pub = InstrumentDataUtils.getPublicBroadcast(conductorStack);
         this.broadcastNote = InstrumentDataUtils.getBroadcastNote(conductorStack);
         this.midiChannelToggle = new MidiChannelToggleWidget(conductorStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
     }
@@ -72,10 +69,6 @@ public class GuiConductor extends BaseGui {
             this.syncConductorToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_OCTAVE_BUTTON_COORDS))) {
             this.shiftBroadcastNoteOctave();
-            this.syncConductorToServer();
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(TRANSMIT_MODE_BUTTON_COORDS))) {
-            pub = !pub;
-            InstrumentDataUtils.setPublicBroadcast(conductorStack, pub);
             this.syncConductorToServer();
         }
 
@@ -100,9 +93,6 @@ public class GuiConductor extends BaseGui {
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Broadcast note
         graphics.drawString(font, InstrumentDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
-
-        // Transmit mode
-        graphics.drawString(font, pub ? "Public" : "Linked", START_X + 205, START_Y + 79, 0xFF00E600);
 
         this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
 

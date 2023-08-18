@@ -5,12 +5,10 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig.Type;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ModConfigs {
@@ -32,12 +30,5 @@ public class ModConfigs {
     public static void preInit(ModLoadingContext context) { 
         context.registerConfig(Type.CLIENT, ModConfigs.CLIENTSPEC);
         context.registerConfig(Type.COMMON, ModConfigs.COMMONSPEC);
-    }
-    
-    @SubscribeEvent
-    public static void onFileChange(final ModConfigEvent.Reloading event) {
-        if(event.getConfig().getSpec() == COMMONSPEC) {
-            COMMON.onConfigChange();
-        }
     }
 }

@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.client;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,9 +33,6 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void registerScreens(FMLClientSetupEvent event) {
         MenuScreens.register(ModContainers.TUNINGTABLE, GuiTuningTableContainerScreen::new);
-        MenuScreens.register(ModContainers.DISKWRITER, GuiDiskWriterContainerScreen::new);
-        MenuScreens.register(ModContainers.BROADCASTER, GuiBroadcasterContainerScreen::new);
-        MenuScreens.register(ModContainers.TRANSMITTER, GuiTransmitterContainerScreen::new);
         MenuScreens.register(ModContainers.MECHANICALMAESTRO, GuiMechanicalMaestroContainerScreen::new);
     }
 
@@ -49,7 +45,6 @@ public class ClientEventHandler {
     public static void register(RegisterColorHandlersEvent.Item event) {
         registerItemColors(event, ModItems.INSTRUMENT_ITEMS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
         registerItemColors(event, ModItems.BLOCK_INSTRUMENT_ITEMS.stream().filter(i -> i.isDyeable()).collect(Collectors.toList()));
-        registerItemColors(event, Arrays.asList(ModItems.FLOPPYDISK));
     }
 
     @SubscribeEvent

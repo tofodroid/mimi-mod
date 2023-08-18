@@ -36,11 +36,6 @@ public class TransmitterNotePacketHandler {
     public static void handlePacketServer(final TransmitterNotePacket message, BlockPos sourcePos, ServerLevel worldIn, UUID senderId) {
         HashMap<UUID, List<MidiNotePacket>> notePackets = new HashMap<>();
 
-        // Override senderId for public
-        if(message.pub) {
-            senderId = InstrumentDataUtils.PUBLIC_SOURCE_ID;
-        }
-
         // Handle Players
         for(ServerPlayer player : getPotentialPlayers(sourcePos, worldIn, getQueryBoxRange(message.velocity <= 0))) {
             List<MidiNotePacket> playerPackets = new ArrayList<>();

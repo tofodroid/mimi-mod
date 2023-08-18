@@ -2,14 +2,9 @@ package io.github.tofodroid.mods.mimi.common.command;
 
 import java.util.List;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
-
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
-import io.github.tofodroid.mods.mimi.util.RemoteMidiUrlUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -34,69 +29,6 @@ public class ModCommands {
                     .then(Commands.literal("reload")
                         .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
                         .executes(ctx -> reloadServerMusicList(ctx.getSource()))
-                    )
-                    .then(Commands.literal("add")
-                        .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
-                        .then(Commands.argument("url", StringArgumentType.string())
-                            .then(Commands.argument("name", StringArgumentType.string())
-                                .executes(ctx -> addServerSong(ctx.getSource(), StringArgumentType.getString(ctx, "url"), StringArgumentType.getString(ctx, "name")))
-                            )
-                        )
-                    )
-                    .then(Commands.literal("remove")
-                    .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
-                        .then(Commands.argument("name", StringArgumentType.string())
-                            .executes(ctx -> removeServerSong(ctx.getSource(), StringArgumentType.getString(ctx, "name")))
-                        )
-                    )
-                )
-                .then(Commands.literal("cache")
-                    .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
-                    .then(Commands.literal("size")
-                        .executes(ctx -> getServerCacheSize(ctx.getSource()))
-                    )
-                    .then(Commands.literal("set")
-                        .then(Commands.argument("size", IntegerArgumentType.integer(0, 999))
-                            .executes(ctx -> setServerCacheSize(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "size")))
-                        )
-                    )
-                    .then(Commands.literal("prune")
-                        .executes(ctx -> pruneServerCache(ctx.getSource()))
-                    )
-                    .then(Commands.literal("clear")
-                        .executes(ctx -> emptyServerCache(ctx.getSource()))
-                    )
-                    .then(Commands.literal("reload")
-                        .executes(ctx -> reloadServerCache(ctx.getSource()))
-                    )
-                )
-                .then(Commands.literal("web")
-                    .then(Commands.literal("list")
-                        .then(Commands.argument("page", IntegerArgumentType.integer(1, 99999))
-                            .executes(ctx -> listWebHosts(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "page")))
-                        )
-                        .executes(ctx -> listWebHosts(ctx.getSource(), 1))
-                    )
-                    .then(Commands.literal("status")
-                        .executes(ctx -> getWebStatus(ctx.getSource()))
-                    )
-                    .then(Commands.literal("add")
-                        .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
-                        .then(Commands.argument("host", StringArgumentType.string())
-                            .executes(ctx -> addWebHost(ctx.getSource(), StringArgumentType.getString(ctx, "host")))
-                        )
-                    )
-                    .then(Commands.literal("remove")
-                        .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
-                        .then(Commands.argument("number", IntegerArgumentType.integer(1))
-                                .executes(ctx -> removeWebHost(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "number")))
-                        )
-                    )
-                    .then(Commands.literal("set")
-                        .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
-                        .then(Commands.argument("enabled", BoolArgumentType.bool())
-                                .executes(ctx -> setWebStatus(ctx.getSource(), BoolArgumentType.getBool(ctx, "enabled")))
-                        )
                     )
                 )
         );
@@ -131,7 +63,7 @@ public class ModCommands {
         return 0;
     }
 
-    
+    /*
     private static int addServerSong(CommandSourceStack source, String url, String name) {
         url = url.strip();
         name = name.strip();
@@ -300,4 +232,5 @@ public class ModCommands {
         source.sendSuccess(() -> Component.literal("Server Web MIDI set to: " + (ModConfigs.COMMON.allowWebMidi.get() ? "enabled" : "disabled")), true);
         return 0;
     }
+    */
 }

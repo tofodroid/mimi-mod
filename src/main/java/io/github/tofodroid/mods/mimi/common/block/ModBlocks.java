@@ -24,10 +24,6 @@ public class ModBlocks {
     // Village Blocks
     public static final RegistryObject<BlockTuningTable> TUNINGTABLE = BLOCKS.register(BlockTuningTable.REGISTRY_NAME, () -> new BlockTuningTable());
 
-    // Other Blocks
-    public static final RegistryObject<BlockDiskWriter> DISKWRITER = BLOCKS.register(BlockDiskWriter.REGISTRY_NAME, () -> new BlockDiskWriter());
-    public static final RegistryObject<BlockBroadcaster> BROADCASTER = BLOCKS.register(BlockBroadcaster.REGISTRY_NAME, () -> new BlockBroadcaster());
-
     // Instrument Blocks
     protected static List<RegistryObject<BlockInstrument>> INSTRUMENTS = buildInstruments();
 

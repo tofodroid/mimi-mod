@@ -4,8 +4,6 @@ import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.network.KeybindOpenTransmitterPacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 
 import org.lwjgl.glfw.GLFW;
@@ -58,11 +56,8 @@ public class ModBindings {
         // GUIs
         if(worldIn != null && playerIn != null && MIMIMod.proxy.isClient() && Minecraft.getInstance().screen == null) {
             if(GUIFILECASTER.isDown()) {
-                if(((ClientProxy)MIMIMod.proxy).getMidiInput().fileCasterIsActive()) {
-                    ClientGuiWrapper.openPlaylistGui(worldIn, playerIn);
-                }
-            }else if(GUITRANSMITTER.isDown()) {
-                NetworkManager.INFO_CHANNEL.sendToServer(new KeybindOpenTransmitterPacket());
+                // TODO - Only if in hotbar
+                ClientGuiWrapper.openPlaylistGui(worldIn, playerIn);
             } else if(MIDIGUIMAIN.isDown()) {
                 ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND, playerIn.getItemInHand(InteractionHand.MAIN_HAND));
             } else if(MIDIGUIOFF.isDown()) {

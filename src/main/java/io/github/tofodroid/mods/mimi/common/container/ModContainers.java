@@ -8,9 +8,6 @@ import net.minecraftforge.registries.RegisterEvent;
 
 public class ModContainers {
     public static MenuType<ContainerTuningTable> TUNINGTABLE = null;
-    public static MenuType<ContainerDiskWriter> DISKWRITER = null;
-    public static MenuType<ContainerBroadcaster> BROADCASTER = null;
-    public static MenuType<ContainerTransmitter> TRANSMITTER = null;
     public static MenuType<ContainerMechanicalMaestro> MECHANICALMAESTRO = null;
     
     private static <T extends AbstractContainerMenu> MenuType<T> registerType(String id, IContainerFactory<T> factory, final RegisterEvent.RegisterHelper<MenuType<?>> event) {
@@ -21,9 +18,6 @@ public class ModContainers {
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<MenuType<?>> event) {
         TUNINGTABLE = registerType("tuningtable", ContainerTuningTable::new, event);
-        DISKWRITER = registerType("diskwriter", ContainerDiskWriter::new, event);
-        BROADCASTER = registerType("broadcaster", ContainerBroadcaster::new, event);
-        TRANSMITTER = registerType("transmitter", ContainerTransmitter::new, event);
         MECHANICALMAESTRO = registerType("mechanicalmaestro", ContainerMechanicalMaestro::new, event);
     }
 }

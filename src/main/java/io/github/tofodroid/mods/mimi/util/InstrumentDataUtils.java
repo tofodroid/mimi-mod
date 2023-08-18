@@ -81,7 +81,7 @@ public abstract class InstrumentDataUtils {
             return stack.getTag().getUUID(SOURCE_TAG);
         }
 
-        return PUBLIC_SOURCE_ID;
+        return NONE_SOURCE_ID;
     }
 
     public static String getMidiSourceName(ItemStack stack) {
@@ -89,8 +89,6 @@ public abstract class InstrumentDataUtils {
 
         if(stackTagContainsKey(stack, SOURCE_NAME_TAG)) {
             return stack.getTag().getString(SOURCE_NAME_TAG);
-        } else if(sourceId.equals(PUBLIC_SOURCE_ID)) {
-            return "Public";
         } else if(sourceId.equals(NONE_SOURCE_ID)) {
             return "None";
         }
@@ -208,22 +206,6 @@ public abstract class InstrumentDataUtils {
         }
 
         return 0;
-    }
-    
-    public static void setPublicBroadcast(ItemStack stack, Boolean pub) {
-        if (pub) {
-            stack.getOrCreateTag().putBoolean(BROADCAST_PUBLIC_TAG, pub);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(BROADCAST_PUBLIC_TAG);
-        }
-    }
-
-    public static Boolean getPublicBroadcast(ItemStack stack) {
-        if (stackTagContainsKey(stack, BROADCAST_PUBLIC_TAG)) {
-            return stack.getTag().getBoolean(BROADCAST_PUBLIC_TAG);
-        }
-
-        return false;
     }
 
     public static Byte getInstrumentId(ItemStack stack) {

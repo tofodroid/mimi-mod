@@ -32,7 +32,6 @@ public class ConfigurableMidiTileSyncPacketHandler {
             InstrumentDataUtils.setFilterOct(midiStack, message.filterOct);
             InstrumentDataUtils.setInvertInstrument(midiStack, message.invertInstrument);
             InstrumentDataUtils.setInvertNoteOct(midiStack, message.invertNoteOct);
-            InstrumentDataUtils.setPublicBroadcast(midiStack, message.publicBroadcast);
             tile.setSourceStack(midiStack);
             sender.level().sendBlockUpdated(tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 2);
         }
