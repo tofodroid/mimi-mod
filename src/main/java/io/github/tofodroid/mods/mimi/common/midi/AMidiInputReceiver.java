@@ -4,7 +4,7 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-public abstract class MidiInputReceiver implements Receiver {
+public abstract class AMidiInputReceiver implements Receiver {
     private volatile boolean open = true;
 
     public synchronized void send(MidiMessage msg, long timeStamp) {

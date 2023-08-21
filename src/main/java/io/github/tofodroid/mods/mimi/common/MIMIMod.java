@@ -16,7 +16,7 @@ import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.loot.ModLootModifiers;
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileManager;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -32,6 +32,7 @@ public class MIMIMod {
     public static final String MODID = "mimi";
     public static final Logger LOGGER = LogManager.getLogger();
     public static Proxy proxy = (Proxy)DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+    public static final MidiFileManager midiFileManager = new MidiFileManager();
 
     public MIMIMod() {
         MIMIMod.preInit(FMLJavaModLoadingContext.get(), ModLoadingContext.get());
@@ -53,7 +54,6 @@ public class MIMIMod {
     @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
         proxy.init(event);
-        MidiFileCacheManager.init();
     }
 
     @SubscribeEvent

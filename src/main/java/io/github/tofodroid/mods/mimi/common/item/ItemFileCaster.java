@@ -5,7 +5,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -22,9 +24,12 @@ public class ItemFileCaster extends Item {
     public ItemFileCaster() {
         super(new Properties().stacksTo(1));
     }
-    
+
     @Override
     public boolean isFoil(ItemStack stack) {
+        if(MIMIMod.proxy.isClient()) {
+            return ((ClientProxy)MIMIMod.proxy).getMidiInput().enderTransmitterManager.isPlaying();
+        }
         return false;
     }
     
@@ -35,10 +40,10 @@ public class ItemFileCaster extends Item {
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
             
-            if(stack.hasFoil()) {
-                tooltip.add(Component.literal("-----------------"));
+            if(((ClientProxy)MIMIMod.proxy).getMidiInput().enderTransmitterManager.isPlaying()) {
+
                 tooltip.add(Component.literal("§2§lCurrently Playing§r"));
-                tooltip.add(Component.literal("§oMust keep one FileCaster in Hands§r"));
+                tooltip.add(Component.literal("§oMust keep one Ender Transmitter in Hands§r"));
                 tooltip.add(Component.literal("§oor HotBar to keep playing§r"));
             }
         }
@@ -50,10 +55,7 @@ public class ItemFileCaster extends Item {
         final ItemStack heldItem = playerIn.getItemInHand(handIn);
 
         if(worldIn.isClientSide && !playerIn.isCrouching()) {
-            ClientGuiWrapper.openPlaylistGui(
-                worldIn, 
-                playerIn
-            );
+            ClientGuiWrapper.openEnderTransmitterGui(worldIn);
             return new InteractionResultHolder<>(InteractionResult.SUCCESS, heldItem);
         }
 

@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.server.midi;
 
 import javax.sound.midi.ShortMessage;
 
-import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
 import net.minecraft.server.MinecraftServer;
@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class TransmitterReceiver extends MidiInputReceiver {
+public class TransmitterReceiver extends AMidiInputReceiver {
     protected Player player;
 
     public TransmitterReceiver(Player player) {

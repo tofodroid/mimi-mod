@@ -4,6 +4,8 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.Proxy;
+import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.midi.MidiFileManager;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import net.minecraft.Util;
@@ -15,6 +17,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 public class ClientProxy implements Proxy {
     private MidiMultiSynthManager MIDI_SYNTH;
     private MidiInputManager MIDI_INPUT;
+    private MidiFileManager DEFAULT_MIDI_FILES = new MidiFileManager();
+    private MidiFileManager CUSTOM_MIDI_FILES = new MidiFileManager();
     private Long startSyncEpoch = null;
     private Long serverStartEpoch = 0l;
 
@@ -25,6 +29,29 @@ public class ClientProxy implements Proxy {
         
         MIDI_INPUT = new MidiInputManager();
         MinecraftForge.EVENT_BUS.register(MIDI_INPUT);
+
+        defaultMidiFiles().initFromConfigFolder();
+        customMidiFiles().initFromAbsolutePath(ModConfigs.CLIENT.playlistFolderPath.get());
+    }
+
+    @Override
+    public Boolean isClient() {
+        return true;
+    }
+
+    @Override
+    public Long getServerStartEpoch() {
+        return serverStartEpoch;
+    }
+
+    @Override
+    public MidiFileManager defaultMidiFiles() {
+        return DEFAULT_MIDI_FILES;
+    }
+
+    @Override
+    public MidiFileManager customMidiFiles() {
+        return CUSTOM_MIDI_FILES;
     }
 
     public MidiMultiSynthManager getMidiSynth() {
@@ -55,15 +82,5 @@ public class ClientProxy implements Proxy {
                 this.startSyncEpoch = null;
             }
         }
-    }
-
-    @Override
-    public Boolean isClient() {
-        return true;
-    }
-
-    @Override
-    public Long getServerStartEpoch() {
-        return serverStartEpoch;
     }
 }

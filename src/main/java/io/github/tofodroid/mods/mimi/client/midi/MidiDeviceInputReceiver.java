@@ -4,14 +4,14 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInputReceiver;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
-public class MidiDeviceInputReceiver extends MidiInputReceiver {
+public class MidiDeviceInputReceiver extends AMidiInputReceiver {
     @Override
     @SuppressWarnings("resource")
     protected void handleMessage(ShortMessage message) {

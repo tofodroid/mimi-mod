@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileCacheManager;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,23 +23,21 @@ public class TransmitterControlPacketHandler {
     public static void handlePacketServer(final TransmitterControlPacket message, ServerPlayer sender) {
         switch(message.control) {
             case PLAY:
-                if(ServerMusicPlayerMidiManager.hasTransmitter(sender.getUUID())) {
-                    ServerMusicPlayerMidiManager.playTransmitter(sender.getUUID());
-                } else if(message.data.isPresent()) {
-                    ServerMusicPlayerMidiManager.createOrReplaceTransmitter(sender, MidiFileCacheManager.getSequenceByIndex(message.data.get()));
-                    ServerMusicPlayerMidiManager.playTransmitter(sender.getUUID());
-                }
+                if(message.data.isPresent()) {
+                    ServerMusicPlayerMidiManager.createOrReplaceTransmitter(sender, MIMIMod.proxy.defaultMidiFiles().getSequenceByIndex(message.data.get()));
+                    ServerMusicPlayerMidiManager.playTransmitter(message.transmitterId);
+                } else if(ServerMusicPlayerMidiManager.hasTransmitter(message.transmitterId)) {
+                    ServerMusicPlayerMidiManager.playTransmitter(message.transmitterId);
+                } 
                 break;
             case PAUSE:
-                ServerMusicPlayerMidiManager.pauseTransmitter(sender.getUUID());
+                ServerMusicPlayerMidiManager.pauseTransmitter(message.transmitterId);
                 break;
             case STOP:
-                ServerMusicPlayerMidiManager.stopTransmitter(sender.getUUID());
+                ServerMusicPlayerMidiManager.stopTransmitter(message.transmitterId);
                 break;
-            case SELECT:
-                ServerMusicPlayerMidiManager.createOrReplaceTransmitter(sender, MidiFileCacheManager.getSequenceByIndex(message.data.get()));
             case SEEK:
-                ServerMusicPlayerMidiManager.seekTransmitter(sender.getUUID(), message.data.get());
+                ServerMusicPlayerMidiManager.seekTransmitter(message.transmitterId, message.data.get());
                 break;
             default:
                 break;

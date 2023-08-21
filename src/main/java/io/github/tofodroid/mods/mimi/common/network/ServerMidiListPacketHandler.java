@@ -1,11 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -24,8 +21,7 @@ public class ServerMidiListPacketHandler {
     }
     
     public static void handlePacketServer(final ServerMidiListPacket message, ServerPlayer sender) {
-        List<MidiFileInfo> midiList = new ArrayList<>();
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMidiListPacket(midiList));
+        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMidiListPacket(MIMIMod.proxy.defaultMidiFiles().getAllSongs()));
     }
     
     @OnlyIn(Dist.CLIENT)

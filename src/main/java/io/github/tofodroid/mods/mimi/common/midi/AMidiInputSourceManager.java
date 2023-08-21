@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.midi;
 
 import javax.sound.midi.Transmitter;
 
-public abstract class MidiInputSourceManager {
+public abstract class AMidiInputSourceManager {
     protected Transmitter activeTransmitter = null;
 
     protected abstract void openTransmitter();

@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.world.InteractionHand;
@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.api.distmarker.Dist;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class MidiInputDeviceManager extends MidiInputSourceManager {
+public class MidiInputDeviceManager extends AMidiInputSourceManager {
     private List<ItemStack> localInstrumentsToPlay = new ArrayList<>();
     private String selectedDeviceName;
     private String midiDeviceError;
