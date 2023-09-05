@@ -24,33 +24,52 @@ public class TransmitterControlPacket {
     };
     
     public final CONTROL control;
-    public final Optional<Integer> data;
+    public final Optional<Integer> controlData;
+    public final Optional<UUID> songId;
     public final UUID transmitterId;
 
-    public TransmitterControlPacket(UUID transmitterId, CONTROL control, Integer data) {
+    public TransmitterControlPacket(UUID transmitterId, CONTROL control, Integer controlData, UUID songId) {
         this.transmitterId = transmitterId;
         this.control = control != null ? control : CONTROL.UNKNOWN;
-        this.data = Optional.of(data);
+        this.controlData = Optional.of(controlData);
+        this.songId = Optional.of(songId);
     }
 
-    public TransmitterControlPacket(UUID transmitterId, CONTROL control, Optional<Integer> data) {
+    public TransmitterControlPacket(UUID transmitterId, CONTROL control, Optional<Integer> controlData, Optional<UUID> songId) {
         this.transmitterId = transmitterId;
         this.control = control != null ? control : CONTROL.UNKNOWN;
-        this.data = data;
+        this.controlData = controlData;
+        this.songId = songId;
+    }
+
+    public TransmitterControlPacket(UUID transmitterId, CONTROL control, Integer controlData) {
+        this.transmitterId = transmitterId;
+        this.control = control != null ? control : CONTROL.UNKNOWN;
+        this.controlData = Optional.of(controlData);
+        this.songId = Optional.empty();
+    }
+
+    public TransmitterControlPacket(UUID transmitterId, CONTROL control, UUID songId) {
+        this.transmitterId = transmitterId;
+        this.control = control != null ? control : CONTROL.UNKNOWN;
+        this.controlData = Optional.empty();
+        this.songId = Optional.of(songId);
     }
 
     public TransmitterControlPacket(UUID transmitterId, CONTROL control) {
         this.transmitterId = transmitterId;
         this.control = control != null ? control : CONTROL.UNKNOWN;
-        this.data = Optional.empty();
+        this.controlData = Optional.empty();
+        this.songId = Optional.empty();
     }
     
     public static TransmitterControlPacket decodePacket(FriendlyByteBuf buf) {
         try {
             UUID transmitterId = buf.readUUID();
             byte control = buf.readByte();
-            Optional<Integer> data = buf.readOptional(FriendlyByteBuf::readInt);
-            return new TransmitterControlPacket(transmitterId, CONTROL.fromByte(control), data);
+            Optional<Integer> controlData = buf.readOptional(FriendlyByteBuf::readInt);
+            Optional<UUID> songId = buf.readOptional(FriendlyByteBuf::readUUID);
+            return new TransmitterControlPacket(transmitterId, CONTROL.fromByte(control), controlData, songId);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("TransmitterControlPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -64,6 +83,7 @@ public class TransmitterControlPacket {
     public static void encodePacket(TransmitterControlPacket pkt, FriendlyByteBuf buf) {
         buf.writeUUID(pkt.transmitterId);
         buf.writeByte(Integer.valueOf(pkt.control.ordinal()).byteValue());
-        buf.writeOptional(pkt.data, FriendlyByteBuf::writeInt);
+        buf.writeOptional(pkt.controlData, FriendlyByteBuf::writeInt);
+        buf.writeOptional(pkt.songId, FriendlyByteBuf::writeUUID);
     }
 }

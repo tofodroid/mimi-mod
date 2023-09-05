@@ -59,10 +59,12 @@ public class ServerMidiListPacket {
             for(int i = 0; i < midiArray.length; i++) {
                 SerializedMidiFileInfo info = midiArray[i]; 
                 MidiFileInfo fullInfo = new MidiFileInfo();
+                fullInfo.local = false;
                 fullInfo.file = new File(info.fileName);
                 fullInfo.byteChannelMapping = info.channelMapping;
                 fullInfo.instrumentMapping = MidiFileInfo.getInstrumentMapping(info.channelMapping);
                 fullInfo.songLength = info.songLengthSeconds;
+                fullInfo.tempo = info.tempoBpm;
                 list.add(fullInfo);
             }
             return list;
@@ -75,7 +77,7 @@ public class ServerMidiListPacket {
             SerializedMidiFileInfo[] midiArray = new SerializedMidiFileInfo[midiList.size()];
             for(int i = 0; i < midiList.size(); i++) {
                 MidiFileInfo info = midiList.get(i);
-                midiArray[i] = new SerializedMidiFileInfo(info.file.getName(), info.byteChannelMapping, info.songLength);
+                midiArray[i] = new SerializedMidiFileInfo(info.file.getName(), info.byteChannelMapping, info.songLength, info.tempo);
             }
             
             try(ByteArrayOutputStream bos = new ByteArrayOutputStream()){

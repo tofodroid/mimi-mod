@@ -8,6 +8,9 @@ import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.UUID;
+
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
@@ -20,13 +23,13 @@ public class MidiFileManager {
     public static final String MIMI_CONFIG_DIR = "mimi";
     public static final String MIMI_MIDI_DIR = "midi_files";
 
-    protected List<MidiFileInfo> songList = new ArrayList<>();
+    protected TreeMap<UUID, MidiFileInfo> songMap = new TreeMap<>();
     protected File selectedFolder = null;
 
     public MidiFileManager() {}
 
     public void clear() {
-        this.songList = new ArrayList<>();
+        this.songMap = new TreeMap<>();
     }
 
     public void refresh() {
@@ -42,7 +45,7 @@ public class MidiFileManager {
 
         if(directory != null && directory.exists() && directory.isDirectory()) {
             selectedFolder = directory;
-            loadSongList();
+            loadSongMap();
         }
     }
     
@@ -74,11 +77,11 @@ public class MidiFileManager {
     }
 
     public Integer getFileInfoPages(Integer pageSize) {
-        return Double.valueOf(Math.ceil((double)songList.size() / (double)pageSize)).intValue();
+        return Double.valueOf(Math.ceil((double)songMap.size() / (double)pageSize)).intValue();
     }
 
         public List<MidiFileInfo> getFileInfoPage(Integer pageSize, Integer pageNum) {
-        List<MidiFileInfo> pageList = new ArrayList<>(songList);
+        List<MidiFileInfo> pageList = new ArrayList<>(songMap.values());
 
         if(pageList.size() <= pageSize) {
             return pageList;
@@ -97,18 +100,18 @@ public class MidiFileManager {
 
 
     public List<MidiFileInfo> getAllSongs() {
-        return songList;
+        return new ArrayList<>(songMap.values());
     }
     
 
-    public void loadSongList() {
-        songList = new ArrayList<>();
+    public void loadSongMap() {
+        songMap = new TreeMap<>();
         try {
             for(File file : selectedFolder.listFiles()) {
                 if(file.isFile() && (file.getAbsolutePath().endsWith(".mid") || file.getAbsolutePath().endsWith(".midi"))) {
                     MidiFileInfo info = MidiFileInfo.fromFile(file);
                     if(info != null) {
-                        songList.add(info);
+                        songMap.put(info.toUUID(), info);
                     }
                 }
             }
@@ -117,9 +120,13 @@ public class MidiFileManager {
         }
     }
     
+    public Sequence getSequenceById(UUID id) {
+        return songMap.get(id).getSequence();
+    }
+
     public Sequence getSequenceByIndex(Integer index) {
         try {
-            return songList.get(index).getSequence();
+            return getAllSongs().get(index).getSequence();
         } catch(Exception e) {
             return null;
         }

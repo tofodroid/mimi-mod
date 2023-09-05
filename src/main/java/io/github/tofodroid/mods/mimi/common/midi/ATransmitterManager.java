@@ -2,7 +2,9 @@ package io.github.tofodroid.mods.mimi.common.midi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.client.network.MidiUploadManager;
@@ -20,37 +22,51 @@ public abstract class ATransmitterManager {
         SINGLE,
         NONE;
     }
+    public enum FavoriteMode {
+        ALL,
+        FAVORITE,
+        NOT_FAVORITE;
+    }
+    public enum SourceMode {
+        ALL,
+        LOCAL,
+        SERVER;
+    }
 
-    private Boolean initialized = false;
-    private Boolean localMode = this.supportsLocal();
-    private List<MidiFileInfo> localSongList = new ArrayList<>();
-    private List<MidiFileInfo> serverSongList = new ArrayList<>();
-    private List<MidiFileInfo> originalLocalSongList = new ArrayList<>();
-    private List<MidiFileInfo> originalServerSongList = new ArrayList<>();
-    private Integer selectedLocalSong = -1;
-    private Integer selectedServerSong = -1;
-    private Boolean selectedSongHasLoaded = false;
-    private Boolean selectedSongIsLoading = false;
+    protected Map<UUID, MidiFileInfo> songMap = new HashMap<>();
+    protected ArrayList<UUID> defaultSongOrder = new ArrayList<>();
+    protected ArrayList<UUID> shuffleSongOrder = null;
+    protected ArrayList<MidiFileInfo> displaySongs = new ArrayList<>();
+    protected Boolean initialized = false;
+    protected Integer selectedDisplayIndex = -1;
+    protected UUID selectedSong = null;
+    protected Boolean selectedSongHasLoaded = false;
+    protected Boolean selectedSongIsLoading = false;
+    protected Boolean selectedSongFavorite = false;
 
-    private ServerMusicPlayerStatusPacket lastMediaStatus = null;
+    protected ServerMusicPlayerStatusPacket lastMediaStatus = null;
 
     public void init() {
         if(!this.initialized) {
-            if(supportsLocal()) {
-                this.localSongList = MIMIMod.proxy.customMidiFiles().getAllSongs();
-
-                if(this.localSongList.size() > 0) {
-                    this.selectSong(0);
-                }
-            }
-
-            if(!this.localMode) {
-                this.startLoadServerSongsFromRemote();
-            }
-
+            refreshSongs();
             this.initialized = true;
         }
+    }
 
+    public void refreshSongs() {
+        stop();
+        clearSongs();
+        this.startLoadServerSongsFromRemote();
+    }
+
+    public Boolean isSelectedSongFavorite() {
+        return this.selectedSongFavorite;
+    }
+
+    private void refreshSelectedSongFavorite() {
+        if(this.selectedSong != null) {
+            this.selectedSongFavorite = this.isSongFavorite(this.selectedSong);
+        }
     }
 
     // Media
@@ -107,40 +123,21 @@ public abstract class ATransmitterManager {
         NetworkManager.INFO_CHANNEL.sendToServer(new TransmitterControlPacket(transmitterId(), control));
     }
 
-    public void sendControlPacket(CONTROL control, Integer data) {
-        NetworkManager.INFO_CHANNEL.sendToServer(new TransmitterControlPacket(transmitterId(), control, data));
+    public void sendControlPacket(CONTROL control, UUID songId) {
+        NetworkManager.INFO_CHANNEL.sendToServer(new TransmitterControlPacket(transmitterId(), control, songId));
     }
 
-    // Mode
-    public Boolean isLocalMode() {
-        return this.localMode;
-    }
-
-    public void clearMediaState() {
-        this.stop();
-        this.selectedSongHasLoaded = false;
-        this.selectedSongIsLoading = false;
-    }
-
-    public void toggleLocalMode() {
-        if(supportsLocal()) {
-            clearMediaState();
-            this.localMode = !this.localMode;
-
-            if(!this.localMode) {
-                this.startLoadServerSongsFromRemote();
-            }
-        }
-
+    public void sendControlPacket(CONTROL control, Integer controlData) {
+        NetworkManager.INFO_CHANNEL.sendToServer(new TransmitterControlPacket(transmitterId(), control, controlData));
     }
 
     // Song List
-    public List<MidiFileInfo> getCurrentModeSongList() {
-        return localMode ? localSongList : serverSongList;
+    public List<MidiFileInfo> getDisplaySongList() {
+        return this.displaySongs;
     }
 
-    public Integer getCurrentSongLength() {
-        MidiFileInfo info = getCurrentModeSelectedSongInfo();
+    public Integer getSelectedSongLength() {
+        MidiFileInfo info = getSelectedSongInfo();
 
         if(info != null) {
             return info.songLength;
@@ -149,12 +146,30 @@ public abstract class ATransmitterManager {
         }
     }
 
-    public Integer getCurrentModeSongCount() {
-        return getCurrentModeSongList().size();
+    protected Integer getLoadedSongCount() {
+        return this.songMap.size();
     }
 
-    public Integer getCurrentModeSelectedSong() {
-        return localMode ? selectedLocalSong : selectedServerSong;
+    public Integer getDisplaySongCount() {
+        return this.displaySongs.size();
+    }
+
+    public Integer getSelectedDisplayIndex() {
+        return this.selectedDisplayIndex;
+    }
+
+    protected UUID getSelectedSong() {
+        return this.selectedSong;
+    }
+
+    public MidiFileInfo getSelectedSongInfo() {
+        UUID selectedSong = getSelectedSong();
+
+        if(selectedSong != null) {
+            return this.songMap.get(selectedSong);
+        }
+
+        return null;
     }
 
     public Boolean songLoading() {
@@ -165,65 +180,59 @@ public abstract class ATransmitterManager {
         return this.selectedSongHasLoaded;
     }
 
-    public MidiFileInfo getCurrentModeSelectedSongInfo() {
-        Integer currentSong = getCurrentModeSelectedSong();
-
-        if(currentSong >= 0) {
-            return getCurrentModeSongList().get(currentSong);
-        }
-
-        return null;
+    public Boolean selectedSongIsLocal() {
+        MidiFileInfo selectedInfo = this.getSelectedSongInfo();
+        return selectedInfo != null && selectedInfo.local;
     }
     
-    public Boolean getCurrentModeHasSongs() {
-        return getCurrentModeSongCount() > 0;
+    public Boolean getDisplayHasSongs() {
+        return getDisplaySongCount() > 0;
     }
 
     public Integer selectNextSong() {
-        if(getCurrentModeHasSongs()) {
+        if(getDisplayHasSongs()) {
             Integer newSongIndex = 0;
 
-            if(getCurrentModeSelectedSong() < (getCurrentModeSongCount() - 1)) {
-                newSongIndex = getCurrentModeSelectedSong() + 1;
+            if(getSelectedDisplayIndex() < (getDisplaySongCount() - 1)) {
+                newSongIndex = getSelectedDisplayIndex() + 1;
             }
             
-            selectSong(newSongIndex);
+            selectDisplaySong(newSongIndex);
             return newSongIndex;
         }
         return -1;
     }
 
     public Integer selectPreviousSong() {
-        if(getCurrentModeHasSongs()) {
-            Integer newSongIndex = getCurrentModeSongCount() - 1;
+        if(getDisplayHasSongs()) {
+            Integer newSongIndex = getDisplaySongCount() - 1;
 
-            if(getCurrentModeSelectedSong() > 0) {
-                newSongIndex = getCurrentModeSelectedSong() - 1;
+            if(getSelectedDisplayIndex() > 0) {
+                newSongIndex = getSelectedDisplayIndex() - 1;
             }
             
-            selectSong(newSongIndex);
+            selectDisplaySong(newSongIndex);
             return newSongIndex;
         }
         return -1;
     }
 
-    public Boolean selectSong(Integer songIndex) {
-        if(songIndex < getCurrentModeSongCount()) {
+    public Boolean selectDisplaySong(Integer displaySongIndex) {
+        if(displaySongIndex >= 0 && displaySongIndex < getDisplaySongCount()) {
             Boolean wasPlaying = this.isPlaying();
             this.stop();
+            this.selectedDisplayIndex = displaySongIndex;
             this.selectedSongHasLoaded = false;
+            this.selectedSong = this.displaySongs.get(displaySongIndex).toUUID();
+            this.refreshSelectedSongFavorite();
 
-            if(localMode) {
-                this.selectedLocalSong = songIndex;
-
+            if(this.selectedSongIsLocal()) {
                 if(wasPlaying || this.selectedSongIsLoading) {
                     this.startUploadSelectedLocalSongToServer();
                 }
             } else {
-                this.selectedServerSong = songIndex;
-
-                if(wasPlaying) {
-                    this.sendControlPacket(CONTROL.PLAY, selectedServerSong);
+                if(wasPlaying || this.selectedSongIsLoading) {
+                    this.sendControlPacket(CONTROL.PLAY, this.selectedSong);
                     this.selectedSongHasLoaded = true;
                 }
             }
@@ -233,14 +242,14 @@ public abstract class ATransmitterManager {
     }
     
     public void play() {
-        if(!this.isPlaying() && this.getCurrentModeHasSongs()) {
+        if(!this.isPlaying() && this.getLoadedSongCount() > 0) {
             if(this.songLoaded()) {
                 this.sendControlPacket(CONTROL.PLAY);
             } else {
-                if(this.isLocalMode()) {
+                if(this.selectedSongIsLocal()) {
                     this.startUploadSelectedLocalSongToServer();
                 } else {
-                    this.sendControlPacket(CONTROL.PLAY, selectedServerSong);
+                    this.sendControlPacket(CONTROL.PLAY, this.selectedSong);
                     this.selectedSongHasLoaded = true;
                 }
             }
@@ -256,29 +265,31 @@ public abstract class ATransmitterManager {
     }
 
     public void seek(Integer seekToSeconds) {
-        if(this.getCurrentModeHasSongs() && this.songLoaded()) {
+        if(this.songLoaded()) {
             this.sendControlPacket(CONTROL.SEEK, seekToSeconds);
         }
     }
 
-    public void clearServerSongs() {
-        this.clearMediaState();
-        this.selectedServerSong = -1;
-        this.serverSongList = new ArrayList<>();
-        this.originalServerSongList = new ArrayList<>();
-    }
+    public void clearSongs() {
+        this.stop();
 
-    public void clearLocalSongs() {
-        this.clearMediaState();
-        this.selectedLocalSong = -1;
-        this.localSongList = new ArrayList<>();
-        this.originalLocalSongList = new ArrayList<>();
+        if(this.isShuffled()) {
+            this.toggleShuffle();
+        }
+
+        this.selectedSongHasLoaded = false;
+        this.selectedSongIsLoading = false;
+        this.selectedSong = null;
+        this.selectedSongFavorite = false;
+        this.songMap = new HashMap<>();
+        this.displaySongs = new ArrayList<>();
+        this.defaultSongOrder = new ArrayList<>();
     }
     
     public void startUploadSelectedLocalSongToServer() {
-        if(this.selectedLocalSong >= 0) {
+        if(this.selectedSong != null) {
             this.selectedSongIsLoading = true;
-            MidiUploadManager.startUploadSequenceToServer(this.localSongList.get(this.selectedLocalSong).getSequence());
+            MidiUploadManager.startUploadSequenceToServer(this.getSelectedSongInfo().getSequence());
         }
     }
 
@@ -295,34 +306,73 @@ public abstract class ATransmitterManager {
     }
 
     public void startLoadServerSongsFromRemote() {
-        clearServerSongs();
         NetworkManager.INFO_CHANNEL.sendToServer(new ServerMidiListPacket());
     }
 
     public Boolean finishLoadServerSongsFromRemote(ServerMidiListPacket response) {
-        this.serverSongList = new ArrayList<>(response.midiList);
+        // TODO - Change
+        MIMIMod.proxy.customMidiFiles().initFromAbsolutePath("D:/midi");
         
-        // Select first song
-        if(!this.serverSongList.isEmpty()) {
-            this.selectSong(0);
-            return true;
+        // Merge local and server songs and sort by name
+        ArrayList<MidiFileInfo> allFiles = new ArrayList<>(response.midiList);
+        allFiles.addAll(MIMIMod.proxy.customMidiFiles().getAllSongs());
+        allFiles.sort((midiA, midiB) -> {
+            return midiA.file.getName().toLowerCase().trim().compareTo(midiB.file.getName().toLowerCase().trim());
+        });
+
+        // Build song map
+        allFiles.forEach(midiFile -> {
+            this.songMap.put(midiFile.toUUID(), midiFile);
+            this.defaultSongOrder.add(midiFile.toUUID());
+        });
+
+        // Build display songs
+        if(!this.songMap.isEmpty()) {
+            this.buildDisplaySongList();
+
+            // Select first song
+            if(!this.displaySongs.isEmpty()) {
+                this.selectDisplaySong(0);
+                return true;
+            }
         }
 
         return false;
     }
 
-    public Boolean loadLocalSongsFromFolder(String folderPath) {
-        clearLocalSongs();
-        MIMIMod.proxy.customMidiFiles().initFromAbsolutePath(folderPath);
-        this.localSongList = MIMIMod.proxy.customMidiFiles().getAllSongs();
+    protected void buildDisplaySongList() {
+        this.displaySongs = new ArrayList<>();
 
-        // Select first song
-        if(!this.localSongList.isEmpty()) {
-            this.selectSong(0);
-            return true;
+        List<UUID> orderedSongs = this.isShuffled() ? this.shuffleSongOrder : this.defaultSongOrder;
+        Integer newSelectedIndex = -1;
+        
+        for(UUID songId : orderedSongs) {
+            MidiFileInfo fileInfo = this.songMap.get(songId);
+
+            // Source Filter
+            if(sourceMode() == SourceMode.LOCAL && !fileInfo.local) {
+                continue;
+            } else if(sourceMode() == SourceMode.SERVER && fileInfo.local) {
+                continue;
+            }
+
+            // Favorite Filter
+            Boolean isFavorite = this.isSongFavorite(songId);
+            if(favoriteMode() == FavoriteMode.FAVORITE && !isFavorite) {
+                continue;
+            } else if(favoriteMode() == FavoriteMode.NOT_FAVORITE && isFavorite) {
+                continue;
+            }
+
+            // Selected Song
+            if(songId.equals(this.selectedSong)) {
+                newSelectedIndex = this.displaySongs.size();
+            }
+
+            this.displaySongs.add(fileInfo);
         }
 
-        return false;
+        this.selectedDisplayIndex = newSelectedIndex;
     }
     
     public void shiftLoopMode() {
@@ -338,45 +388,75 @@ public abstract class ATransmitterManager {
     public Integer getLoopMode() {
         return loopMode().ordinal();
     }
+    
+    public void shiftSourceMode() {
+        if(sourceMode() == SourceMode.ALL) {
+            setSourceMode(SourceMode.LOCAL);
+        } else if(sourceMode() == SourceMode.LOCAL) {
+            setSourceMode(SourceMode.SERVER);
+        } else {
+            setSourceMode(SourceMode.ALL);
+        }
+        this.buildDisplaySongList();
+    }
+
+    public Integer getSourceMode() {
+        return sourceMode().ordinal();
+    }
+
+    public void shiftFavoriteMode() {
+        if(favoriteMode() == FavoriteMode.ALL) {
+            setFavoriteMode(FavoriteMode.FAVORITE);
+        } else if(favoriteMode() == FavoriteMode.FAVORITE) {
+            setFavoriteMode(FavoriteMode.NOT_FAVORITE);
+        } else {
+            setFavoriteMode(FavoriteMode.ALL);
+        }
+        this.buildDisplaySongList();
+    }
+
+    public Integer getFavoriteMode() {
+        return favoriteMode().ordinal();
+    }
 
     public Integer getShuffleMode() {
         return isShuffled() ? 1 : 0;
     }
     
     public Boolean toggleShuffle() {
-        MidiFileInfo selectedSong = getCurrentModeSelectedSongInfo();
         this.toggleShuffled();
 
         // Local
         if(this.isShuffled()) {
-            this.originalLocalSongList = new ArrayList<>(this.localSongList);
-            this.originalServerSongList = new ArrayList<>(this.serverSongList);
-            Collections.shuffle(this.localSongList);
-            Collections.shuffle(this.serverSongList);
+            this.shuffleSongOrder = new ArrayList<>(this.defaultSongOrder);
+            Collections.shuffle(this.shuffleSongOrder);
         } else {
-            this.localSongList = this.originalLocalSongList;
-            this.serverSongList = this.originalServerSongList;
-            this.originalLocalSongList = new ArrayList<>();
-            this.originalServerSongList = new ArrayList<>();
+            this.shuffleSongOrder = null;
         }
-    
-        if(selectedSong != null) {
-            Integer selectedIndex = getCurrentModeSongList().indexOf(selectedSong);
 
-            if(isLocalMode()) {
-                this.selectedLocalSong = selectedIndex;
-            } else {
-                this.selectedServerSong = selectedIndex;
-            }
-        }
+        this.buildDisplaySongList();
 
         return isShuffled();
     }
+
+    public void toggleSelectedSongFavorite() {
+        if(this.selectedSong != null) {
+            this.toggleFavoriteSong(this.selectedSong);
+            this.refreshSelectedSongFavorite();
+            this.buildDisplaySongList();
+        }
+    }
     
-    public abstract Boolean supportsLocal();
     public abstract UUID transmitterId();
-    public abstract Boolean isShuffled();
     public abstract LoopMode loopMode();
-    public abstract void toggleShuffled();
     public abstract void setLoopMode(LoopMode mode);
+    public abstract SourceMode sourceMode();
+    public abstract void setSourceMode(SourceMode mode);
+    public abstract FavoriteMode favoriteMode();
+    public abstract void setFavoriteMode(FavoriteMode mode);
+    public abstract Boolean isShuffled();
+    public abstract void toggleShuffled();
+    public abstract List<UUID> getFavoriteSongs();
+    public abstract void toggleFavoriteSong(UUID id);
+    public abstract Boolean isSongFavorite(UUID id);
 }

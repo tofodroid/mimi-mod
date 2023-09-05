@@ -5,7 +5,7 @@ import org.joml.Vector2i;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -65,6 +65,13 @@ public abstract class BaseGui extends Screen {
             guiCoords.x() + START_X, 
             guiCoords.y() + START_Y
         );
+    }
+
+    protected String truncateString(Font font, String source, Integer maxWidth) {
+        if(source == null || font.width(source) <= maxWidth) {
+            return source;
+        }
+        return font.plainSubstrByWidth("..." + source, maxWidth).substring(3) + "...";
     }
 
 }

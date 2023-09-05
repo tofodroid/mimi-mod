@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.common.midi;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiSystem;
@@ -13,6 +14,7 @@ import javax.sound.midi.Track;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
 public class MidiFileInfo {
+    public Boolean local = true;
     public File file;
     public Integer songLength;
     public Integer tempo;
@@ -20,6 +22,8 @@ public class MidiFileInfo {
     public Map<Integer,String> instrumentMapping;
 
     public Sequence getSequence() {
+        if(!this.local) return null;
+
         try {
             return MidiSystem.getSequence(file);
         } catch(Exception e) {
@@ -31,7 +35,14 @@ public class MidiFileInfo {
     public static MidiFileInfo fromFile(File file) {
         if(file.exists()) {
             try {
-                return fromSequence(file, MidiSystem.getSequence(file));
+                MidiFileInfo result = new MidiFileInfo();
+                Sequence sequence = MidiSystem.getSequence(file);
+                result.byteChannelMapping = getChannelMapping(sequence);
+                result.instrumentMapping = getInstrumentMapping(result.byteChannelMapping);
+                result.tempo = getTempoBPM(sequence);
+                result.file = file;
+                result.songLength = Integer.parseInt(Long.valueOf(sequence.getMicrosecondLength()/1000000).toString());
+                return result;
             } catch(Exception e) {
                 MIMIMod.LOGGER.warn("Invalid MIDI file: " + file.getAbsolutePath(), e);
             }
@@ -39,19 +50,32 @@ public class MidiFileInfo {
         return null;
     }
 
-    public static MidiFileInfo fromSequence(File file, Sequence sequence) {
-        try {
-            MidiFileInfo result = new MidiFileInfo();
-            result.byteChannelMapping = getChannelMapping(sequence);
-            result.instrumentMapping = getInstrumentMapping(result.byteChannelMapping);
-            result.tempo = getTempoBPM(sequence);
-            result.file = file;
-            result.songLength = Integer.parseInt(Long.valueOf(sequence.getMicrosecondLength()/1000000).toString());
-            return result;
-        } catch(Exception e) {
-            MIMIMod.LOGGER.warn("Invalid MIDI sequence: " + file.getAbsolutePath(), e);
-            return null;
+    public UUID toUUID() {
+        return UUID.nameUUIDFromBytes(this.toString().getBytes());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(other == null || !(other instanceof MidiFileInfo)) {
+            return false;
         }
+        return ((MidiFileInfo)other).toUUID().equals(this.toUUID());
+    }
+
+    @Override
+    public String toString() {
+        String channelString = "";
+        for(int i = 0; i < this.byteChannelMapping.length; i++) {
+            channelString += Integer.valueOf(this.byteChannelMapping[i]).toString();
+        }
+        
+        return new StringBuilder()
+            .append("sort:" + this.file.getName().trim().toLowerCase() + ";")
+            .append("file:" + this.file.getName().trim() + ";")
+            .append("tempo:" + this.tempo + ";")
+            .append("length:" + this.songLength + ";")
+            .append("channels:" + channelString + ";")
+            .toString();
     }
 
     public static byte[] getChannelMapping(Sequence sequence) {

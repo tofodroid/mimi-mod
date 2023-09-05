@@ -23,8 +23,8 @@ public class TransmitterControlPacketHandler {
     public static void handlePacketServer(final TransmitterControlPacket message, ServerPlayer sender) {
         switch(message.control) {
             case PLAY:
-                if(message.data.isPresent()) {
-                    ServerMusicPlayerMidiManager.createOrReplaceTransmitter(sender, MIMIMod.proxy.defaultMidiFiles().getSequenceByIndex(message.data.get()));
+                if(message.songId.isPresent()) {
+                    ServerMusicPlayerMidiManager.createOrReplaceTransmitter(sender, MIMIMod.proxy.defaultMidiFiles().getSequenceById(message.songId.get()));
                     ServerMusicPlayerMidiManager.playTransmitter(message.transmitterId);
                 } else if(ServerMusicPlayerMidiManager.hasTransmitter(message.transmitterId)) {
                     ServerMusicPlayerMidiManager.playTransmitter(message.transmitterId);
@@ -37,7 +37,7 @@ public class TransmitterControlPacketHandler {
                 ServerMusicPlayerMidiManager.stopTransmitter(message.transmitterId);
                 break;
             case SEEK:
-                ServerMusicPlayerMidiManager.seekTransmitter(message.transmitterId, message.data.get());
+                ServerMusicPlayerMidiManager.seekTransmitter(message.transmitterId, message.controlData.get());
                 break;
             default:
                 break;
