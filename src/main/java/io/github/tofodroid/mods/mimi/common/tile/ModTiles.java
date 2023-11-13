@@ -8,6 +8,7 @@ import net.minecraftforge.registries.RegisterEvent;
 
 public class ModTiles {
     public static BlockEntityType<TileInstrument> INSTRUMENT = null;
+    public static BlockEntityType<TileTransmitter> TRANSMITTER = null;
     public static BlockEntityType<TileListener> LISTENER = null;
     public static BlockEntityType<TileReceiver> RECEIVER = null;
     public static BlockEntityType<TileConductor> CONDUCTOR = null;
@@ -20,6 +21,7 @@ public class ModTiles {
     }
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<BlockEntityType<?>> event) {
+        TRANSMITTER = registerType("transmitter", BlockEntityType.Builder.of(TileTransmitter::new, ModBlocks.TRANSMITTER.get()), event);
         LISTENER = registerType("listener", BlockEntityType.Builder.of(TileListener::new, ModBlocks.LISTENER.get()), event);
         RECEIVER = registerType("receiver", BlockEntityType.Builder.of(TileReceiver::new, ModBlocks.RECEIVER.get()), event);
         CONDUCTOR = registerType("conductor", BlockEntityType.Builder.of(TileConductor::new, ModBlocks.CONDUCTOR.get()), event);

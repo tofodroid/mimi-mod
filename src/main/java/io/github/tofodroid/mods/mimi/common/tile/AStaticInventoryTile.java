@@ -70,12 +70,17 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
 
     @Override
     public ItemStack removeItem(int i, int count) {
-        return ContainerHelper.removeItem(this.getItems(), i, count);
+        return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int i) {
-        return ContainerHelper.takeItem(this.getItems(), i);
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
     }
 
     @Override
@@ -152,11 +157,11 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
 
     @Override
     public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return true;
+        return false;
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int p_19235_, ItemStack p_19236_, @Nullable Direction p_19237_) {
-        return true;
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+        return false;
     }
 }

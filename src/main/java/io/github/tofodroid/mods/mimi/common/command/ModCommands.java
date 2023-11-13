@@ -25,8 +25,8 @@ public class ModCommands {
 	}
 
     private static int reloadServerMusicList(CommandSourceStack source) {
-        MIMIMod.proxy.defaultMidiFiles().refresh();
-        source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + MIMIMod.proxy.defaultMidiFiles().getFileInfoPages(1) + " files"), true);
+        MIMIMod.proxy.serverMidiFiles().refresh();
+        source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + MIMIMod.proxy.serverMidiFiles().getSongCount() + " files"), true);
         return 0;
     }
 }

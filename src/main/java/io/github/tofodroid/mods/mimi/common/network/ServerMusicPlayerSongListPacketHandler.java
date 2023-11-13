@@ -13,8 +13,8 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
-public class ServerMusicPlayerStatusPacketHandler {
-    public static void handlePacket(final ServerMusicPlayerStatusPacket message, Supplier<NetworkEvent.Context> ctx) {
+public class ServerMusicPlayerSongListPacketHandler {
+    public static void handlePacket(final ServerMusicPlayerSongListPacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
             ctx.get().enqueueWork(() -> handlePacketServer(message, ctx.get().getSender()));
         } else {
@@ -23,19 +23,20 @@ public class ServerMusicPlayerStatusPacketHandler {
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacketServer(ServerMusicPlayerStatusPacket request, ServerPlayer sender) {
-        ServerMusicPlayer player = ServerMusicPlayerManager.getMusicPlayer(request.musicPlayerId);
-        
+    public static void handlePacketServer(final ServerMusicPlayerSongListPacket message, ServerPlayer sender) {
+        ServerMusicPlayer player = ServerMusicPlayerManager.getMusicPlayer(message.musicPlayerId);
+
         if(player != null) {
-            NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), player.getStatus());
+            player.refreshSongs();
+            NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMusicPlayerSongListPacket(message.musicPlayerId, player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
         }
     }
     
     @OnlyIn(Dist.CLIENT)
     @SuppressWarnings({"resource", "null"})
-    public static void handlePacketClient(final ServerMusicPlayerStatusPacket message) {
+    public static void handlePacketClient(final ServerMusicPlayerSongListPacket message) {
         if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiTransmitter) {
-            ((GuiTransmitter)Minecraft.getInstance().screen).handleMusicPlayerStatusPacket(message);
+            ((GuiTransmitter)Minecraft.getInstance().screen).handleMusicplayerSongListPacket(message);
         }
     }
 }

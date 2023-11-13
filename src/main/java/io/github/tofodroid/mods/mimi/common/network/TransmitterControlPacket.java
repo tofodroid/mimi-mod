@@ -12,7 +12,15 @@ public class TransmitterControlPacket {
         PLAY,
         PAUSE,
         STOP,
+        RESTART,
         SEEK,
+        NEXT,
+        PREV,
+        LOOP_M,
+        FAVE_M,
+        SOURCE_M,
+        MARKFAVE,
+        SHUFFLE,
         UNKNOWN;
 
         public static CONTROL fromByte(byte b) {

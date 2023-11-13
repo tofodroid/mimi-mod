@@ -1,14 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import javax.annotation.Nullable;
-
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
@@ -118,31 +115,6 @@ public class TileInstrument extends AStaticInventoryTile {
             this.setInstrumentStack(convertStack);
         }
         // END TEMPORARY LEGACY COMPATIBILITY CODE
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return false;
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-        return false;
-    }
-
-    @Override
-    public ItemStack removeItem(int i, int count) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int i) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void onChunkUnloaded() {
-        super.onChunkUnloaded();
     }
 
     private ItemStack initializeInstrumentStack() {

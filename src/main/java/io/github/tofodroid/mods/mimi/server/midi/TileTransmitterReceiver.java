@@ -5,17 +5,17 @@ import javax.sound.midi.ShortMessage;
 import io.github.tofodroid.mods.mimi.common.midi.AMidiInputReceiver;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class TransmitterReceiver extends AMidiInputReceiver {
-    protected Player player;
+public class TileTransmitterReceiver extends AMidiInputReceiver {
+    protected TileTransmitter tile;
 
-    public TransmitterReceiver(Player player) {
+    public TileTransmitterReceiver(TileTransmitter tile) {
         super();
-        this.player = player;
+        this.tile = tile;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TransmitterReceiver extends AMidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, velocity);
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID());
+            TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getUUID());
         });        
     }
     
@@ -43,7 +43,7 @@ public class TransmitterReceiver extends AMidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, midiNote, Integer.valueOf(0).byteValue());
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID());
+            TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getUUID());
         });     
     }
 
@@ -51,7 +51,7 @@ public class TransmitterReceiver extends AMidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createAllNotesOffPacket(channel);
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID());
+            TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getUUID());
         });     
     }
 
@@ -59,7 +59,7 @@ public class TransmitterReceiver extends AMidiInputReceiver {
         TransmitterNotePacket packet = TransmitterNotePacket.createControllerPacket(channel, controller, value);
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         server.execute(() -> {
-            TransmitterNotePacketHandler.handlePacketServer(packet, player.getOnPos(), (ServerLevel)player.level(), player.getUUID());
+            TransmitterNotePacketHandler.handlePacketServer(packet, tile.getBlockPos(), (ServerLevel)tile.getLevel(), tile.getUUID());
         });     
     }
     

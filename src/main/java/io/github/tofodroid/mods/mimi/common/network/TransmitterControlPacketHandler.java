@@ -1,14 +1,17 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerMidiManager;
+import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayer;
+import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 public class TransmitterControlPacketHandler {
     public static void handlePacket(final TransmitterControlPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -21,36 +24,69 @@ public class TransmitterControlPacketHandler {
     }
     
     public static void handlePacketServer(final TransmitterControlPacket message, ServerPlayer sender) {
-        switch(message.control) {
-            case PLAY:
-                if(message.songId.isPresent()) {
-                    ServerMusicPlayerMidiManager.createOrReplaceTransmitter(sender, MIMIMod.proxy.defaultMidiFiles().getSequenceById(message.songId.get()));
-                    ServerMusicPlayerMidiManager.playTransmitter(message.transmitterId);
-                } else if(ServerMusicPlayerMidiManager.hasTransmitter(message.transmitterId)) {
-                    ServerMusicPlayerMidiManager.playTransmitter(message.transmitterId);
-                } 
-                break;
-            case PAUSE:
-                ServerMusicPlayerMidiManager.pauseTransmitter(message.transmitterId);
-                break;
-            case STOP:
-                ServerMusicPlayerMidiManager.stopTransmitter(message.transmitterId);
-                break;
-            case SEEK:
-                ServerMusicPlayerMidiManager.seekTransmitter(message.transmitterId, message.controlData.get());
-                break;
-            default:
-                break;
+        ServerMusicPlayer musicPlayer = ServerMusicPlayerManager.getMusicPlayer(message.transmitterId);
+        Boolean shouldRefreshSongs = false;
+
+        if(musicPlayer != null) {
+            switch(message.control) {
+                case PLAY:
+                    musicPlayer.play();
+                    break;
+                case PAUSE:
+                    musicPlayer.pause();
+                    break;
+                case STOP:
+                    musicPlayer.stop();
+                    break;
+                case RESTART:
+                    musicPlayer.stop();
+                    musicPlayer.play();
+                    break;
+                case SEEK:
+                    //musicPlayer.seek(message.transmitterId, message.controlData.get());
+                    break;
+                case PREV:
+                    musicPlayer.previous();
+                    break;
+                case NEXT:
+                    musicPlayer.next();
+                    break;
+                case SHUFFLE:
+                    musicPlayer.toggleShuffled();
+                    shouldRefreshSongs = true;
+                    break;
+                case LOOP_M:
+                    musicPlayer.cycleLoopMode();
+                    break;
+                case FAVE_M:
+                    musicPlayer.cycleFavoriteMode();
+                    shouldRefreshSongs = true;
+                    break;
+                case SOURCE_M:
+                    musicPlayer.cycleSourceMode();
+                    shouldRefreshSongs = true;
+                    break;
+                case MARKFAVE:
+                    musicPlayer.toggleSongFavorite();
+                    shouldRefreshSongs = true;
+                    break;
+                default:
+                    break;
+            }
+
+            sendResponsePackets(shouldRefreshSongs, message.transmitterId, sender, musicPlayer);
         }
-        sendStatusPacket(sender);
     }
 
-    public static void sendStatusPacket(ServerPlayer sender) {
-        ServerMusicPlayerStatusPacketHandler.handlePacketServer(sender);
+    public static void sendResponsePackets(Boolean songListPacket, UUID musicPlayerId, ServerPlayer sender, ServerMusicPlayer player) {
+        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), player.getStatus());
+
+        if(songListPacket) {
+            NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMusicPlayerSongListPacket(musicPlayerId, player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
+        }
     }
     
     @OnlyIn(Dist.CLIENT)
-    @SuppressWarnings("resource")
     public static void handlePacketClient(final TransmitterControlPacket message) {
         MIMIMod.LOGGER.warn("Client received unexpected TransmitterControlPacket!");
     }

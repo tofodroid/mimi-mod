@@ -14,6 +14,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockConductor;
@@ -21,6 +22,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.BlockListener;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
+import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
@@ -33,9 +35,10 @@ public final class ModItems {
 
     // Other
     public static ItemMidiDeviceConfig DEVICECONFIG;
-    public static ItemFileCaster FILECASTER;
+    public static ItemEnderTransmitter ENDERTRANSMITTER;
 
     // Blocks - Redstone
+    public static BlockItem TRANSMITTER;
     public static BlockItem LISTENER;
     public static BlockItem RECEIVER;
     public static BlockItem MECHANICALMAESTRO;
@@ -56,7 +59,7 @@ public final class ModItems {
             output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
             output.acceptAll(getStacksForItems(Arrays.asList(
                 DEVICECONFIG,
-                FILECASTER,
+                ENDERTRANSMITTER,
                 LISTENER,
                 RECEIVER,
                 MECHANICALMAESTRO,
@@ -68,7 +71,7 @@ public final class ModItems {
     }
 
     public static List<ItemStack> getStacksForItems(List<? extends Item> items) {
-        return items.stream().map(i -> new ItemStack(i)).toList();
+        return items.stream().map(i -> new ItemStack(i)).collect(Collectors.toList());
     }
 
     public static void submitRegistrations(final RegisterEvent.RegisterHelper<Item> event) {
@@ -76,10 +79,13 @@ public final class ModItems {
         DEVICECONFIG = new ItemMidiDeviceConfig();
         event.register(ItemMidiDeviceConfig.REGISTRY_NAME, DEVICECONFIG);
 
-        FILECASTER = new ItemFileCaster();
-        event.register(ItemFileCaster.REGISTRY_NAME, FILECASTER);
+        ENDERTRANSMITTER = new ItemEnderTransmitter();
+        event.register(ItemEnderTransmitter.REGISTRY_NAME, ENDERTRANSMITTER);
 
         // Redstone Blocks
+        TRANSMITTER = new BlockItem(ModBlocks.TRANSMITTER.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockTransmitter.REGISTRY_NAME, TRANSMITTER);
+
         LISTENER = new BlockItem(ModBlocks.LISTENER.get(), new Item.Properties().stacksTo(64));
         event.register(BlockListener.REGISTRY_NAME, LISTENER);
 

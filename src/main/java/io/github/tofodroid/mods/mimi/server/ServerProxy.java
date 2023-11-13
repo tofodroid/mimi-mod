@@ -2,12 +2,16 @@ package io.github.tofodroid.mods.mimi.server;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.Proxy;
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileManager;
+import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import net.minecraft.Util;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ServerProxy implements Proxy {
     private final Long serverStartEpoch = Util.getEpochMillis();
-    private MidiFileManager DEFAULT_MIDI_FILES = new MidiFileManager();
+    private FilesystemMidiFileProvider MIDI_FILES = new FilesystemMidiFileProvider(true);
+
+    @Override
+    public void init(FMLCommonSetupEvent event) { }
 
     @Override
     public Boolean isClient() {
@@ -21,14 +25,12 @@ public class ServerProxy implements Proxy {
     }
 
     @Override
-    public MidiFileManager defaultMidiFiles() {
-        return DEFAULT_MIDI_FILES;
+    public FilesystemMidiFileProvider serverMidiFiles() {
+        return MIDI_FILES;
     }
 
     @Override
-    public MidiFileManager customMidiFiles() {
-        MIMIMod.LOGGER.warn("Server attempted to access custom MIDI files which are not supported!");
-        return DEFAULT_MIDI_FILES;
+    public FilesystemMidiFileProvider clientMidiFiles() {
+        return MIDI_FILES;
     }
-
 }

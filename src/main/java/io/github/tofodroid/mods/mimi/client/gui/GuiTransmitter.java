@@ -2,66 +2,78 @@ package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.joml.Vector2i;
 
-import io.github.tofodroid.mods.mimi.common.midi.ATransmitterManager;
-import io.github.tofodroid.mods.mimi.common.midi.MidiFileInfo;
-import io.github.tofodroid.mods.mimi.common.midi.ATransmitterManager.FavoriteMode;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
+import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
+import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CONTROL;
+import io.github.tofodroid.mods.mimi.server.midi.AMusicPlayerPlaylistHandler.FavoriteMode;
+import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class GuiTransmitter extends BaseGui {
-    private static final Integer UPDATE_STATUS_EVERY_TICKS = 10;
-    private static final Integer ANIM_FRAME_EVERY_TICKS = 3;
-    private static final Integer LOADING_ANIMATION_FRAMES = 4;
+    protected static final Integer UPDATE_STATUS_EVERY_TICKS = 10;
+    protected static final Integer ANIM_FRAME_EVERY_TICKS = 3;
+    protected static final Integer LOADING_ANIMATION_FRAMES = 4;
     
     // Playlist Controls
-    private static final Vector2i FAVORITE_FILTER_BUTTON = new Vector2i(300,32);
-    private static final Vector2i FAVORITE_FILTER_SCREEN = new Vector2i(318,33);
-    private static final Vector2i REFRESH_SONGS_BUTTON = new Vector2i(335,32);
+    protected static final Vector2i FAVORITE_FILTER_BUTTON = new Vector2i(300,32);
+    protected static final Vector2i FAVORITE_FILTER_SCREEN = new Vector2i(318,33);
+    protected static final Vector2i REFRESH_SONGS_BUTTON = new Vector2i(335,32);
 
     // Song Controls
-    private static final Vector2i TOGGLE_FAVORITE_BUTTON = new Vector2i(335,149);
-    private static final Vector2i PREVIOUS_BUTTON = new Vector2i(10,264);
-    private static final Vector2i STOP_BUTTON = new Vector2i(29,264);
-    private static final Vector2i PLAY_PAUSE_BUTTON = new Vector2i(48,264);
-    private static final Vector2i NEXT_BUTTON = new Vector2i(67,264);
-    private static final Vector2i LOOP_BUTTON = new Vector2i(86,264);
-    private static final Vector2i LOOP_SCREEN = new Vector2i(104,265);
-    private static final Vector2i SHUFFLE_BUTTON = new Vector2i(121,264);
-    private static final Vector2i SHUFFLE_SCREEN = new Vector2i(139,265);
+    protected static final Vector2i TOGGLE_FAVORITE_BUTTON = new Vector2i(335,149);
+    protected static final Vector2i PREVIOUS_BUTTON = new Vector2i(10,264);
+    protected static final Vector2i STOP_BUTTON = new Vector2i(29,264);
+    protected static final Vector2i PLAY_PAUSE_BUTTON = new Vector2i(48,264);
+    protected static final Vector2i NEXT_BUTTON = new Vector2i(67,264);
+    protected static final Vector2i LOOP_BUTTON = new Vector2i(86,264);
+    protected static final Vector2i LOOP_SCREEN = new Vector2i(104,265);
+    protected static final Vector2i SHUFFLE_BUTTON = new Vector2i(121,264);
+    protected static final Vector2i SHUFFLE_SCREEN = new Vector2i(139,265);
 
     // Time Slider
-    private static final Integer SLIDE_Y = 263;
-    private static final Integer SLIDE_MIN_X = 166;
-    private static final Integer SLIDE_MAX_X = 335;
-    private static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
+    protected static final Integer SLIDE_Y = 263;
+    protected static final Integer SLIDE_MIN_X = 166;
+    protected static final Integer SLIDE_MAX_X = 335;
+    protected static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
+
+    // Animation
+    protected Integer ticksSinceUpdate = 0;
+    protected Integer ticksSinceAnimFrame = 0;
+    protected Integer loadingAnimationFrame = 0;
 
     // Data
-    private Integer ticksSinceUpdate = 0;
-    private Integer ticksSinceAnimFrame = 0;
-    private Integer loadingAnimationFrame = 0;
-
-    // MIDI
-    private ATransmitterManager transmitterManager;
+    protected UUID musicPlayerId;
+    protected ServerMusicPlayerStatusPacket musicStatus;
+    protected ServerMusicPlayerSongListPacket songList;
     
-    public GuiTransmitter(ATransmitterManager transmitterManager) {
+    public GuiTransmitter(UUID musicPlayerId) {
         super(360, 288, 360, "textures/gui/container_transmitter.png", "item.MIMIMod.gui_transmitter");
-        this.transmitterManager = transmitterManager;
-
-        if(this.transmitterManager.isPlaying()) {
-            this.transmitterManager.startRefreshMediaStatus();
-        }
+        this.musicPlayerId = musicPlayerId;
+        this.musicStatus = new ServerMusicPlayerStatusPacket(musicPlayerId);
+        this.songList = new ServerMusicPlayerSongListPacket(musicPlayerId);
     }
     
     @Override
     public void init() {
         super.init();
+        this.startRefreshPlayerStatus();
+        this.startRefreshSongList();
     }
 
     @Override
     public void tick() {
         if(this.ticksSinceUpdate >= UPDATE_STATUS_EVERY_TICKS) {
-            this.transmitterManager.startRefreshMediaStatus();
+            this.startRefreshPlayerStatus();
             this.ticksSinceUpdate = 0;
         } else {
             this.ticksSinceUpdate++;
@@ -80,43 +92,51 @@ public class GuiTransmitter extends BaseGui {
         }
     }
 
+    public void handleMusicPlayerStatusPacket(ServerMusicPlayerStatusPacket packet) {
+        this.musicStatus = packet;
+    }
+
+    public void handleMusicplayerSongListPacket(ServerMusicPlayerSongListPacket packet) {
+        this.songList = packet;
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
         if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(FAVORITE_FILTER_BUTTON))) {
-            this.transmitterManager.shiftFavoriteMode();
+            this.sendTransmitterCommand(CONTROL.FAVE_M);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_SONGS_BUTTON))) {
-            this.transmitterManager.refreshSongs();
-        } else if(this.transmitterManager.getSelectedSongInfo() != null && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(TOGGLE_FAVORITE_BUTTON))) {
-            this.transmitterManager.toggleSelectedSongFavorite();
+            this.startRefreshSongList();
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(TOGGLE_FAVORITE_BUTTON))) {
+            this.sendTransmitterCommand(CONTROL.MARKFAVE);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PREVIOUS_BUTTON))) {
             Double slidePercentage = null;
 
-            if(this.transmitterManager.songLoaded()) {
-                slidePercentage =  Double.valueOf(this.transmitterManager.getSongPositionSeconds()) / Double.valueOf(this.transmitterManager.getSelectedSongInfo().songLength);
+            if(this.musicStatus.songPositionSeconds != null && this.musicStatus.songLengthSeconds != null && this.musicStatus.songLengthSeconds > 0) {
+                slidePercentage =  Double.valueOf(this.musicStatus.songPositionSeconds) / Double.valueOf(this.musicStatus.songLengthSeconds);
             }
 
             if(slidePercentage != null && slidePercentage >= 0.25) {
-                this.transmitterManager.seek(0);
+                this.sendTransmitterCommand(CONTROL.RESTART);
             } else {
-                this.transmitterManager.selectPreviousSong();
+                this.sendTransmitterCommand(CONTROL.PREV);
             }
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(STOP_BUTTON))) {
-            this.transmitterManager.stop();
+            this.sendTransmitterCommand(CONTROL.STOP);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_PAUSE_BUTTON))) {
-            if(this.transmitterManager.isPlaying()) {
-                this.transmitterManager.pause();
+            if(this.musicStatus.isPlaying) {
+                this.sendTransmitterCommand(CONTROL.PAUSE);
             } else {
-                this.transmitterManager.play();
+                this.sendTransmitterCommand(CONTROL.PLAY);
             }
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NEXT_BUTTON))) {
-            this.transmitterManager.selectNextSong();
+            this.sendTransmitterCommand(CONTROL.NEXT);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(LOOP_BUTTON))) {
-            this.transmitterManager.shiftLoopMode();
+            this.sendTransmitterCommand(CONTROL.LOOP_M);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHUFFLE_BUTTON))) {
-            this.transmitterManager.toggleShuffle();
+            this.sendTransmitterCommand(CONTROL.SHUFFLE);
         }
         
         return super.mouseClicked(mouseX, mouseY, button);
@@ -131,40 +151,40 @@ public class GuiTransmitter extends BaseGui {
         graphics.blit(guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Title
-        graphics.blit(guiTexture, START_X + 132, START_Y + 6, 53, 330, 97, 14, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.renderTitle(graphics);
 
         // Selected Song Box
-        if(this.transmitterManager.getDisplayHasSongs() && this.transmitterManager.getSelectedDisplayIndex() >= 0) {
+        if(!this.songList.infos.isEmpty() && this.musicStatus.fileIndex != null) {
             Integer songOffset = getSongOffset();            
             Integer boxY = (getFirstSongY() - 2) + (11 * songOffset);
             graphics.blit(guiTexture, START_X + 10, START_Y + boxY, 1, 290, 340, 11, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Play/Pause Button
-        if(!this.transmitterManager.songLoading()) {
-            graphics.blit(guiTexture, START_X + 49, START_Y + 265, this.transmitterManager.isPlaying() ? 14 : 1, 316, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        if(!this.musicStatus.isLoading) {
+            graphics.blit(guiTexture, START_X + 49, START_Y + 265, this.musicStatus.isPlaying ? 14 : 1, 316, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
             graphics.blit(guiTexture, START_X + 49, START_Y + 265, 1 + this.loadingAnimationFrame*13, 345, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
 
         // Toggle Favorite Button
-        graphics.blit(guiTexture, START_X + 336, START_Y + 150, this.transmitterManager.isSelectedSongFavorite() ? 40 : 27, 316, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + 336, START_Y + 150, this.musicStatus.isFileFavorite ? 40 : 27, 316, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Favorite Filter Screen
-        graphics.blit(guiTexture, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.transmitterManager.getFavoriteMode()), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.musicStatus.favoriteMode.ordinal()), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Loop Screen
-        graphics.blit(guiTexture, START_X + LOOP_SCREEN.x(), START_Y + LOOP_SCREEN.y(), 1 + (13 * this.transmitterManager.getLoopMode()), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + LOOP_SCREEN.x(), START_Y + LOOP_SCREEN.y(), 1 + (13 * this.musicStatus.loopMode.ordinal()), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Shuffle Screen    
-        graphics.blit(guiTexture, START_X + SHUFFLE_SCREEN.x(), START_Y + SHUFFLE_SCREEN.y(), 40 + (13 * this.transmitterManager.getShuffleMode()), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + SHUFFLE_SCREEN.x(), START_Y + SHUFFLE_SCREEN.y(), 40 + (13 * (this.musicStatus.isShuffled ? 1 : 0)), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;
-        if(this.transmitterManager.songLoaded()) {
-            Integer slideLength = this.transmitterManager.getSelectedSongInfo().songLength;
-            Integer slideProgress = this.transmitterManager.getSongPositionSeconds();
+        if(this.musicStatus.songPositionSeconds != null && this.musicStatus.songLengthSeconds != null && this.musicStatus.songLengthSeconds > 0) {
+            Integer slideLength = this.musicStatus.songLengthSeconds;
+            Integer slideProgress = this.musicStatus.songPositionSeconds;
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
@@ -176,53 +196,63 @@ public class GuiTransmitter extends BaseGui {
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Playlist
-        this.renderPlaylistSongs(graphics);
+        if(!this.songList.infos.isEmpty()) {
+            Integer minSong = getMinSong();
+
+            for(int i = 0; i < getVisibleSongs(); i++) {
+                if(this.songList.infos.size() > (minSong + i)) {
+                    BasicMidiInfo info = this.songList.infos.get(minSong + i);
+                    graphics.drawString(font, this.truncateString(font, ((minSong + i) < 9 ? "0" : "") + (minSong + i + 1) + "). " + info.fileName, this.maxPlaylistSongTitleWidth()), START_X + 12, START_Y + getFirstSongY() + i * 11, 0xFF00E600);
+                    this.renderPlaylistSongBadges(graphics, info, i, minSong);
+                } else {
+                    break;
+                }            
+            }
+        }
 
         // Current Song
-        MidiFileInfo info = this.transmitterManager.getSelectedSongInfo();
-
-        if(info != null) {
-            graphics.drawString(font, this.truncateString(font, info.file.getName(), 264), START_X + 66, START_Y + 153, 0xFF00E600);
+        if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
+            BasicMidiInfo info = this.songList.infos.get(this.musicStatus.fileIndex);
+            graphics.drawString(font, this.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 153, 0xFF00E600);
     
-            if(info.instrumentMapping != null) {
+            if(this.musicStatus.channelMapping != null) {
+                Map<Integer, String> instrumentMapping = MidiFileUtils.getInstrumentMapping(this.musicStatus.channelMapping);
                 graphics.drawString(font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 168, 0xFF00E600);
                 
                 Integer index = 0;
                 for(Integer i = 0; i < 16; i+=2) {
-                    String name = info.instrumentMapping.get(i) == null ? "None" : info.instrumentMapping.get(i);
+                    String name = instrumentMapping.get(i) == null ? "None" : instrumentMapping.get(i);
                     graphics.drawString(font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 12, START_Y + 182 + 10*index, 0xFF00E600);
                     index++;
                 }
 
                 index = 0;
                 for(Integer i = 1; i < 16; i+=2) {
-                    String name = info.instrumentMapping.get(i) == null ? "None" : info.instrumentMapping.get(i);
+                    String name = instrumentMapping.get(i) == null ? "None" : instrumentMapping.get(i);
                     graphics.drawString(font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 180, START_Y + 182 + 10*index, 0xFF00E600);
                     index++;
                 }
+            } else {
+                graphics.drawString(font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 168, 0xFF00E600);
             }
         }
         
         return graphics;
     }
 
-    protected GuiGraphics renderPlaylistSongs(GuiGraphics graphics) {
-        if(this.transmitterManager.getDisplayHasSongs()) {
-            Integer minSong = getMinSong();
+    protected Integer maxPlaylistSongTitleWidth() {
+        return 324;
+    }
 
-            for(int i = 0; i < getVisibleSongs(); i++) {
-                if(this.transmitterManager.getDisplaySongCount() > (minSong + i)) {
-                    MidiFileInfo info = this.transmitterManager.getDisplaySongList().get(minSong + i);
-                    graphics.drawString(font, this.truncateString(font, ((minSong + i) < 9 ? "0" : "") + (minSong + i + 1) + "). " + info.file.getName(), 324), START_X + 12, START_Y + getFirstSongY() + i * 11, 0xFF00E600);
-                    
-                    // Favorite Badge
-                    if(this.transmitterManager.favoriteMode() != FavoriteMode.NOT_FAVORITE && (this.transmitterManager.favoriteMode() == FavoriteMode.FAVORITE || this.transmitterManager.isSongFavorite(info.toUUID()))) {
-                        graphics.blit(guiTexture, START_X + 339, START_Y + getFirstSongY() - 1 + i * 11, 145, 302, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
-                    }
-                } else {
-                    break;
-                }            
-            }
+    protected GuiGraphics renderTitle(GuiGraphics graphics) {
+        graphics.blit(guiTexture, START_X + 132, START_Y + 6, 53, 330, 97, 14, TEXTURE_SIZE, TEXTURE_SIZE);
+        return graphics;
+    }
+
+    protected GuiGraphics renderPlaylistSongBadges(GuiGraphics graphics, BasicMidiInfo info, Integer songIndex, Integer minSong) {
+        // Favorite Badge
+        if(this.musicStatus.favoriteMode != FavoriteMode.NOT_FAVORITE && (this.musicStatus.favoriteMode == FavoriteMode.FAVORITE || this.songList.favoriteIndicies.contains(minSong + songIndex))) {
+            graphics.blit(guiTexture, START_X + 339, START_Y + getFirstSongY() - 1 + songIndex * 11, 145, 302, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         return graphics;
     }
@@ -236,22 +266,35 @@ public class GuiTransmitter extends BaseGui {
     }
 
     protected Integer getMinSong() {
-        if(this.transmitterManager.getDisplaySongCount() <= getVisibleSongs() || this.transmitterManager.getSelectedDisplayIndex() < 4) {
+        if(this.songList.infos.size() <= getVisibleSongs() || this.musicStatus.fileIndex == null || this.musicStatus.fileIndex < 4) {
             return 0;
-        } else if(this.transmitterManager.getSelectedDisplayIndex() > this.transmitterManager.getDisplaySongCount() - 4) {
-            return this.transmitterManager.getDisplaySongCount() - getVisibleSongs();
+        } else if(this.musicStatus.fileIndex > this.songList.infos.size() - 4) {
+            return this.songList.infos.size() - getVisibleSongs();
         } else {
-            return this.transmitterManager.getSelectedDisplayIndex() - 4;
+            return this.musicStatus.fileIndex - 4;
         }
     }
 
     protected Integer getSongOffset() {
-        if(this.transmitterManager.getDisplaySongCount() <= getVisibleSongs() || this.transmitterManager.getSelectedDisplayIndex() < 4) {
-            return this.transmitterManager.getSelectedDisplayIndex();
-        } else if(this.transmitterManager.getSelectedDisplayIndex() > this.transmitterManager.getDisplaySongCount() - 4) {
-            return getVisibleSongs() - (this.transmitterManager.getDisplaySongCount() - this.transmitterManager.getSelectedDisplayIndex());
+        if(this.musicStatus.fileIndex != null && (this.songList.infos.size() <= getVisibleSongs() || this.musicStatus.fileIndex < 4)) {
+            return this.musicStatus.fileIndex;
+        } else if(this.musicStatus.fileIndex != null && (this.musicStatus.fileIndex > this.songList.infos.size() - 4)) {
+            return getVisibleSongs() - (this.songList.infos.size() - this.musicStatus.fileIndex);
         } else {
             return 4;
         }
+    }
+
+    protected void sendTransmitterCommand(CONTROL control) {
+        NetworkManager.INFO_CHANNEL.sendToServer(new TransmitterControlPacket(musicPlayerId, control));
+    }
+
+    protected void startRefreshPlayerStatus() {
+        NetworkManager.INFO_CHANNEL.sendToServer(new ServerMusicPlayerStatusPacket(this.musicPlayerId));
+    }
+
+    protected void startRefreshSongList() {
+        MIMIMod.proxy.clientMidiFiles().refresh();
+        NetworkManager.INFO_CHANNEL.sendToServer(new ClientMidiListPacket(true, MIMIMod.proxy.clientMidiFiles().getSortedSongInfos()));
     }
 }

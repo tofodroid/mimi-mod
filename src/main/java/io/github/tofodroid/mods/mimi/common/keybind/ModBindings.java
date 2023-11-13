@@ -56,7 +56,7 @@ public class ModBindings {
         // GUIs
         if(worldIn != null && playerIn != null && MIMIMod.proxy.isClient() && Minecraft.getInstance().screen == null) {
             if(GUIFILECASTER.isDown()) {
-                ClientGuiWrapper.openEnderTransmitterGui(worldIn);
+                ClientGuiWrapper.openEnderTransmitterGui(worldIn, playerIn);
             } else if(MIDIGUIMAIN.isDown()) {
                 ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND, playerIn.getItemInHand(InteractionHand.MAIN_HAND));
             } else if(MIDIGUIOFF.isDown()) {

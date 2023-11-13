@@ -47,13 +47,13 @@ public class NetworkManager {
         BROADCAST_CHANNEL.registerMessage(0, TransmitterNotePacket.class, TransmitterNotePacket::encodePacket, TransmitterNotePacket::decodePacket, TransmitterNotePacketHandler::handlePacket);
         
         INFO_CHANNEL.registerMessage(0, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, SyncInstrumentPacketHandler::handlePacket);
-        INFO_CHANNEL.registerMessage(1, ServerMidiListPacket.class, ServerMidiListPacket::encodePacket, ServerMidiListPacket::decodePacket, ServerMidiListPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(1, ClientMidiListPacket.class, ClientMidiListPacket::encodePacket, ClientMidiListPacket::decodePacket, ClientMidiListPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(2, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, ServerMusicPlayerStatusPacketHandler::handlePacket);
+        INFO_CHANNEL.registerMessage(3, ServerMusicPlayerSongListPacket.class, ServerMusicPlayerSongListPacket::encodePacket, ServerMusicPlayerSongListPacket::decodePacket, ServerMusicPlayerSongListPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(4, ServerTimeSyncPacket.class, ServerTimeSyncPacket::encodePacket, ServerTimeSyncPacket::decodePacket, ServerTimeSyncPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(5, ConfigurableMidiTileSyncPacket.class, ConfigurableMidiTileSyncPacket::encodePacket, ConfigurableMidiTileSyncPacket::decodePacket, ConfigurableMidiTileSyncPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(6, TransmitterControlPacket.class, TransmitterControlPacket::encodePacket, TransmitterControlPacket::decodePacket, TransmitterControlPacketHandler::handlePacket);
     
         SEQUENCE_CHANNEL.registerMessage(0, ServerMidiUploadPacket.class, ServerMidiUploadPacket::encodePacket, ServerMidiUploadPacket::decodePacket, ServerMidiUploadPacketHandler::handlePacket);
-
     }
 }

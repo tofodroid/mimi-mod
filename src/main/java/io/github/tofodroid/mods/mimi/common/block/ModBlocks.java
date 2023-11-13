@@ -16,6 +16,7 @@ public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MIMIMod.MODID);
 
     // Redstone Blocks
+    public static final RegistryObject<BlockTransmitter> TRANSMITTER = BLOCKS.register(BlockTransmitter.REGISTRY_NAME, () -> new BlockTransmitter());
     public static final RegistryObject<BlockListener> LISTENER = BLOCKS.register(BlockListener.REGISTRY_NAME, () -> new BlockListener());
     public static final RegistryObject<BlockReceiver> RECEIVER = BLOCKS.register(BlockReceiver.REGISTRY_NAME, () -> new BlockReceiver());
     public static final RegistryObject<BlockMechanicalMaestro> MECHANICALMAESTRO = BLOCKS.register(BlockMechanicalMaestro.REGISTRY_NAME, () -> new BlockMechanicalMaestro());
