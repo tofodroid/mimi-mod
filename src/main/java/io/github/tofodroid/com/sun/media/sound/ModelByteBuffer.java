@@ -259,6 +259,7 @@ public final class ModelByteBuffer {
         return fileoffset;
     }
 
+    @SuppressWarnings("null")
     public static void loadAll(Collection<ModelByteBuffer> col)
             throws IOException {
         File selfile = null;

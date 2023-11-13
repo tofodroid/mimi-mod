@@ -78,6 +78,7 @@ public final class SoftLimiter implements SoftAudioProcessor {
     double silentcounter = 0;
 
     @Override
+    @SuppressWarnings("null")
     public void processAudio() {
         if (this.bufferL.isSilent()
                 && (this.bufferR == null || this.bufferR.isSilent())) {

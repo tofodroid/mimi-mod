@@ -196,7 +196,6 @@ final class PortMixer extends AbstractMixer {
             ports[index] = new PortMixerPort(portInfos[index], this, index);
             return ports[index];
         }
-        // $$fb TODO: return (Port) (ports[index].clone());
         return ports[index];
     }
 

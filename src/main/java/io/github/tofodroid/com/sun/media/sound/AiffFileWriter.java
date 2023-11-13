@@ -133,7 +133,6 @@ public final class AiffFileWriter extends SunFileWriter {
             int aiffLength=bytesWritten;
             int ssndChunkSize=aiffLength-aiffFileFormat.getHeaderSize()+16;
             long dataSize=ssndChunkSize-16;
-            //TODO possibly incorrect round
             int numFrames = (int) (dataSize / ssndBlockSize);
             try (final RandomAccessFile raf = new RandomAccessFile(out, "rw")) {
                 // skip FORM magic

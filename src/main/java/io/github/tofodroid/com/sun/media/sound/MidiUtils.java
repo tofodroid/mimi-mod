@@ -42,9 +42,6 @@ import javax.sound.midi.Track;
 import static javax.sound.midi.SysexMessage.SPECIAL_SYSTEM_EXCLUSIVE;
 import static javax.sound.midi.SysexMessage.SYSTEM_EXCLUSIVE;
 
-// TODO:
-// - define and use a global symbolic constant for 60000000 (see convertTempo)
-
 /**
  * Some utilities for MIDI (some stuff is used from javax.sound.midi)
  *
