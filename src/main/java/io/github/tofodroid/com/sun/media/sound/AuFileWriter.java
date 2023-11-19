@@ -193,7 +193,7 @@ public final class AuFileWriter extends SunFileWriter {
         int sampleRate     = (int)format.getSampleRate();
         int channels       = format.getChannels();
 
-        // if we need to do any format conversion, we do it here.
+        // if we need any format conversion, we do it here.
         //$$ fb 2001-07-13: Bug 4391108
         audioStream = AudioSystem.getAudioInputStream(format, audioStream);
 

@@ -127,7 +127,7 @@ abstract class AbstractMidiDevice implements MidiDevice, ReferenceCountingDevice
                 openRefCount++;
                 getOpenKeepingObjects().add(object);
             }
-            // double calls to doOpens() will be catched by the open flag.
+            // double calls to 'doOpens()' will be catched by the open flag.
             doOpen();
         }
     }

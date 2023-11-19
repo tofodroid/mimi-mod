@@ -64,6 +64,7 @@ public final class ModItems {
                 RECEIVER,
                 MECHANICALMAESTRO,
                 CONDUCTOR,
+                TRANSMITTER,
                 TUNINGTABLE
             )));
         });

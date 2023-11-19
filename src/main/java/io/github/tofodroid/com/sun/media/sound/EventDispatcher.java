@@ -222,7 +222,7 @@ final class EventDispatcher implements Runnable {
     void sendAudioEvents(Object event, List<Object> listeners) {
         if ((listeners == null)
             || (listeners.size() == 0)) {
-            // nothing to do
+            // no-op
             return;
         }
 

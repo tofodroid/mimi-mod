@@ -7,6 +7,8 @@ import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CONTROL;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
@@ -72,4 +74,9 @@ public class GuiEnderTransmitter extends GuiTransmitter {
         return graphics;
     }
     
+    @Override
+    protected void startRefreshSongList() {
+        MIMIMod.proxy.clientMidiFiles().refresh();
+        NetworkManager.INFO_CHANNEL.sendToServer(new ClientMidiListPacket(true, MIMIMod.proxy.clientMidiFiles().getSortedSongInfos()));
+    }
 }

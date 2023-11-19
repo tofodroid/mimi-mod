@@ -67,6 +67,8 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     public InteractionResult useOn(UseOnContext context) {
         if(washItem(context)) {
             return InteractionResult.SUCCESS;
+        } else if(linkToTransmitter(context)) {
+            return InteractionResult.SUCCESS;
         }
 
         return InteractionResult.PASS;

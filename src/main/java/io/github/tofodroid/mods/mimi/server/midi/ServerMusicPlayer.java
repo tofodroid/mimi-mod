@@ -8,6 +8,7 @@ import javax.sound.midi.Sequence;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.common.midi.IMidiFileProvider.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class ServerMusicPlayer implements AutoCloseable {
     protected UUID id;
     protected Boolean loading = false;
+    protected Boolean loadFailed = false;
     protected Boolean shouldPlayNextLoad = false;
     protected MusicPlayerMidiHandler midiHandler;
     protected AMusicPlayerPlaylistHandler playlistHandler;
@@ -144,6 +146,7 @@ public class ServerMusicPlayer implements AutoCloseable {
             this.midiHandler.getSongLengthSeconds(),
             this.midiHandler.getPositionSeconds(),
             this.midiHandler.isPlaying(),
+            this.loadFailed,
             this.loading,
             this.playlistHandler.getIsShuffled(),
             this.playlistHandler.getLoopMode(),
@@ -154,13 +157,34 @@ public class ServerMusicPlayer implements AutoCloseable {
 
     public void startLoadSequence(BasicMidiInfo info) {
         this.loading = true;
+        this.loadFailed = false;
 
         if(info.serverMidi) {
             this.loading = false;
-            this.midiHandler.load(info, MIMIMod.proxy.serverMidiFiles().getInfoById(info.fileId).loadSequenceFromFile());
+            LocalMidiInfo localInfo = MIMIMod.proxy.serverMidiFiles().getInfoById(info.fileId);
+
+            if(localInfo != null) {
+                Sequence sequence = localInfo.loadSequenceFromFile();
+
+                if(sequence != null) {
+                    this.finishLoadSequence(info, sequence);
+                    return;
+                }
+            }
+
+            // Failure if it gets here
+            this.onSequenceLoadFailed(info);
         } else {
             this.midiHandler.unloadSong();
-            ServerMusicPlayerManager.startLoadSequence(this.id, this.id, info);
+            ServerMusicPlayerManager.startLoadSequence(this.id, this.playlistHandler.getClientSourceId(), info);
+        }
+    }
+
+    public void onSequenceLoadFailed(BasicMidiInfo info) {
+        if(info.fileId.toString().equals(this.playlistHandler.getSelectedSongId().toString())) {
+            this.loading = false;
+            this.loadFailed = true;
+            this.shouldPlayNextLoad = false;
         }
     }
 

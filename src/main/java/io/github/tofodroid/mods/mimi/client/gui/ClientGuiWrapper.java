@@ -1,5 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import java.util.UUID;
+
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import net.minecraft.client.Minecraft;
@@ -42,9 +44,8 @@ public abstract class ClientGuiWrapper {
         openGui(world, new GuiEnderTransmitter(player.getUUID()));
     }
 
-    public static void openTransmitterGui(Level world, Player player) {
-        // TODO
-        //openGui(world, new GuiTransmitter(((ClientProxy)MIMIMod.proxy).getMidiInput().enderTransmitterManager));
+    public static void openTransmitterGui(Level world, UUID transmitterTileId) {
+        openGui(world, new GuiTransmitter(transmitterTileId));
     }
 
     public static void openConfigGui(Level world, Player player) {

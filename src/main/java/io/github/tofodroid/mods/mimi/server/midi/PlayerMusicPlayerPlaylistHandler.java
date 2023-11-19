@@ -1,75 +1,95 @@
 package io.github.tofodroid.mods.mimi.server.midi;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class PlayerMusicPlayerPlaylistHandler extends AMusicPlayerPlaylistHandler {
+    protected MusicPlayerPlaylistData data;
+
     public PlayerMusicPlayerPlaylistHandler(ServerPlayer player) {
         super(player.getUUID());
-    }
 
-    // TODO: Store on world data?
-    ArrayList<UUID> favoriteSongs = new ArrayList<>();
-    LoopMode loopMode = LoopMode.NONE;
-    FavoriteMode favoriteMode = FavoriteMode.ALL;
-    SourceMode sourceMode = SourceMode.ALL;
-    Boolean isShuffled = false;
+        // Load from world saved data
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        this.data = server.overworld().getDataStorage().computeIfAbsent(MusicPlayerPlaylistData::loadFromTag, MusicPlayerPlaylistData::new, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
+        this.data.setDirty();
+    }
 
     @Override
     public ArrayList<UUID> getFavoriteSongs() {
-        return this.favoriteSongs;
+        return this.data.favoriteSongs;
     }
 
     @Override
     public LoopMode getLoopMode() {
-        return this.loopMode;
+        return this.data.loopMode;
     }
 
     @Override
     public FavoriteMode getFavoriteMode() {
-        return this.favoriteMode;
+        return this.data.favoriteMode;
     }
 
     @Override
     public SourceMode getSourceMode() {
-        return this.sourceMode;
+        return this.data.sourceMode;
     }
 
     @Override
     public Boolean getIsShuffled() {
-        return this.isShuffled;
+        return this.data.isShuffled;
     }
 
     @Override
     protected void setFavoriteSongs(ArrayList<UUID> favorites) {
-        this.favoriteSongs = favorites;
+        this.data.favoriteSongs = favorites;
+        this.data.setDirty();
     }
 
     @Override
     protected void setLoopMode(LoopMode mode) {
-        this.loopMode = mode;
+        this.data.loopMode = mode;
+        this.data.setDirty();
     }
 
     @Override
     protected void setFavoriteMode(FavoriteMode mode) {
-        this.favoriteMode = mode;
+        this.data.favoriteMode = mode;
+        this.data.setDirty();
     }
 
     @Override
     protected void setSourceMode(SourceMode mode) {
-        this.sourceMode = mode;
+        this.data.sourceMode = mode;
+        this.data.setDirty();
     }
 
     @Override
     protected void setIsShuffled(Boolean shuffle) {
-        this.isShuffled = shuffle;
+        this.data.isShuffled = shuffle;
+        
+        if(shuffle) {
+            data.shuffleSeed = Math.abs(new Random().nextInt());
+        } else {
+            data.shuffleSeed = 0;
+        }
+
+        this.data.setDirty();
     }
 
     @Override
     public UUID getClientSourceId() {
         return this.musicPlayerId;
     }
-    
+
+    @Override
+    protected Integer getShuffleSeed() {
+        return this.data.shuffleSeed;
+    }
 }

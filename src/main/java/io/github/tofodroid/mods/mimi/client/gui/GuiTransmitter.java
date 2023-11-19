@@ -7,9 +7,7 @@ import java.util.UUID;
 
 import org.joml.Vector2i;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
-import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
@@ -214,8 +212,20 @@ public class GuiTransmitter extends BaseGui {
         if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
             BasicMidiInfo info = this.songList.infos.get(this.musicStatus.fileIndex);
             graphics.drawString(font, this.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 153, 0xFF00E600);
-    
-            if(this.musicStatus.channelMapping != null) {
+
+            if(this.musicStatus.isLoading) {
+                graphics.drawString(font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 168, 0xFF00E600);
+            } else if(!this.musicStatus.isLoading && this.musicStatus.isLoadFailed) {
+                graphics.drawString(font, "Failed to load selected song:", START_X + 12, START_Y + 168, 0xFF00E600);
+
+                if(info.serverMidi) {
+                    graphics.drawString(font, "It may be invalid or may have been deleted from the server.", START_X + 12, START_Y + 192, 0xFF00E600);
+                } else {
+                    graphics.drawString(font, "It may be invalid or may have been deleted from your MIDI folder.", START_X + 12, START_Y + 192, 0xFF00E600);
+                }
+
+                graphics.drawString(font, "Try refreshing the the MIDI list with the button in the top right.", START_X + 12, START_Y + 202, 0xFF00E600);
+            } else if(this.musicStatus.channelMapping != null) {
                 Map<Integer, String> instrumentMapping = MidiFileUtils.getInstrumentMapping(this.musicStatus.channelMapping);
                 graphics.drawString(font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 168, 0xFF00E600);
                 
@@ -232,8 +242,6 @@ public class GuiTransmitter extends BaseGui {
                     graphics.drawString(font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 180, START_Y + 182 + 10*index, 0xFF00E600);
                     index++;
                 }
-            } else {
-                graphics.drawString(font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 168, 0xFF00E600);
             }
         }
         
@@ -294,7 +302,6 @@ public class GuiTransmitter extends BaseGui {
     }
 
     protected void startRefreshSongList() {
-        MIMIMod.proxy.clientMidiFiles().refresh();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ClientMidiListPacket(true, MIMIMod.proxy.clientMidiFiles().getSortedSongInfos()));
+        NetworkManager.INFO_CHANNEL.sendToServer(new ServerMusicPlayerSongListPacket(this.musicPlayerId));
     }
 }

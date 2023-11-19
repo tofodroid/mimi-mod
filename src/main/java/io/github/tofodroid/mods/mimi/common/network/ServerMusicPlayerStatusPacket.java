@@ -19,8 +19,9 @@ public class ServerMusicPlayerStatusPacket {
     public final byte[] channelMapping;
     public final Integer songLengthSeconds;
     public final Integer songPositionSeconds;
-    public final Boolean isLoading;
     public final Boolean isPlaying;
+    public final Boolean isLoadFailed;
+    public final Boolean isLoading;
     public final Boolean isShuffled;
     public final LoopMode loopMode;
     public final FavoriteMode favoriteMode;
@@ -34,15 +35,16 @@ public class ServerMusicPlayerStatusPacket {
         this.channelMapping = null;
         this.songLengthSeconds = null;
         this.songPositionSeconds = null;
-        this.isLoading = false;
         this.isPlaying = false;
+        this.isLoadFailed = false;
+        this.isLoading = false;
         this.isShuffled = false;
         this.loopMode = LoopMode.ALL;
         this.favoriteMode = FavoriteMode.ALL;
         this.sourceMode = SourceMode.ALL;
     }
 
-    public ServerMusicPlayerStatusPacket(UUID musicPlayerId, UUID fileId, Integer fileIndex, Boolean isFileFavorite, byte[] channelMapping, Integer songLengthSeconds, Integer songPositionSeconds, Boolean isPlaying, Boolean isLoading, Boolean isShuffled, LoopMode loopMode, FavoriteMode favoriteMode, SourceMode sourceMode) {
+    public ServerMusicPlayerStatusPacket(UUID musicPlayerId, UUID fileId, Integer fileIndex, Boolean isFileFavorite, byte[] channelMapping, Integer songLengthSeconds, Integer songPositionSeconds, Boolean isPlaying, Boolean isLoadFailed, Boolean isLoading, Boolean isShuffled, LoopMode loopMode, FavoriteMode favoriteMode, SourceMode sourceMode) {
         this.musicPlayerId = musicPlayerId;
         this.fileId = fileId;
         this.fileIndex = fileIndex;
@@ -50,8 +52,9 @@ public class ServerMusicPlayerStatusPacket {
         this.channelMapping = channelMapping;
         this.songLengthSeconds = songLengthSeconds;
         this.songPositionSeconds = songPositionSeconds;
-        this.isLoading = isLoading;
         this.isPlaying = isPlaying;
+        this.isLoadFailed = isLoadFailed;
+        this.isLoading = isLoading;
         this.isShuffled = isShuffled;
         this.loopMode = loopMode;
         this.favoriteMode = favoriteMode;
@@ -80,13 +83,14 @@ public class ServerMusicPlayerStatusPacket {
                 songPositionSeconds = null;
             }
             Boolean isPlaying = buf.readBoolean();
+            Boolean isLoadFailed = buf.readBoolean();
             Boolean isLoading = buf.readBoolean();
             Boolean isShuffled = buf.readBoolean();
             LoopMode loopMode = LoopMode.values()[buf.readByte()];
             FavoriteMode favoritMode = FavoriteMode.values()[buf.readByte()];
             SourceMode sourceMode = SourceMode.values()[buf.readByte()];
             
-            return new ServerMusicPlayerStatusPacket(musicPlayerId, fileId, fileIndex, isFileFavorite, channelMapping, songLengthSeconds, songPositionSeconds, isPlaying, isLoading, isShuffled, loopMode, favoritMode, sourceMode);
+            return new ServerMusicPlayerStatusPacket(musicPlayerId, fileId, fileIndex, isFileFavorite, channelMapping, songLengthSeconds, songPositionSeconds, isPlaying, isLoadFailed, isLoading, isShuffled, loopMode, favoritMode, sourceMode);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ServerMusicPlayerStatusPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -112,6 +116,7 @@ public class ServerMusicPlayerStatusPacket {
         buf.writeInt(pkt.songLengthSeconds != null ? pkt.songLengthSeconds : -1);
         buf.writeInt(pkt.songPositionSeconds != null ? pkt.songPositionSeconds : -1);
         buf.writeBoolean(pkt.isPlaying);
+        buf.writeBoolean(pkt.isLoadFailed);
         buf.writeBoolean(pkt.isLoading);
         buf.writeBoolean(pkt.isShuffled);
         buf.writeByte(pkt.loopMode.ordinal());

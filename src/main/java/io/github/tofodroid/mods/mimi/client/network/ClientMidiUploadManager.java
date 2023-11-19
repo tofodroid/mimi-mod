@@ -16,37 +16,39 @@ public abstract class ClientMidiUploadManager {
     public static final Integer MAX_TOTAL_SEQUENCE_SIZE = 6000000;
         
     public static List<ServerMidiUploadPacket> generateUploadPackets(LocalMidiInfo file) {
-        try {
-            byte[] bytes = MidiUtils.sequenceToByteArray(file.loadSequenceFromFile());
-            List<byte[]> dataParts = new ArrayList<>();
+        if(file.file.exists()) {
+            try {
+                byte[] bytes = MidiUtils.sequenceToByteArray(file.loadSequenceFromFile());
+                List<byte[]> dataParts = new ArrayList<>();
 
-            // Size cap
-            if(bytes.length > MAX_TOTAL_SEQUENCE_SIZE) {
-                throw new IOException("Sequence is too large to upload. Size: " + bytes.length + " / " + MAX_TOTAL_SEQUENCE_SIZE);
-            }
-
-            // Split if necessary
-            if(bytes.length > ServerMidiUploadPacket.MAX_DATA_SIZE) {
-                for(var i = 0; i < bytes.length; i += ServerMidiUploadPacket.MAX_DATA_SIZE) {
-                    Integer rangeEnd = Math.min(i + ServerMidiUploadPacket.MAX_DATA_SIZE, bytes.length);
-                    dataParts.add(Arrays.copyOfRange(bytes, i, rangeEnd));
+                // Size cap
+                if(bytes.length > MAX_TOTAL_SEQUENCE_SIZE) {
+                    throw new IOException("Sequence is too large to upload. Size: " + bytes.length + " / " + MAX_TOTAL_SEQUENCE_SIZE);
                 }
-            } else {
-                dataParts.add(bytes);
+
+                // Split if necessary
+                if(bytes.length > ServerMidiUploadPacket.MAX_DATA_SIZE) {
+                    for(var i = 0; i < bytes.length; i += ServerMidiUploadPacket.MAX_DATA_SIZE) {
+                        Integer rangeEnd = Math.min(i + ServerMidiUploadPacket.MAX_DATA_SIZE, bytes.length);
+                        dataParts.add(Arrays.copyOfRange(bytes, i, rangeEnd));
+                    }
+                } else {
+                    dataParts.add(bytes);
+                }
+
+                // Generate Packets
+                List<ServerMidiUploadPacket> packets = new ArrayList<>();
+                for(Integer i = 0; i < dataParts.size(); i++) {
+                    packets.add(new ServerMidiUploadPacket(file.fileId, Integer.valueOf(dataParts.size()).byteValue(), i.byteValue(), dataParts.get(i)));
+                };
+
+                return packets;
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to upload MIDI Sequence: ", e);
             }
+        }        
 
-            // Generate Packets
-            List<ServerMidiUploadPacket> packets = new ArrayList<>();
-            for(Integer i = 0; i < dataParts.size(); i++) {
-                packets.add(new ServerMidiUploadPacket(file.fileId, Integer.valueOf(dataParts.size()).byteValue(), i.byteValue(), dataParts.get(i)));
-            };
-
-            return packets;
-        } catch(Exception e) {
-            MIMIMod.LOGGER.error("Failed to upload MIDI Sequence: ", e);
-        }
-
-        return null;
+        return Arrays.asList(new ServerMidiUploadPacket(file.fileId).markFailed());
     }
 
     public static void uploadFileToServer(LocalMidiInfo file) {

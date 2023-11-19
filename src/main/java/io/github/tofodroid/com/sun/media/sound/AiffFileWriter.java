@@ -291,7 +291,7 @@ public final class AiffFileWriter extends SunFileWriter {
         byte[] header = null;
         InputStream codedAudioStream = audioStream;
 
-        // if we need to do any format conversion, do it here....
+        // if we need any format conversion, do it here....
 
         if( audioStream instanceof AudioInputStream ) {
 
@@ -398,7 +398,7 @@ public final class AiffFileWriter extends SunFileWriter {
         /* The special cases NaN, Infinity and Zero are ignored, since
            they do not represent useful sample rates anyway.
            Denormalized number aren't handled, too. Below, there is a cast
-           from float to double. We hope that in this conversion,
+           from float --> double. We hope that in this conversion,
            numbers are normalized. Numbers that cannot be normalized are
            ignored, too, as they, too, do not represent useful sample rates. */
         long doubleBits = Double.doubleToLongBits((double) f);

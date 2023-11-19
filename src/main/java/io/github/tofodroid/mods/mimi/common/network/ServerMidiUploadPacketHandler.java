@@ -2,10 +2,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.RandomUtils;
-
 import io.github.tofodroid.mods.mimi.client.network.ClientMidiUploadManager;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -27,10 +24,6 @@ public class ServerMidiUploadPacketHandler {
     }
 
     public static void handlePacketServer(final ServerMidiUploadPacket message, ServerPlayer sender) {
-        if(RandomUtils.nextInt() % 3 != 4) {
-            ServerMidiUploadManager.handlePacket(message, sender);
-        } else {
-            MIMIMod.LOGGER.info("Debug skip packet: " + message.fileId.toString() + "_" + message.part);
-        }
+        ServerMidiUploadManager.handlePacket(message, sender);
     }
 }

@@ -5,7 +5,6 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 
 public class ServerMidiUploadPacket {
     public static final int MAX_DATA_SIZE = 30000;
@@ -13,8 +12,7 @@ public class ServerMidiUploadPacket {
     public static final Byte UPLOAD_RESEND = Integer.valueOf(1).byteValue();
     public static final Byte UPLOAD_FAIL = Integer.valueOf(2).byteValue();
 
-    private Boolean retry = false;
-    private ServerPlayer sender = null;
+    private Boolean failed = false;
     public final UUID fileId;
     public final Byte part;
     public final Byte totalParts;
@@ -32,30 +30,13 @@ public class ServerMidiUploadPacket {
         this(new UUID(0,0), totalParts, part, data);
     }
 
-    public Byte getResponseStatus() {
-        return this.totalParts;
-    }
-
-    public ServerPlayer getSender() {
-        return this.sender;
-    }
-
-    public ServerMidiUploadPacket withSender(ServerPlayer sender) {
-        this.sender = sender;
+    public ServerMidiUploadPacket markFailed() {
+        this.failed = true;
         return this;
     }
 
-    private ServerMidiUploadPacket withRetry(Boolean retry) {
-        this.retry = retry;
-        return this;
-    }
-
-    public ServerMidiUploadPacket markRetry() {
-        return this.withRetry(true);
-    }
-
-    public Boolean isRetry() {
-        return this.retry;
+    public Boolean failed() {
+        return this.failed;
     }
 
     public ServerMidiUploadPacket(UUID fileId, Byte totalParts, Byte part, byte[] data) {
@@ -73,13 +54,17 @@ public class ServerMidiUploadPacket {
     
     public static ServerMidiUploadPacket decodePacket(FriendlyByteBuf buf) {
         try {
-            Boolean retry = buf.readBoolean();
+            Boolean failed = buf.readBoolean();
             UUID fileId = buf.readUUID();
-            Byte totalParts = buf.readByte();
-            Byte part = buf.readByte();
-            byte[] data = buf.readByteArray(MAX_DATA_SIZE);
 
-            return new ServerMidiUploadPacket(fileId, totalParts, part, data).withRetry(retry);
+            if(!failed) {
+                Byte totalParts = buf.readByte();
+                Byte part = buf.readByte();
+                byte[] data = buf.readByteArray(MAX_DATA_SIZE);
+                return new ServerMidiUploadPacket(fileId, totalParts, part, data);
+            }
+
+            return new ServerMidiUploadPacket(fileId).markFailed();
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ServerMidiUploadPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -90,10 +75,13 @@ public class ServerMidiUploadPacket {
     }
 
     public static void encodePacket(ServerMidiUploadPacket pkt, FriendlyByteBuf buf) {
-        buf.writeBoolean(pkt.retry);
+        buf.writeBoolean(pkt.failed);
         buf.writeUUID(pkt.fileId);
-        buf.writeByte(pkt.totalParts);
-        buf.writeByte(pkt.part);
-        buf.writeByteArray(pkt.data);
+
+        if(!pkt.failed) {
+            buf.writeByte(pkt.totalParts);
+            buf.writeByte(pkt.part);
+            buf.writeByteArray(pkt.data);
+        }
     }
 }

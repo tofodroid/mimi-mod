@@ -28,7 +28,7 @@ package io.github.tofodroid.com.sun.media.sound;
 import javax.sound.midi.Receiver;
 
 /**
- * Interface for Sequencers that are able to do the auto-connect
+ * Interface for Sequencers that are able to auto-connect
  * as required by MidiSystem-getSequencer()
  *
  * @author Florian Bomers

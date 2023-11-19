@@ -161,7 +161,7 @@ final class JSSecurityManager {
                     // $$mp 2003-08-22
                     // Always adding at the beginning reverses the
                     // order of the providers. So we no longer have
-                    // to do this in AudioSystem and MidiSystem
+                    // to in AudioSystem and MidiSystem
                     p.add(0, provider);
                 }
             } catch (Throwable t) {

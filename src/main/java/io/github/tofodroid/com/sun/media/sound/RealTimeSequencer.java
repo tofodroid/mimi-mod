@@ -748,7 +748,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
             try {
                 rec = MidiSystem.getReceiver();
             } catch (Exception e) {
-                // something went wrong. Nothing to do then!
+                // something went wrong. no-op
             }
         }
         if (rec != null) {

@@ -1,7 +1,6 @@
 package io.github.tofodroid.mods.mimi.server.network;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +35,15 @@ public class ServerMidiUploadManager {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if(!TICKS_SINCE_LAST_PART.isEmpty()) {
-            List<UUID> toRemove = new ArrayList<>();
+            List<UUID> toFail = new ArrayList<>();
+            List<UUID> toClear = new ArrayList<>();
             
             for(UUID fileId : TICKS_SINCE_LAST_PART.keySet()) {
                 int count = TICKS_SINCE_LAST_PART.get(fileId);
                 ServerPlayer player = getServerPlayerById(UPLOAD_CLIENTS.get(fileId));
 
                 if(player == null || count > CANCEL_UPLOAD_AFTER_TICKS) {
-                    toRemove.add(fileId);
-                    // TODO: Notify music player
+                    toFail.add(fileId);                    
                 } else if(count > 0 && count % REQUEST_MISSING_PARTS_EVERY_TICKS == 0) {
                     if(UPLOAD_PARTS.get(fileId).values().isEmpty()) {
                         requestParts(player, fileId, new byte[]{1});
@@ -53,7 +52,7 @@ public class ServerMidiUploadManager {
                         byte[] missingParts = getMissingParts(fileId, packet.totalParts);
 
                         if(missingParts.length == 0) {
-                            toRemove.add(fileId);
+                            toClear.add(fileId);
                         } else {
                             requestParts(player, fileId, missingParts);
                         }
@@ -63,7 +62,11 @@ public class ServerMidiUploadManager {
                 TICKS_SINCE_LAST_PART.put(fileId, count+1);
             };
 
-            for(UUID fileId : toRemove) {
+            for(UUID fileId : toFail) {
+                onUploadFailed(fileId);
+            }
+
+            for(UUID fileId : toClear) {
                 UPLOAD_CLIENTS.remove(fileId);
                 UPLOAD_PARTS.remove(fileId);
                 UPLOAD_INFOS.remove(fileId);
@@ -82,16 +85,6 @@ public class ServerMidiUploadManager {
             TICKS_SINCE_LAST_PART.put(info.fileId, 0);
             NetworkManager.SEQUENCE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ServerMidiUploadPacket(info.fileId));
         }
-    }
-
-    public static Boolean isSameSender(UUID fileId, UUID clientId) {
-        Map<Integer,ServerMidiUploadPacket> packets = UPLOAD_PARTS.get(fileId);
-        
-        if(packets != null && packets.size() > 0) {
-            return clientId.equals(new ArrayList<>(UPLOAD_PARTS.get(fileId).values()).get(0).getSender().getUUID());
-        }
-
-        return false;
     }
 
     public static ServerPlayer getServerPlayerById(UUID clientId) {
@@ -116,29 +109,37 @@ public class ServerMidiUploadManager {
     }
 
     public static void handlePacket(final ServerMidiUploadPacket message, ServerPlayer sender) {
-        if(!isSameSender(message.fileId, sender.getUUID())) {
-            // Ignore - TODO?
+        if(!UPLOAD_CLIENTS.get(message.fileId).equals(sender.getUUID())) {
+            // Ignore
+            MIMIMod.LOGGER.warn("Received upload packet for fileId " + message.fileId + " from unexpected sender. Ignoring.");
+            return;
         }
 
         Map<Integer, ServerMidiUploadPacket> filePackets = UPLOAD_PARTS.get(message.fileId);
 
-        filePackets.put(message.part.intValue(), message.withSender(sender));
+
+        // Handle failed packet
+        if(message.failed()) {
+            onUploadFailed(message.fileId);
+            return;
+        }
+
+        filePackets.put(message.part.intValue(), message);
 
         // If all packets are accounted for, load
         if(partsAreAllPresent(message.fileId, filePackets, message.totalParts)) {
-            MIMIMod.LOGGER.info("Received upload part " + (message.part+1) + "/" + message.totalParts + " for file: " + message.fileId);
-            MIMIMod.LOGGER.info("Received full upload for file: " + message.fileId);
             TICKS_SINCE_LAST_PART.remove(message.fileId);
             Sequence sequence = loadSequenceFromParts(UPLOAD_PARTS.remove(message.fileId));
             BasicMidiInfo info = UPLOAD_INFOS.remove(message.fileId);
             UPLOAD_CLIENTS.remove(message.fileId);
 
             if(sequence == null) {
-                // TODO - Handle fail
+                ServerMusicPlayerManager.onSequenceUploadFailed(info);
+                return;
             }
-            ServerMusicPlayerManager.onFinishLoadSequence(info, sequence);
+
+            ServerMusicPlayerManager.onFinishUploadSequence(info, sequence);
         } else {
-            MIMIMod.LOGGER.info("Received upload part " + (message.part+1) + "/" + message.totalParts + " for file: " + message.fileId);
             UPLOAD_PARTS.put(message.fileId, filePackets);
             TICKS_SINCE_LAST_PART.put(message.fileId, 0);
         }
@@ -149,9 +150,17 @@ public class ServerMidiUploadManager {
             byte[] fullBytes = merge(parts.values().stream().map(p -> p.data).collect(Collectors.toList()));
             return MidiUtils.byteArrayToSequence(fullBytes);
         } catch(Exception e) {
-            MIMIMod.LOGGER.error("Failed to load MIDI data from parts: ", e);
+            MIMIMod.LOGGER.error("Failed to load MIDI sequence from received data parts: ", e);
         }
         return null;
+    }
+
+    public static void onUploadFailed(UUID fileId) {
+        TICKS_SINCE_LAST_PART.remove(fileId);
+        UPLOAD_PARTS.remove(fileId);
+        BasicMidiInfo info = UPLOAD_INFOS.remove(fileId);
+        UPLOAD_CLIENTS.remove(fileId);
+        ServerMusicPlayerManager.onSequenceUploadFailed(info);
     }
 
     public static byte[] merge(List<byte[]> arrays) {
@@ -178,7 +187,6 @@ public class ServerMidiUploadManager {
     }
 
     public static void requestParts(ServerPlayer player, UUID fileId, byte[] parts) {
-        MIMIMod.LOGGER.info("Requesting resend of parts " + Arrays.toString(parts) + " for file ID: " + fileId);
         NetworkManager.SEQUENCE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ServerMidiUploadPacket(fileId, parts));
     }
 }

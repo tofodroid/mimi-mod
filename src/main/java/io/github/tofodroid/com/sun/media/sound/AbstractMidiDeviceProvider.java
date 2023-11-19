@@ -100,8 +100,6 @@ public abstract class AbstractMidiDeviceProvider extends MidiDeviceProvider {
                         // disable this device info
                         infos[i].setIndex(-1);
                     }
-                    // what to do with the MidiDevice instances that are left
-                    // in the devices array ?? Close them ?
                 }
             }
             // commit new list of infos.

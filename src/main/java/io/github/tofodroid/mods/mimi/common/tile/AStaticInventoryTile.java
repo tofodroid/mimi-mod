@@ -93,7 +93,6 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
     }
 
     @Override
-    @SuppressWarnings("null")
     public boolean stillValid(Player playerEntity) {
         if (this.level != null && this.level.getBlockEntity(this.worldPosition) != this) {
             return false;

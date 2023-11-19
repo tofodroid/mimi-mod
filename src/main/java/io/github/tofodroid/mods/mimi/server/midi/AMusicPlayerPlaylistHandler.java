@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.server.midi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ public abstract class AMusicPlayerPlaylistHandler {
     public abstract SourceMode getSourceMode();
     public abstract Boolean getIsShuffled();
     public abstract UUID getClientSourceId();
+    protected abstract Integer getShuffleSeed();
     protected abstract void setFavoriteSongs(ArrayList<UUID> songId);
     protected abstract void setLoopMode(LoopMode mode);
     protected abstract void setFavoriteMode(FavoriteMode mode);
@@ -141,7 +143,7 @@ public abstract class AMusicPlayerPlaylistHandler {
         }
 
         if(this.getIsShuffled()) {
-            Collections.shuffle(this.filteredSongs);
+            Collections.shuffle(this.filteredSongs, new Random(this.getShuffleSeed()));
         }
 
         // Get new selected index

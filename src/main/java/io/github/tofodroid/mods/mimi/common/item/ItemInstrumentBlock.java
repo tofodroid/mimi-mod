@@ -55,6 +55,8 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     public InteractionResult useOn(UseOnContext context) {
         if(washItem(context)) {
             return InteractionResult.SUCCESS;
+        } else if(linkToTransmitter(context)) {
+            return InteractionResult.SUCCESS;
         }
         return super.useOn(context);
     }

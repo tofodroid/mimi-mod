@@ -10,6 +10,7 @@ import javax.sound.midi.Sequence;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -33,6 +34,14 @@ public class ServerMusicPlayerManager {
         }
     }
 
+    public static void createTransmitter(TileTransmitter tile) {
+        ServerMusicPlayer handler = PLAYER_MAP.get(tile.getUUID());
+        
+        if(handler == null) {
+            PLAYER_MAP.put(tile.getUUID(), new ServerMusicPlayer(tile));
+        }
+    }
+
     public static void removeTransmitter(UUID id) {
         ServerMusicPlayer handler = PLAYER_MAP.remove(id);
         
@@ -47,7 +56,11 @@ public class ServerMusicPlayerManager {
     
     public static void clearMusicPlayers() {
         for(UUID id : PLAYER_MAP.keySet()) {
-            removeTransmitter(id);
+            ServerMusicPlayer player = PLAYER_MAP.get(id);
+
+            if(player != null) {
+                player.close();
+            }
         }
         PLAYER_MAP.clear();
     }
@@ -99,7 +112,19 @@ public class ServerMusicPlayerManager {
         }
     }
 
-    public static void onFinishLoadSequence(BasicMidiInfo info, Sequence sequence) {
+    public static void onSequenceUploadFailed(BasicMidiInfo info) {
+        if(MIDI_LOAD_CACHE_MAP.containsKey(info.fileId)) {
+            for(UUID musicPlayerId : MIDI_LOAD_CACHE_MAP.get(info.fileId)) {
+                ServerMusicPlayer player = getMusicPlayer(musicPlayerId);
+                if(player != null) {
+                    player.onSequenceLoadFailed(info);
+                }
+            }
+            MIDI_LOAD_CACHE_MAP.remove(info.fileId);
+        }
+    }
+
+    public static void onFinishUploadSequence(BasicMidiInfo info, Sequence sequence) {
         if(MIDI_LOAD_CACHE_MAP.containsKey(info.fileId)) {
             for(UUID musicPlayerId : MIDI_LOAD_CACHE_MAP.get(info.fileId)) {
                 ServerMusicPlayer player = getMusicPlayer(musicPlayerId);
@@ -109,6 +134,5 @@ public class ServerMusicPlayerManager {
             }
             MIDI_LOAD_CACHE_MAP.remove(info.fileId);
         }
-
     }
 }
