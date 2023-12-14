@@ -20,7 +20,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
@@ -98,7 +97,6 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
                     String itemId = stackTag.getString("id");
 
                     if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
-                        MIMIMod.LOGGER.info("Converting ItemInstrument from Switchboard.");
                         tag = tag.merge(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
                         tag.remove("inventory");
                     }

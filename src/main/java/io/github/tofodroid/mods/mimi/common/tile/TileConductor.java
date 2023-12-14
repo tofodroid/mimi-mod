@@ -1,10 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.Set;
-import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -28,11 +27,11 @@ public class TileConductor extends AConfigurableMidiTile {
                 Byte velocity = stop ? -1 : Byte.MAX_VALUE;
                 
                 for(Byte channel : channels) {
-                    TransmitterNotePacketHandler.handlePacketServer(
-                        TransmitterNotePacket.createNotePacket(channel, note, velocity), 
+                    ServerMusicReceiverManager.handlePacket(
+                        TransmitterNoteEvent.createNoteEvent(channel, note, velocity), 
+                        getUUID(),
                         getBlockPos(), 
-                        (ServerLevel)level,
-                        getUniqueId()
+                        (ServerLevel)level
                     );
                 }
             }
@@ -45,11 +44,6 @@ public class TileConductor extends AConfigurableMidiTile {
             this.stopNote();
             this.setItem(SOURCE_STACK_SLOT, stack);
         }
-    }
-
-    public UUID getUniqueId() {
-        String posString = "con" + this.getBlockPos().getX() + this.getBlockPos().getY() + this.getBlockPos().getZ();
-        return UUID.nameUUIDFromBytes(posString.getBytes());
     }
 
     public void startNote() {

@@ -4,8 +4,8 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayer;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerManager;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitter;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -28,7 +28,7 @@ public class ClientMidiListPacketHandler {
     
     public static void handlePacketServer(final ClientMidiListPacket message, ServerPlayer sender) {
         ServerMidiManager.setCacheInfosForSource(sender.getUUID(), message.infos);
-        ServerMusicPlayer player = ServerMusicPlayerManager.getMusicPlayer(sender.getUUID());
+        ServerMusicTransmitter player = ServerMusicTransmitterManager.getMusicPlayer(sender.getUUID());
 
         if(message.doUpdateServerFileList) {
             MIMIMod.proxy.serverMidiFiles().refresh();
@@ -37,8 +37,8 @@ public class ClientMidiListPacketHandler {
         if(player != null) {
             player.refreshSongs();
         } else {
-            ServerMusicPlayerManager.createTransmitter(sender);
-            player = ServerMusicPlayerManager.getMusicPlayer(sender.getUUID());
+            ServerMusicTransmitterManager.createTransmitter(sender);
+            player = ServerMusicTransmitterManager.getMusicPlayer(sender.getUUID());
         }
 
         NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMusicPlayerSongListPacket(sender.getUUID(), player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));

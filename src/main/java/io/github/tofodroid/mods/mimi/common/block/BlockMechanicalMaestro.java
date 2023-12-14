@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -64,6 +65,7 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
             BlockEntity blockEntity = worldIn.getBlockEntity(pos);
             
             if (blockEntity instanceof TileMechanicalMaestro) {
+                ServerMusicReceiverManager.removeReceivers(((TileMechanicalMaestro)blockEntity).getUUID());
                 ((TileMechanicalMaestro)blockEntity).allNotesOff();
             }
         }

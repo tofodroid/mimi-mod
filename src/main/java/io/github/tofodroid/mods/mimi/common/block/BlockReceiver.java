@@ -5,14 +5,18 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
     public static final String REGISTRY_NAME = "receiver";
@@ -30,20 +34,35 @@ public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
     public BlockEntityType<TileReceiver> getTileType() {
         return ModTiles.RECEIVER;
     }
+    
+    @Override
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if(!worldIn.isClientSide) {
+            if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
+                return;
+            BlockEntity blockEntity = worldIn.getBlockEntity(pos);
+            
+            if (blockEntity instanceof TileReceiver) {
+                ServerMusicReceiverManager.removeReceivers(((TileReceiver)blockEntity).getUUID());
+            }
+        }
+
+        super.onRemove(state, worldIn, pos, newState, isMoving);
+    }
 
     @Override
     protected void appendMidiSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        String enabledChannels = InstrumentDataUtils.getEnabledChannelsString(blockItemStack);
-        if(enabledChannels != null && !enabledChannels.isEmpty()) {
-            if(enabledChannels.equals(InstrumentDataUtils.ALL_CHANNELS_STRING)) {
+        Integer enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(blockItemStack);
+        if(enabledChannels != null) {
+            if(enabledChannels.equals(InstrumentDataUtils.ALL_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
-            } else if(enabledChannels.equals(InstrumentDataUtils.NONE_CHANNELS_STRING)) {
+            } else if(enabledChannels.equals(InstrumentDataUtils.NONE_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
             } else {
-                tooltip.add(Component.literal("  Channels: " + enabledChannels).withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.literal("  Channels: " + InstrumentDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
             }
         }
 

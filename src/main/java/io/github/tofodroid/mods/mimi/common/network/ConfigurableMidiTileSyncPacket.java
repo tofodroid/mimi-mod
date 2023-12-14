@@ -17,17 +17,17 @@ public class ConfigurableMidiTileSyncPacket {
     public final Byte filterNote;
     public final Boolean invertNoteOct;
     public final Byte instrumentId;
-    public final String enabledChannelsString;
+    public final Integer enabledChannelsInt;
     public final Boolean invertInstrument;
 
-    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, String enabledChannelsString, Byte instrumentId, Boolean invertInstrument) {
+    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertInstrument) {
         this.tilePos = tilePos;
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
         this.filterOct = filterOct;
         this.filterNote = filterNote;
         this.invertNoteOct = invertNoteOct;
-        this.enabledChannelsString = enabledChannelsString;
+        this.enabledChannelsInt = enabledChannelsInt;
         this.instrumentId = instrumentId;
         this.invertInstrument = invertInstrument;
     }
@@ -39,7 +39,7 @@ public class ConfigurableMidiTileSyncPacket {
         this.filterOct = InstrumentDataUtils.getFilterOct(sourceStack);
         this.filterNote = InstrumentDataUtils.getFilterNote(sourceStack);
         this.invertNoteOct = InstrumentDataUtils.getInvertNoteOct(sourceStack);
-        this.enabledChannelsString = InstrumentDataUtils.getEnabledChannelsString(sourceStack);
+        this.enabledChannelsInt = InstrumentDataUtils.getEnabledChannelsInt(sourceStack);
         this.instrumentId = InstrumentDataUtils.getFilterInstrument(sourceStack);
         this.invertInstrument = InstrumentDataUtils.getInvertInstrument(sourceStack);
     }
@@ -47,16 +47,25 @@ public class ConfigurableMidiTileSyncPacket {
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
          try {
             BlockPos tilePos = buf.readBlockPos();
-            UUID midiSource = buf.readUUID();
-            String midiSourceName = buf.readUtf(64);
+
+            UUID midiSource = null;
+            if(buf.readBoolean()) {
+                midiSource = buf.readUUID();
+            }
+
+            String midiSourceName = null;
+            if(buf.readBoolean()) {
+                midiSourceName = buf.readUtf(64);
+            }
+
             Byte filterOct = buf.readByte();
             Byte filterNote = buf.readByte();
             Boolean invertNoteOct = buf.readBoolean();
-            String enabledChannelsString = buf.readUtf(38);
+            Integer enabledChannelsInt = buf.readInt();
             Byte instrumentId = buf.readByte();
             Boolean invertInstrument = buf.readBoolean();
 
-            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsString, instrumentId, invertInstrument);
+            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertInstrument);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ConfigurableMidiTileSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -68,12 +77,25 @@ public class ConfigurableMidiTileSyncPacket {
     
     public static void encodePacket(ConfigurableMidiTileSyncPacket pkt, FriendlyByteBuf buf) {
         buf.writeBlockPos(pkt.tilePos);
-        buf.writeUUID(pkt.midiSource);
-        buf.writeUtf(pkt.midiSourceName, 64);
+
+        if(pkt.midiSource != null) {
+            buf.writeBoolean(true);
+            buf.writeUUID(pkt.midiSource);
+        } else {
+            buf.writeBoolean(false);
+        }
+
+        if(pkt.midiSourceName != null) {
+            buf.writeBoolean(true);
+            buf.writeUtf(pkt.midiSourceName, 64);
+        } else {
+            buf.writeBoolean(false);
+        }
+
         buf.writeByte(pkt.filterOct);
         buf.writeByte(pkt.filterNote);
         buf.writeBoolean(pkt.invertNoteOct);
-        buf.writeUtf(pkt.enabledChannelsString, 38);
+        buf.writeInt(pkt.enabledChannelsInt);
         buf.writeByte(pkt.instrumentId);
         buf.writeBoolean(pkt.invertInstrument);
     }

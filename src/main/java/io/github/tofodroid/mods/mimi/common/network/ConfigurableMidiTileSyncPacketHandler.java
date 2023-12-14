@@ -26,7 +26,7 @@ public class ConfigurableMidiTileSyncPacketHandler {
         if(tile != null) {
             ItemStack midiStack = tile.getSourceStack();
             InstrumentDataUtils.setMidiSource(midiStack, message.midiSource, message.midiSourceName);
-            InstrumentDataUtils.setEnabledChannelsString(midiStack, message.enabledChannelsString);
+            InstrumentDataUtils.setEnabledChannelsInt(midiStack, message.enabledChannelsInt);
             InstrumentDataUtils.setFilterInstrument(midiStack, message.instrumentId);
             InstrumentDataUtils.setFilterNote(midiStack, message.filterNote);
             InstrumentDataUtils.setFilterOct(midiStack, message.filterOct);

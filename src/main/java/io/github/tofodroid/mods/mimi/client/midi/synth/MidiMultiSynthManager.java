@@ -166,7 +166,7 @@ public class MidiMultiSynthManager {
     }
 
     protected AMIMISynth<?> getSynthForMessage(MidiNotePacket message) {
-        if(message.player.equals(TileMechanicalMaestro.MECH_UUID)) {
+        if(message.player.equals(TileMechanicalMaestro.MECH_SOURCE_ID)) {
             return mechSynth;
         } else {
             return playerSynth;

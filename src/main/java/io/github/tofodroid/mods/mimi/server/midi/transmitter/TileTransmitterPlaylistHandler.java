@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi;
+package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -7,11 +7,11 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import net.minecraft.world.item.ItemStack;
 
-public class TileTransmitterMusicPlayerPlaylistHandler extends AMusicPlayerPlaylistHandler {
+public class TileTransmitterPlaylistHandler extends APlaylistHandler {
     private TileTransmitter tile;
-    private MusicPlayerPlaylistData data;
+    private PlaylistData data;
 
-    public TileTransmitterMusicPlayerPlaylistHandler(TileTransmitter tile) {
+    public TileTransmitterPlaylistHandler(TileTransmitter tile) {
         super(tile.getUUID());
         this.tile = tile;
         this.refreshData();
@@ -86,14 +86,14 @@ public class TileTransmitterMusicPlayerPlaylistHandler extends AMusicPlayerPlayl
     @SuppressWarnings("null")
     protected void saveData() {
         ItemStack sourceStack = tile.getSourceStack();
-        MusicPlayerPlaylistData.writeToTag(data, sourceStack.getOrCreateTag());
+        PlaylistData.writeToTag(data, sourceStack.getOrCreateTag());
         tile.setSourceStack(sourceStack);
         tile.getLevel().sendBlockUpdated(tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 2);
         this.refreshData();
     }
     
     protected void refreshData() {
-        this.data = MusicPlayerPlaylistData.loadFromTag(tile.getSourceStack().getOrCreateTag());
+        this.data = PlaylistData.loadFromTag(tile.getSourceStack().getOrCreateTag());
     }
 
     @Override

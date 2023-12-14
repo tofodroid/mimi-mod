@@ -32,7 +32,7 @@ public class SyncInstrumentPacketHandler {
         }
         
         InstrumentDataUtils.setMidiSource(instrumentStack, message.midiSource, message.midiSourceName);
-        InstrumentDataUtils.setEnabledChannelsString(instrumentStack, message.enabledChannelsString);
+        InstrumentDataUtils.setEnabledChannelsInt(instrumentStack, message.enabledChannelsInt);
         InstrumentDataUtils.setSysInput(instrumentStack, message.sysInput);
         InstrumentDataUtils.setInstrumentVolume(instrumentStack, message.volume);
         

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi;
+package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,18 +13,18 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacke
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import net.minecraft.server.level.ServerPlayer;
 
-public class ServerMusicPlayer implements AutoCloseable {
-    protected UUID id;
-    protected Boolean loading = false;
-    protected Boolean loadFailed = false;
-    protected Boolean shouldPlayNextLoad = false;
-    protected MusicPlayerMidiHandler midiHandler;
-    protected AMusicPlayerPlaylistHandler playlistHandler;
+public class ServerMusicTransmitter implements AutoCloseable {
+    private UUID id;
+    private Boolean loading = false;
+    private Boolean loadFailed = false;
+    private Boolean shouldPlayNextLoad = false;
+    private MidiHandler midiHandler;
+    private APlaylistHandler playlistHandler;
     
-    public ServerMusicPlayer(TileTransmitter tile) {
+    public ServerMusicTransmitter(TileTransmitter tile) {
         this.id = tile.getUUID();
-        this.playlistHandler = new TileTransmitterMusicPlayerPlaylistHandler(tile);
-        this.midiHandler = new MusicPlayerMidiHandler(tile, this::onSongEnd);
+        this.playlistHandler = new TileTransmitterPlaylistHandler(tile);
+        this.midiHandler = new MidiHandler(tile, this::onSongEnd);
         this.refreshSongs();
 
         if(this.playlistHandler.getSelectedSongInfo() != null) {
@@ -32,10 +32,10 @@ public class ServerMusicPlayer implements AutoCloseable {
         }
     }
 
-    public ServerMusicPlayer(ServerPlayer player) {
+    public ServerMusicTransmitter(ServerPlayer player) {
         this.id = player.getUUID();
-        this.playlistHandler = new PlayerMusicPlayerPlaylistHandler(player);
-        this.midiHandler = new MusicPlayerMidiHandler(player, this::onSongEnd);
+        this.playlistHandler = new PlayerPlaylistHandler(player);
+        this.midiHandler = new MidiHandler(player, this::onSongEnd);
         this.refreshSongs();
 
         if(this.playlistHandler.getSelectedSongInfo() != null) {
@@ -48,14 +48,17 @@ public class ServerMusicPlayer implements AutoCloseable {
     }
 
     public void play() {
+        ServerMusicTransmitterManager.addPlaying(this.id);
         this.midiHandler.play();
     }
 
     public void pause() {
+        ServerMusicTransmitterManager.removePlaying(this.id);
         this.midiHandler.pause();
     }
 
     public void stop() {
+        ServerMusicTransmitterManager.removePlaying(this.id);
         this.midiHandler.stop();
     }
 
@@ -77,9 +80,9 @@ public class ServerMusicPlayer implements AutoCloseable {
                 this.next();
                 this.shouldPlayNextLoad = true;
             case SINGLE:
-                this.midiHandler.play();
+                this.play();
             default:
-                this.midiHandler.stop();
+                this.stop();
         }
     }
 
@@ -176,7 +179,7 @@ public class ServerMusicPlayer implements AutoCloseable {
             this.onSequenceLoadFailed(info);
         } else {
             this.midiHandler.unloadSong();
-            ServerMusicPlayerManager.startLoadSequence(this.id, this.playlistHandler.getClientSourceId(), info);
+            ServerMusicTransmitterManager.startLoadSequence(this.id, this.playlistHandler.getClientSourceId(), info);
         }
     }
 
@@ -194,7 +197,7 @@ public class ServerMusicPlayer implements AutoCloseable {
             this.midiHandler.load(info, sequence);
 
             if(this.shouldPlayNextLoad) {
-                this.midiHandler.play();
+                this.play();
             }
         }
     }

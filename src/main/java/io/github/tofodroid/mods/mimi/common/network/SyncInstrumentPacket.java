@@ -12,15 +12,15 @@ import net.minecraft.world.item.ItemStack;
 public class SyncInstrumentPacket {
     public final UUID midiSource;
     public final String midiSourceName;
-    public final String enabledChannelsString;
+    public final Integer enabledChannelsInt;
     public final Boolean sysInput;
     public final Byte volume;
     public final InteractionHand handIn;
 
-    public SyncInstrumentPacket(UUID midiSource, String midiSourceName, String enabledChannelsString, Boolean sysInput, Byte volume, InteractionHand handIn) {
+    public SyncInstrumentPacket(UUID midiSource, String midiSourceName, Integer enabledChannelsInt, Boolean sysInput, Byte volume, InteractionHand handIn) {
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
-        this.enabledChannelsString = enabledChannelsString;
+        this.enabledChannelsInt = enabledChannelsInt;
         this.sysInput = sysInput;
         this.volume = volume;
         this.handIn = handIn;
@@ -29,7 +29,7 @@ public class SyncInstrumentPacket {
     public SyncInstrumentPacket(ItemStack instrumentStack, InteractionHand handIn) {
         this.midiSource = InstrumentDataUtils.getMidiSource(instrumentStack);
         this.midiSourceName = InstrumentDataUtils.getMidiSourceName(instrumentStack);
-        this.enabledChannelsString = InstrumentDataUtils.getEnabledChannelsString(instrumentStack);
+        this.enabledChannelsInt = InstrumentDataUtils.getEnabledChannelsInt(instrumentStack);
         this.sysInput = InstrumentDataUtils.getSysInput(instrumentStack);
         this.volume = InstrumentDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;
@@ -55,14 +55,22 @@ public class SyncInstrumentPacket {
 
     public static SyncInstrumentPacket decodePacket(FriendlyByteBuf buf) {
         try {
-            UUID midiSource = buf.readUUID();
-            String midiSourceName = buf.readUtf(64);
-            String enabledChannelsString = buf.readUtf(38);
+            UUID midiSource = null;
+            if(buf.readBoolean()) {
+                midiSource = buf.readUUID();
+            }
+
+            String midiSourceName = null;
+            if(buf.readBoolean()) {
+                midiSourceName = buf.readUtf(64);
+            }
+
+            Integer enabledChannelsInt = buf.readInt();
             Boolean sysInput = buf.readBoolean();
             Byte volume = buf.readByte();
             InteractionHand handIn = getInstrumentLocationHand(buf.readByte());
 
-            return new SyncInstrumentPacket(midiSource, midiSourceName, enabledChannelsString, sysInput,volume, handIn);
+            return new SyncInstrumentPacket(midiSource, midiSourceName, enabledChannelsInt, sysInput,volume, handIn);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("SyncInstrumentPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -73,9 +81,21 @@ public class SyncInstrumentPacket {
     }
 
     public static void encodePacket(SyncInstrumentPacket pkt, FriendlyByteBuf buf) {
-        buf.writeUUID(pkt.midiSource);
-        buf.writeUtf(pkt.midiSourceName, 64);
-        buf.writeUtf(pkt.enabledChannelsString, 38);
+        if(pkt.midiSource != null) {
+            buf.writeBoolean(true);
+            buf.writeUUID(pkt.midiSource);
+        } else {
+            buf.writeBoolean(false);
+        }
+        
+        if(pkt.midiSourceName != null) {
+            buf.writeBoolean(true);
+            buf.writeUtf(pkt.midiSourceName, 64);
+        } else {
+            buf.writeBoolean(false);
+        }
+
+        buf.writeInt(pkt.enabledChannelsInt);
         buf.writeBoolean(pkt.sysInput);
         buf.writeByte(pkt.volume);
         buf.writeByte(getInstrumentLocationByte(pkt.handIn));

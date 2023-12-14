@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.client;
 
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
@@ -68,14 +67,6 @@ public class ClientProxy implements Proxy {
                 NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket(0l, false));
             } else {
                 this.serverStartEpoch = Util.getEpochMillis() - message.currentServerMilli - ((Util.getEpochMillis() - this.startSyncEpoch)/2);
-                MIMIMod.LOGGER.info(
-                    "TIME SYNC CLIENT:\n\tServer Response Current Millis: " + message.currentServerMilli
-                    + "\n\tReceive Millis: " + Util.getEpochMillis()
-                    + "\n\tLatency Millis: " + (Util.getEpochMillis() - this.startSyncEpoch)
-                    + "\n\tLatency-Adjusted Server Current Millis: " + (message.currentServerMilli - ((Util.getEpochMillis() - this.startSyncEpoch))/2)
-                    + "\n\tClient Current Millis: " + Util.getEpochMillis()
-                    + "\n\tCalculated Server Start Millis: " + this.serverStartEpoch
-                );
                 this.startSyncEpoch = null;
             }
         }

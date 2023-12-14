@@ -162,6 +162,10 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         return this.spec.defaultColor();
     }
 
+    public InstrumentSpec getSpec() {
+        return spec;
+    }
+
     public Byte getInstrumentId() {
         return spec.instrumentId;
     }
@@ -195,6 +199,15 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
             return (EntitySeat) entity.getVehicle();
         }
 
+        return null;
+    }
+
+    public static ItemStack getTileInstrumentStackForEntity(LivingEntity entity) {
+        TileInstrument tile = getTileInstrumentForEntity(entity);
+
+        if(tile != null) {
+            return tile.getInstrumentStack();
+        }
         return null;
     }
     

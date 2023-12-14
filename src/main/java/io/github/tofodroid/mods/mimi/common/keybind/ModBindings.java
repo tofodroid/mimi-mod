@@ -5,6 +5,7 @@ import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.util.EntityUtils;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -55,7 +56,7 @@ public class ModBindings {
 
         // GUIs
         if(worldIn != null && playerIn != null && MIMIMod.proxy.isClient() && Minecraft.getInstance().screen == null) {
-            if(GUIFILECASTER.isDown()) {
+            if(GUIFILECASTER.isDown() && EntityUtils.playerHasActiveTransmitter(playerIn)) {
                 ClientGuiWrapper.openEnderTransmitterGui(worldIn, playerIn);
             } else if(MIDIGUIMAIN.isDown()) {
                 ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND, playerIn.getItemInHand(InteractionHand.MAIN_HAND));

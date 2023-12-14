@@ -28,17 +28,8 @@ public abstract class AContainerBlock<T extends BlockEntity & Container> extends
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
-			return;
-        BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        
-        if (blockEntity instanceof AContainerTile) {
-            ((AContainerTile)blockEntity).dropContent();
-            worldIn.updateNeighbourForOutputSignal(pos, this);
-        } else if (blockEntity instanceof AStaticInventoryTile) {
-            ((AStaticInventoryTile)blockEntity).dropContent();
-            worldIn.updateNeighbourForOutputSignal(pos, this);
-        }
-
+			return;        
+        this.dropContent(worldIn, pos, worldIn.getBlockEntity(pos));
         super.onRemove(state, worldIn, pos, newState, isMoving);
     }
     
@@ -67,6 +58,16 @@ public abstract class AContainerBlock<T extends BlockEntity & Container> extends
     
     public void writeGuiFriendlyByteBuf(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, FriendlyByteBuf buffer) {
         buffer.writeBlockPos(pos);
+    }
+
+    public void dropContent(Level worldIn, BlockPos pos, BlockEntity blockEntity) {
+        if (blockEntity instanceof AContainerTile) {
+            ((AContainerTile)blockEntity).dropContent();
+            worldIn.updateNeighbourForOutputSignal(pos, this);
+        } else if (blockEntity instanceof AStaticInventoryTile) {
+            ((AStaticInventoryTile)blockEntity).dropContent();
+            worldIn.updateNeighbourForOutputSignal(pos, this);
+        }
     }
 
     @SuppressWarnings("unchecked")

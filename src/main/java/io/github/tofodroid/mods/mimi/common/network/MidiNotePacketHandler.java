@@ -1,8 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -14,60 +14,88 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import net.minecraft.world.level.gameevent.GameEvent;
 
+@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MidiNotePacketHandler {
+    private static final ConcurrentHashMap<BlockPos, List<EntityNoteResponsiveTile>> ENTITY_CACHE_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<BlockPos, List<ServerPlayer>> PLAYER_CACHE_MAP = new ConcurrentHashMap<>();
+
+    @SubscribeEvent
+    public static void onServerTick(ServerTickEvent event) {
+        if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
+            return;
+        }
+        
+        ENTITY_CACHE_MAP.clear();
+        PLAYER_CACHE_MAP.clear();
+    }
+
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketsServer(Arrays.asList(message),(ServerLevel)ctx.get().getSender().level(), ctx.get().getSender()));
+            ctx.get().enqueueWork(() -> handlePacketServer(message,(ServerLevel)ctx.get().getSender().level(), ctx.get().getSender()));
         } else {
             ctx.get().enqueueWork(() -> handlePacketClient(message));
         }
         ctx.get().setPacketHandled(true);
     }
     
-    public static void handlePacketsServer(final List<MidiNotePacket> messages, ServerLevel worldIn, ServerPlayer sender) {
-        if(messages != null && !messages.isEmpty()) {
-            // Forward to players
-            for(MidiNotePacket packet : messages) {
-                if(ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
-                    NetworkManager.NOTE_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
-                } else {
-                    ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
-                        if(player != sender && Math.sqrt(player.getOnPos().distSqr(packet.pos)) <= getQueryBoxRange(packet.velocity <= 0)) {
-                            NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
-                        }
-                    });
+    public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {
+        if(message != null) {
+            // Forward to nearby players
+            List<ServerPlayer> potentialPlayers = PLAYER_CACHE_MAP.computeIfAbsent(
+                message.pos,
+                (key) -> getPotentialPlayers(worldIn, message.pos, getQueryBoxRange(message.velocity <= 0))
+            );
+            potentialPlayers.forEach(player -> {
+                if(player != sender) {
+                    NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
                 }
-            }
+            });
 
-            // Process Redstone and Sculk
-            List<EntityNoteResponsiveTile> entities = new ArrayList<>();
-            BlockPos lastPacketPos = null;
-
-            for(MidiNotePacket packet : messages) {
-                if(!packet.isControlPacket() && packet.velocity > 0) {
-                    if(lastPacketPos != packet.pos) {  
-                        lastPacketPos = packet.pos;
-                        entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
-                        worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, packet.pos, GameEvent.Context.of(worldIn.getBlockState(packet.pos)));
+            // Process Listeners and Sculk
+            if(!message.isControlPacket() && message.velocity > 0) {
+                List<EntityNoteResponsiveTile> potentialEntities = ENTITY_CACHE_MAP.computeIfAbsent(
+                    message.pos,
+                    (key) -> {
+                        List<EntityNoteResponsiveTile> newEntities = getPotentialEntities(worldIn, message.pos, getQueryBoxRange(false));
+                        worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, message.pos, GameEvent.Context.of(worldIn.getBlockState(message.pos)));
+                        return newEntities;
                     }
-                    
-                    for(TileListener listener : filterToListeners(entities)) {
-                        listener.onMidiEvent(null, null, packet.note, packet.velocity, packet.instrumentId);
-                    };
-                }
+                );
+                
+                for(TileListener listener : filterToListeners(potentialEntities)) {
+                    if(listener.shouldTriggerFromMidiEvent(null, message.note, message.velocity, message.instrumentId)) {
+                        listener.onTrigger(null, message.note, message.velocity, message.instrumentId);
+                    }
+                };
             }
         }
     }
 
     public static void handlePacketClient(final MidiNotePacket message) {
         if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
+    }
+
+    protected static List<ServerPlayer> getPotentialPlayers(ServerLevel worldIn, BlockPos notePos, Integer range) {
+        List<ServerPlayer> potentialEntites = new ArrayList<>();
+
+        AABB queryBox = new AABB(notePos.getX() - range, notePos.getY() - range, notePos.getZ() - range, 
+                                                    notePos.getX() + range, notePos.getY() + range, notePos.getZ() + range);
+        potentialEntites = worldIn.getEntitiesOfClass(ServerPlayer.class, queryBox, entity -> {
+            return entity.isAlive();
+        });
+
+        return potentialEntites;
     }
 
     protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerLevel worldIn, BlockPos notePos, Integer range) {
@@ -96,7 +124,7 @@ public class MidiNotePacketHandler {
         });
     }
 
-    protected static Double getQueryBoxRange(Boolean off) {
-        return off ? 128d : 64d;
+    protected static Integer getQueryBoxRange(Boolean off) {
+        return off ? 128 : 64;
     }
 }

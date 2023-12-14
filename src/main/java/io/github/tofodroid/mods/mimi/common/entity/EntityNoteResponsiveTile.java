@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.entity;
 
 import java.util.List;
 
-import io.github.tofodroid.mods.mimi.common.tile.INoteResponsiveTile;
+import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -39,7 +39,7 @@ public class EntityNoteResponsiveTile extends Entity {
         super.tick();
 
         if(!this.level().isClientSide && !this.isRemoved()) {
-            if(source == null || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(this.source) instanceof INoteResponsiveTile)) {
+            if(source == null || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(this.source) instanceof AConfigurableMidiNoteResponsiveTile)) {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
@@ -49,10 +49,9 @@ public class EntityNoteResponsiveTile extends Entity {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public INoteResponsiveTile<? extends BlockEntity> getTile() {
+    public AConfigurableMidiNoteResponsiveTile getTile() {
         BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.level().getBlockEntity(this.source) : null;
-        return tile != null && tile instanceof INoteResponsiveTile ? (INoteResponsiveTile<? extends BlockEntity>) tile : null;
+        return tile != null && tile instanceof AConfigurableMidiNoteResponsiveTile ? (AConfigurableMidiNoteResponsiveTile) tile : null;
     }
     
     protected static EntityNoteResponsiveTile getAtPos(Level world, Double posX, Double posY, Double posZ) {

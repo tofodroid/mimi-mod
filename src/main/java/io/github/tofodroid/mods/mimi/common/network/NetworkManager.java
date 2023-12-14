@@ -25,13 +25,6 @@ public class NetworkManager {
             .clientAcceptedVersions(NET_PROTOCOL::equals)
             .serverAcceptedVersions(NET_PROTOCOL::equals)
             .simpleChannel();
-    
-    public static final SimpleChannel BROADCAST_CHANNEL = NetworkRegistry.ChannelBuilder
-        .named(new ResourceLocation(MIMIMod.MODID, "broadcast_channel"))
-        .networkProtocolVersion(() -> NET_PROTOCOL)
-        .clientAcceptedVersions(NET_PROTOCOL::equals)
-        .serverAcceptedVersions(NET_PROTOCOL::equals)
-        .simpleChannel();
 
     public static final SimpleChannel SEQUENCE_CHANNEL = NetworkRegistry.ChannelBuilder
         .named(new ResourceLocation(MIMIMod.MODID, "sequence_channel"))
@@ -43,9 +36,7 @@ public class NetworkManager {
     @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
         NOTE_CHANNEL.registerMessage(0, MidiNotePacket.class, MidiNotePacket::encodePacket, MidiNotePacket::decodePacket, MidiNotePacketHandler::handlePacket);
-        
-        BROADCAST_CHANNEL.registerMessage(0, TransmitterNotePacket.class, TransmitterNotePacket::encodePacket, TransmitterNotePacket::decodePacket, TransmitterNotePacketHandler::handlePacket);
-        
+    
         INFO_CHANNEL.registerMessage(0, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, SyncInstrumentPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(1, ClientMidiListPacket.class, ClientMidiListPacket::encodePacket, ClientMidiListPacket::decodePacket, ClientMidiListPacketHandler::handlePacket);
         INFO_CHANNEL.registerMessage(2, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, ServerMusicPlayerStatusPacketHandler::handlePacket);

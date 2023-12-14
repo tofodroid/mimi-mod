@@ -1,16 +1,16 @@
-package io.github.tofodroid.mods.mimi.server.midi;
+package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.server.midi.AMusicPlayerPlaylistHandler.FavoriteMode;
-import io.github.tofodroid.mods.mimi.server.midi.AMusicPlayerPlaylistHandler.LoopMode;
-import io.github.tofodroid.mods.mimi.server.midi.AMusicPlayerPlaylistHandler.SourceMode;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.LoopMode;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.SourceMode;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.saveddata.SavedData;
 
-public class MusicPlayerPlaylistData extends SavedData {
+public class PlaylistData extends SavedData {
     public ArrayList<UUID> favoriteSongs = new ArrayList<>();
     public LoopMode loopMode = LoopMode.NONE;
     public FavoriteMode favoriteMode = FavoriteMode.ALL;
@@ -20,11 +20,11 @@ public class MusicPlayerPlaylistData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        return MusicPlayerPlaylistData.writeToTag(this, tag);
+        return PlaylistData.writeToTag(this, tag);
     }
 
-    public static MusicPlayerPlaylistData loadFromTag(CompoundTag tag) {
-        MusicPlayerPlaylistData data = new MusicPlayerPlaylistData();
+    public static PlaylistData loadFromTag(CompoundTag tag) {
+        PlaylistData data = new PlaylistData();
 
         if(tag.contains("FAVORITE_SONGS")) {
             CompoundTag favoriteSongTag = tag.getCompound("FAVORITE_SONGS");
@@ -51,7 +51,7 @@ public class MusicPlayerPlaylistData extends SavedData {
         return data;
     }
 
-    public static CompoundTag writeToTag(MusicPlayerPlaylistData data, CompoundTag resultTag) {
+    public static CompoundTag writeToTag(PlaylistData data, CompoundTag resultTag) {
         CompoundTag favoriteSongTag = new CompoundTag();
 
         if(!data.favoriteSongs.isEmpty()) {

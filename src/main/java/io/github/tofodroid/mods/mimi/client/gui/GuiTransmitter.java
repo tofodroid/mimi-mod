@@ -13,7 +13,7 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPac
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CONTROL;
-import io.github.tofodroid.mods.mimi.server.midi.AMusicPlayerPlaylistHandler.FavoriteMode;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 import net.minecraft.client.gui.GuiGraphics;
 

@@ -1,5 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import java.util.UUID;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
@@ -12,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiTile extends AStaticInventoryTile {
     public static final Integer SOURCE_STACK_SLOT = 0;
+    protected UUID id;
     
     public AConfigurableMidiTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 1);
@@ -58,7 +61,6 @@ public abstract class AConfigurableMidiTile extends AStaticInventoryTile {
             String itemId = stackTag.getString("id");
 
             if(itemId.equalsIgnoreCase("mimi:switchboard")) {
-                MIMIMod.LOGGER.info("Converting Configurable MIDI Tile from Switchboard.");
                 convertStack = initializeSourceStack(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
             }
         }
@@ -81,5 +83,13 @@ public abstract class AConfigurableMidiTile extends AStaticInventoryTile {
         }
 
         return sourceStack;
+    }
+
+    public UUID getUUID() {
+        if(this.id == null) {
+            String idString = getClass().getSimpleName() + this.getBlockPos().getX() + "-" + this.getBlockPos().getY() + "-" + this.getBlockPos().getZ();
+            this.id = UUID.nameUUIDFromBytes(idString.getBytes());
+        }
+        return this.id;
     }
 }

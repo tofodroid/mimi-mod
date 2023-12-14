@@ -15,7 +15,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerManager;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,10 +31,11 @@ public class ServerMidiUploadManager {
     private static Map<UUID, BasicMidiInfo> UPLOAD_INFOS = new HashMap<>();
     private static Map<UUID, Map<Integer,ServerMidiUploadPacket>> UPLOAD_PARTS = new HashMap<>();
     private static Map<UUID, Integer> TICKS_SINCE_LAST_PART = new HashMap<>();
+    private static Boolean doTick = false;
     
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if(!TICKS_SINCE_LAST_PART.isEmpty()) {
+        if(doTick) {
             List<UUID> toFail = new ArrayList<>();
             List<UUID> toClear = new ArrayList<>();
             
@@ -72,6 +73,7 @@ public class ServerMidiUploadManager {
                 UPLOAD_INFOS.remove(fileId);
                 TICKS_SINCE_LAST_PART.remove(fileId);
             }
+            doTick = !TICKS_SINCE_LAST_PART.isEmpty();
         }
     }
 
@@ -83,6 +85,7 @@ public class ServerMidiUploadManager {
             UPLOAD_INFOS.put(info.fileId, info);
             UPLOAD_CLIENTS.put(info.fileId, clientId);
             TICKS_SINCE_LAST_PART.put(info.fileId, 0);
+            doTick = true;
             NetworkManager.SEQUENCE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ServerMidiUploadPacket(info.fileId));
         }
     }
@@ -134,15 +137,16 @@ public class ServerMidiUploadManager {
             UPLOAD_CLIENTS.remove(message.fileId);
 
             if(sequence == null) {
-                ServerMusicPlayerManager.onSequenceUploadFailed(info);
+                ServerMusicTransmitterManager.onSequenceUploadFailed(info);
                 return;
             }
 
-            ServerMusicPlayerManager.onFinishUploadSequence(info, sequence);
+            ServerMusicTransmitterManager.onFinishUploadSequence(info, sequence);
         } else {
             UPLOAD_PARTS.put(message.fileId, filePackets);
             TICKS_SINCE_LAST_PART.put(message.fileId, 0);
         }
+        doTick = !TICKS_SINCE_LAST_PART.isEmpty();
     }
 
     public static Sequence loadSequenceFromParts(Map<Integer, ServerMidiUploadPacket> parts) {
@@ -157,10 +161,11 @@ public class ServerMidiUploadManager {
 
     public static void onUploadFailed(UUID fileId) {
         TICKS_SINCE_LAST_PART.remove(fileId);
+        doTick = !TICKS_SINCE_LAST_PART.isEmpty();
         UPLOAD_PARTS.remove(fileId);
         BasicMidiInfo info = UPLOAD_INFOS.remove(fileId);
         UPLOAD_CLIENTS.remove(fileId);
-        ServerMusicPlayerManager.onSequenceUploadFailed(info);
+        ServerMusicTransmitterManager.onSequenceUploadFailed(info);
     }
 
     public static byte[] merge(List<byte[]> arrays) {

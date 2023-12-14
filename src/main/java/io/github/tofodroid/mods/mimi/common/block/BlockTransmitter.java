@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
-import io.github.tofodroid.mods.mimi.server.midi.ServerMusicPlayerManager;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -48,7 +48,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
         TileTransmitter tileEntity = getTileForBlock(worldIn, pos);
 
         if(!worldIn.isClientSide && tileEntity != null) {
-            ServerMusicPlayerManager.removeTransmitter(tileEntity.getUUID());
+            ServerMusicTransmitterManager.removeTransmitter(tileEntity.getUUID());
         }
         
         super.onRemove(state, worldIn, pos, newState, isMoving);
@@ -63,7 +63,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
             tileEntity.setSourceStack(newStack);
             
             if(!worldIn.isClientSide) {
-                ServerMusicPlayerManager.createTransmitter(tileEntity);
+                ServerMusicTransmitterManager.createTransmitter(tileEntity);
             }
         }
     }

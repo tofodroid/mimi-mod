@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.UUID;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -13,8 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiTile implements INoteResponsiveTile<AConfigurableMidiPowerSourceTile> {
-    private Integer updateTickCount = 0;
+public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiNoteResponsiveTile {
     private Integer triggeredTickCount = 0;
     private Integer poweredTickCount = 0;
 
@@ -61,11 +58,11 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
-        self.tick(world, pos, state, self);
+        self.tick(world, pos, state);
     }
 
     @Override
-    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
+    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {
         if(this.isBlockValid()) {
             if(this.isPowered()) {
                 if(this.poweredTickCount > this.stayPoweredForTicks()) {
@@ -86,8 +83,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
     
     @Override
-    @SuppressWarnings("null")
-    public Boolean onTrigger(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+    public Boolean onTrigger(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
         if(isBlockValid()) {
             if(isPowered()) {
                 this.poweredTickCount = 0;
@@ -98,20 +94,5 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         }
         
         return false;
-    }
-    
-    @Override
-    public void setTickCount(Integer count) {
-        this.updateTickCount = count;
-    }
-
-    @Override
-    public Integer getTickCount() {
-        return this.updateTickCount;
-    }
-
-    @Override
-    public Boolean shouldHaveEntity() {
-        return true;
     }
 }

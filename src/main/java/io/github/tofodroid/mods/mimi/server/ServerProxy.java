@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.server;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import net.minecraft.Util;
@@ -20,7 +19,6 @@ public class ServerProxy implements Proxy {
 
     @Override
     public Long getServerStartEpoch() {
-        MIMIMod.LOGGER.info("TIME SYNC SERVER:\n\tServer Start Millis: " + this.serverStartEpoch);
         return serverStartEpoch;
     }
 

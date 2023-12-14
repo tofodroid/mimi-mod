@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi;
+package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 import net.minecraft.world.entity.player.Player;
 
-public class MusicPlayerMidiHandler {
+public class MidiHandler {
     private final Runnable sequenceEndCallback;
 
     // Play State
@@ -36,15 +36,15 @@ public class MusicPlayerMidiHandler {
     private Receiver activeReceiver;
     private Transmitter activeTransmitter;
 
-    public MusicPlayerMidiHandler(TileTransmitter tile, Runnable sequenceEndCallback) {
-        this(new TileTransmitterReceiver(tile), sequenceEndCallback);
+    public MidiHandler(TileTransmitter tile, Runnable sequenceEndCallback) {
+        this(new TileTransmitterMidiReceiver(tile), sequenceEndCallback);
     }
 
-    public MusicPlayerMidiHandler(Player player, Runnable sequenceEndCallback) {
-        this(new PlayerTransmitterReceiver(player), sequenceEndCallback);
+    public MidiHandler(Player player, Runnable sequenceEndCallback) {
+        this(new PlayerTransmitterMidiReceiver(player), sequenceEndCallback);
     }
 
-    protected MusicPlayerMidiHandler(Receiver receiver, Runnable sequenceEndCallback) {
+    protected MidiHandler(Receiver receiver, Runnable sequenceEndCallback) {
         this.activeReceiver = receiver;
         this.sequenceEndCallback = sequenceEndCallback;
         initializeSequencer();
@@ -207,7 +207,7 @@ public class MusicPlayerMidiHandler {
 
     protected Boolean initializeSequencer() {
         try { 
-            MusicPlayerMidiHandler self = this;
+            MidiHandler self = this;
             RealTimeSequencerProvider provider = new RealTimeSequencerProvider();
             this.activeSequencer = (Sequencer)provider.getDevice(provider.getDeviceInfo()[0]);
             this.activeSequencer.open();

@@ -1,10 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.UUID;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
@@ -17,17 +16,24 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
     }
 
     public static void doTick(Level world, BlockPos pos, BlockState state, TileReceiver self) {
-        self.tick(world, pos, state, self);
+        self.tick(world, pos, state);
+    }
+    
+    @Override
+    public void tick(Level world, BlockPos pos, BlockState state) {
+        super.tick(world, pos, state);
+        ServerMusicReceiverManager.loadConfigurableMidiNoteResponsiveTileReceiver(this);
     }
 
     @Override
-    public Boolean shouldTriggerFromMidiEvent(@Nullable UUID sender, @Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+    public Boolean shouldTriggerFromMidiEvent(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
         ItemStack sourceStack = getSourceStack();
         if(!sourceStack.isEmpty()) {
             return 
-                InstrumentDataUtils.isChannelEnabled(sourceStack, channel) 
-                && (note == null || InstrumentDataUtils.isNoteFiltered(sourceStack, note))
-                && (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(sourceStack)));
+                InstrumentDataUtils.isChannelEnabled(this.enabledChannels, channel)
+                && velocity > 0
+                && (note == null || note > 0)
+                && (note == null || InstrumentDataUtils.isNoteFiltered(filteredNotes, invertFilterNoteOct, note));
         }
         return false;
     }

@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class TransmitterSourceWidget extends BaseWidget {
     private static final Vector2i SOURCE_SELF_BUTTON_COORDS = new Vector2i(32, 26);
-    private static final Vector2i SOURCE_PUBLIC_BUTTON_COORDS = new Vector2i(51, 26);
     private static final Vector2i SOURCE_CLEAR_BUTTON_COORDS = new Vector2i(70, 26);
 
     private ItemStack midiStack;
@@ -36,9 +35,6 @@ public class TransmitterSourceWidget extends BaseWidget {
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), SOURCE_SELF_BUTTON_COORDS)) {
             InstrumentDataUtils.setMidiSource(midiStack, playerId, playerName);
-            return true;
-        } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), SOURCE_PUBLIC_BUTTON_COORDS)) {
-            InstrumentDataUtils.setMidiSource(midiStack, InstrumentDataUtils.PUBLIC_SOURCE_ID, "Public");
             return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), SOURCE_CLEAR_BUTTON_COORDS)) {
             InstrumentDataUtils.setMidiSource(midiStack, null, "None");

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi;
+package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,15 +9,15 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class PlayerMusicPlayerPlaylistHandler extends AMusicPlayerPlaylistHandler {
-    protected MusicPlayerPlaylistData data;
+public class PlayerPlaylistHandler extends APlaylistHandler {
+    protected PlaylistData data;
 
-    public PlayerMusicPlayerPlaylistHandler(ServerPlayer player) {
+    public PlayerPlaylistHandler(ServerPlayer player) {
         super(player.getUUID());
 
         // Load from world saved data
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        this.data = server.overworld().getDataStorage().computeIfAbsent(MusicPlayerPlaylistData::loadFromTag, MusicPlayerPlaylistData::new, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
+        this.data = server.overworld().getDataStorage().computeIfAbsent(PlaylistData::loadFromTag, PlaylistData::new, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
         this.data.setDirty();
     }
 

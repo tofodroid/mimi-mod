@@ -106,14 +106,14 @@ public class BlockConductor extends AConfigurableMidiBlock<TileConductor> {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        String enabledChannels = InstrumentDataUtils.getEnabledChannelsString(blockItemStack);
-        if(enabledChannels != null && !enabledChannels.isEmpty()) {
-            if(enabledChannels.equals(InstrumentDataUtils.ALL_CHANNELS_STRING)) {
+        Integer enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(blockItemStack);
+        if(enabledChannels != null) {
+            if(enabledChannels.equals(InstrumentDataUtils.ALL_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
-            } else if(enabledChannels.equals(InstrumentDataUtils.NONE_CHANNELS_STRING)) {
+            } else if(enabledChannels.equals(InstrumentDataUtils.NONE_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
             } else {
-                tooltip.add(Component.literal("  Channels: " + enabledChannels).withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.literal("  Channels: " + InstrumentDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
             }
         }
 

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi;
+package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,8 +8,9 @@ import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 
-public abstract class AMusicPlayerPlaylistHandler {
+public abstract class APlaylistHandler {
     public enum LoopMode {
         ALL,
         SINGLE,
@@ -44,7 +45,7 @@ public abstract class AMusicPlayerPlaylistHandler {
     protected abstract void setSourceMode(SourceMode mode);
     protected abstract void setIsShuffled(Boolean shuffle);
 
-    public AMusicPlayerPlaylistHandler(UUID musicPlayerId) {
+    public APlaylistHandler(UUID musicPlayerId) {
         this.musicPlayerId = musicPlayerId;
     }
 
@@ -220,6 +221,6 @@ public abstract class AMusicPlayerPlaylistHandler {
             this.selectedDisplayIndex = null;
             this.selectedSongInfo = null;
         }
-        ServerMusicPlayerManager.onSelectedSongChange(this.musicPlayerId, this.selectedSongInfo);
+        ServerMusicTransmitterManager.onSelectedSongChange(this.musicPlayerId, this.selectedSongInfo);
     }
 }
