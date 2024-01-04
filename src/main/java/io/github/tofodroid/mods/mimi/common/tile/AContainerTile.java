@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.StackedContentsCompatible;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,7 +51,14 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
         super.load(nbt);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         ContainerHelper.loadAllItems(nbt, this.items);
+        this.onLoadItemsComplete();
 	}
+
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        this.onAddedToLevel();
+    }
     
     @Override
     public int getContainerSize() {
@@ -169,5 +177,13 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
         for(ItemStack itemstack : this.items) {
             helper.accountStack(itemstack);
         }
+    }
+
+    protected void onLoadItemsComplete() {
+        // Default no-op
+    }
+
+    protected void onAddedToLevel() {
+        // Default no-op
     }
 }

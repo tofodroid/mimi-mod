@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitter;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.AServerMusicTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -28,7 +28,7 @@ public class ClientMidiListPacketHandler {
     
     public static void handlePacketServer(final ClientMidiListPacket message, ServerPlayer sender) {
         ServerMidiManager.setCacheInfosForSource(sender.getUUID(), message.infos);
-        ServerMusicTransmitter player = ServerMusicTransmitterManager.getMusicPlayer(sender.getUUID());
+        AServerMusicTransmitter player = ServerMusicTransmitterManager.getMusicPlayer(sender.getUUID());
 
         if(message.doUpdateServerFileList) {
             MIMIMod.proxy.serverMidiFiles().refresh();

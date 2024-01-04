@@ -264,10 +264,8 @@ public class GuiInstrument extends BaseGui {
                 this.syncInstrumentToServer();
             } else if(transmitSource.mouseClicked(imouseX, imouseY, mouseButton)) {
                 this.syncInstrumentToServer();
-                this.allNotesOff();
             } else if(midiChannelToggle.mouseClicked(imouseX, imouseY, mouseButton)) {
                 this.syncInstrumentToServer();
-                this.allNotesOff();
             }
         }
         
@@ -617,7 +615,7 @@ public class GuiInstrument extends BaseGui {
         if(editMode) {
             this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
             this.transmitSource.renderText(graphics, font, mouseX, mouseY);
-            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolumePercent(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
+            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolume(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
         }
 
         // Keyboard Layout

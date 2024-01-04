@@ -135,7 +135,9 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(channel != null) {
             if(message.isAllNotesOffPacket()) {
                 channel.allNotesOff();
+                channel.reset();
                 this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
+                channelAssignmentMap.remove(channel);
             } else {
                 try {
                     this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.note, 0), getSynthEventTimestamp(timestamp));

@@ -13,7 +13,7 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
 
     @SuppressWarnings("null")
     public ConfigurableMidiNoteResponsiveTileReceiver(AConfigurableMidiNoteResponsiveTile tile) {        
-        super(InstrumentDataUtils.getMidiSource(tile.getSourceStack()), tile.getBlockPos(), tile.getLevel().dimension());
+        super(InstrumentDataUtils.getMidiSource(tile.getSourceStack()), tile::getBlockPos, () -> tile.getLevel().dimension());
         this.tile = tile;
     }
 
@@ -24,7 +24,7 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
 
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        return Math.abs(Math.sqrt(sourcePos.distSqr(getPos()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(getDimension()) && 
+        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get()) && 
                 tile.shouldTriggerFromMidiEvent(packet.channel, packet.note, packet.velocity, null);
     }
 }

@@ -11,15 +11,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
 public class TransmitterSourceWidget extends BaseWidget {
-    private static final Vector2i SOURCE_SELF_BUTTON_COORDS = new Vector2i(32, 26);
-    private static final Vector2i SOURCE_CLEAR_BUTTON_COORDS = new Vector2i(70, 26);
+    private static final Vector2i SOURCE_SELF_BUTTON_COORDS = new Vector2i(78, 14);
+    private static final Vector2i SOURCE_CLEAR_BUTTON_COORDS = new Vector2i(97, 14);
 
     private ItemStack midiStack;
     private String playerName;
     private UUID playerId;
 
     public TransmitterSourceWidget(ItemStack midiStack, UUID playerId, String playerName, Vector2i screenOffset, Vector2i start) {
-        super("textures/gui/widget/transmit_source.png", 116,  new Vector2i(116,44), screenOffset, start);
+        super("textures/gui/widget/transmit_source.png", 116,  new Vector2i(116,45), screenOffset, start);
         this.midiStack = midiStack;
         this.playerId = playerId;
         this.playerName = playerName;
@@ -27,8 +27,24 @@ public class TransmitterSourceWidget extends BaseWidget {
 
     @Override
     public void renderText(GuiGraphics graphics, Font font, Integer mouseX, Integer mouseY) {
-        String selectedSourceName = InstrumentDataUtils.getMidiSourceName(this.midiStack);
-        graphics.drawString(font, selectedSourceName.length() <= 22 ? selectedSourceName : selectedSourceName.substring(0,21) + "...", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
+        UUID source = InstrumentDataUtils.getMidiSource(this.midiStack);
+
+        if(source == null) {
+            graphics.drawString(font, "None", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
+        } else {
+            String sourceName = InstrumentDataUtils.getMidiSourceName(this.midiStack);
+            Boolean isTransmitter = InstrumentDataUtils.getMidiSourceIsTransmitter(this.midiStack);
+
+            graphics.drawString(font, isTransmitter ? "Transmitter:" : "Player:", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
+
+            
+            if(isTransmitter) {
+                graphics.drawString(font, this.truncateString(font, sourceName.substring(0, sourceName.indexOf("@")), 68), ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 24, 0xFF00E600);
+                graphics.drawString(font, this.truncateString(font, sourceName.substring(sourceName.indexOf("(") + 1, sourceName.indexOf(")")), 106), ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 34, 0xFF00E600);
+            } else {
+                graphics.drawString(font, this.truncateString(font, sourceName, 106), ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 33, 0xFF00E600);
+            }
+        }
     }
 
     @Override

@@ -3,10 +3,14 @@ package io.github.tofodroid.mods.mimi.common.item;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,13 +18,17 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
@@ -48,7 +56,6 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Override
     public Boolean isDyeable() {
         return this.spec.isDyeable();
-
     }
 
     @Override
@@ -62,14 +69,38 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     }
 
     @Override
-    @Nonnull
     public InteractionResult useOn(UseOnContext context) {
         if(washItem(context)) {
             return InteractionResult.SUCCESS;
-        } else if(linkToTransmitter(context)) {
-            return InteractionResult.SUCCESS;
         }
+        return super.useOn(context);
+    }
+    
+    @Override
+    public EquipmentSlot getEquipmentSlot(ItemStack stack) {
+        return EquipmentSlot.OFFHAND;
+    }
 
+    @Override
+    @SuppressWarnings({"resource", "deprecation"})
+    public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity target, InteractionHand handIn) {
+        if(target instanceof Player) {
+            if(!user.level().isClientSide) {
+                InstrumentDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
+                user.setItemInHand(handIn, stack);
+                user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
+                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos()), (ServerLevel)user.level(), null);
+            }
+             return InteractionResult.CONSUME;
+        } else if(target instanceof Mob) {
+            if(!user.level().isClientSide && Arrays.asList(ModConfigs.COMMON.allowedInstrumentMobs.get().split(",")).contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
+                user.setItemInHand(handIn, ItemStack.EMPTY);
+                target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
+                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos()), (ServerLevel)user.level(), null);
+            }
+            return InteractionResult.CONSUME;
+        }
+        
         return InteractionResult.PASS;
     }
 

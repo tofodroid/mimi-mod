@@ -4,20 +4,41 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileInstrument extends AStaticInventoryTile {
     public static final String COLOR_TAG = "color";
     protected Integer color;
+    protected Player currentPlayer = null;
 
     public TileInstrument(BlockPos pos, BlockState state) {
         super(ModTiles.INSTRUMENT, pos, state, 1);
+    }
+
+    public void setCurrentPlayer(Player player) {
+        // Reload previous player
+        if(this.currentPlayer != null && this.currentPlayer != player) {
+            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.currentPlayer);
+        }
+
+        this.currentPlayer = player;
+
+        // Reload new player
+        if(this.currentPlayer != null) {
+            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.currentPlayer);
+        }
+    }
+
+    public Player getCurrentPlayer() {
+        return this.currentPlayer;
     }
 
     public void setInstrumentStack(ItemStack stack) {
@@ -26,6 +47,10 @@ public class TileInstrument extends AStaticInventoryTile {
             
             if(this.blockInstrument().isDyeable() && ((IDyeableItem)stack.getItem()).hasColor(stack)) {
                 this.color = ((IDyeableItem)stack.getItem()).getColor(stack);
+            }
+
+            if(this.currentPlayer != null) {
+                ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.currentPlayer);
             }
         }
     }

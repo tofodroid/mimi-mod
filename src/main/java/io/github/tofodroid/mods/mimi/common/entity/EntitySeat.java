@@ -4,16 +4,18 @@ import java.util.List;
 
 import org.joml.Vector3d;
 
+import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 
 public class EntitySeat extends Entity {
@@ -34,6 +36,18 @@ public class EntitySeat extends Entity {
     public boolean isPushedByFluid() {
         return false;
     }
+    
+    public LivingEntity getControllingPassenger() {
+        Entity entity = this.getFirstPassenger();
+        LivingEntity livingentity1;
+        if (entity instanceof LivingEntity livingentity) {
+            livingentity1 = livingentity;
+        } else {
+            livingentity1 = null;
+        }
+
+        return livingentity1;
+    }
 
     @Override
     @SuppressWarnings("resource")
@@ -41,8 +55,14 @@ public class EntitySeat extends Entity {
         super.tick();
 
         if(!this.level().isClientSide) {
-            if(source == null || this.getPassengers().isEmpty() || this.level().getBlockEntity(this.source) == null /*|| !(this.level().getBlockEntity(source) instanceof TileInstrument)*/ || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
+            BlockEntity blockEntity = this.level().getBlockEntity(this.source);
+            if(source == null || this.getPassengers().isEmpty() || blockEntity == null || !(blockEntity instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.ejectPassengers();
+
+                if(blockEntity != null && blockEntity instanceof TileInstrument) {
+                    ((TileInstrument)blockEntity).setCurrentPlayer(null);
+                }
+
                 this.discard();
                 this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());
             }
@@ -72,16 +92,17 @@ public class EntitySeat extends Entity {
         return !seats.isEmpty();
     }
     
-    public static InteractionResult create(Level world, BlockPos pos, Vector3d sitOffsetPos, Player player) {
+    public static Boolean create(Level world, BlockPos pos, Vector3d sitOffsetPos, Player player) {
         if(!world.isClientSide) {
             EntitySeat newSeat = new EntitySeat(world, pos, sitOffsetPos);
             
             if(!seatExists(world, newSeat.getX(), newSeat.getY(), newSeat.getZ())) {
                 world.addFreshEntity(newSeat);
                 player.startRiding(newSeat, false);
+                return true;
             }
         }
-        return InteractionResult.SUCCESS;
+        return false;
     }
 
     @Override

@@ -16,6 +16,7 @@ import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,24 +25,24 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerMusicTransmitterManager {
-    protected static final Set<UUID> PLAYING_LIST = new HashSet<>();
-    protected static final Map<UUID,ServerMusicTransmitter> PLAYER_MAP = new HashMap<>();
-    protected static final Map<UUID, Set<UUID>> MIDI_LOAD_CACHE_MAP = new HashMap<>();
-    protected static Boolean hasPlaying = false;
+    private static final Set<UUID> PLAYING_LIST = new HashSet<>();
+    private static final Map<UUID,AServerMusicTransmitter> PLAYER_MAP = new HashMap<>();
+    private static final Map<UUID, Set<UUID>> MIDI_LOAD_CACHE_MAP = new HashMap<>();
+    private static Boolean hasPlaying = false;
 
     public static void createTransmitter(ServerPlayer player) {
-        ServerMusicTransmitter handler = PLAYER_MAP.get(player.getUUID());
+        AServerMusicTransmitter handler = PLAYER_MAP.get(player.getUUID());
         
         if(handler == null) {
-            PLAYER_MAP.put(player.getUUID(), new ServerMusicTransmitter(player));
+            PLAYER_MAP.put(player.getUUID(), new PlayerTransmitterMusicTransmitter(player));
         }
     }
 
     public static void createTransmitter(TileTransmitter tile) {
-        ServerMusicTransmitter handler = PLAYER_MAP.get(tile.getUUID());
+        AServerMusicTransmitter handler = PLAYER_MAP.get(tile.getUUID());
         
         if(handler == null) {
-            PLAYER_MAP.put(tile.getUUID(), new ServerMusicTransmitter(tile));
+            PLAYER_MAP.put(tile.getUUID(), new TileTransmitterMusicTransmitter(tile));
         }
     }
 
@@ -56,7 +57,7 @@ public class ServerMusicTransmitterManager {
     }
 
     public static void removeTransmitter(UUID id) {
-        ServerMusicTransmitter handler = PLAYER_MAP.remove(id);
+        AServerMusicTransmitter handler = PLAYER_MAP.remove(id);
         
         if(handler != null) {
             handler.close();
@@ -64,13 +65,13 @@ public class ServerMusicTransmitterManager {
         removePlaying(id);
     }
 
-    public static ServerMusicTransmitter getMusicPlayer(UUID id) {
+    public static AServerMusicTransmitter getMusicPlayer(UUID id) {
         return PLAYER_MAP.get(id);
     }
     
     public static void clearMusicPlayers() {
         for(UUID id : PLAYER_MAP.keySet()) {
-            ServerMusicTransmitter player = PLAYER_MAP.get(id);
+            AServerMusicTransmitter player = PLAYER_MAP.get(id);
 
             if(player != null) {
                 player.close();
@@ -110,9 +111,9 @@ public class ServerMusicTransmitterManager {
         if(!(event.getEntity() instanceof ServerPlayer)) {
             return;
         }
-
-        if(PLAYER_MAP.containsKey(event.getEntity().getUUID())) {
-            PLAYER_MAP.get(event.getEntity().getUUID()).stop();
+        AServerMusicTransmitter player = getMusicPlayer(event.getEntity().getUUID());
+        if(player != null) {
+            player.stop();
         }
     }
 
@@ -124,8 +125,30 @@ public class ServerMusicTransmitterManager {
         removeTransmitter(event.getEntity().getUUID());
     }
 
+    @SubscribeEvent
+    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        AServerMusicTransmitter player = getMusicPlayer(event.getEntity().getUUID());
+        if(player != null) {
+            player.allNotesOff();
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onEntityTeleport(EntityTeleportEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        AServerMusicTransmitter player = getMusicPlayer(event.getEntity().getUUID());
+        if(player != null) {
+            player.allNotesOff();
+        }
+    }
+
     public static void onSelectedSongChange(UUID musicPlayerId, BasicMidiInfo newInfo) {
-        ServerMusicTransmitter player = getMusicPlayer(musicPlayerId);
+        AServerMusicTransmitter player = getMusicPlayer(musicPlayerId);
 
         if(player != null) {
             player.loadSong(newInfo);
@@ -145,7 +168,7 @@ public class ServerMusicTransmitterManager {
     public static void onSequenceUploadFailed(BasicMidiInfo info) {
         if(MIDI_LOAD_CACHE_MAP.containsKey(info.fileId)) {
             for(UUID musicPlayerId : MIDI_LOAD_CACHE_MAP.get(info.fileId)) {
-                ServerMusicTransmitter player = getMusicPlayer(musicPlayerId);
+                AServerMusicTransmitter player = getMusicPlayer(musicPlayerId);
                 if(player != null) {
                     player.onSequenceLoadFailed(info);
                 }
@@ -157,7 +180,7 @@ public class ServerMusicTransmitterManager {
     public static void onFinishUploadSequence(BasicMidiInfo info, Sequence sequence) {
         if(MIDI_LOAD_CACHE_MAP.containsKey(info.fileId)) {
             for(UUID musicPlayerId : MIDI_LOAD_CACHE_MAP.get(info.fileId)) {
-                ServerMusicTransmitter player = getMusicPlayer(musicPlayerId);
+                AServerMusicTransmitter player = getMusicPlayer(musicPlayerId);
                 if(player != null) {
                     player.finishLoadSequence(info, sequence);
                 }

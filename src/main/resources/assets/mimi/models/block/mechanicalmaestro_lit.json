@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+      "particle": "mimi:block/mechmaestro/side_lit",
+      "north": "mimi:block/mechmaestro/side_lit",
+      "south": "mimi:block/mechmaestro/side_lit",
+      "east": "mimi:block/mechmaestro/side_lit",
+      "west": "mimi:block/mechmaestro/side_lit",
+      "up": "mimi:block/mechmaestro/top",
+      "down": "mimi:block/mechmaestro/bottom"
+    }
+}

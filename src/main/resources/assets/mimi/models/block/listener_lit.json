@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+      "particle": "mimi:block/listener/side_lit",
+      "north": "mimi:block/listener/side_lit",
+      "south": "mimi:block/listener/side_lit",
+      "east": "mimi:block/listener/side_lit",
+      "west": "mimi:block/listener/side_lit",
+      "up": "mimi:block/listener/top",
+      "down": "mimi:block/listener/bottom"
+    }
+}

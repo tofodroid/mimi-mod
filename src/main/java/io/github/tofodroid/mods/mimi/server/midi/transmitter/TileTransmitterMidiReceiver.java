@@ -1,16 +1,13 @@
 package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
+import java.util.UUID;
 import javax.sound.midi.ShortMessage;
-
-import io.github.tofodroid.mods.mimi.common.midi.AMidiInputReceiver;
-import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
-import net.minecraft.server.MinecraftServer;
+import io.github.tofodroid.mods.mimi.server.midi.AServerMidiInputReceiver;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class TileTransmitterMidiReceiver extends AMidiInputReceiver {
+public class TileTransmitterMidiReceiver extends AServerMidiInputReceiver {
     protected TileTransmitter tile;
 
     public TileTransmitterMidiReceiver(TileTransmitter tile) {
@@ -31,40 +28,23 @@ public class TileTransmitterMidiReceiver extends AMidiInputReceiver {
         }
     }
     
-    public void sendTransmitterNoteOnPacket(Byte channel, Byte midiNote, Byte velocity) {
-        TransmitterNoteEvent packet = TransmitterNoteEvent.createNoteEvent(channel, midiNote, velocity);
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, tile.getUUID(), tile.getBlockPos(), (ServerLevel)tile.getLevel());
-        });        
-    }
-    
-    public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
-        TransmitterNoteEvent packet = TransmitterNoteEvent.createNoteEvent(channel, midiNote, Integer.valueOf(0).byteValue());
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, tile.getUUID(), tile.getBlockPos(), (ServerLevel)tile.getLevel());
-        });     
-    }
-
-    public void sendTransmitterAllNotesOffPacket(Byte channel) {
-        TransmitterNoteEvent packet = TransmitterNoteEvent.createAllNotesOffEvent(channel);
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, tile.getUUID(), tile.getBlockPos(), (ServerLevel)tile.getLevel());
-        });     
-    }
-
-    public void sendTransmitterControllerPacket(Byte channel, Byte controller, Byte value) {
-        TransmitterNoteEvent packet = TransmitterNoteEvent.createControllerEvent(channel, controller, value);
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, tile.getUUID(), tile.getBlockPos(), (ServerLevel)tile.getLevel());
-        });     
-    }
-    
     @Override
     protected Boolean isSupportedControlMessage(ShortMessage msg) {
         return false;
+    }
+
+    @Override
+    protected UUID getTransmitterId() {
+        return tile.getUUID();
+    }
+
+    @Override
+    protected BlockPos getTransmitterPos() {
+        return tile.getBlockPos();
+    }
+
+    @Override
+    protected ServerLevel getTransmitterLevel() {
+        return (ServerLevel)tile.getLevel();
     }
 }

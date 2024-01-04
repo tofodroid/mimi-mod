@@ -22,22 +22,28 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
-
 import net.minecraft.world.level.gameevent.GameEvent;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MidiNotePacketHandler {
-    private static final ConcurrentHashMap<BlockPos, List<EntityNoteResponsiveTile>> ENTITY_CACHE_MAP = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<BlockPos, List<ServerPlayer>> PLAYER_CACHE_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, List<EntityNoteResponsiveTile>> ENTITY_CACHE_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, List<ServerPlayer>> PLAYER_CACHE_MAP = new ConcurrentHashMap<>();
+    private static final Integer CLEAR_CACHE_EVERY_TICKS = 5;
+    private static Integer cacheClearTickCounter = 0;
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent event) {
         if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
             return;
         }
-        
-        ENTITY_CACHE_MAP.clear();
-        PLAYER_CACHE_MAP.clear();
+
+        if(cacheClearTickCounter >= CLEAR_CACHE_EVERY_TICKS) {
+            cacheClearTickCounter = 0;
+            ENTITY_CACHE_MAP.clear();
+            PLAYER_CACHE_MAP.clear();
+        } else {
+            cacheClearTickCounter++;
+        }        
     }
 
     public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -51,11 +57,21 @@ public class MidiNotePacketHandler {
     
     public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {
         if(message != null) {
-            // Forward to nearby players
+            String packetCacheKey = worldIn.dimensionTypeId().location().toString() + message.pos.toShortString();
+
+            // Find nearby players
             List<ServerPlayer> potentialPlayers = PLAYER_CACHE_MAP.computeIfAbsent(
-                message.pos,
+                packetCacheKey,
                 (key) -> getPotentialPlayers(worldIn, message.pos, getQueryBoxRange(message.velocity <= 0))
             );
+
+            // Ensure source player is included if this is coming from music reciever
+            ServerPlayer sourcePlayer = (ServerPlayer)worldIn.getPlayerByUUID(message.player);
+            if(sender == null && sourcePlayer != null && !potentialPlayers.contains(sourcePlayer)) {
+                potentialPlayers.add(sourcePlayer);
+            }
+
+            // Forward to nearby players
             potentialPlayers.forEach(player -> {
                 if(player != sender) {
                     NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
@@ -65,7 +81,7 @@ public class MidiNotePacketHandler {
             // Process Listeners and Sculk
             if(!message.isControlPacket() && message.velocity > 0) {
                 List<EntityNoteResponsiveTile> potentialEntities = ENTITY_CACHE_MAP.computeIfAbsent(
-                    message.pos,
+                    packetCacheKey,
                     (key) -> {
                         List<EntityNoteResponsiveTile> newEntities = getPotentialEntities(worldIn, message.pos, getQueryBoxRange(false));
                         worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, message.pos, GameEvent.Context.of(worldIn.getBlockState(message.pos)));

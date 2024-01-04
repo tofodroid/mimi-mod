@@ -56,4 +56,10 @@ public abstract class BaseWidget {
         );
     }
 
+    protected String truncateString(Font font, String source, Integer maxWidth) {
+        if(source == null || font.width(source) <= maxWidth) {
+            return source;
+        }
+        return font.plainSubstrByWidth("..." + source, maxWidth).substring(3) + "...";
+    }
 }

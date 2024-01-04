@@ -74,13 +74,11 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
-                if(!tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
+                if(!tileInstrument.equals(getTileInstrumentForEntity(player)) && EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player)) {
+                    tileInstrument.setCurrentPlayer(player);
                 }
-            } else if(worldIn.isClientSide) {
-                if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
-                }
+            } else if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
+                ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
             }
         }
 

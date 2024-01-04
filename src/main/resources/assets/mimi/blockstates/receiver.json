@@ -1,7 +1,10 @@
 {
     "variants": {
-        "": {
+        "power=0": {
             "model": "mimi:block/receiver"
+        },
+        "power=15": {
+            "model": "mimi:block/receiver_lit"
         }
     }
 }

@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitter;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.AServerMusicTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,7 +24,7 @@ public class TransmitterControlPacketHandler {
     }
     
     public static void handlePacketServer(final TransmitterControlPacket message, ServerPlayer sender) {
-        ServerMusicTransmitter musicPlayer = ServerMusicTransmitterManager.getMusicPlayer(message.transmitterId);
+        AServerMusicTransmitter musicPlayer = ServerMusicTransmitterManager.getMusicPlayer(message.transmitterId);
         Boolean shouldRefreshSongs = false;
 
         if(musicPlayer != null) {
@@ -78,7 +78,7 @@ public class TransmitterControlPacketHandler {
         }
     }
 
-    public static void sendResponsePackets(Boolean songListPacket, UUID musicPlayerId, ServerPlayer sender, ServerMusicTransmitter player) {
+    public static void sendResponsePackets(Boolean songListPacket, UUID musicPlayerId, ServerPlayer sender, AServerMusicTransmitter player) {
         NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), player.getStatus());
 
         if(songListPacket) {

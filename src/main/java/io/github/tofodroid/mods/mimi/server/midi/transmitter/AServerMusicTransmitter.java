@@ -10,32 +10,20 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.midi.IMidiFileProvider.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
-import net.minecraft.server.level.ServerPlayer;
 
-public class ServerMusicTransmitter implements AutoCloseable {
-    private UUID id;
-    private Boolean loading = false;
-    private Boolean loadFailed = false;
-    private Boolean shouldPlayNextLoad = false;
-    private MidiHandler midiHandler;
-    private APlaylistHandler playlistHandler;
-    
-    public ServerMusicTransmitter(TileTransmitter tile) {
-        this.id = tile.getUUID();
-        this.playlistHandler = new TileTransmitterPlaylistHandler(tile);
-        this.midiHandler = new MidiHandler(tile, this::onSongEnd);
-        this.refreshSongs();
+public abstract class AServerMusicTransmitter implements AutoCloseable {
+    protected UUID id;
+    protected Boolean loading = false;
+    protected Boolean loadFailed = false;
+    protected Boolean shouldPlayNextLoad = false;
+    protected MidiHandler midiHandler;
+    protected APlaylistHandler playlistHandler;
 
-        if(this.playlistHandler.getSelectedSongInfo() != null) {
-            this.loadSong(this.playlistHandler.getSelectedSongInfo());
-        }
+    public AServerMusicTransmitter(UUID id) {
+        this.id = id;
     }
 
-    public ServerMusicTransmitter(ServerPlayer player) {
-        this.id = player.getUUID();
-        this.playlistHandler = new PlayerPlaylistHandler(player);
-        this.midiHandler = new MidiHandler(player, this::onSongEnd);
+    public void onLoad() {
         this.refreshSongs();
 
         if(this.playlistHandler.getSelectedSongInfo() != null) {
@@ -134,7 +122,12 @@ public class ServerMusicTransmitter implements AutoCloseable {
 
     @Override
     public void close() {
+        this.midiHandler.stop();
         this.midiHandler.close();
+    }
+
+    public void allNotesOff() {
+        this.midiHandler.allNotesOff();
     }
 
     public ServerMusicPlayerStatusPacket getStatus() {
@@ -161,6 +154,7 @@ public class ServerMusicTransmitter implements AutoCloseable {
     public void startLoadSequence(BasicMidiInfo info) {
         this.loading = true;
         this.loadFailed = false;
+        this.shouldPlayNextLoad = this.shouldPlayNextLoad || this.midiHandler.isPlaying();
 
         if(info.serverMidi) {
             this.loading = false;
@@ -198,6 +192,7 @@ public class ServerMusicTransmitter implements AutoCloseable {
 
             if(this.shouldPlayNextLoad) {
                 this.play();
+                this.shouldPlayNextLoad = false;
             }
         }
     }

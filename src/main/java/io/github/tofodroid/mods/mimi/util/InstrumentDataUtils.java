@@ -29,10 +29,11 @@ public abstract class InstrumentDataUtils {
     public static final String INSTRUMENT_TAG = "filter_instrument";
     public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
     public static final String VOLUME_TAG = "instrument_volume";
+    public static final String TRANSMITTER_SOURCE_PREFIX = ";T;";
     public static final Byte INSTRUMENT_ALL = -1;
-    public static final Byte MAX_INSTRUMENT_VOLUME = 5;
+    public static final Byte MAX_INSTRUMENT_VOLUME = 10;
     public static final Integer PERCUSSION_BANK = 120;
-    public static final Byte DEFAULT_INSTRUMENT_VOLUME = 3;
+    public static final Byte DEFAULT_INSTRUMENT_VOLUME = 5;
     public static final Byte MIN_INSTRUMENT_VOLUME = 0;
     public static final Integer ALL_CHANNELS_INT = 65535;
     public static final Integer NONE_CHANNELS_INT = 0;
@@ -59,6 +60,10 @@ public abstract class InstrumentDataUtils {
         return INSTRUMENT_NAME_MAP;
     }
 
+    public static void setMidiSourceFromTransmitter(ItemStack stack,UUID sourceId, String sourceName) {
+        setMidiSource(stack, sourceId, TRANSMITTER_SOURCE_PREFIX + sourceName);
+    }
+
     public static void setMidiSource(ItemStack stack, UUID sourceId, String sourceName) {
         if (sourceId != null) {
             stack.getOrCreateTag().putUUID(SOURCE_TAG, sourceId);
@@ -77,13 +82,19 @@ public abstract class InstrumentDataUtils {
         return TagUtils.getUUIDOrDefault(stack, SOURCE_TAG, null);
     }
 
+    public static Boolean getMidiSourceIsTransmitter(ItemStack stack) {
+        return TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "").startsWith(TRANSMITTER_SOURCE_PREFIX);
+    }
+
     public static String getMidiSourceName(ItemStack stack) {
         UUID sourceId = getMidiSource(stack);
 
         if(sourceId == null) {
             return "None";
         }
-        return TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "Unknown");
+
+        String name = TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "Unknown");
+        return name.replaceFirst(TRANSMITTER_SOURCE_PREFIX, "");
     }
 
     public static void setEnabledChannelsInt(ItemStack stack, Integer enabledChannels) {
@@ -248,12 +259,7 @@ public abstract class InstrumentDataUtils {
     }
 
     public static Byte getInstrumentVolume(ItemStack stack) {
-        return TagUtils.getByteOrDefault(stack, BROADCAST_NOTE_TAG, DEFAULT_INSTRUMENT_VOLUME);
-    }
-
-    public static String getInstrumentVolumePercent(ItemStack stack) {
-        Integer value = Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * 10).intValue());
-        return value == 10 ? value.toString() : "0" + value.toString();
+        return TagUtils.getByteOrDefault(stack, VOLUME_TAG, DEFAULT_INSTRUMENT_VOLUME);
     }
 
     public static Byte applyVolume(ItemStack stack, Byte sourceVelocity) {
@@ -408,10 +414,11 @@ public abstract class InstrumentDataUtils {
         }
 
         // Note Source
-        tooltip.add(Component.literal("  Play Notes From: " + getMidiSourceName(stack)).withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.literal("  Play Notes From: " + (getMidiSourceIsTransmitter(stack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.literal("  " + getMidiSourceName(stack)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
 
         // Instrument Volume
-        tooltip.add(Component.literal("  Volume: " + getInstrumentVolumePercent(stack)).withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.literal("  Volume: " + getInstrumentVolume(stack)).withStyle(ChatFormatting.GREEN));
 
         // MIDI Device Input
         if(getSysInput(stack)) {

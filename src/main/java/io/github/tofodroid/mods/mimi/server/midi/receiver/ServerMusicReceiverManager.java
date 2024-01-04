@@ -23,6 +23,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -50,17 +54,24 @@ public class ServerMusicReceiverManager {
 
     @SuppressWarnings("null")
     public static void loadMechanicalMaestroInstrumentReceivers(TileMechanicalMaestro tile) {
+        if(!(tile.getLevel() instanceof ServerLevel)) {
+            return;
+        }
+
         List<InstrumentMusicReceiver> receivers = new ArrayList<>();
+
         tile.getInstrumentStacks().forEach(instrumentStack -> {
             if(tile.getLevel() != null && instrumentStack != null && InstrumentDataUtils.getMidiSource(instrumentStack) != null) {
-                receivers.add(new InstrumentMusicReceiver(
-                    tile.getBlockPos(),
-                    tile.getLevel().dimension(),
+                InstrumentMusicReceiver newReceiver = new InstrumentMusicReceiver(
+                    tile::getBlockPos,
+                    () -> tile.getLevel().dimension(),
                     TileMechanicalMaestro.MECH_SOURCE_ID,
                     instrumentStack
-                ));
+                );
+                receivers.add(newReceiver);
             }
         });
+        allNotesOffRemovedInstrumentRecievers(receivers, tile.getUUID(), (ServerLevel)tile.getLevel());
 
         if(!receivers.isEmpty()) {
             OWNED_RECEIVERS.put(tile.getUUID(), receivers);
@@ -70,26 +81,42 @@ public class ServerMusicReceiverManager {
     }
 
     public static void loadEntityInstrumentReceivers(LivingEntity entity) {
-        List<InstrumentMusicReceiver> receivers = new ArrayList<>();        
+        if(!(entity.level() instanceof ServerLevel)) {
+            return;
+        }
+
+        List<InstrumentMusicReceiver> receivers = new ArrayList<>();
+
         ENTITY_INSTRUMENT_ITER.forEach(hand -> {
             ItemStack instrumentStack = hand != null ? 
                 ItemInstrumentHandheld.getEntityHeldInstrumentStack(entity, hand) : 
                 BlockInstrument.getTileInstrumentStackForEntity(entity);
             
             if(entity.level() != null && instrumentStack != null && InstrumentDataUtils.getMidiSource(instrumentStack) != null) {
-                receivers.add(new InstrumentMusicReceiver(
-                    entity.getOnPos(),
-                    entity.level().dimension(),
+                InstrumentMusicReceiver newReceiver = new InstrumentMusicReceiver(
+                    entity::getOnPos,
+                    () -> entity.level().dimension(),
                     entity.getUUID(),
                     instrumentStack
-                ));
+                );
+                receivers.add(newReceiver);
             }
         });
-        
+        allNotesOffRemovedInstrumentRecievers(receivers, entity.getUUID(), (ServerLevel)entity.level());
+
         if(!receivers.isEmpty()) {
             OWNED_RECEIVERS.put(entity.getUUID(), receivers);
         } else {
             OWNED_RECEIVERS.remove(entity.getUUID());
+        }
+    }
+
+    public static void allNotesOffRemovedInstrumentRecievers(List<InstrumentMusicReceiver> newRecievers, UUID ownerId, ServerLevel ownerLevel) {
+        List<? extends AMusicReceiver> oldReceivers = OWNED_RECEIVERS.get(ownerId);
+
+        if(oldReceivers != null) {
+            oldReceivers.stream()
+                .forEach(r -> ((InstrumentMusicReceiver)r).allNotesOff(ownerLevel));
         }
     }
     
@@ -110,6 +137,66 @@ public class ServerMusicReceiverManager {
     public static void removeReceivers(UUID id) {
         OWNED_RECEIVERS.remove(id);
     }
+
+    @SubscribeEvent
+    public static void onLivingEquipmentChange(LivingEquipmentChangeEvent event) {
+        if(!(event.getEntity().level() instanceof ServerLevel)) {
+            return;
+        }
+
+        if(event.getFrom().getItem() instanceof ItemInstrumentHandheld || event.getTo().getItem() instanceof ItemInstrumentHandheld) {
+            loadEntityInstrumentReceivers(event.getEntity());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingDeath(LivingDeathEvent event) {
+        if(!(event.getEntity().level() instanceof ServerLevel)) {
+            return;
+        }
+        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
+    }
+
+    @SubscribeEvent
+    public static void onEntityTeleport(EntityTeleportEvent event) {
+        if(!(event.getEntity().level() instanceof ServerLevel)) {
+            return;
+        }
+        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
+    }
+    
+    @SubscribeEvent
+    public static void onEntityChangeDimension(EntityTravelToDimensionEvent event) {
+        if(!(event.getEntity().level() instanceof ServerLevel) || !(event.getEntity() instanceof LivingEntity)) {
+            return;
+        }
+        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
+        removeReceivers(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        loadEntityInstrumentReceivers(event.getEntity());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
+            return;
+        }
+        loadEntityInstrumentReceivers(event.getEntity());
+    }
     
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent event) {
@@ -120,13 +207,6 @@ public class ServerMusicReceiverManager {
             SOURCE_LINKED_RECEIVERS.clear();
             return;
         }
-
-        // Identify player receivers
-        event.getServer().getPlayerList().getPlayers().stream().forEach(player -> {
-            if(player != null) {
-                loadEntityInstrumentReceivers(player);
-            }
-        });
         
         // Identify linked receivers
         SOURCE_LINKED_RECEIVERS.clear();
@@ -141,16 +221,18 @@ public class ServerMusicReceiverManager {
     }
 
     @SubscribeEvent
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
-        }
-        removeReceivers(event.getEntity().getUUID());
-    }
-
-    @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         OWNED_RECEIVERS.clear();
         SOURCE_LINKED_RECEIVERS.clear();
+    }
+
+    public static void allInstrumentReceiverNotesOff(UUID ownerId, ServerLevel ownerLevel) {
+        List<? extends AMusicReceiver> recievers = OWNED_RECEIVERS.get(ownerId);
+
+        if(recievers != null && !recievers.isEmpty()) {
+            recievers.stream()
+                .filter(r -> r instanceof InstrumentMusicReceiver)
+                .forEach(r -> ((InstrumentMusicReceiver)r).allNotesOff(ownerLevel));
+        }
     }
 }

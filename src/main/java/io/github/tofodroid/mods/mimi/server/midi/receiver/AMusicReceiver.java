@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.server.midi.receiver;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import net.minecraft.core.BlockPos;
@@ -9,11 +10,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 public abstract class AMusicReceiver {
-    private UUID linkedId;
-    private BlockPos blockPos;
-    private ResourceKey<Level> dimension;
+    protected UUID linkedId;
+    protected Supplier<BlockPos> blockPos;
+    protected Supplier<ResourceKey<Level>> dimension;
 
-    public AMusicReceiver(UUID linkedId, BlockPos pos, ResourceKey<Level> dim) {
+    public AMusicReceiver(UUID linkedId, Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim) {
         this.linkedId = linkedId;
         this.blockPos = pos;
         this.dimension = dim;
@@ -29,15 +30,6 @@ public abstract class AMusicReceiver {
         }
     }
     
-
-    protected BlockPos getPos() {
-        return this.blockPos;
-    }
-
-    protected ResourceKey<Level> getDimension() {
-        return this.dimension;
-    }
-
     protected abstract Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
     protected abstract void doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
 }

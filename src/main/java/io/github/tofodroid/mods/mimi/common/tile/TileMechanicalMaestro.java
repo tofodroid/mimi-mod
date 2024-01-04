@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
@@ -15,21 +17,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileMechanicalMaestro extends AContainerTile implements BlockEntityTicker<TileMechanicalMaestro> {
+public class TileMechanicalMaestro extends AContainerTile {
     public static final UUID MECH_SOURCE_ID = new UUID(0,3);
 
     private UUID id;
 
     public TileMechanicalMaestro(BlockPos pos, BlockState state) {
         super(ModTiles.MECHANICALMAESTRO, pos, state, 3);
-    }
-
-    public static void doTick(Level world, BlockPos pos, BlockState state, TileMechanicalMaestro self) {
-        self.tick(world, pos, state, self);
     }
     
     public UUID getUUID() {
@@ -59,12 +55,14 @@ public class TileMechanicalMaestro extends AContainerTile implements BlockEntity
         }
 
         super.setItem(i, item);
+        this.refreshMidiReceivers();
     }
 
     @Override
     public ItemStack removeItem(int i, int count) {
         ItemStack result = super.removeItem(i, count);
         this.allNotesOff(((IInstrumentItem)result.getItem()).getInstrumentId());
+        this.refreshMidiReceivers();
         return result;
     }
 
@@ -72,6 +70,7 @@ public class TileMechanicalMaestro extends AContainerTile implements BlockEntity
     public ItemStack removeItemNoUpdate(int i) {
         ItemStack result = super.removeItemNoUpdate(i);
         this.allNotesOff(((IInstrumentItem)result.getItem()).getInstrumentId());
+        this.refreshMidiReceivers();
         return result;
     }
     
@@ -79,15 +78,23 @@ public class TileMechanicalMaestro extends AContainerTile implements BlockEntity
     public void clearContent() {
         this.allNotesOff();
         super.clearContent();
+        ServerMusicReceiverManager.removeReceivers(this.getUUID());
     }
-    
+
     @Override
+    public void onAddedToLevel() {
+        this.refreshMidiReceivers();
+    }
+
     @SuppressWarnings("null")
-    public void tick(Level world, BlockPos pos, BlockState state, TileMechanicalMaestro self) {
-        if(this.hasAnInstrument() && this.getLevel().hasNeighborSignal(this.getBlockPos())) {
-            ServerMusicReceiverManager.loadMechanicalMaestroInstrumentReceivers(self);
-        } else {
-            ServerMusicReceiverManager.removeReceivers(self.getUUID());
+    public void refreshMidiReceivers() {
+        if(this.hasLevel() && !this.level.isClientSide) {
+            MIMIMod.LOGGER.info("Mech Maestro refresh");
+            if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
+                ServerMusicReceiverManager.loadMechanicalMaestroInstrumentReceivers(this);
+            } else {
+                ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            }
         }
     }
 

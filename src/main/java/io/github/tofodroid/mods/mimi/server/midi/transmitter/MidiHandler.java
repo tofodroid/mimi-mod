@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
-import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Track;
@@ -15,6 +14,7 @@ import io.github.tofodroid.com.sun.media.sound.RealTimeSequencerProvider;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
+import io.github.tofodroid.mods.mimi.server.midi.AServerMidiInputReceiver;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 import net.minecraft.world.entity.player.Player;
 
@@ -33,7 +33,7 @@ public class MidiHandler {
 
     // Midi System
     private Sequencer activeSequencer;
-    private Receiver activeReceiver;
+    private AServerMidiInputReceiver activeReceiver;
     private Transmitter activeTransmitter;
 
     public MidiHandler(TileTransmitter tile, Runnable sequenceEndCallback) {
@@ -44,7 +44,7 @@ public class MidiHandler {
         this(new PlayerTransmitterMidiReceiver(player), sequenceEndCallback);
     }
 
-    protected MidiHandler(Receiver receiver, Runnable sequenceEndCallback) {
+    protected MidiHandler(AServerMidiInputReceiver receiver, Runnable sequenceEndCallback) {
         this.activeReceiver = receiver;
         this.sequenceEndCallback = sequenceEndCallback;
         initializeSequencer();
@@ -101,6 +101,12 @@ public class MidiHandler {
         return this.channelMapping;
     }
 
+    public void allNotesOff() {
+        if(this.activeReceiver != null) {
+            this.activeReceiver.sendTransmitterAllNotesOffPacket();
+        }
+    }
+
     public void load(BasicMidiInfo info, Sequence sequence) {
         Boolean wasPlaying = this.isPlaying();
         this.stop();
@@ -146,6 +152,10 @@ public class MidiHandler {
             this.pausedMicrosecond = this.activeSequencer.getMicrosecondPosition();;
             this.activeSequencer.stop();
         }
+
+        if(this.activeReceiver != null) {
+            this.activeReceiver.sendTransmitterAllNotesOffPacket();
+        }
     }
     
     public void stop() {
@@ -156,6 +166,10 @@ public class MidiHandler {
         if(this.activeSequencer != null) {
             this.activeSequencer.stop();
             this.activeSequencer.setTickPosition(0);
+        }
+
+        if(this.activeReceiver != null) {
+            this.activeReceiver.sendTransmitterAllNotesOffPacket();
         }
     }
     
@@ -171,6 +185,7 @@ public class MidiHandler {
         }
 
         if(this.activeReceiver != null) {
+            this.activeReceiver.sendTransmitterAllNotesOffPacket();
             this.activeReceiver.close();
             this.activeReceiver = null;
         }
@@ -215,6 +230,7 @@ public class MidiHandler {
                 @Override
                 public void meta(MetaMessage meta) {
                     if(MidiUtils.isMetaEndOfTrack(meta) && !activeSequencer.isRunning()) {
+                        self.stop();
                         self.sequenceEndCallback.run();
                     } else if(MidiUtils.isMetaTempo(meta) | (meta.getType() == 81 && meta.getData().length == 3)) {
                         byte[] data = meta.getData();

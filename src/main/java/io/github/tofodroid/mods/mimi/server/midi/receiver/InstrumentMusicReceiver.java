@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.server.midi.receiver;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
@@ -15,15 +16,15 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class InstrumentMusicReceiver extends AMusicReceiver {
-    private Byte instrumentId;
-    private UUID notePlayerId;
+    protected Byte instrumentId;
+    protected UUID notePlayerId;
     protected Integer enabledChannels;
     protected List<Byte> filteredNotes;
     protected Byte filteredInstrument;
     protected Boolean invertFilterNoteOct;
     protected Boolean invertFilterInstrument;
 
-    public InstrumentMusicReceiver(BlockPos pos, ResourceKey<Level> dim, UUID notePlayerId, ItemStack instrumentStack) {
+    public InstrumentMusicReceiver(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim, UUID notePlayerId, ItemStack instrumentStack) {
         super(InstrumentDataUtils.getMidiSource(instrumentStack), pos, dim);
         this.notePlayerId = notePlayerId;
         this.instrumentId = InstrumentDataUtils.getInstrumentId(instrumentStack);
@@ -34,9 +35,32 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
         this.invertFilterNoteOct = InstrumentDataUtils.getInvertNoteOct(instrumentStack);
     }
 
+    public void allNotesOff(ServerLevel sourceLevel) {
+        ServerLifecycleHooks.getCurrentServer().execute(
+            () -> MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(instrumentId, notePlayerId, this.blockPos.get()), sourceLevel, null)
+        );
+    }
+
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        return Math.abs(Math.sqrt(sourcePos.distSqr(getPos()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(getDimension()) && InstrumentDataUtils.isChannelEnabled(this.enabledChannels, packet.channel);
+        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get()) && InstrumentDataUtils.isChannelEnabled(this.enabledChannels, packet.channel);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(other instanceof InstrumentMusicReceiver) {
+            InstrumentMusicReceiver o = (InstrumentMusicReceiver) other;
+
+            return o.linkedId.equals(this.linkedId) &&
+                o.instrumentId == this.instrumentId &&
+                o.enabledChannels == this.enabledChannels &&
+                o.filteredNotes.equals(this.filteredNotes) &&
+                o.filteredInstrument == this.filteredInstrument &&
+                o.invertFilterNoteOct == this.invertFilterNoteOct &&
+                o.invertFilterInstrument == this.invertFilterInstrument;
+        }
+        
+        return false;
     }
 
     @Override
@@ -44,9 +68,9 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
         MidiNotePacket notePacket;
 
         if(packet.isControlEvent()) {
-            notePacket = MidiNotePacket.createControlPacket(packet.getControllerNumber(), packet.getControllerValue(), instrumentId, notePlayerId, getPos(), packet.noteServerTime);
+            notePacket = MidiNotePacket.createControlPacket(packet.getControllerNumber(), packet.getControllerValue(), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime);
         } else {
-            notePacket = MidiNotePacket.createNotePacket(packet.note, packet.velocity, instrumentId, notePlayerId, getPos(), packet.noteServerTime);
+            notePacket = MidiNotePacket.createNotePacket(packet.note, packet.velocity, instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime);
         }
 
         ServerLifecycleHooks.getCurrentServer().execute(
