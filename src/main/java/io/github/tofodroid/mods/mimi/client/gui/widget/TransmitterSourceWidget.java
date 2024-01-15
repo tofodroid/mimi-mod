@@ -32,7 +32,7 @@ public class TransmitterSourceWidget extends BaseWidget {
         if(source == null) {
             graphics.drawString(font, "None", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
         } else {
-            String sourceName = InstrumentDataUtils.getMidiSourceName(this.midiStack);
+            String sourceName = InstrumentDataUtils.getMidiSourceName(this.midiStack, true);
             Boolean isTransmitter = InstrumentDataUtils.getMidiSourceIsTransmitter(this.midiStack);
 
             graphics.drawString(font, isTransmitter ? "Transmitter:" : "Player:", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);

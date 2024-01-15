@@ -28,7 +28,7 @@ public class SyncInstrumentPacket {
 
     public SyncInstrumentPacket(ItemStack instrumentStack, InteractionHand handIn) {
         this.midiSource = InstrumentDataUtils.getMidiSource(instrumentStack);
-        this.midiSourceName = InstrumentDataUtils.getMidiSourceName(instrumentStack);
+        this.midiSourceName = InstrumentDataUtils.getMidiSourceName(instrumentStack, false);
         this.enabledChannelsInt = InstrumentDataUtils.getEnabledChannelsInt(instrumentStack);
         this.sysInput = InstrumentDataUtils.getSysInput(instrumentStack);
         this.volume = InstrumentDataUtils.getInstrumentVolume(instrumentStack);

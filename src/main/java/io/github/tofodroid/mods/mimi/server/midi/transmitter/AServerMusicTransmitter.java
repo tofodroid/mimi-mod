@@ -63,14 +63,18 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
     }
     
     public void onSongEnd() {
+        MIMIMod.LOGGER.info("Song end...");
         switch(this.playlistHandler.getLoopMode()) {
             case ALL:
                 this.next();
                 this.shouldPlayNextLoad = true;
+                break;
             case SINGLE:
                 this.play();
+                break;
             default:
                 this.stop();
+                break;
         }
     }
 

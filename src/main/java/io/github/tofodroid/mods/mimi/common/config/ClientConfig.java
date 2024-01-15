@@ -36,9 +36,15 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
 
+    // DEBUG
+    public ForgeConfigSpec.IntValue blockColor;
+
 
     public ClientConfig(ForgeConfigSpec.Builder builder) {
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
+        blockColor = builder.comment("Debug: BlockColor")
+            .translation(MIMIMod.MODID + ".config.debug.blockColor")
+            .defineInRange("blockColor", 0, 0, Integer.MAX_VALUE);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
             .translation(MIMIMod.MODID + ".config.instrument.keyboard.layout")
             .defineEnum("instrumentKeyboardLayout", KEYBOARD_LAYOUTS.MIMI);

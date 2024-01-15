@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=south": { "model": "mimi:block/organ" },
-    "facing=west": { "model": "mimi:block/organ", "y": 90 },
-    "facing=north": { "model": "mimi:block/organ", "y": 180 },
-    "facing=east": { "model": "mimi:block/organ", "y": 270 }
+    "facing=south": { "model": "mimi:block/instruments/organ" },
+    "facing=west": { "model": "mimi:block/instruments/organ", "y": 90 },
+    "facing=north": { "model": "mimi:block/instruments/organ", "y": 180 },
+    "facing=east": { "model": "mimi:block/instruments/organ", "y": 270 }
   }
 }

@@ -44,8 +44,8 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     }
 
     @Override
-    public Boolean isDyeable() {
-        return spec.isDyeable();
+    public Boolean isColorable() {
+        return spec.isColorable();
     }
 
     @Override

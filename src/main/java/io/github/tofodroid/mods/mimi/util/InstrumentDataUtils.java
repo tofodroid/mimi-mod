@@ -86,7 +86,7 @@ public abstract class InstrumentDataUtils {
         return TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "").startsWith(TRANSMITTER_SOURCE_PREFIX);
     }
 
-    public static String getMidiSourceName(ItemStack stack) {
+    public static String getMidiSourceName(ItemStack stack, Boolean forDisplay) {
         UUID sourceId = getMidiSource(stack);
 
         if(sourceId == null) {
@@ -94,7 +94,7 @@ public abstract class InstrumentDataUtils {
         }
 
         String name = TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "Unknown");
-        return name.replaceFirst(TRANSMITTER_SOURCE_PREFIX, "");
+        return forDisplay ? name.replaceFirst(TRANSMITTER_SOURCE_PREFIX, "") : name;
     }
 
     public static void setEnabledChannelsInt(ItemStack stack, Integer enabledChannels) {
@@ -263,7 +263,11 @@ public abstract class InstrumentDataUtils {
     }
 
     public static Byte applyVolume(ItemStack stack, Byte sourceVelocity) {
-        return Integer.valueOf(Double.valueOf((Double.valueOf(getInstrumentVolume(stack)) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
+        return applyVolume(getInstrumentVolume(stack), sourceVelocity);
+    }
+
+    public static Byte applyVolume(Byte volume, Byte sourceVelocity) {
+        return Integer.valueOf(Double.valueOf((Double.valueOf(volume) / Double.valueOf(MAX_INSTRUMENT_VOLUME)) * sourceVelocity).intValue()).byteValue();
     }
 
     public static String getInstrumentName(Byte instrumentId) {
@@ -415,7 +419,7 @@ public abstract class InstrumentDataUtils {
 
         // Note Source
         tooltip.add(Component.literal("  Play Notes From: " + (getMidiSourceIsTransmitter(stack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.literal("  " + getMidiSourceName(stack)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        tooltip.add(Component.literal("  " + getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
 
         // Instrument Volume
         tooltip.add(Component.literal("  Volume: " + getInstrumentVolume(stack)).withStyle(ChatFormatting.GREEN));

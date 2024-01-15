@@ -66,7 +66,8 @@ public class ServerMusicReceiverManager {
                     tile::getBlockPos,
                     () -> tile.getLevel().dimension(),
                     TileMechanicalMaestro.MECH_SOURCE_ID,
-                    instrumentStack
+                    instrumentStack,
+                    null
                 );
                 receivers.add(newReceiver);
             }
@@ -97,7 +98,8 @@ public class ServerMusicReceiverManager {
                     entity::getOnPos,
                     () -> entity.level().dimension(),
                     entity.getUUID(),
-                    instrumentStack
+                    instrumentStack,
+                    hand
                 );
                 receivers.add(newReceiver);
             }

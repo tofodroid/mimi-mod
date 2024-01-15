@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
@@ -9,6 +10,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -41,6 +43,11 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
         return super.use(state, worldIn, pos, player, hand, hit);
     }
     
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return super.getStateForPlacement(context).setValue(POWERED, Boolean.valueOf(context.getLevel().hasNeighborSignal(context.getClickedPos())));
+    }
+        
     @Override
     public BlockEntityType<TileMechanicalMaestro> getTileType() {
         return ModTiles.MECHANICALMAESTRO;

@@ -1,10 +1,10 @@
 {
     "variants": {
-        "power=0": {
-            "model": "mimi:block/transmitterblock"
+        "powered=false": {
+            "model": "mimi:block/midi/transmitterblock"
         },
-        "power=15": {
-            "model": "mimi:block/transmitterblock_lit"
+        "powered=true": {
+            "model": "mimi:block/midi/transmitterblock_lit"
         }
     }
 }

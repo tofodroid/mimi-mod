@@ -117,7 +117,7 @@ public class TileMechanicalMaestro extends AContainerTile {
     public void allNotesOff(Byte instrumentId) {
 		if(instrumentId != null && this.getLevel() instanceof ServerLevel) {
 			MidiNotePacketHandler.handlePacketServer(
-                MidiNotePacket.createAllNotesOffPacket(instrumentId, TileMechanicalMaestro.MECH_SOURCE_ID, this.getBlockPos()),
+                MidiNotePacket.createAllNotesOffPacket(instrumentId, TileMechanicalMaestro.MECH_SOURCE_ID, this.getBlockPos(), null),
                 (ServerLevel)this.getLevel(),
                 null
             );

@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "powered=true": {
+            "model": "mimi:block/ledcube/ledcube_b_on"
+        },
+        "powered=false": {
+            "model": "mimi:block/ledcube/ledcube_b_off"
+        }
+    }
+}

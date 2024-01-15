@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,18 +17,18 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiPowerSourceTile> extends AConfigurableMidiBlock<B> {
-    public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
 
     public APoweredConfigurableMidiBlock(Properties builder) {
-        this(builder, 0, false);
+        this(builder, false, false);
     }
 
-    public APoweredConfigurableMidiBlock(Properties builder, Integer defaultPowerLevel, Boolean defaultTriggeredState) {
+    public APoweredConfigurableMidiBlock(Properties builder, Boolean defaultPowerState, Boolean defaultTriggeredState) {
         super(builder);
         this.registerDefaultState(
             this.stateDefinition.any()
-                .setValue(POWER, defaultPowerLevel)
+                .setValue(POWERED, defaultPowerState)
                 .setValue(TRIGGERED, defaultTriggeredState)
         );
     }
@@ -40,17 +41,12 @@ public abstract class APoweredConfigurableMidiBlock<B extends AConfigurableMidiP
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWER, TRIGGERED);
+        state.add(POWERED, TRIGGERED);
     }
     
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
-    }
-    
-    @Override
-    public int getDirectSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
+        return state.getValue(POWERED) ? 15 : 0;
     }
 
     @Override

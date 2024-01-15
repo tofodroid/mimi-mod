@@ -54,8 +54,8 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     }
 
     @Override
-    public Boolean isDyeable() {
-        return this.spec.isDyeable();
+    public Boolean isColorable() {
+        return this.spec.isColorable();
     }
 
     @Override
@@ -89,14 +89,14 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
                 InstrumentDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
                 user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
-                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos()), (ServerLevel)user.level(), null);
+                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.level(), null);
             }
              return InteractionResult.CONSUME;
         } else if(target instanceof Mob) {
             if(!user.level().isClientSide && Arrays.asList(ModConfigs.COMMON.allowedInstrumentMobs.get().split(",")).contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
                 user.setItemInHand(handIn, ItemStack.EMPTY);
                 target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
-                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos()), (ServerLevel)user.level(), null);
+                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.level(), null);
             }
             return InteractionResult.CONSUME;
         }

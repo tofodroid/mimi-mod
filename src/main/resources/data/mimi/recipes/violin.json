@@ -1,25 +1,19 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "BSI",
-        "SN ",
-        "PP "
+        "BP ",
+        "PN ",
+        "  P"
     ],
     "key": {
         "N": {
             "item": "minecraft:note_block"
-        },
-        "S": {
-            "item": "minecraft:string"
         },
         "B": {
             "item": "minecraft:bow"
         },
         "P": {
             "tag": "minecraft:planks"
-        },
-        "I": {
-            "item": "minecraft:iron_ingot"
         }
     },
     "result": {

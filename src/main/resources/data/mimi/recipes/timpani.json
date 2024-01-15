@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "LLL",
+        "CNC",
+        " B "
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "L": {
+            "item": "minecraft:leather"
+        },
+        "C": {
+            "item": "minecraft:copper_ingot"
+        },
+        "B": {
+            "item": "minecraft:stone_button"
+        }
+    },
+    "result": {
+        "item": "mimi:timpani"
+    }
+}

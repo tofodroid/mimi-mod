@@ -1,3 +1,3 @@
 {
-    "parent": "mimi:block/harpsichord"
+    "parent": "mimi:block/instruments/harpsichord"
 }

@@ -68,7 +68,7 @@ public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
 
         // Note Source
         tooltip.add(Component.literal("  Recieve Notes From: " + (InstrumentDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.literal("  " + InstrumentDataUtils.getMidiSourceName(blockItemStack)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        tooltip.add(Component.literal("  " + InstrumentDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
 
 
         // Filter Note

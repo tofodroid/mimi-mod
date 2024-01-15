@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,7 +29,11 @@ public class ItemEnderTransmitter extends Item {
     @Override
     public boolean isFoil(ItemStack stack) {
         if(MIMIMod.proxy.isClient()) {
-           
+            ServerMusicPlayerStatusPacket status = ((ClientProxy)MIMIMod.proxy).getMidiData().getPlayerStatusPacket();
+            
+            if(status != null) {
+                return status.isPlaying;
+            }
         }
         return false;
     }

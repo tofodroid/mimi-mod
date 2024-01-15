@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.block.APoweredConfigurableMidiBlock;
 import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.core.BlockPos;
@@ -35,8 +34,8 @@ public class TileTransmitter extends AConfigurableMidiTile {
         // Create music player for existing tiles from world save
         if(!this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {
             ServerMusicTransmitterManager.createTransmitter(this);
-            this.setUnpowered();
         }
+        this.setUnpowered();
     }
 
     @Override
@@ -53,23 +52,23 @@ public class TileTransmitter extends AConfigurableMidiTile {
     }
 
     public Boolean isPowered() {
-        return this.getBlockState().getValue(BlockTransmitter.POWER) > 0;
+        return this.getBlockState().getValue(BlockTransmitter.POWERED);
     }
 
     public void setPowered() {
-        this.setPowerAndUpdate(15);
+        this.setPowerAndUpdate(true);
     }
 
     public void setUnpowered() {
-        this.setPowerAndUpdate(0);
+        this.setPowerAndUpdate(false);
     }
 
     @SuppressWarnings("null")
-    protected void setPowerAndUpdate(Integer power) {
+    protected void setPowerAndUpdate(Boolean powered) {
         this.getLevel().setBlockAndUpdate(
             getBlockPos(), 
             getBlockState()
-                .setValue(APoweredConfigurableMidiBlock.POWER, power)
+                .setValue(BlockTransmitter.POWERED, powered)
         );
         
         for(Direction direction : Direction.values()) {

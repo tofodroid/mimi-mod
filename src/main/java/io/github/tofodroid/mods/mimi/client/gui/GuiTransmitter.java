@@ -60,6 +60,10 @@ public class GuiTransmitter extends BaseGui {
         this.musicStatus = new ServerMusicPlayerStatusPacket(musicPlayerId);
         this.songList = new ServerMusicPlayerSongListPacket(musicPlayerId);
     }
+
+    public UUID getMusicPlayerId() {
+        return this.musicPlayerId;
+    }
     
     @Override
     public void init() {

@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import org.joml.Vector3d;
-
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
@@ -74,8 +72,8 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
-                if(!tileInstrument.equals(getTileInstrumentForEntity(player)) && EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player)) {
-                    tileInstrument.setCurrentPlayer(player);
+                if(player.getVehicle() == null) {
+                    tileInstrument.attemptSit(player);
                 }
             } else if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
                 ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
@@ -98,6 +96,22 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
         state.add(DIRECTION, WATERLOGGED);
+    }
+    
+    @Override
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        super.onRemove(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
+        TileInstrument tileInstrument = getter.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
+        
+        if(tileInstrument != null) {
+            return tileInstrument.getInstrumentStack();
+        }
+
+        return super.getCloneItemStack(getter, pos, state);
     }
     
     @Override
@@ -152,8 +166,8 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         return Arrays.asList();
     }
 
-    public Boolean isDyeable() {
-        return this.spec.isDyeable();
+    public Boolean isColorable() {
+        return this.spec.isColorable();
     }
 
     public Integer getDefaultColor() {
@@ -170,21 +184,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     public String getDefaultChannels() {
         return this.defaultChannels;
-    }
-
-    protected Vector3d getSeatOffset(BlockState state) {
-        switch(state.getValue(DIRECTION)) {
-            case NORTH:
-                return new Vector3d(0.5, 0, 0.05);
-            case SOUTH:
-                return new Vector3d(0.5, 0, 0.95);
-            case EAST:
-                return new Vector3d(0.95, 0, 0.5);
-            case WEST:
-                return new Vector3d(0.05, 0, 0.5);
-            default:
-                return new Vector3d(0.5, 0, 0.05);
-        }
     }
 
     @SuppressWarnings("null")

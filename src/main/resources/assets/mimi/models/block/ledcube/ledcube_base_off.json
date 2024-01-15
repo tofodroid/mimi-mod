@@ -1,0 +1,7 @@
+{
+    "parent": "mimi:block/ledcube/ledcube_base",
+	"textures": {
+		"particle": "mimi:block/ledcube/ledcube_dark",
+		"0": "mimi:block/ledcube/ledcube_dark"
+    }
+}

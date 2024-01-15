@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=south": { "model": "mimi:block/celesta" },
-    "facing=west": { "model": "mimi:block/celesta", "y": 90 },
-    "facing=north": { "model": "mimi:block/celesta", "y": 180 },
-    "facing=east": { "model": "mimi:block/celesta", "y": 270 }
+    "facing=south": { "model": "mimi:block/instruments/celesta" },
+    "facing=west": { "model": "mimi:block/instruments/celesta", "y": 90 },
+    "facing=north": { "model": "mimi:block/instruments/celesta", "y": 180 },
+    "facing=east": { "model": "mimi:block/instruments/celesta", "y": 270 }
   }
 }

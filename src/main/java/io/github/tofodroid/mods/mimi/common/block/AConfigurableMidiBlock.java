@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
@@ -57,6 +59,23 @@ public abstract class AConfigurableMidiBlock<B extends AConfigurableMidiTile> ex
             newStack.setTag(stack.getOrCreateTag().copy());
             ((B)tileEntity).setSourceStack(newStack);
         }
+    }
+    
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
+        BlockEntity tile = getter.getBlockEntity(pos);
+        
+        if(tile != null && tile instanceof AConfigurableMidiTile) {
+            return ((AConfigurableMidiTile)tile).getSourceStack();
+        } else {
+            if(tile == null) {
+                MIMIMod.LOGGER.info("Tile is null");
+            } else {
+                MIMIMod.LOGGER.info("Tile is " + tile.getClass());
+            }
+        }
+
+        return super.getCloneItemStack(getter, pos, state);
     }
 
     @Override

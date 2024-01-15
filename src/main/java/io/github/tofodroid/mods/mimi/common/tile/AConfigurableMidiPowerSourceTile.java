@@ -32,7 +32,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public Boolean isPowered() {
-        return getBlockState().getValue(APoweredConfigurableMidiBlock.POWER) > 0;
+        return getBlockState().getValue(APoweredConfigurableMidiBlock.POWERED);
     }
 
     public Integer stayPoweredForTicks() {
@@ -44,12 +44,12 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     @SuppressWarnings("null")
-    public void setTriggeredAndPower(Boolean triggered, Integer power) {
+    public void setTriggeredAndPower(Boolean triggered, Boolean powered) {
         this.getLevel().setBlockAndUpdate(
             getBlockPos(), 
             getBlockState()
                 .setValue(APoweredConfigurableMidiBlock.TRIGGERED, triggered)
-                .setValue(APoweredConfigurableMidiBlock.POWER, power)
+                .setValue(APoweredConfigurableMidiBlock.POWERED, powered)
         );
         
         for(Direction direction : Direction.values()) {
@@ -67,14 +67,14 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
             if(this.isPowered()) {
                 if(this.poweredTickCount > this.stayPoweredForTicks()) {
                     this.poweredTickCount = 0;
-                    this.setTriggeredAndPower(false, 0);
+                    this.setTriggeredAndPower(false, false);
                 } else {
                     this.poweredTickCount++;
                 }
             } else if(this.isTriggered()) {
                 if(this.triggeredTickCount > this.powerAfterTriggerTicks()) {
                     this.triggeredTickCount = 0;
-                    this.setTriggeredAndPower(false, 15);
+                    this.setTriggeredAndPower(false, true);
                 } else {
                     this.triggeredTickCount++;
                 }
@@ -88,7 +88,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
             if(isPowered()) {
                 this.poweredTickCount = 0;
             } else if(!isTriggered()) {
-                this.setTriggeredAndPower(true, 0);
+                this.setTriggeredAndPower(true, false);
             }
             return true;
         }

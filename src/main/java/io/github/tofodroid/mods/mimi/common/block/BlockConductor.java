@@ -117,9 +117,6 @@ public class BlockConductor extends AConfigurableMidiBlock<TileConductor> {
             }
         }
 
-        // Transmit mode
-        tooltip.add(Component.literal("  Transmit Mode: " + InstrumentDataUtils.getMidiSourceName(blockItemStack)).withStyle(ChatFormatting.GREEN));
-
         // Transmit Note
         tooltip.add(Component.literal("  Transmit Note: " + InstrumentDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN));
     }

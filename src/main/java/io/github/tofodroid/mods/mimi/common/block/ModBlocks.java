@@ -25,18 +25,31 @@ public class ModBlocks {
     // Village Blocks
     public static final RegistryObject<BlockTuningTable> TUNINGTABLE = BLOCKS.register(BlockTuningTable.REGISTRY_NAME, () -> new BlockTuningTable());
 
+    // LED Cube Blocks
+    public static final RegistryObject<BlockLedCube> LEDCUBE_A = BLOCKS.register(BlockLedCube.REGISTRY_NAME_A, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_B = BLOCKS.register(BlockLedCube.REGISTRY_NAME_B, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_C = BLOCKS.register(BlockLedCube.REGISTRY_NAME_C, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_D = BLOCKS.register(BlockLedCube.REGISTRY_NAME_D, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_E = BLOCKS.register(BlockLedCube.REGISTRY_NAME_E, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_F = BLOCKS.register(BlockLedCube.REGISTRY_NAME_F, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_G = BLOCKS.register(BlockLedCube.REGISTRY_NAME_G, () -> new BlockLedCube());
+    public static final RegistryObject<BlockLedCube> LEDCUBE_H = BLOCKS.register(BlockLedCube.REGISTRY_NAME_H, () -> new BlockLedCube());
+
     // Instrument Blocks
-    protected static List<RegistryObject<BlockInstrument>> INSTRUMENTS = buildInstruments();
+    public static final List<RegistryObject<BlockInstrument>> INSTRUMENTS = buildInstruments();
+
+    public static <T extends Block> List<T> getBlocksFromRegistryList(List<RegistryObject<T>> regList) {
+        return regList.stream().map(r -> r.get()).collect(Collectors.toList());
+    }
 
     public static List<BlockInstrument> getBlockInstruments() {
-        return INSTRUMENTS.stream()
-            .map(i -> i.get())
-            .collect(Collectors.toList());
+        return getBlocksFromRegistryList(INSTRUMENTS);
     }
 
     public static List<RegistryObject<BlockInstrument>> buildInstruments()  {
         List<RegistryObject<BlockInstrument>> result = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
+            MIMIMod.LOGGER.info("Reg instrument - " + instrument.registryName);
             result.add(
                 BLOCKS.register(
                     instrument.registryName, 

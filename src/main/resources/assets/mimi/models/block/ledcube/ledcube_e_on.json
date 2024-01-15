@@ -1,0 +1,6 @@
+{
+    "parent": "mimi:block/ledcube/ledcube_base_on",
+	"textures": {
+		"1": "mimi:block/ledcube/ledcube_face_e"
+	}
+}

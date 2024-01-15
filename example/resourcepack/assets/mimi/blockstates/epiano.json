@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=south": { "model": "mimi:block/epiano" },
-    "facing=west": { "model": "mimi:block/epiano", "y": 90 },
-    "facing=north": { "model": "mimi:block/epiano", "y": 180 },
-    "facing=east": { "model": "mimi:block/epiano", "y": 270 }
+    "facing=south": { "model": "mimi:block/instruments/epiano" },
+    "facing=west": { "model": "mimi:block/instruments/epiano", "y": 90 },
+    "facing=north": { "model": "mimi:block/instruments/epiano", "y": 180 },
+    "facing=east": { "model": "mimi:block/instruments/epiano", "y": 270 }
   }
 }

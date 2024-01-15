@@ -1,3 +1,3 @@
 {
-    "parent": "mimi:block/transmitterblock"
+    "parent": "mimi:block/midi/transmitterblock"
 }

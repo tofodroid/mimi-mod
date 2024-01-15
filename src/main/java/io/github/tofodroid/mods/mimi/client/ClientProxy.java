@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.client;
 
-import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
+import io.github.tofodroid.mods.mimi.client.midi.MidiDataManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy implements Proxy {
     private MidiMultiSynthManager MIDI_SYNTH;
-    private MidiInputManager MIDI_INPUT;
+    private MidiDataManager MIDI_DATA;
     private FilesystemMidiFileProvider CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false);
     private FilesystemMidiFileProvider SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true);
     private Long startSyncEpoch = null;
@@ -25,8 +25,8 @@ public class ClientProxy implements Proxy {
         MIDI_SYNTH = new MidiMultiSynthManager();
         MinecraftForge.EVENT_BUS.register(MIDI_SYNTH);
         
-        MIDI_INPUT = new MidiInputManager();
-        MinecraftForge.EVENT_BUS.register(MIDI_INPUT);
+        MIDI_DATA = new MidiDataManager();
+        MinecraftForge.EVENT_BUS.register(MIDI_DATA);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class ClientProxy implements Proxy {
         return MIDI_SYNTH;
     }
 
-    public MidiInputManager getMidiInput() {
-        return MIDI_INPUT;
+    public MidiDataManager getMidiData() {
+        return MIDI_DATA;
     }
 
     public void handleTimeSyncPacket(ServerTimeSyncPacket message) {

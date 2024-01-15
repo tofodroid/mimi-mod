@@ -25,6 +25,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.block.BlockLedCube;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 
@@ -43,6 +44,16 @@ public final class ModItems {
     public static BlockItem RECEIVER;
     public static BlockItem MECHANICALMAESTRO;
     public static BlockItem CONDUCTOR;
+    
+    // Blocks - LED Cubes
+    public static BlockItem LEDCUBE_A;
+    public static BlockItem LEDCUBE_B;
+    public static BlockItem LEDCUBE_C;
+    public static BlockItem LEDCUBE_D;
+    public static BlockItem LEDCUBE_E;
+    public static BlockItem LEDCUBE_F;
+    public static BlockItem LEDCUBE_G;
+    public static BlockItem LEDCUBE_H;
 
     // Blocks - Other
     public static BlockItem TUNINGTABLE;
@@ -63,9 +74,16 @@ public final class ModItems {
                 LISTENER,
                 RECEIVER,
                 MECHANICALMAESTRO,
-                CONDUCTOR,
                 TRANSMITTER,
-                TUNINGTABLE
+                TUNINGTABLE,
+                LEDCUBE_A,
+                LEDCUBE_B,
+                LEDCUBE_C,
+                LEDCUBE_D,
+                LEDCUBE_E,
+                LEDCUBE_F,
+                LEDCUBE_G,
+                LEDCUBE_H
             )));
         });
         event.register(new ResourceLocation(MIMIMod.MODID, "group"), builder.build());
@@ -98,6 +116,31 @@ public final class ModItems {
         
         CONDUCTOR = new BlockItem(ModBlocks.CONDUCTOR.get(), new Item.Properties().stacksTo(64));
         event.register(BlockConductor.REGISTRY_NAME, CONDUCTOR);
+
+        // LED Cube Blocks
+        LEDCUBE_A = new BlockItem(ModBlocks.LEDCUBE_A.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_A, LEDCUBE_A);
+
+        LEDCUBE_B = new BlockItem(ModBlocks.LEDCUBE_B.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_B, LEDCUBE_B);
+
+        LEDCUBE_C = new BlockItem(ModBlocks.LEDCUBE_C.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_C, LEDCUBE_C);
+
+        LEDCUBE_D = new BlockItem(ModBlocks.LEDCUBE_D.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_D, LEDCUBE_D);
+
+        LEDCUBE_E = new BlockItem(ModBlocks.LEDCUBE_E.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_E, LEDCUBE_E);
+
+        LEDCUBE_F = new BlockItem(ModBlocks.LEDCUBE_F.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_F, LEDCUBE_F);
+
+        LEDCUBE_G = new BlockItem(ModBlocks.LEDCUBE_G.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_G, LEDCUBE_G);
+
+        LEDCUBE_H = new BlockItem(ModBlocks.LEDCUBE_H.get(), new Item.Properties().stacksTo(64));
+        event.register(BlockLedCube.REGISTRY_NAME_H, LEDCUBE_H);
 
         // Other Blocks
         TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE.get(), new Item.Properties().stacksTo(64));

@@ -8,6 +8,8 @@ import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
@@ -27,7 +29,7 @@ import net.minecraftforge.api.distmarker.Dist;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MidiInputDeviceManager extends AMidiInputSourceManager {
-    private List<ItemStack> localInstrumentsToPlay = new ArrayList<>();
+    private List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay = new ArrayList<>();
     private String selectedDeviceName;
     private String midiDeviceError;
     private Boolean dirty = false;
@@ -98,32 +100,32 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
         this.localInstrumentsToPlay = localInstrumentsToPlay(event.player);
     }
     
-    protected List<ItemStack> localInstrumentsToPlay(Player player) {
-        List<ItemStack> result = new ArrayList<>();
+    protected List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay(Player player) {
+        List<Pair<InteractionHand, ItemStack>> result = new ArrayList<>();
 
         // Check for seated instrument
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
         if(instrumentEntity != null) {
-            result.add(instrumentEntity.getInstrumentStack());
+            result.add(Pair.of(null, instrumentEntity.getInstrumentStack()));
         }
 
         // Check for held instruments
         ItemStack mainHand = ItemInstrumentHandheld.getEntityHeldInstrumentStack(player, InteractionHand.MAIN_HAND);
         if(mainHand != null) {
-            result.add(mainHand);
+            result.add(Pair.of(InteractionHand.MAIN_HAND, mainHand));
         }
 
         ItemStack offHand = ItemInstrumentHandheld.getEntityHeldInstrumentStack(player, InteractionHand.OFF_HAND);
         if(offHand != null) {
-            result.add(offHand);
+            result.add(Pair.of(InteractionHand.OFF_HAND, offHand));
         }
 
         return result;
     }
     
-    public List<ItemStack> getLocalInstrumentsForMidiDevice(Player player, Byte channel) {
+    public List<Pair<InteractionHand, ItemStack>> getLocalInstrumentsForMidiDevice(Player player, Byte channel) {
         return localInstrumentsToPlay.stream()
-            .filter(instrumentStack -> InstrumentDataUtils.getSysInput(instrumentStack) && InstrumentDataUtils.isChannelEnabled(instrumentStack, channel))
+            .filter(instrumentStack -> InstrumentDataUtils.getSysInput(instrumentStack.getRight()) && InstrumentDataUtils.isChannelEnabled(instrumentStack.getRight(), channel))
             .collect(Collectors.toList());
     }
 

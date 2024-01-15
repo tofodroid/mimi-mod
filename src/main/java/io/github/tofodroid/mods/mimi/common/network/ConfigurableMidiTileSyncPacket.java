@@ -35,7 +35,7 @@ public class ConfigurableMidiTileSyncPacket {
     public ConfigurableMidiTileSyncPacket(ItemStack sourceStack, BlockPos tilePos) {
         this.tilePos = tilePos;
         this.midiSource = InstrumentDataUtils.getMidiSource(sourceStack);
-        this.midiSourceName = InstrumentDataUtils.getMidiSourceName(sourceStack);
+        this.midiSourceName = InstrumentDataUtils.getMidiSourceName(sourceStack, false);
         this.filterOct = InstrumentDataUtils.getFilterOct(sourceStack);
         this.filterNote = InstrumentDataUtils.getFilterNote(sourceStack);
         this.invertNoteOct = InstrumentDataUtils.getInvertNoteOct(sourceStack);

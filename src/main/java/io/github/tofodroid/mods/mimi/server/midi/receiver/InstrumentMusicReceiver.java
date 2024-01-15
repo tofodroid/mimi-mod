@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.server.midi.receiver;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -11,6 +10,7 @@ import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -19,25 +19,21 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     protected Byte instrumentId;
     protected UUID notePlayerId;
     protected Integer enabledChannels;
-    protected List<Byte> filteredNotes;
-    protected Byte filteredInstrument;
-    protected Boolean invertFilterNoteOct;
-    protected Boolean invertFilterInstrument;
+    protected Byte volume;
+    protected InteractionHand handIn;
 
-    public InstrumentMusicReceiver(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim, UUID notePlayerId, ItemStack instrumentStack) {
+    public InstrumentMusicReceiver(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim, UUID notePlayerId, ItemStack instrumentStack, InteractionHand handIn) {
         super(InstrumentDataUtils.getMidiSource(instrumentStack), pos, dim);
         this.notePlayerId = notePlayerId;
         this.instrumentId = InstrumentDataUtils.getInstrumentId(instrumentStack);
         this.enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(instrumentStack);
-        this.filteredNotes = InstrumentDataUtils.getFilterNotes(InstrumentDataUtils.getFilterNote(instrumentStack), InstrumentDataUtils.getFilterOct(instrumentStack));
-        this.filteredInstrument = InstrumentDataUtils.getFilterInstrument(instrumentStack);
-        this.invertFilterInstrument = InstrumentDataUtils.getInvertInstrument(instrumentStack);
-        this.invertFilterNoteOct = InstrumentDataUtils.getInvertNoteOct(instrumentStack);
+        this.volume = InstrumentDataUtils.getInstrumentVolume(instrumentStack);
+        this.handIn = handIn;
     }
 
     public void allNotesOff(ServerLevel sourceLevel) {
         ServerLifecycleHooks.getCurrentServer().execute(
-            () -> MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(instrumentId, notePlayerId, this.blockPos.get()), sourceLevel, null)
+            () -> MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(instrumentId, notePlayerId, this.blockPos.get(), this.handIn), sourceLevel, null)
         );
     }
 
@@ -54,10 +50,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
             return o.linkedId.equals(this.linkedId) &&
                 o.instrumentId == this.instrumentId &&
                 o.enabledChannels == this.enabledChannels &&
-                o.filteredNotes.equals(this.filteredNotes) &&
-                o.filteredInstrument == this.filteredInstrument &&
-                o.invertFilterNoteOct == this.invertFilterNoteOct &&
-                o.invertFilterInstrument == this.invertFilterInstrument;
+                o.volume == this.volume;
         }
         
         return false;
@@ -68,9 +61,9 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
         MidiNotePacket notePacket;
 
         if(packet.isControlEvent()) {
-            notePacket = MidiNotePacket.createControlPacket(packet.getControllerNumber(), packet.getControllerValue(), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime);
+            notePacket = MidiNotePacket.createControlPacket(packet.getControllerNumber(), packet.getControllerValue(), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
         } else {
-            notePacket = MidiNotePacket.createNotePacket(packet.note, packet.velocity, instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime);
+            notePacket = MidiNotePacket.createNotePacket(packet.note, InstrumentDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
         }
 
         ServerLifecycleHooks.getCurrentServer().execute(

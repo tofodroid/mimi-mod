@@ -9,7 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
-import io.github.tofodroid.mods.mimi.client.midi.MidiInputManager;
+import io.github.tofodroid.mods.mimi.client.midi.MidiDataManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
@@ -23,14 +23,14 @@ public class GuiMidiInputConfig extends BaseGui {
     private static final Vector2i SAVE_DEVICE_BUTTON = new Vector2i(266,133);
 
     // MIDI
-    private MidiInputManager midiInputManager;
+    private MidiDataManager midiDataManager;
     private List<MidiDevice> availableDevices;
     private Integer visibleDeviceId = 0;
 
     public GuiMidiInputConfig(Player player) {
         super(288, 156, 288, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
-        this.midiInputManager = ((ClientProxy)MIMIMod.proxy).getMidiInput();
-        availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
+        this.midiDataManager = ((ClientProxy)MIMIMod.proxy).getMidiData();
+        availableDevices = this.midiDataManager.inputDeviceManager.getAvailableDevices();
     }
 
     @Override
@@ -40,11 +40,11 @@ public class GuiMidiInputConfig extends BaseGui {
 
         if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_DEVICES_BUTTON))) {
             visibleDeviceId = 0;
-            availableDevices = this.midiInputManager.inputDeviceManager.getAvailableDevices();
-        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected() && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(CLEAR_DEVICE_BUTTON))) {
-            this.midiInputManager.inputDeviceManager.clearDeviceSelection();
+            availableDevices = this.midiDataManager.inputDeviceManager.getAvailableDevices();
+        } else if(this.midiDataManager.inputDeviceManager.isDeviceSelected() && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(CLEAR_DEVICE_BUTTON))) {
+            this.midiDataManager.inputDeviceManager.clearDeviceSelection();
         } else if(this.availableDevices != null && this.availableDevices.size() > visibleDeviceId && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SAVE_DEVICE_BUTTON))) {
-            this.midiInputManager.inputDeviceManager.saveDeviceSelection(availableDevices.get(visibleDeviceId));
+            this.midiDataManager.inputDeviceManager.saveDeviceSelection(availableDevices.get(visibleDeviceId));
         } else if(this.availableDevices != null && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_UP_BUTTON))) {
             visibleDeviceId = visibleDeviceId < (this.availableDevices.size() - 1) ? visibleDeviceId + 1 : visibleDeviceId;
         } else if(this.availableDevices != null  && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_DOWN_BUTTON))) {
@@ -66,10 +66,10 @@ public class GuiMidiInputConfig extends BaseGui {
         Integer statusX = START_X + 259;
         Integer statusY = START_Y + 33;
 
-        if(this.midiInputManager.inputDeviceManager.isDirtyStatus()) {
+        if(this.midiDataManager.inputDeviceManager.isDirtyStatus()) {
             graphics.blit(guiTexture, statusX, statusY, 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
-            graphics.blit(guiTexture, statusX, statusY, this.midiInputManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+        } else if(this.midiDataManager.inputDeviceManager.isDeviceSelected()) {
+            graphics.blit(guiTexture, statusX, statusY, this.midiDataManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         return graphics;
@@ -78,8 +78,8 @@ public class GuiMidiInputConfig extends BaseGui {
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Selected Device Name
-        if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
-            graphics.drawString(font, this.midiInputManager.inputDeviceManager.getSelectedDeviceName(), START_X + 117, START_Y + 40, 0xFF00E600);
+        if(this.midiDataManager.inputDeviceManager.isDeviceSelected()) {
+            graphics.drawString(font, this.midiDataManager.inputDeviceManager.getSelectedDeviceName(), START_X + 117, START_Y + 40, 0xFF00E600);
         }
 
         // Available Device Info

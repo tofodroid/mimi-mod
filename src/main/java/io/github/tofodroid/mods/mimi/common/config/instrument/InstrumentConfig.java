@@ -27,16 +27,16 @@ public abstract class InstrumentConfig {
         return getAllInstruments().stream().filter(s -> !s.isBlock).collect(Collectors.toList());
     }
 
-    public static List<InstrumentSpec> getItemInstruments(Boolean dyeable) {
-        return getAllInstruments().stream().filter(s -> !s.isBlock && s.isDyeable() == dyeable).collect(Collectors.toList());
+    public static List<InstrumentSpec> getItemInstruments(Boolean colorable) {
+        return getAllInstruments().stream().filter(s -> !s.isBlock && s.isColorable() == colorable).collect(Collectors.toList());
     }
 
     public static List<InstrumentSpec> getBlockInstruments() {
         return getAllInstruments().stream().filter(s -> s.isBlock).collect(Collectors.toList());
     }
 
-    public static List<InstrumentSpec> getBlockInstruments(Boolean dyeable) {
-        return getAllInstruments().stream().filter(s -> s.isBlock && s.isDyeable() == dyeable).collect(Collectors.toList());
+    public static List<InstrumentSpec> getBlockInstruments(Boolean colorable) {
+        return getAllInstruments().stream().filter(s -> s.isBlock && s.isColorable() == colorable).collect(Collectors.toList());
     }
     
     public static List<InstrumentSpec> getAllInstruments() {

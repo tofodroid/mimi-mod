@@ -9,6 +9,8 @@ import io.github.tofodroid.com.sun.media.sound.SF2SoundbankReader;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Soundbank;
+
+import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
@@ -122,6 +124,23 @@ public class MidiMultiSynthManager {
         }
     }
 
+    @SuppressWarnings({"resource", "null"})
+    public void sendToGui(MidiNotePacket message) {
+        if(Minecraft.getInstance().player == null || !message.player.equals(Minecraft.getInstance().player.getUUID()) || Minecraft.getInstance().screen == null || !(Minecraft.getInstance().screen instanceof GuiInstrument)) {
+            return;
+        }
+
+        GuiInstrument gui = (GuiInstrument)Minecraft.getInstance().screen;
+
+        if(message.instrumentId == gui.getInstrumentId() && message.instrumentHand == gui.getHandIn()) {
+            if(message.velocity > 0) {
+                gui.onExternalNotePress(message.note);
+            } else {
+                gui.onExternalNoteRelease(message.note);
+            }
+        }
+    }
+
     public void handlePacket(MidiNotePacket message) {
         if(loggingOff) return;
 
@@ -134,6 +153,7 @@ public class MidiMultiSynthManager {
                 } else if(message.velocity <= 0) {
                     targetSynth.noteOff(message, getBufferTime(message.noteServerTime));
                 }
+                this.sendToGui(message);
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
                 targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }

@@ -28,17 +28,18 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
-    public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final String REGISTRY_NAME = "transmitterblock";
 
     public BlockTransmitter() {
         super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
-        this.registerDefaultState(this.defaultBlockState().setValue(POWER, 0));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWER);
+        state.add(POWERED);
     }
     
     @Override
@@ -110,12 +111,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
     
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
-    }
-    
-    @Override
-    public int getDirectSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
+        return state.getValue(POWERED) ? 15 : 0;
     }
 
     @Override

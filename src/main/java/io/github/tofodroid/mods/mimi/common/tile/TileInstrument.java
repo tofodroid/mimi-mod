@@ -1,8 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import org.joml.Vector3d;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
+import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
+import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
@@ -16,41 +19,58 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileInstrument extends AStaticInventoryTile {
     public static final String COLOR_TAG = "color";
+    protected EntitySeat currentSeat = null;
     protected Integer color;
-    protected Player currentPlayer = null;
 
     public TileInstrument(BlockPos pos, BlockState state) {
         super(ModTiles.INSTRUMENT, pos, state, 1);
     }
 
-    public void setCurrentPlayer(Player player) {
-        // Reload previous player
-        if(this.currentPlayer != null && this.currentPlayer != player) {
-            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.currentPlayer);
+    @SuppressWarnings("resource")
+    public void attemptSit(Player player) {
+        if(player.level().isClientSide) {
+            return;
         }
 
-        this.currentPlayer = player;
+        EntitySeat newSeat = EntitySeat.create(player.level(), this.getBlockPos(), this.getSeatOffset(getBlockState()), player);
 
-        // Reload new player
-        if(this.currentPlayer != null) {
-            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.currentPlayer);
+        if(newSeat != null) {
+            this.currentSeat = newSeat;
         }
     }
 
     public Player getCurrentPlayer() {
-        return this.currentPlayer;
+        if(this.currentSeat != null && !this.currentSeat.isRemoved()) {
+            return this.currentSeat.getRider();
+        }
+        return null;
+    }
+    
+    protected Vector3d getSeatOffset(BlockState state) {
+        switch(state.getValue(BlockInstrument.DIRECTION)) {
+            case NORTH:
+                return new Vector3d(0.5, 0, 0.05);
+            case SOUTH:
+                return new Vector3d(0.5, 0, 0.95);
+            case EAST:
+                return new Vector3d(0.95, 0, 0.5);
+            case WEST:
+                return new Vector3d(0.05, 0, 0.5);
+            default:
+                return new Vector3d(0.5, 0, 0.05);
+        }
     }
 
     public void setInstrumentStack(ItemStack stack) {
         if(stack.getItem() instanceof IInstrumentItem) {
             this.setItem(0, stack);
             
-            if(this.blockInstrument().isDyeable() && ((IDyeableItem)stack.getItem()).hasColor(stack)) {
-                this.color = ((IDyeableItem)stack.getItem()).getColor(stack);
+            if(this.blockInstrument().isColorable() && ((IColorableItem)stack.getItem()).hasColor(stack)) {
+                this.color = ((IColorableItem)stack.getItem()).getColor(stack);
             }
 
-            if(this.currentPlayer != null) {
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.currentPlayer);
+            if(this.getCurrentPlayer() != null) {
+                ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
             }
         }
     }
@@ -68,11 +88,11 @@ public class TileInstrument extends AStaticInventoryTile {
     }
 
     public Boolean hasColor() {
-        return color != null && this.blockInstrument().isDyeable();
+        return color != null && this.blockInstrument().isColorable();
     }
 
     public Integer getColor() { 
-        if(!this.blockInstrument().isDyeable()) {
+        if(!this.blockInstrument().isColorable()) {
             return -1;
         }
 
@@ -107,7 +127,7 @@ public class TileInstrument extends AStaticInventoryTile {
         if(compound.contains(COLOR_TAG) && !this.hasColor()) {
             this.color = compound.getInt(COLOR_TAG);
             ItemStack stack = this.getInstrumentStack();
-            ((IDyeableItem)stack.getItem()).setColor(stack, this.color);
+            ((IColorableItem)stack.getItem()).setColor(stack, this.color);
             this.setInstrumentStack(stack);
         }
         // END TEMPORARY LEGACY COMPATIBILITY CODE
@@ -128,7 +148,7 @@ public class TileInstrument extends AStaticInventoryTile {
                 convertStack = initializeInstrumentStack(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
 
                 if(compound.contains(COLOR_TAG)) {
-                    ((IDyeableItem)convertStack.getItem()).setColor(convertStack, compound.getInt(COLOR_TAG));
+                    ((IColorableItem)convertStack.getItem()).setColor(convertStack, compound.getInt(COLOR_TAG));
                 }
             }
         }
