@@ -86,7 +86,7 @@ public abstract class ServerMusicTransmitterManager {
     public static void onServerTick() {
         for(UUID playerId : PLAYER_MAP.keySet()) {
             ServerPlayer player = ServerExecutor.getServerPlayerById(playerId);
-            if(!EntityUtils.playerHasActiveTransmitter(player)) {
+            if(player != null && !EntityUtils.playerHasActiveTransmitter(player)) {
                 PLAYER_MAP.get(player.getUUID()).stop();
             }
         }
