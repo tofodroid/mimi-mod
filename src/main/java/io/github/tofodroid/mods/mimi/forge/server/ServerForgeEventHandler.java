@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.forge.server;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
@@ -101,6 +102,7 @@ public class ServerForgeEventHandler {
         ServerMusicReceiverManager.onServerTick();
         ServerMusicTransmitterManager.onServerTick();
         ServerMidiUploadManager.onServerTick();
+        MidiNotePacketHandler.onServerTick();
     }
 
     @SubscribeEvent

@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
@@ -14,29 +13,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MidiNotePacketHandler {
     private static final ConcurrentHashMap<String, List<EntityNoteResponsiveTile>> ENTITY_CACHE_MAP = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, List<ServerPlayer>> PLAYER_CACHE_MAP = new ConcurrentHashMap<>();
     private static final Integer CLEAR_CACHE_EVERY_TICKS = 5;
     private static Integer cacheClearTickCounter = 0;
 
-    @SubscribeEvent
-    public static void onServerTick(ServerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
-            return;
-        }
-
+    public static void onServerTick() {
         if(cacheClearTickCounter >= CLEAR_CACHE_EVERY_TICKS) {
             cacheClearTickCounter = 0;
             ENTITY_CACHE_MAP.clear();
@@ -46,13 +31,8 @@ public class MidiNotePacketHandler {
         }        
     }
 
-    public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
-        if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketServer(message,(ServerLevel)ctx.get().getSender().level(), ctx.get().getSender()));
-        } else {
-            ctx.get().enqueueWork(() -> handlePacketClient(message));
-        }
-        ctx.get().setPacketHandled(true);
+    public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
+        handlePacketServer(message, sender.serverLevel(), sender);
     }
     
     public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {
@@ -128,16 +108,6 @@ public class MidiNotePacketHandler {
 
     protected static List<TileListener> filterToListeners(List<EntityNoteResponsiveTile> entities) {
         return entities.stream().filter(e -> e.getTile() instanceof TileListener).map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
-    }
-    
-    protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerLevel worldIn, ServerPlayer excludePlayer, Double range) {
-        return PacketDistributor.NEAR.with(() -> {
-            if(excludePlayer == null) {
-                return new PacketDistributor.TargetPoint(targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.dimension());
-            } else {
-                return new PacketDistributor.TargetPoint(excludePlayer, targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.dimension());
-            }
-        });
     }
 
     protected static Integer getQueryBoxRange(Boolean off) {
