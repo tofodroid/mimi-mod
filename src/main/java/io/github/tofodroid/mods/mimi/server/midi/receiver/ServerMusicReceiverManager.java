@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
@@ -19,22 +18,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ServerMusicReceiverManager {
+public abstract class ServerMusicReceiverManager {
     private static final List<InteractionHand> ENTITY_INSTRUMENT_ITER = Collections.unmodifiableList(
         Arrays.asList(InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND, null)
     );
@@ -140,72 +128,55 @@ public class ServerMusicReceiverManager {
         OWNED_RECEIVERS.remove(id);
     }
 
-    @SubscribeEvent
-    public static void onLivingEquipmentChange(LivingEquipmentChangeEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
-            return;
-        }
+    public static void allInstrumentReceiverNotesOff(UUID ownerId, ServerLevel ownerLevel) {
+        List<? extends AMusicReceiver> recievers = OWNED_RECEIVERS.get(ownerId);
 
-        if(event.getFrom().getItem() instanceof ItemInstrumentHandheld || event.getTo().getItem() instanceof ItemInstrumentHandheld) {
-            loadEntityInstrumentReceivers(event.getEntity());
+        if(recievers != null && !recievers.isEmpty()) {
+            recievers.stream()
+                .filter(r -> r instanceof InstrumentMusicReceiver)
+                .forEach(r -> ((InstrumentMusicReceiver)r).allNotesOff(ownerLevel));
         }
-    }
-
-    @SubscribeEvent
-    public static void onLivingDeath(LivingDeathEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
-            return;
-        }
-        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
     }
 
-    @SubscribeEvent
-    public static void onEntityTeleport(EntityTeleportEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
-            return;
+    public static void onLivingEquipmentChange(ItemStack from, ItemStack to, LivingEntity entity) {
+        if(from.getItem() instanceof ItemInstrumentHandheld || to.getItem() instanceof ItemInstrumentHandheld) {
+            loadEntityInstrumentReceivers(entity);
         }
-        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
-    }
-    
-    @SubscribeEvent
-    public static void onEntityChangeDimension(EntityTravelToDimensionEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel) || !(event.getEntity() instanceof LivingEntity)) {
-            return;
-        }
-        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
-        }
-        allInstrumentReceiverNotesOff(event.getEntity().getUUID(), (ServerLevel)event.getEntity().level());
-        removeReceivers(event.getEntity().getUUID());
+    public static void onLivingDeath(LivingEntity entity) {
+        allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.level());
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
+    public static void onEntityTeleport(Entity entity) {
+        if(entity instanceof LivingEntity) {
+            allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.level());
         }
-        loadEntityInstrumentReceivers(event.getEntity());
     }
 
-    @SubscribeEvent
-    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
+    public static void onEntityChangeDimension(Entity entity) {
+        if(entity instanceof LivingEntity) {
+            allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.level());
         }
-        loadEntityInstrumentReceivers(event.getEntity());
     }
-    
-    @SubscribeEvent
-    public static void onServerTick(ServerTickEvent event) {
-        // Pre-conditions
-        if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
-            return;
-        } else if(!ServerMusicTransmitterManager.hasPlayingTransmitters()) {
+
+    public static void onPlayerLoggedOut(ServerPlayer player) {
+        if(player.level() instanceof ServerLevel) {
+            allInstrumentReceiverNotesOff(player.getUUID(), (ServerLevel)player.level());
+            removeReceivers(player.getUUID());
+        }
+    }
+
+    public static void onPlayerLoggedIn(ServerPlayer player) {
+        loadEntityInstrumentReceivers(player);
+    }
+
+    public static void onPlayerRespawn(ServerPlayer player) {
+        loadEntityInstrumentReceivers(player);
+    }
+
+    public static void onServerTick() {
+        if(!ServerMusicTransmitterManager.hasPlayingTransmitters()) {
             SOURCE_LINKED_RECEIVERS.clear();
             return;
         }
@@ -222,19 +193,8 @@ public class ServerMusicReceiverManager {
         });
     }
 
-    @SubscribeEvent
-    public static void onServerStopping(ServerStoppingEvent event) {
+    public static void onServerStopping() {
         OWNED_RECEIVERS.clear();
         SOURCE_LINKED_RECEIVERS.clear();
-    }
-
-    public static void allInstrumentReceiverNotesOff(UUID ownerId, ServerLevel ownerLevel) {
-        List<? extends AMusicReceiver> recievers = OWNED_RECEIVERS.get(ownerId);
-
-        if(recievers != null && !recievers.isEmpty()) {
-            recievers.stream()
-                .filter(r -> r instanceof InstrumentMusicReceiver)
-                .forEach(r -> ((InstrumentMusicReceiver)r).allNotesOff(ownerLevel));
-        }
     }
 }

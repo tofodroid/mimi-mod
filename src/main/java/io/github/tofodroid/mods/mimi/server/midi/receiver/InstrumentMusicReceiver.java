@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -13,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class InstrumentMusicReceiver extends AMusicReceiver {
     protected Byte instrumentId;
@@ -32,7 +32,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     }
 
     public void allNotesOff(ServerLevel sourceLevel) {
-        ServerLifecycleHooks.getCurrentServer().execute(
+        ServerExecutor.executeOnServerThread(
             () -> MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(instrumentId, notePlayerId, this.blockPos.get(), this.handIn), sourceLevel, null)
         );
     }
@@ -66,7 +66,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
             notePacket = MidiNotePacket.createNotePacket(packet.note, InstrumentDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
         }
 
-        ServerLifecycleHooks.getCurrentServer().execute(
+        ServerExecutor.executeOnServerThread(
             () -> MidiNotePacketHandler.handlePacketServer(notePacket, sourceLevel, null)
         );
     }

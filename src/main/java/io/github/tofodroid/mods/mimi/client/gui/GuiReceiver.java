@@ -9,7 +9,7 @@ import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.TransmitterSourceWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -57,7 +57,7 @@ public class GuiReceiver extends BaseGui {
     }
 
     public void syncListenerToServer() {
-        NetworkManager.INFO_CHANNEL.sendToServer(new ConfigurableMidiTileSyncPacket(receiverStack, tilePos));
+        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(receiverStack, tilePos));
     }
 
     @Override

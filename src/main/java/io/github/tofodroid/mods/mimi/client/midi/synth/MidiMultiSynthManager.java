@@ -14,9 +14,9 @@ import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 
@@ -71,7 +71,7 @@ public class MidiMultiSynthManager {
     public void handleLogin() {
         this.loggingOff = false;
         this.reloadSynths();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket());
+        NetworkProxy.sendToServer(new ServerTimeSyncPacket());
     }
 
     public void reloadSynths() {

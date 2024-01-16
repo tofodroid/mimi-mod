@@ -10,7 +10,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -57,7 +57,7 @@ public class GuiListener extends BaseGui {
     }
 
     public void syncListenerToServer() {
-        NetworkManager.INFO_CHANNEL.sendToServer(new ConfigurableMidiTileSyncPacket(listenerStack, tilePos));
+        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(listenerStack, tilePos));
     }
 
     @Override

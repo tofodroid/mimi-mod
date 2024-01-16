@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.midi;
 
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -46,7 +46,7 @@ public class MidiDataManager {
 
         if(updateTickCount >= UPDATE_MUSIC_PLAYER_STATUS_EVERY_TICKS) {
             updateTickCount = 0;
-            NetworkManager.INFO_CHANNEL.sendToServer(new ServerMusicPlayerStatusPacket(Minecraft.getInstance().player.getUUID()));
+            NetworkProxy.sendToServer(new ServerMusicPlayerStatusPacket(Minecraft.getInstance().player.getUUID()));
         } else {
             updateTickCount++;
         }

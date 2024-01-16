@@ -6,18 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ServerMidiManager {
+public abstract class ServerMidiManager {
     private static final Map<UUID, List<BasicMidiInfo>> CACHE_MAP = new HashMap<>();
 
     public static List<BasicMidiInfo> getMidiInfosForSourceId(UUID sourceId) {
@@ -47,20 +41,12 @@ public class ServerMidiManager {
         return null;
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
-        }
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer)event.getEntity()), new ClientMidiListPacket());
+    public static void onPlayerLoggedIn(ServerPlayer player) {
+        NetworkProxy.sendToPlayer(player, new ClientMidiListPacket());
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
-        }
-        clearCacheInfosForSource(event.getEntity().getUUID());
+    public static void onPlayerLoggedOut(ServerPlayer player) {
+        clearCacheInfosForSource(player.getUUID());
     }
 }
 

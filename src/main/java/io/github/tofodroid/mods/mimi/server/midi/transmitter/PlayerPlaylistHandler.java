@@ -5,9 +5,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class PlayerPlaylistHandler extends APlaylistHandler {
     protected PlaylistData data;
@@ -16,8 +14,7 @@ public class PlayerPlaylistHandler extends APlaylistHandler {
         super(player.getUUID());
 
         // Load from world saved data
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        this.data = server.overworld().getDataStorage().computeIfAbsent(PlaylistData::loadFromTag, PlaylistData::new, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
+        this.data = player.getServer().overworld().getDataStorage().computeIfAbsent(PlaylistData::loadFromTag, PlaylistData::new, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
         this.data.setDirty();
     }
 

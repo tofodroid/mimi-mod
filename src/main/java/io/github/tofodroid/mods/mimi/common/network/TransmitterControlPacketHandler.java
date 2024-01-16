@@ -11,7 +11,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class TransmitterControlPacketHandler {
     public static void handlePacket(final TransmitterControlPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -79,10 +78,10 @@ public class TransmitterControlPacketHandler {
     }
 
     public static void sendResponsePackets(Boolean songListPacket, UUID musicPlayerId, ServerPlayer sender, AServerMusicTransmitter player) {
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), player.getStatus());
+        NetworkProxy.sendToPlayer(sender, player.getStatus());
 
         if(songListPacket) {
-            NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMusicPlayerSongListPacket(musicPlayerId, player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
+            NetworkProxy.sendToPlayer(sender, new ServerMusicPlayerSongListPacket(musicPlayerId, player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
         }
     }
     

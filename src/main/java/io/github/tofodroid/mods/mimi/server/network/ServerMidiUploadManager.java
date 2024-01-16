@@ -13,17 +13,12 @@ import javax.sound.midi.Sequence;
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
+import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerMidiUploadManager {
     private static final Integer REQUEST_MISSING_PARTS_EVERY_TICKS = 100;
     private static final Integer CANCEL_UPLOAD_AFTER_TICKS = 1000;
@@ -32,16 +27,15 @@ public class ServerMidiUploadManager {
     private static Map<UUID, Map<Integer,ServerMidiUploadPacket>> UPLOAD_PARTS = new HashMap<>();
     private static Map<UUID, Integer> TICKS_SINCE_LAST_PART = new HashMap<>();
     private static Boolean doTick = false;
-    
-    @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+    public static void onServerTick() {
         if(doTick) {
             List<UUID> toFail = new ArrayList<>();
             List<UUID> toClear = new ArrayList<>();
             
             for(UUID fileId : TICKS_SINCE_LAST_PART.keySet()) {
                 int count = TICKS_SINCE_LAST_PART.get(fileId);
-                ServerPlayer player = getServerPlayerById(UPLOAD_CLIENTS.get(fileId));
+                ServerPlayer player = ServerExecutor.getServerPlayerById(UPLOAD_CLIENTS.get(fileId));
 
                 if(player == null || count > CANCEL_UPLOAD_AFTER_TICKS) {
                     toFail.add(fileId);                    
@@ -78,7 +72,7 @@ public class ServerMidiUploadManager {
     }
 
     public static void startUploadRequest(UUID clientId, BasicMidiInfo info) {
-        ServerPlayer player = getServerPlayerById(clientId);
+        ServerPlayer player = ServerExecutor.getServerPlayerById(clientId);
 
         if(!UPLOAD_PARTS.containsKey(info.fileId) && player != null) {
             UPLOAD_PARTS.put(info.fileId, new HashMap<>());
@@ -86,12 +80,8 @@ public class ServerMidiUploadManager {
             UPLOAD_CLIENTS.put(info.fileId, clientId);
             TICKS_SINCE_LAST_PART.put(info.fileId, 0);
             doTick = true;
-            NetworkManager.SEQUENCE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ServerMidiUploadPacket(info.fileId));
+            NetworkProxy.sendToPlayer(player, new ServerMidiUploadPacket(info.fileId));
         }
-    }
-
-    public static ServerPlayer getServerPlayerById(UUID clientId) {
-        return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(clientId);
     }
 
     public static byte[] getMissingParts(UUID fileId, Byte expectedParts) {
@@ -192,6 +182,6 @@ public class ServerMidiUploadManager {
     }
 
     public static void requestParts(ServerPlayer player, UUID fileId, byte[] parts) {
-        NetworkManager.SEQUENCE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ServerMidiUploadPacket(fileId, parts));
+        NetworkProxy.sendToPlayer(player, new ServerMidiUploadPacket(fileId, parts));
     }
 }

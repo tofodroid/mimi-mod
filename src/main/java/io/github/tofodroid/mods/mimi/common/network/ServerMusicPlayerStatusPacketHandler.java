@@ -13,7 +13,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class ServerMusicPlayerStatusPacketHandler {
     public static void handlePacket(final ServerMusicPlayerStatusPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -29,7 +28,7 @@ public class ServerMusicPlayerStatusPacketHandler {
         AServerMusicTransmitter player = ServerMusicTransmitterManager.getMusicPlayer(request.musicPlayerId);
         
         if(player != null) {
-            NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), player.getStatus());
+            NetworkProxy.sendToPlayer(sender, player.getStatus());
         }
     }
     

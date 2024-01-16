@@ -8,23 +8,16 @@ import java.util.UUID;
 
 import javax.sound.midi.Sequence;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
+import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
 import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ServerMusicTransmitterManager {
+public abstract class ServerMusicTransmitterManager {
     private static final Set<UUID> PLAYING_LIST = new HashSet<>();
     private static final Map<UUID,AServerMusicTransmitter> PLAYER_MAP = new HashMap<>();
     private static final Map<UUID, Set<UUID>> MIDI_LOAD_CACHE_MAP = new HashMap<>();
@@ -90,60 +83,53 @@ public class ServerMusicTransmitterManager {
         return hasPlaying;
     }
 
-    @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
-            return;
-        }
-
-        if(PLAYER_MAP.containsKey(event.player.getUUID()) && !EntityUtils.playerHasActiveTransmitter(event.player)) {
-            PLAYER_MAP.get(event.player.getUUID()).stop();
+    public static void onServerTick() {
+        for(UUID playerId : PLAYER_MAP.keySet()) {
+            ServerPlayer player = ServerExecutor.getServerPlayerById(playerId);
+            if(!EntityUtils.playerHasActiveTransmitter(player)) {
+                PLAYER_MAP.get(player.getUUID()).stop();
+            }
         }
     }
 
-    @SubscribeEvent
-    public static void onServerStopping(ServerStoppingEvent event) {
+    public static void onPlayerLoggedOut(ServerPlayer player) {
+        removeTransmitter(player.getUUID());
+    }
+
+    public static void onServerStopping() {
         clearMusicPlayers();
     }
-    
-    @SubscribeEvent
-    public static void onPlayerDeath(PlayerEvent.PlayerRespawnEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
+
+    public static void onLivingDeath(LivingEntity entity) {
+        if(!(entity instanceof ServerPlayer) ){
             return;
         }
-        AServerMusicTransmitter player = getMusicPlayer(event.getEntity().getUUID());
-        if(player != null) {
-            player.stop();
+        AServerMusicTransmitter transmitter = getMusicPlayer(entity.getUUID());
+
+        if(transmitter != null) {
+            transmitter.stop();
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
+    public static void onEntityChangeDimension(Entity entity) {
+        if(!(entity instanceof ServerPlayer)) {
             return;
         }
-        removeTransmitter(event.getEntity().getUUID());
+        AServerMusicTransmitter transmitter = getMusicPlayer(entity.getUUID());
+
+        if(transmitter != null) {
+            transmitter.allNotesOff();
+        }
     }
 
-    @SubscribeEvent
-    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
+    public static void onEntityTeleport(Entity entity) {
+        if(!(entity instanceof ServerPlayer)) {
             return;
         }
-        AServerMusicTransmitter player = getMusicPlayer(event.getEntity().getUUID());
-        if(player != null) {
-            player.allNotesOff();
-        }
-    }
-    
-    @SubscribeEvent
-    public static void onEntityTeleport(EntityTeleportEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer)) {
-            return;
-        }
-        AServerMusicTransmitter player = getMusicPlayer(event.getEntity().getUUID());
-        if(player != null) {
-            player.allNotesOff();
+
+        AServerMusicTransmitter transmitter = getMusicPlayer(entity.getUUID());
+        if(transmitter != null) {
+            transmitter.allNotesOff();
         }
     }
 

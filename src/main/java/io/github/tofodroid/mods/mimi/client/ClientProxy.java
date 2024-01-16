@@ -4,7 +4,7 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiDataManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -61,7 +61,7 @@ public class ClientProxy implements Proxy {
             // Ignore the first response and do it again because initial login to server adds a lot of latency
             if(this.startSyncEpoch == null) {
                 this.startSyncEpoch = Util.getEpochMillis();
-                NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket(0l, false));
+                NetworkProxy.sendToServer(new ServerTimeSyncPacket(0l, false));
             } else {
                 this.serverStartEpoch = Util.getEpochMillis() - message.currentServerMilli - ((Util.getEpochMillis() - this.startSyncEpoch)/2);
                 this.startSyncEpoch = null;

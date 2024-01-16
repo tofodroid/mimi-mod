@@ -8,7 +8,6 @@ import net.minecraft.Util;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class ServerTimeSyncPacketHandler {
     public static Long lastHandleMillis = Util.getEpochMillis();
@@ -30,6 +29,6 @@ public class ServerTimeSyncPacketHandler {
     }
     
     public static void handlePacketServer(final ServerTimeSyncPacket message, ServerPlayer sender) {
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerTimeSyncPacket(MIMIMod.proxy.getCurrentServerMillis(), message.firstRequest));
+        NetworkProxy.sendToPlayer(sender, new ServerTimeSyncPacket(MIMIMod.proxy.getCurrentServerMillis(), message.firstRequest));
     }
 }

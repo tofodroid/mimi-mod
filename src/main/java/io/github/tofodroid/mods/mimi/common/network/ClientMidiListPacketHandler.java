@@ -9,7 +9,6 @@ import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmit
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class ClientMidiListPacketHandler {
     public static void handlePacket(final ClientMidiListPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -23,7 +22,7 @@ public class ClientMidiListPacketHandler {
 
     public static void handlePacketClient(final ClientMidiListPacket message) {
         MIMIMod.proxy.clientMidiFiles().refresh();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ClientMidiListPacket(false, MIMIMod.proxy.clientMidiFiles().getSortedSongInfos()));
+        NetworkProxy.sendToServer(new ClientMidiListPacket(false, MIMIMod.proxy.clientMidiFiles().getSortedSongInfos()));
     }
     
     public static void handlePacketServer(final ClientMidiListPacket message, ServerPlayer sender) {
@@ -41,6 +40,6 @@ public class ClientMidiListPacketHandler {
             player = ServerMusicTransmitterManager.getMusicPlayer(sender.getUUID());
         }
 
-        NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMusicPlayerSongListPacket(sender.getUUID(), player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
+        NetworkProxy.sendToPlayer(sender, new ServerMusicPlayerSongListPacket(sender.getUUID(), player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
     }
 }

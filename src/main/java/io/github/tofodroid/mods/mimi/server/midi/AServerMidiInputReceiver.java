@@ -7,12 +7,11 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
+import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public abstract class AServerMidiInputReceiver implements Receiver {
     private volatile boolean open = true;
@@ -38,8 +37,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createNoteEvent(channel, midiNote, velocity);
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
+        ServerExecutor.executeOnServerThread(() -> {
             ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
         });        
     }
@@ -49,8 +47,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createNoteEvent(channel, midiNote, Integer.valueOf(0).byteValue());
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
+        ServerExecutor.executeOnServerThread(() -> {
             ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
         });     
     }
@@ -64,8 +61,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createAllNotesOffEvent(channel);
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
+        ServerExecutor.executeOnServerThread(() -> {
             ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
         });     
     }
@@ -75,8 +71,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createControllerEvent(channel, controller, value);
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.execute(() -> {
+        ServerExecutor.executeOnServerThread(() -> {
             ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
         });     
     }

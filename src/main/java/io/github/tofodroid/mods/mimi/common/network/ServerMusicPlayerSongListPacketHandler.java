@@ -11,7 +11,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class ServerMusicPlayerSongListPacketHandler {
     public static void handlePacket(final ServerMusicPlayerSongListPacket message, Supplier<NetworkEvent.Context> ctx) {
@@ -28,7 +27,7 @@ public class ServerMusicPlayerSongListPacketHandler {
 
         if(player != null) {
             player.refreshSongs();
-            NetworkManager.INFO_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new ServerMusicPlayerSongListPacket(message.musicPlayerId, player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
+            NetworkProxy.sendToPlayer(sender, new ServerMusicPlayerSongListPacket(message.musicPlayerId, player.getCurrentSongsSorted(), player.getCurrentFavoriteIndicies()));
         }
     }
     

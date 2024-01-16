@@ -8,11 +8,11 @@ import java.util.UUID;
 import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CONTROL;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 import net.minecraft.client.gui.GuiGraphics;
@@ -298,14 +298,14 @@ public class GuiTransmitter extends BaseGui {
     }
 
     protected void sendTransmitterCommand(CONTROL control) {
-        NetworkManager.INFO_CHANNEL.sendToServer(new TransmitterControlPacket(musicPlayerId, control));
+        NetworkProxy.sendToServer(new TransmitterControlPacket(musicPlayerId, control));
     }
 
     protected void startRefreshPlayerStatus() {
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerMusicPlayerStatusPacket(this.musicPlayerId));
+        NetworkProxy.sendToServer(new ServerMusicPlayerStatusPacket(this.musicPlayerId));
     }
 
     protected void startRefreshSongList() {
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerMusicPlayerSongListPacket(this.musicPlayerId));
+        NetworkProxy.sendToServer(new ServerMusicPlayerSongListPacket(this.musicPlayerId));
     }
 }

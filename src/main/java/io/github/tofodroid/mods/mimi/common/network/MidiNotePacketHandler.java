@@ -74,7 +74,7 @@ public class MidiNotePacketHandler {
             // Forward to nearby players
             potentialPlayers.forEach(player -> {
                 if(player != sender) {
-                    NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
+                    NetworkProxy.sendToPlayer(player, message);
                 }
             });
 

@@ -23,8 +23,8 @@ import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.TransmitterSourceWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.SyncInstrumentPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import io.github.tofodroid.mods.mimi.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
@@ -186,7 +186,7 @@ public class GuiInstrument extends BaseGui {
     }
 
     public void syncInstrumentToServer() {
-        NetworkManager.INFO_CHANNEL.sendToServer(new SyncInstrumentPacket(instrumentStack, this.handIn));
+        NetworkProxy.sendToServer(new SyncInstrumentPacket(instrumentStack, this.handIn));
     }
 
     public Byte getInstrumentId() {
@@ -347,7 +347,7 @@ public class GuiInstrument extends BaseGui {
         Byte controller = 64;
         Byte value = on ? Byte.MAX_VALUE : 0;
         MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos(), handIn);
-        NetworkManager.NOTE_CHANNEL.sendToServer(packet);
+        NetworkProxy.sendToServer(packet);
         ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
     }
 
@@ -407,7 +407,7 @@ public class GuiInstrument extends BaseGui {
             }
 
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos(), handIn);
-            NetworkManager.NOTE_CHANNEL.sendToServer(packet);
+            NetworkProxy.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
@@ -420,7 +420,7 @@ public class GuiInstrument extends BaseGui {
             this.releaseHeldNotes();
 
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos(), handIn);
-            NetworkManager.NOTE_CHANNEL.sendToServer(packet);
+            NetworkProxy.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
@@ -445,7 +445,7 @@ public class GuiInstrument extends BaseGui {
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         if(this.instrumentId != null) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, InstrumentDataUtils.applyVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos(), handIn);
-            NetworkManager.NOTE_CHANNEL.sendToServer(packet);
+            NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);
             this.heldNotes.put(midiNote, Instant.now());
@@ -455,7 +455,7 @@ public class GuiInstrument extends BaseGui {
     private void onGuiNoteRelease(Byte midiNote) {
         if(this.instrumentId != null) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos(), handIn);
-            NetworkManager.NOTE_CHANNEL.sendToServer(packet);
+            NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
 
             if(this.heldNotes.remove(midiNote) != null) {
