@@ -51,7 +51,7 @@ public class MIMIMod {
    
     @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
-        proxy.init(event);
+        proxy.init();
     }
 
     @SubscribeEvent

@@ -19,16 +19,7 @@ import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 2;
     protected Boolean loggingOff = false;
@@ -51,13 +42,8 @@ public class MidiMultiSynthManager {
         }
     }
 
-    @SubscribeEvent
     @SuppressWarnings("resource")
-    public void handleTick(ClientTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT) {
-            return;
-        }
-
+    public void handleClientTick() {
         midiTickCounter++;
 
         // Tick synths every N tickets
@@ -77,7 +63,17 @@ public class MidiMultiSynthManager {
         }
     }
 
-    @SuppressWarnings("resource")
+    public void handleLogout() {
+        this.close();
+        this.loggingOff = true;
+    }
+
+    public void handleLogin() {
+        this.loggingOff = false;
+        this.reloadSynths();
+        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket());
+    }
+
     public void reloadSynths() {
         if(localSynth != null)
             localSynth.close();
@@ -88,19 +84,6 @@ public class MidiMultiSynthManager {
         this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
-    }
-
-    @SubscribeEvent
-    public void handleSelfLogOut(LoggingOut event) {
-        this.close();
-        this.loggingOff = true;
-    }
-
-    @SubscribeEvent
-    public void handleSelfLogin(LoggingIn event) {
-        this.loggingOff = false;
-        this.reloadSynths();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket());
     }
 
     public Long getBufferTime(Long noteServerTime) {

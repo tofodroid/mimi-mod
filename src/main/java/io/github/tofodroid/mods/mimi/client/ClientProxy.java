@@ -9,24 +9,21 @@ import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy implements Proxy {
     private MidiMultiSynthManager MIDI_SYNTH;
     private MidiDataManager MIDI_DATA;
     private FilesystemMidiFileProvider CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false);
+    
+    // In singleplayer this proxy is used on server side, so we need both providers
     private FilesystemMidiFileProvider SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true);
     private Long startSyncEpoch = null;
     private Long serverStartEpoch = 0l;
 
     @Override
-    public void init(final FMLCommonSetupEvent event) {
-        MIDI_SYNTH = new MidiMultiSynthManager();
-        MinecraftForge.EVENT_BUS.register(MIDI_SYNTH);
-        
+    public void init() {
+        MIDI_SYNTH = new MidiMultiSynthManager();        
         MIDI_DATA = new MidiDataManager();
-        MinecraftForge.EVENT_BUS.register(MIDI_DATA);
     }
 
     @Override

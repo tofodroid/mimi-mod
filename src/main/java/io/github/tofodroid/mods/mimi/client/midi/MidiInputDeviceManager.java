@@ -20,14 +20,7 @@ import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.api.distmarker.Dist;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MidiInputDeviceManager extends AMidiInputSourceManager {
     private List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay = new ArrayList<>();
     private String selectedDeviceName;
@@ -91,13 +84,11 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
         return devices;
     }
 
-    @SubscribeEvent
-    public void handleTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isLocalPlayer()) {
+    public void handlePlayerTick(Player player) {
+        if(!player.isLocalPlayer()) {
             return;
         }
-
-        this.localInstrumentsToPlay = localInstrumentsToPlay(event.player);
+        this.localInstrumentsToPlay = localInstrumentsToPlay(player);
     }
     
     protected List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay(Player player) {
