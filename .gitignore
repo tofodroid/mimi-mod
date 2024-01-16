@@ -1,15 +1,19 @@
 # IDEs
-bin
 .settings
 .vscode
 .metadata
 .classpath
 .project
 .idea
+runClient.launch
+runData.launch
+runGameTestServer.launch
+runServer.launch
 
 # Gradle
 .gradle
 build
+bin
 
 # Forge
 run
