@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileTransmitter extends AConfigurableMidiTile {
+    public static final String REGISTRY_NAME = "transmitter";
     private UUID id;
 
     public TileTransmitter(BlockPos pos, BlockState state) {

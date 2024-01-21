@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
@@ -20,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileMechanicalMaestro extends AContainerTile {
+    public static final String REGISTRY_NAME = "mechanicalmaestro";
     public static final UUID MECH_SOURCE_ID = new UUID(0,3);
 
     private UUID id;
@@ -43,7 +43,7 @@ public class TileMechanicalMaestro extends AContainerTile {
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
-        return new ContainerMechanicalMaestro(id, playerInventory, this.getBlockPos());
+        return new ContainerMechanicalMaestro(id, playerInventory, this);
     }
 
     @Override
@@ -86,10 +86,8 @@ public class TileMechanicalMaestro extends AContainerTile {
         this.refreshMidiReceivers();
     }
 
-    @SuppressWarnings("null")
     public void refreshMidiReceivers() {
         if(this.hasLevel() && !this.level.isClientSide) {
-            MIMIMod.LOGGER.info("Mech Maestro refresh");
             if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
                 ServerMusicReceiverManager.loadMechanicalMaestroInstrumentReceivers(this);
             } else {

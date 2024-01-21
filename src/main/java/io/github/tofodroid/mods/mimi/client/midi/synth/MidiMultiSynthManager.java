@@ -12,10 +12,10 @@ import javax.sound.midi.Soundbank;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -87,7 +87,7 @@ public class MidiMultiSynthManager {
     }
 
     public Long getBufferTime(Long noteServerTime) {
-        return (MIMIMod.proxy.getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0)) + (MIMIMod.proxy.getServerStartEpoch() + noteServerTime);
+        return (MIMIMod.getProxy().getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0)) + (MIMIMod.getProxy().getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {

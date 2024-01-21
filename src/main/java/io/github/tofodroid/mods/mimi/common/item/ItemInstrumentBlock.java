@@ -19,7 +19,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
-    public final String REGISTRY_NAME;
+    protected final String REGISTRY_NAME;
     protected final InstrumentSpec spec;
 
     public ItemInstrumentBlock(BlockInstrument blockIn, Properties builder, String name) {
@@ -78,5 +78,10 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
             }
         }
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public String getRegistryName() {
+        return this.REGISTRY_NAME;
     }
 }

@@ -1,17 +1,12 @@
 package io.github.tofodroid.mods.mimi.common.container;
 
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
-import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 	private static final int INSTRUMENT_SLOT_L_X = 46;
@@ -21,47 +16,30 @@ public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 	private static final int INSTRUMENT_SLOT_R_X = 118;
 	private static final int INSTRUMENT_SLOT_R_Y = 35;
 
-	protected IItemHandler targetInventory;
-	private final BlockPos tilePos;
+	private Container targetContainer;
 
-    @SuppressWarnings("null")
-	public ContainerMechanicalMaestro(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
-		super(ModContainers.MECHANICALMAESTRO, id, playerInventory);
-		tilePos = extraData.readBlockPos();
-		this.targetInventory = playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y, 0));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y, 1));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y, 2));
+	public ContainerMechanicalMaestro(int id, Inventory playerInventory) {
+		this(id, playerInventory, new SimpleContainer(3));
 	}
 
-    @SuppressWarnings("null")
-	public ContainerMechanicalMaestro(int id, Inventory playerInventory, BlockPos pos) {
+	public ContainerMechanicalMaestro(int id, Inventory playerInventory, Container targetContainer) {
 		super(ModContainers.MECHANICALMAESTRO, id, playerInventory);
-		tilePos = pos;
-		this.targetInventory = playerInventory.player.level().getBlockEntity(tilePos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(NullPointerException::new);
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y, 0));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y, 1));
-		this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y, 2));
-	}
-
-	public TileMechanicalMaestro getMechanicalMaestroTile() {
-		BlockEntity ent = playerInventory.player.level().getBlockEntity(tilePos);
-
-		if(ent != null && ent instanceof TileMechanicalMaestro) {
-			return (TileMechanicalMaestro)ent;
-		}
-		return null;
+		this.targetContainer = targetContainer;
+		this.addSlot(buildInstrumentSlot(targetContainer, INSTRUMENT_SLOT_L_X, INSTRUMENT_SLOT_L_Y, 0));
+		this.addSlot(buildInstrumentSlot(targetContainer, INSTRUMENT_SLOT_M_X, INSTRUMENT_SLOT_M_Y, 1));
+		this.addSlot(buildInstrumentSlot(targetContainer, INSTRUMENT_SLOT_R_X, INSTRUMENT_SLOT_R_Y, 2));
+		this.targetContainer.startOpen(playerInventory.player);
 	}
 	
-    protected Slot buildInstrumentSlot(int xPos, int yPos, int index) {
-        return new SlotItemHandler(targetInventory, index, xPos, yPos) {
+    protected Slot buildInstrumentSlot(Container targetContainer, int xPos, int yPos, int index) {
+		return new Slot(targetContainer, index, xPos, yPos){
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof IInstrumentItem;
             }
         };
     }
-		
+
     @Override
     protected Integer getPlayerInventoryX() {
         return 10;
@@ -104,7 +82,14 @@ public class ContainerMechanicalMaestro extends APlayerInventoryContainer {
 	  return itemstack;
 	}
 	
-	public IItemHandler getTargetInventory() {
-		return targetInventory;
+	@Override
+	public boolean stillValid(Player p_40195_) {
+		return this.targetContainer.stillValid(p_40195_);
+	}
+
+	@Override
+	public void removed(Player p_40197_) {
+		super.removed(p_40197_);
+		this.targetContainer.stopOpen(p_40197_);
 	}
 }

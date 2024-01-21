@@ -6,14 +6,12 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.CreativeModeTab.Builder;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -30,40 +28,42 @@ import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 
 public final class ModItems {
+    public static Map<ResourceLocation, Item> ITEMS = new HashMap<>();
+    public static Map<ResourceLocation, CreativeModeTab> CREATIVE_TABS = new HashMap<>();
+
     // Instruments
-    public static List<ItemInstrumentHandheld> INSTRUMENT_ITEMS;
-    public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS;
+    public static List<ItemInstrumentHandheld> INSTRUMENT_ITEMS = buildHandheldInstruments();
+    public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS = buildBlockInstruments();
 
     // Other
-    public static ItemMidiDeviceConfig DEVICECONFIG;
-    public static ItemEnderTransmitter ENDERTRANSMITTER;
+    public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig());
+    public static ItemEnderTransmitter ENDERTRANSMITTER = create(ItemEnderTransmitter.REGISTRY_NAME, new ItemEnderTransmitter());
 
     // Blocks - Redstone
-    public static BlockItem TRANSMITTER;
-    public static BlockItem LISTENER;
-    public static BlockItem RECEIVER;
-    public static BlockItem MECHANICALMAESTRO;
-    public static BlockItem CONDUCTOR;
+    public static BlockItem TRANSMITTER = create(BlockTransmitter.REGISTRY_NAME, new BlockItem(ModBlocks.TRANSMITTER, new Item.Properties().stacksTo(64)));
+    public static BlockItem LISTENER = create(BlockListener.REGISTRY_NAME, new BlockItem(ModBlocks.LISTENER, new Item.Properties().stacksTo(64)));
+    public static BlockItem RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockItem(ModBlocks.RECEIVER, new Item.Properties().stacksTo(64)));
+    public static BlockItem MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().stacksTo(64)));
+    public static BlockItem CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().stacksTo(64)));
     
     // Blocks - LED Cubes
-    public static BlockItem LEDCUBE_A;
-    public static BlockItem LEDCUBE_B;
-    public static BlockItem LEDCUBE_C;
-    public static BlockItem LEDCUBE_D;
-    public static BlockItem LEDCUBE_E;
-    public static BlockItem LEDCUBE_F;
-    public static BlockItem LEDCUBE_G;
-    public static BlockItem LEDCUBE_H;
+    public static BlockItem LEDCUBE_A = create(BlockLedCube.REGISTRY_NAME_A, new BlockItem(ModBlocks.LEDCUBE_A, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_B = create(BlockLedCube.REGISTRY_NAME_B, new BlockItem(ModBlocks.LEDCUBE_B, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_C = create(BlockLedCube.REGISTRY_NAME_C, new BlockItem(ModBlocks.LEDCUBE_C, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_D = create(BlockLedCube.REGISTRY_NAME_D, new BlockItem(ModBlocks.LEDCUBE_D, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_E = create(BlockLedCube.REGISTRY_NAME_E, new BlockItem(ModBlocks.LEDCUBE_E, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_F = create(BlockLedCube.REGISTRY_NAME_F, new BlockItem(ModBlocks.LEDCUBE_F, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_G = create(BlockLedCube.REGISTRY_NAME_G, new BlockItem(ModBlocks.LEDCUBE_G, new Item.Properties().stacksTo(64)));
+    public static BlockItem LEDCUBE_H = create(BlockLedCube.REGISTRY_NAME_H, new BlockItem(ModBlocks.LEDCUBE_H, new Item.Properties().stacksTo(64)));
 
     // Blocks - Other
-    public static BlockItem TUNINGTABLE;
+    public static BlockItem TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().stacksTo(64)));
 
-    public static void registerCreativeTab(final RegisterEvent.RegisterHelper<CreativeModeTab> event) {
-        Builder builder = CreativeModeTab.builder();
-        // Set name of tab to display
-        builder.title(Component.translatable("itemGroup." + MIMIMod.MODID + ".group"))
+    // Creative Tabs
+    public static CreativeModeTab CREATIVE_TAB = create("group", CreativeModeTab.builder()
+        .title(Component.translatable("itemGroup." + MIMIMod.MODID + ".group"))
         // Set icon of creative tab
-        .icon(() -> new ItemStack(ModBlocks.getBlockInstruments().get(0)))
+        .icon(() -> new ItemStack(ModBlocks.INSTRUMENTS.get(0)))
         // Add default items to tab
         .displayItems((parameters, output) -> {
             output.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
@@ -85,84 +85,16 @@ public final class ModItems {
                 LEDCUBE_G,
                 LEDCUBE_H
             )));
-        });
-        event.register(new ResourceLocation(MIMIMod.MODID, "group"), builder.build());
-    }
-
+        }));
+    
     public static List<ItemStack> getStacksForItems(List<? extends Item> items) {
         return items.stream().map(i -> new ItemStack(i)).collect(Collectors.toList());
-    }
-
-    public static void submitRegistrations(final RegisterEvent.RegisterHelper<Item> event) {
-        // Other Items
-        DEVICECONFIG = new ItemMidiDeviceConfig();
-        event.register(ItemMidiDeviceConfig.REGISTRY_NAME, DEVICECONFIG);
-
-        ENDERTRANSMITTER = new ItemEnderTransmitter();
-        event.register(ItemEnderTransmitter.REGISTRY_NAME, ENDERTRANSMITTER);
-
-        // Redstone Blocks
-        TRANSMITTER = new BlockItem(ModBlocks.TRANSMITTER.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockTransmitter.REGISTRY_NAME, TRANSMITTER);
-
-        LISTENER = new BlockItem(ModBlocks.LISTENER.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockListener.REGISTRY_NAME, LISTENER);
-
-        RECEIVER = new BlockItem(ModBlocks.RECEIVER.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockReceiver.REGISTRY_NAME, RECEIVER);
-
-        MECHANICALMAESTRO = new BlockItem(ModBlocks.MECHANICALMAESTRO.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockMechanicalMaestro.REGISTRY_NAME, MECHANICALMAESTRO);
-        
-        CONDUCTOR = new BlockItem(ModBlocks.CONDUCTOR.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockConductor.REGISTRY_NAME, CONDUCTOR);
-
-        // LED Cube Blocks
-        LEDCUBE_A = new BlockItem(ModBlocks.LEDCUBE_A.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_A, LEDCUBE_A);
-
-        LEDCUBE_B = new BlockItem(ModBlocks.LEDCUBE_B.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_B, LEDCUBE_B);
-
-        LEDCUBE_C = new BlockItem(ModBlocks.LEDCUBE_C.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_C, LEDCUBE_C);
-
-        LEDCUBE_D = new BlockItem(ModBlocks.LEDCUBE_D.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_D, LEDCUBE_D);
-
-        LEDCUBE_E = new BlockItem(ModBlocks.LEDCUBE_E.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_E, LEDCUBE_E);
-
-        LEDCUBE_F = new BlockItem(ModBlocks.LEDCUBE_F.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_F, LEDCUBE_F);
-
-        LEDCUBE_G = new BlockItem(ModBlocks.LEDCUBE_G.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_G, LEDCUBE_G);
-
-        LEDCUBE_H = new BlockItem(ModBlocks.LEDCUBE_H.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockLedCube.REGISTRY_NAME_H, LEDCUBE_H);
-
-        // Other Blocks
-        TUNINGTABLE = new BlockItem(ModBlocks.TUNINGTABLE.get(), new Item.Properties().stacksTo(64));
-        event.register(BlockTuningTable.REGISTRY_NAME, TUNINGTABLE);
-        
-        // Instrument Items
-        INSTRUMENT_ITEMS = buildHandheldInstruments();
-        INSTRUMENT_ITEMS.forEach((ItemInstrumentHandheld instrument) -> {
-            event.register(instrument.REGISTRY_NAME, instrument);
-        });
-
-        // Instrument Block Items
-        BLOCK_INSTRUMENT_ITEMS = buildBlockInstruments();
-        BLOCK_INSTRUMENT_ITEMS.forEach((ItemInstrumentBlock instrument) -> {
-            event.register(instrument.REGISTRY_NAME, instrument);
-        });
     }
 
     public static List<ItemInstrumentHandheld> buildHandheldInstruments() {
         List<ItemInstrumentHandheld> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
-            list.add(new ItemInstrumentHandheld(instrument));
+            list.add(create(instrument.registryName, new ItemInstrumentHandheld(instrument)));
         }
         return list;
     }
@@ -170,14 +102,25 @@ public final class ModItems {
     public static List<ItemInstrumentBlock> buildBlockInstruments() {
         List<ItemInstrumentBlock> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
-            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(MIMIMod.MODID, instrument.registryName));
+            Block block = ModBlocks.BLOCKS.get(new ResourceLocation(MIMIMod.MODID, instrument.registryName));
 
             if(block instanceof BlockInstrument) {
-                list.add((ItemInstrumentBlock)new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().stacksTo(1), instrument.registryName));
+                list.add(create(instrument.registryName, new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().stacksTo(1), instrument.registryName)));
             } else {
                 MIMIMod.LOGGER.error("Failed to create ItemInstrumentBlock for Instrument: " + instrument.registryName + " - Corresponding Registry Block is not a BlockInstrument!");
             }            
         }
         return list;
+    }
+
+    public static CreativeModeTab create(String id, CreativeModeTab.Builder builder) {
+        CreativeModeTab tab = builder.build();
+        CREATIVE_TABS.put(new ResourceLocation(MIMIMod.MODID, id), tab);
+        return tab;
+    }
+
+    public static <T extends Item> T create(String id, T item) {
+        ITEMS.put(new ResourceLocation(MIMIMod.MODID, id), item);
+        return item;
     }
 }

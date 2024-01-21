@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
-import io.github.tofodroid.mods.mimi.forge.common.network.NetworkManager;
+import io.github.tofodroid.mods.mimi.forge.common.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

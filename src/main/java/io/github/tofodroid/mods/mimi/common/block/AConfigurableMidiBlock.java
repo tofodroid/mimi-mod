@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -62,17 +61,12 @@ public abstract class AConfigurableMidiBlock<B extends AConfigurableMidiTile> ex
     }
     
     @Override
+    @SuppressWarnings("deprecation")
     public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
         BlockEntity tile = getter.getBlockEntity(pos);
         
         if(tile != null && tile instanceof AConfigurableMidiTile) {
             return ((AConfigurableMidiTile)tile).getSourceStack();
-        } else {
-            if(tile == null) {
-                MIMIMod.LOGGER.info("Tile is null");
-            } else {
-                MIMIMod.LOGGER.info("Tile is " + tile.getClass());
-            }
         }
 
         return super.getCloneItemStack(getter, pos, state);

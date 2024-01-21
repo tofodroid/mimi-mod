@@ -18,8 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class AStaticInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
     protected final Integer INVENTORY_SIZE;
@@ -135,16 +133,6 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
 
     protected NonNullList<ItemStack> getItems() {
         return this.items;
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-        return super.getCapability(capability, facing);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
     }
 
     @Override

@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileReceiver extends AConfigurableMidiPowerSourceTile {
+    public static final String REGISTRY_NAME = "receiver";
+
     public TileReceiver(BlockPos pos, BlockState state) {
         super(ModTiles.RECEIVER, pos, state);
     }

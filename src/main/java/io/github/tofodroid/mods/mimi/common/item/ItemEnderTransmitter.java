@@ -28,8 +28,8 @@ public class ItemEnderTransmitter extends Item {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        if(MIMIMod.proxy.isClient()) {
-            ServerMusicPlayerStatusPacket status = ((ClientProxy)MIMIMod.proxy).getMidiData().getPlayerStatusPacket();
+        if(MIMIMod.getProxy().isClient()) {
+            ServerMusicPlayerStatusPacket status = ((ClientProxy)MIMIMod.getProxy()).getMidiData().getPlayerStatusPacket();
             
             if(status != null) {
                 return status.isPlaying;

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.config;
+package io.github.tofodroid.mods.mimi.forge.common.config;
 
 import java.util.Arrays;
 

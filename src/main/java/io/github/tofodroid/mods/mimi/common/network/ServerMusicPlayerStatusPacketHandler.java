@@ -23,7 +23,7 @@ public class ServerMusicPlayerStatusPacketHandler {
         }
 
         if(message.musicPlayerId.equals(Minecraft.getInstance().player.getUUID())) {
-            ((ClientProxy)MIMIMod.proxy).getMidiData().setPlayerStatusPakcet(message);
+            ((ClientProxy)MIMIMod.getProxy()).getMidiData().setPlayerStatusPakcet(message);
         }
     }
 }

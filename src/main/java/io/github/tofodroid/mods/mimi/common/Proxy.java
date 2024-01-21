@@ -4,6 +4,7 @@ import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import net.minecraft.Util;
 
 public interface Proxy {
+    public Boolean isInitialized();
     public Boolean isClient();
     public Long getServerStartEpoch();
     public FilesystemMidiFileProvider serverMidiFiles();

@@ -14,10 +14,8 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLPaths;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FilesystemMidiFileProvider implements IMidiFileProvider {
     public static final String MIMI_CONFIG_DIR = "mimi";
     public static final String CLIENT_MIDI_DIR = "midi_files";
@@ -72,7 +70,7 @@ public class FilesystemMidiFileProvider implements IMidiFileProvider {
 
     public FilesystemMidiFileProvider initFromConfigFolder() {
         try {
-            File mimiFolder = new File(FMLPaths.CONFIGDIR.get().toString(), MIMI_CONFIG_DIR);
+            File mimiFolder = new File(ConfigProxy.getConfigPath().toString(), MIMI_CONFIG_DIR);
             if (!mimiFolder.exists() && !mimiFolder.mkdirs() && !mimiFolder.isDirectory()) {
                 throw new IOException("Could not create MIMI config directory!");
             }

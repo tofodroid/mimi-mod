@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileInstrument extends AStaticInventoryTile {
+    public static final String REGISTRY_NAME = "instrument";
     public static final String COLOR_TAG = "color";
     protected EntitySeat currentSeat = null;
     protected Integer color;

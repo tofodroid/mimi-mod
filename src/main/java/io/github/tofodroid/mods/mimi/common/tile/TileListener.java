@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileListener extends AConfigurableMidiPowerSourceTile {
+    public static final String REGISTRY_NAME = "listener";
     private static final Integer UPDATE_EVERY_TICKS = 8;
 
     private Integer updateTickCount = 0;

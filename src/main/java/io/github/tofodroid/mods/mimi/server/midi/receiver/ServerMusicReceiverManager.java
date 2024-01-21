@@ -40,7 +40,7 @@ public abstract class ServerMusicReceiverManager {
         }
     }
 
-    @SuppressWarnings("null")
+    @SuppressWarnings("resource")
     public static void loadMechanicalMaestroInstrumentReceivers(TileMechanicalMaestro tile) {
         if(!(tile.getLevel() instanceof ServerLevel)) {
             return;
@@ -69,6 +69,7 @@ public abstract class ServerMusicReceiverManager {
         }
     }
 
+    @SuppressWarnings("resource")
     public static void loadEntityInstrumentReceivers(LivingEntity entity) {
         if(!(entity.level() instanceof ServerLevel)) {
             return;

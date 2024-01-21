@@ -1,16 +1,13 @@
-package io.github.tofodroid.mods.mimi.common.config;
+package io.github.tofodroid.mods.mimi.forge.common.config;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import java.nio.file.Path;
 
 import org.apache.commons.lang3.tuple.Pair;
-
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig.Type;
+import net.minecraftforge.fml.loading.FMLPaths;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ModConfigs {
     public static ClientConfig CLIENT;
     private static ForgeConfigSpec CLIENTSPEC;
@@ -27,8 +24,12 @@ public class ModConfigs {
         COMMONSPEC = commonPair.getRight();
     }
 
-    public static void preInit(ModLoadingContext context) { 
-        context.registerConfig(Type.CLIENT, ModConfigs.CLIENTSPEC);
-        context.registerConfig(Type.COMMON, ModConfigs.COMMONSPEC);
+    public static void registerConfigs() { 
+        ModLoadingContext.get().registerConfig(Type.CLIENT, ModConfigs.CLIENTSPEC);
+        ModLoadingContext.get().registerConfig(Type.COMMON, ModConfigs.COMMONSPEC);
+    }
+
+    public static Path getConfigPath() {
+        return FMLPaths.CONFIGDIR.get();
     }
 }

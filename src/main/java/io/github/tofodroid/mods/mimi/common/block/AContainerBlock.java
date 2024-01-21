@@ -4,14 +4,12 @@ import io.github.tofodroid.mods.mimi.common.tile.AContainerTile;
 import io.github.tofodroid.mods.mimi.common.tile.AStaticInventoryTile;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -38,10 +36,7 @@ public abstract class AContainerBlock<T extends BlockEntity & Container> extends
         if(!worldIn.isClientSide) {
             T tile = getTileForBlock(worldIn, pos);
             if(tile != null) {
-                ServerPlayer serverPlayerEntity = (ServerPlayer) player;
-                NetworkHooks.openScreen(serverPlayerEntity, this.getMenuProvider(state, worldIn, pos), (FriendlyByteBuf -> {
-                    writeGuiFriendlyByteBuf(state, worldIn, pos, player, hand, FriendlyByteBuf);
-                }));
+                player.openMenu(this.getMenuProvider(state, worldIn, pos));
                 return InteractionResult.CONSUME;
             }
         }

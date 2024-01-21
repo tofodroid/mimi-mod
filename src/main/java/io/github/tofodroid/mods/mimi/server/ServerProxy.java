@@ -5,11 +5,14 @@ import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import net.minecraft.Util;
 
 public class ServerProxy implements Proxy {
+    private Boolean initialized = false;
     private final Long serverStartEpoch = Util.getEpochMillis();
     private FilesystemMidiFileProvider MIDI_FILES = new FilesystemMidiFileProvider(true);
 
     @Override
-    public void init() { }
+    public void init() {
+        this.initialized = true;
+    }
 
     @Override
     public Boolean isClient() {
@@ -29,5 +32,10 @@ public class ServerProxy implements Proxy {
     @Override
     public FilesystemMidiFileProvider clientMidiFiles() {
         return MIDI_FILES;
+    }
+
+    @Override
+    public Boolean isInitialized() {
+        return this.initialized;
     }
 }

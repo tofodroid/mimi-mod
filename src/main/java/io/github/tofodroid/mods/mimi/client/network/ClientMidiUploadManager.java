@@ -53,7 +53,6 @@ public abstract class ClientMidiUploadManager {
 
     public static void uploadFileToServer(LocalMidiInfo file) {
         // Generate and send all packets
-        MIMIMod.LOGGER.info("*** Starting full upload for fileId: " + file.fileId.toString());
         for(ServerMidiUploadPacket packet : generateUploadPackets(file)) {
             sendServerBoundPacket(packet);
         }
@@ -61,7 +60,6 @@ public abstract class ClientMidiUploadManager {
 
     public static void uploadFilePartsToServer(LocalMidiInfo file, byte[] parts) {
         // Generate and send subset of packets
-        MIMIMod.LOGGER.info("*** Starting partial (" + parts.length + ") reupload for fileId: " + file.fileId.toString());
         List<ServerMidiUploadPacket> packets = generateUploadPackets(file);
         for(byte part : parts) {
             sendServerBoundPacket(packets.get(part));
@@ -74,7 +72,7 @@ public abstract class ClientMidiUploadManager {
     
     public static void handlePacket(final ServerMidiUploadPacket message) {
         if(message.fileId != null) {
-            LocalMidiInfo fileInfo = MIMIMod.proxy.clientMidiFiles().getInfoById(message.fileId);
+            LocalMidiInfo fileInfo = MIMIMod.getProxy().clientMidiFiles().getInfoById(message.fileId);
 
             if(fileInfo != null) {
                 if(message.data.length > 0) {

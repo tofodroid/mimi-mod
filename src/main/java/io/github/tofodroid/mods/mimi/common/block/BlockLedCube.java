@@ -40,6 +40,8 @@ public class BlockLedCube extends AColoredBlock {
       this.registerDefaultState(this.defaultBlockState().setValue(POWERED, Boolean.valueOf(false)).setValue(DYE_ID, 0));
    }
 
+   @Override
+   @SuppressWarnings("deprecation")
    public float getShadeBrightness(BlockState state, BlockGetter p_153690_, BlockPos p_153691_) {
       return state.getValue(BlockLedCube.POWERED) ? 1.0f : super.getShadeBrightness(state, p_153690_, p_153691_);
    }
@@ -57,6 +59,7 @@ public class BlockLedCube extends AColoredBlock {
    }
 
    @Override
+   @SuppressWarnings("deprecation")
    public int getLightBlock(BlockState state, BlockGetter p_60586_, BlockPos p_60587_) {
       return state.getValue(BlockLedCube.POWERED) ? BlockStateProperties.MAX_LEVEL_15 : super.getLightBlock(state, p_60586_, p_60587_);
    }

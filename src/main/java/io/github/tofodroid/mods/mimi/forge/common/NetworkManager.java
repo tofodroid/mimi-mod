@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.forge.common.network;
+package io.github.tofodroid.mods.mimi.forge.common;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

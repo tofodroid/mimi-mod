@@ -74,6 +74,7 @@ public final class AudioFileSoundbankReader extends SoundbankReader {
         return null;
     }
 
+    @SuppressWarnings("resource")
     public Soundbank getSoundbank(AudioInputStream ais)
             throws InvalidMidiDataException, IOException {
         try {

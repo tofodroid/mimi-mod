@@ -63,7 +63,6 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
     }
     
     public void onSongEnd() {
-        MIMIMod.LOGGER.info("Song end...");
         switch(this.playlistHandler.getLoopMode()) {
             case ALL:
                 this.next();
@@ -162,7 +161,7 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
 
         if(info.serverMidi) {
             this.loading = false;
-            LocalMidiInfo localInfo = MIMIMod.proxy.serverMidiFiles().getInfoById(info.fileId);
+            LocalMidiInfo localInfo = MIMIMod.getProxy().serverMidiFiles().getInfoById(info.fileId);
 
             if(localInfo != null) {
                 Sequence sequence = localInfo.loadSequenceFromFile();

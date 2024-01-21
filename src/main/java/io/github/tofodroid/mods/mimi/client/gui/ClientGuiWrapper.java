@@ -20,19 +20,19 @@ public abstract class ClientGuiWrapper {
     }
 
     public static void openListenerGui(Level world, BlockPos tilePos, ItemStack listenerStack) {
-        if(listenerStack.getItem().equals(ModBlocks.LISTENER.get().asItem())) {
+        if(listenerStack.getItem().equals(ModBlocks.LISTENER.asItem())) {
             openGui(world, new GuiListener(tilePos, listenerStack));
         }
     }
 
     public static void openReceiverGui(Level world, Player player, BlockPos tilePos, ItemStack receiverStack) {
-        if(receiverStack.getItem().equals(ModBlocks.RECEIVER.get().asItem())) {
+        if(receiverStack.getItem().equals(ModBlocks.RECEIVER.asItem())) {
             openGui(world, new GuiReceiver(player, tilePos, receiverStack));
         }
     }
 
     public static void openConductorGui(Level world, BlockPos tilePos, ItemStack conductorStack) {
-        if(conductorStack.getItem().equals(ModBlocks.CONDUCTOR.get().asItem())) {
+        if(conductorStack.getItem().equals(ModBlocks.CONDUCTOR.asItem())) {
             openGui(world, new GuiConductor(tilePos, conductorStack));
         }
     }

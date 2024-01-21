@@ -14,15 +14,15 @@ public class TransmitterNoteEvent {
     public final @Nonnull Long noteServerTime;
     
     public static TransmitterNoteEvent createNoteEvent(Byte channel, Byte note, Byte velocity) {
-        return new TransmitterNoteEvent(channel, note, velocity, MIMIMod.proxy.getCurrentServerMillis());
+        return new TransmitterNoteEvent(channel, note, velocity, MIMIMod.getProxy().getCurrentServerMillis());
     }
 
     public static TransmitterNoteEvent createAllNotesOffEvent(Byte channel) {
-        return new TransmitterNoteEvent(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), MIMIMod.proxy.getCurrentServerMillis());
+        return new TransmitterNoteEvent(channel, ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), MIMIMod.getProxy().getCurrentServerMillis());
     }
     
     public static TransmitterNoteEvent createControllerEvent(Byte channel, Byte controller, Byte value) {
-        return new TransmitterNoteEvent(channel, Integer.valueOf(-controller).byteValue(), value, MIMIMod.proxy.getCurrentServerMillis());
+        return new TransmitterNoteEvent(channel, Integer.valueOf(-controller).byteValue(), value, MIMIMod.getProxy().getCurrentServerMillis());
     }
 
     @SuppressWarnings("null")

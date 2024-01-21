@@ -29,7 +29,7 @@ public class GuiMidiInputConfig extends BaseGui {
 
     public GuiMidiInputConfig(Player player) {
         super(288, 156, 288, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
-        this.midiDataManager = ((ClientProxy)MIMIMod.proxy).getMidiData();
+        this.midiDataManager = ((ClientProxy)MIMIMod.getProxy()).getMidiData();
         availableDevices = this.midiDataManager.inputDeviceManager.getAvailableDevices();
     }
 

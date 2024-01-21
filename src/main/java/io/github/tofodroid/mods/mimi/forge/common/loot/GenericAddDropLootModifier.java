@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.common.loot;
+package io.github.tofodroid.mods.mimi.forge.common.loot;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

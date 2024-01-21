@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;

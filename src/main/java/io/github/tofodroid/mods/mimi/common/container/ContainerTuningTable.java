@@ -14,7 +14,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.TransientCraftingContainer;
@@ -31,8 +30,8 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     private CraftingContainer craftingInventory = new TransientCraftingContainer(this, 1, 2);
     private ResultContainer resultInventory = new ResultContainer();
 
-    public ContainerTuningTable(MenuType<?> type, int id, Inventory playerInventory) {
-        super(type, id, playerInventory);
+    public ContainerTuningTable(int id, Inventory playerInventory) {
+        super(ModContainers.TUNINGTABLE, id, playerInventory);
         this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_POS_X, INSTRUMENT_SLOT_POS_Y));
         this.addSlot(buildModifierSlot(MODIFIER_SLOT_POS_X, MODIFiER_SLOT_POS_Y));
         this.addSlot(buildResultSlot(RESULT_SLOT_POS_X, RESULT_SLOT_POS_Y));

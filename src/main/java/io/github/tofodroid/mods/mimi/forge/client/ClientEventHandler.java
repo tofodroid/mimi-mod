@@ -13,6 +13,6 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientEventHandler {
     @SubscribeEvent
     public static void handleSoundReload(SoundEngineLoadEvent event) {
-        if(MIMIMod.proxy.isClient() && ((ClientProxy)MIMIMod.proxy).getMidiSynth() != null) ((ClientProxy)MIMIMod.proxy).getMidiSynth().reloadSynths();
+        if(MIMIMod.getProxy().isClient() && ((ClientProxy)MIMIMod.getProxy()).getMidiSynth() != null) ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().reloadSynths();
     }
 }

@@ -18,21 +18,20 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
-    public final String REGISTRY_NAME;
+    protected final String REGISTRY_NAME;
     protected final String defaultChannels;
     protected final InstrumentSpec spec;
 
@@ -93,7 +92,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
             }
              return InteractionResult.CONSUME;
         } else if(target instanceof Mob) {
-            if(!user.level().isClientSide && Arrays.asList(ModConfigs.COMMON.allowedInstrumentMobs.get().split(",")).contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
+            if(!user.level().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
                 user.setItemInHand(handIn, ItemStack.EMPTY);
                 target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
                 MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.level(), null);
@@ -164,5 +163,10 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Override
     public String getDefaultChannels() {
         return this.defaultChannels;
+    }
+
+    @Override
+    public String getRegistryName() {
+        return this.REGISTRY_NAME;
     }
 }

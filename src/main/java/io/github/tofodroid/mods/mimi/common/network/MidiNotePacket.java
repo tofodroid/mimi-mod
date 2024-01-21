@@ -22,15 +22,15 @@ public class MidiNotePacket {
     public final @Nullable InteractionHand instrumentHand;
     
     public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos, InteractionHand instrumentHand) {
-        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis(), instrumentHand);
+        return new MidiNotePacket(Integer.valueOf(-controller).byteValue(), value, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand);
     }
     
     public static MidiNotePacket createAllNotesOffPacket(Byte instrumentId, UUID player, BlockPos pos, InteractionHand instrumentHand) {
-        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis(), instrumentHand);
+        return new MidiNotePacket(ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand);
     }
 
     public static MidiNotePacket createNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, InteractionHand instrumentHand) {
-        return new MidiNotePacket(note, velocity, instrumentId, player, pos, MIMIMod.proxy.getCurrentServerMillis(), instrumentHand);
+        return new MidiNotePacket(note, velocity, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand);
     }
 
     public static MidiNotePacket createControlPacket(Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {

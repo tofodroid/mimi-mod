@@ -31,7 +31,7 @@ public class GuiEnderTransmitter extends GuiTransmitter {
         if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SOURCE_FILTER_BUTTON))) {
             this.sendTransmitterCommand(CONTROL.SOURCE_M);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OPEN_LOCAL_FOLDER_BUTTON))) {
-            Util.getPlatform().openUri(Path.of(MIMIMod.proxy.clientMidiFiles().getCurrentFolderPath()).toUri());
+            Util.getPlatform().openUri(Path.of(MIMIMod.getProxy().clientMidiFiles().getCurrentFolderPath()).toUri());
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -76,7 +76,7 @@ public class GuiEnderTransmitter extends GuiTransmitter {
     
     @Override
     protected void startRefreshSongList() {
-        MIMIMod.proxy.clientMidiFiles().refresh();
-        NetworkProxy.sendToServer(new ClientMidiListPacket(true, MIMIMod.proxy.clientMidiFiles().getSortedSongInfos()));
+        MIMIMod.getProxy().clientMidiFiles().refresh();
+        NetworkProxy.sendToServer(new ClientMidiListPacket(true, MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
     }
 }

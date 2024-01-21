@@ -17,6 +17,7 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -43,7 +44,9 @@ public class ClientRegistrationHandler {
 
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
-        ModBindings.register(event);
+        for(KeyMapping bind : ModBindings.REGISTRANTS) {
+            event.register(bind);
+        }
     }
 
     @SubscribeEvent
@@ -56,13 +59,13 @@ public class ClientRegistrationHandler {
     @SubscribeEvent
     public static void register(RegisterColorHandlersEvent.Block event) {
         registerInstrumentBlockColors(event);
-        registerAColoredBlockColors(event, Arrays.asList(ModBlocks.LEDCUBE_A.get(), ModBlocks.LEDCUBE_B.get(), ModBlocks.LEDCUBE_C.get(), ModBlocks.LEDCUBE_D.get(), ModBlocks.LEDCUBE_E.get(), ModBlocks.LEDCUBE_F.get(), ModBlocks.LEDCUBE_G.get(), ModBlocks.LEDCUBE_H.get()));
+        registerAColoredBlockColors(event, Arrays.asList(ModBlocks.LEDCUBE_A, ModBlocks.LEDCUBE_B, ModBlocks.LEDCUBE_C, ModBlocks.LEDCUBE_D, ModBlocks.LEDCUBE_E, ModBlocks.LEDCUBE_F, ModBlocks.LEDCUBE_G, ModBlocks.LEDCUBE_H));
     }
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.SEAT.get(), EntitySeatRenderer::new);
-        event.registerEntityRenderer(ModEntities.NOTERESPONSIVETILE.get(), EntityNoteResponseTileRenderer::new);
+        event.registerEntityRenderer(ModEntities.SEAT, EntitySeatRenderer::new);
+        event.registerEntityRenderer(ModEntities.NOTERESPONSIVETILE, EntityNoteResponseTileRenderer::new);
     }
 
     protected static void registerIColorableItemColors(RegisterColorHandlersEvent.Item event, List<? extends IColorableItem> items) {
@@ -71,7 +74,7 @@ public class ClientRegistrationHandler {
     }
 
     protected static void registerInstrumentBlockColors(RegisterColorHandlersEvent.Block event) {
-        List<? extends Block> blocks = ModBlocks.getBlockInstruments().stream().filter(i -> i.isColorable()).collect(Collectors.toList());
+        List<? extends Block> blocks = ModBlocks.INSTRUMENTS.stream().filter(i -> i.isColorable()).collect(Collectors.toList());
         event.getBlockColors().register((state, reader, pos, color) -> {
             return reader != null && pos != null && reader.getBlockEntity(pos) != null && reader.getBlockEntity(pos) instanceof TileInstrument ? 
                 ((TileInstrument)reader.getBlockEntity(pos)).getColor() : -1;

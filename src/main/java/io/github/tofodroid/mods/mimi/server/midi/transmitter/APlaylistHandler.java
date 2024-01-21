@@ -57,7 +57,7 @@ public abstract class APlaylistHandler {
         }
         
         if(source != SourceMode.CLIENT) {
-            result.addAll(MIMIMod.proxy.serverMidiFiles().getSortedSongInfos());
+            result.addAll(MIMIMod.getProxy().serverMidiFiles().getSortedSongInfos());
         }
 
         return result;

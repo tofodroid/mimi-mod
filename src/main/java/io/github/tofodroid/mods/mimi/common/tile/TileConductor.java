@@ -12,6 +12,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileConductor extends AConfigurableMidiTile {
+    public static final String REGISTRY_NAME = "conductor";
+
     public TileConductor(BlockPos pos, BlockState state) {
         super(ModTiles.CONDUCTOR, pos, state);
     }

@@ -20,19 +20,17 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ClientForgeEventHandler {
     @SubscribeEvent
     public static void onKey(Key event) {
-        ModBindings.onKeyInput(event);
-    }
-    
-    @SubscribeEvent
-    public static void onLoggingOut(LoggingOut event) {
-        ((ClientProxy)MIMIMod.proxy).getMidiData().handleLoginLogout();   
-        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLogout();    
+        ModBindings.onKeyInput();
     }
 
     @SubscribeEvent
     public static void onLoggingIn(LoggingIn event) {
-        ((ClientProxy)MIMIMod.proxy).getMidiData().handleLoginLogout();
-        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLogin();
+        ((ClientProxy)MIMIMod.getProxy()).onLocalPlayerLogin();
+    }
+    
+    @SubscribeEvent
+    public static void onLoggingOut(LoggingOut event) {
+        ((ClientProxy)MIMIMod.getProxy()).onLocalPlayerLogout();
     }
     
     @SubscribeEvent
@@ -40,8 +38,7 @@ public class ClientForgeEventHandler {
         if(event.phase != Phase.END || event.side != LogicalSide.CLIENT) {
             return;
         }
-        ((ClientProxy)MIMIMod.proxy).getMidiData().handleClientTick();
-        ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleClientTick();
+        ((ClientProxy)MIMIMod.getProxy()).onClientTick();
     }
 
     @SubscribeEvent
@@ -49,6 +46,6 @@ public class ClientForgeEventHandler {
         if(event.phase != Phase.END || event.side != LogicalSide.CLIENT) {
             return;
         }
-        ((ClientProxy)MIMIMod.proxy).getMidiData().handlePlayerTick(event.player);
+        ((ClientProxy)MIMIMod.getProxy()).onPlayerTick(event.player);
     }
 }

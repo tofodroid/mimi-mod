@@ -7,23 +7,23 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkHooks;
 
 public class EntityNoteResponsiveTile extends Entity {
     public BlockPos source;
 
     public EntityNoteResponsiveTile(EntityType<? extends EntityNoteResponsiveTile> type, Level world) {
-        super(ModEntities.NOTERESPONSIVETILE.get(), world);
+        super(ModEntities.NOTERESPONSIVETILE, world);
         this.noPhysics = true;
     }
 
     private EntityNoteResponsiveTile(Level world, BlockPos pos) {
-        this(ModEntities.NOTERESPONSIVETILE.get(), world);
+        this(ModEntities.NOTERESPONSIVETILE, world);
         this.source = pos;
         this.setPos(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -105,6 +105,6 @@ public class EntityNoteResponsiveTile extends Entity {
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 }

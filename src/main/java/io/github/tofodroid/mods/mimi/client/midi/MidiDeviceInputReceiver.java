@@ -43,8 +43,8 @@ public class MidiDeviceInputReceiver implements Receiver {
     protected void handleMessage(ShortMessage message) {
         Player player = Minecraft.getInstance().player;
 
-        if(player != null && MIMIMod.proxy.isClient()) {
-            ((ClientProxy)MIMIMod.proxy).getMidiData().inputDeviceManager.getLocalInstrumentsForMidiDevice(player, Integer.valueOf(message.getChannel()).byteValue()).forEach(instrumentStack -> {
+        if(player != null && MIMIMod.getProxy().isClient()) {
+            ((ClientProxy)MIMIMod.getProxy()).getMidiData().inputDeviceManager.getLocalInstrumentsForMidiDevice(player, Integer.valueOf(message.getChannel()).byteValue()).forEach(instrumentStack -> {
                 Byte instrumentId = InstrumentDataUtils.getInstrumentId(instrumentStack.getRight());
                 if(isNoteOnMessage(message)) {
                     handleMidiNoteOn(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], InstrumentDataUtils.applyVolume(instrumentStack.getRight(), message.getMessage()[2]), player, instrumentStack.getLeft());
@@ -60,34 +60,34 @@ public class MidiDeviceInputReceiver implements Receiver {
     }
 
     public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, Player player, InteractionHand handIn) {
-        if(MIMIMod.proxy.isClient()) {
+        if(MIMIMod.getProxy().isClient()) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
+            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 
     public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, Player player, InteractionHand handIn) {
-        if(MIMIMod.proxy.isClient()) {
+        if(MIMIMod.getProxy().isClient()) {
             MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
+            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 
     public void handleAllNotesOff(Byte channel, Byte instrument, Player player, InteractionHand handIn) {
-        if(MIMIMod.proxy.isClient()) {
+        if(MIMIMod.getProxy().isClient()) {
             MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrument, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
+            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 
     public void handleControlMessage(Byte channel, Byte instrument, Byte controller, Byte value, Player player, InteractionHand handIn) {
-        if(MIMIMod.proxy.isClient()) {
+        if(MIMIMod.getProxy().isClient()) {
             MidiNotePacket packet =MidiNotePacket.createControlPacket(controller, value, instrument, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.proxy).getMidiSynth().handleLocalPacketInstant(packet);
+            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
         }
     }
 

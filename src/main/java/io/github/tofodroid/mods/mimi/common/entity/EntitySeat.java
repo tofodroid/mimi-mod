@@ -26,7 +26,7 @@ public class EntitySeat extends Entity {
     }
 
     private EntitySeat(Level world, BlockPos source, Vector3d offset, Player rider) {
-        this(ModEntities.SEAT.get(), world);
+        this(ModEntities.SEAT, world);
         this.source = source;
         this.setPos(source.getX() + offset.x, source.getY() + offset.y, source.getZ() + offset.z);
 

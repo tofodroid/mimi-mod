@@ -9,6 +9,7 @@ import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.world.entity.player.Player;
 
 public class ClientProxy implements Proxy {
     private MidiMultiSynthManager MIDI_SYNTH;
@@ -19,11 +20,13 @@ public class ClientProxy implements Proxy {
     private FilesystemMidiFileProvider SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true);
     private Long startSyncEpoch = null;
     private Long serverStartEpoch = 0l;
+    private Boolean initialized = false;
 
     @Override
     public void init() {
         MIDI_SYNTH = new MidiMultiSynthManager();        
         MIDI_DATA = new MidiDataManager();
+        this.initialized = true;
     }
 
     @Override
@@ -67,5 +70,37 @@ public class ClientProxy implements Proxy {
                 this.startSyncEpoch = null;
             }
         }
+    }
+
+    @Override
+    public Boolean isInitialized() {
+        return this.initialized;
+    }
+
+    public void onLocalPlayerLogout() {
+        if(this.isInitialized()) {
+            this.getMidiData().handleLoginLogout();
+            this.getMidiSynth().handleLogout();
+        }
+    }
+
+    public void onLocalPlayerLogin() {
+        if(this.isInitialized()) {
+            this.getMidiData().handleLoginLogout();
+            this.getMidiSynth().handleLogin();
+        }
+    }
+
+    public void onClientTick() {
+        if(this.isInitialized()) {
+            this.getMidiData().handleClientTick();
+            this.getMidiSynth().handleClientTick();
+        }
+    }
+
+    public void onPlayerTick(Player player) {
+        if(this.isInitialized()) {
+            this.getMidiData().handlePlayerTick(player);
+        }        
     }
 }

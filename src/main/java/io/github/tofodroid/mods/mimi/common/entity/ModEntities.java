@@ -1,18 +1,24 @@
 package io.github.tofodroid.mods.mimi.common.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ModEntities {
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MIMIMod.MODID);
-    
-    public static final RegistryObject<EntityType<EntitySeat>> SEAT = ENTITY_TYPES.register("seat", () -> EntityType.Builder.of(EntitySeat::new, MobCategory.MISC).sized(0F, 0F).noSummon().fireImmune().build(new ResourceLocation(MIMIMod.MODID, "seat").toString()));
-    public static final RegistryObject<EntityType<EntityNoteResponsiveTile>> NOTERESPONSIVETILE = ENTITY_TYPES.register("noteresponsivetile", () -> EntityType.Builder.of(EntityNoteResponsiveTile::new, MobCategory.MISC).sized(0F, 0F).noSummon().fireImmune().build(new ResourceLocation(MIMIMod.MODID, "noteresponsivetile").toString()));
+    public static final Map<ResourceLocation, EntityType<?>> ENTITES = new HashMap<>();
+
+    public static final EntityType<EntitySeat> SEAT = create("seat", EntityType.Builder.of(EntitySeat::new, MobCategory.MISC).sized(0F, 0F).noSummon().fireImmune());
+    public static final EntityType<EntityNoteResponsiveTile> NOTERESPONSIVETILE = create("noteresponsivetile", EntityType.Builder.of(EntityNoteResponsiveTile::new, MobCategory.MISC).sized(0F, 0F).noSummon().fireImmune());
+
+    public static <T extends Entity> EntityType<T> create(String id, EntityType.Builder<T> builder) {
+        ResourceLocation location = new ResourceLocation(MIMIMod.MODID, id);
+        EntityType<T> type = builder.build(location.toString());
+        ENTITES.put(location, type);
+        return type;
+    }
 }

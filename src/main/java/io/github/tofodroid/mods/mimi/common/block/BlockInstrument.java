@@ -51,7 +51,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected final Map<Direction, VoxelShape> SHAPES;
     protected final InstrumentSpec spec;
     protected final String defaultChannels;
-    public final String REGISTRY_NAME;
+    protected final String REGISTRY_NAME;
 
     public BlockInstrument(InstrumentSpec spec) {
         super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
@@ -104,6 +104,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
         TileInstrument tileInstrument = getter.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
         
@@ -166,6 +167,10 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         return Arrays.asList();
     }
 
+    public String getRegistryName() {
+        return this.REGISTRY_NAME;
+    }
+
     public Boolean isColorable() {
         return this.spec.isColorable();
     }
@@ -188,7 +193,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     @SuppressWarnings("null")
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
-        return entity.isPassenger() && entity.getVehicle() != null && ModEntities.SEAT.get().equals(entity.getVehicle().getType());
+        return entity.isPassenger() && entity.getVehicle() != null && ModEntities.SEAT.equals(entity.getVehicle().getType());
     }
     
     public static EntitySeat getSeatForEntity(LivingEntity entity) {
