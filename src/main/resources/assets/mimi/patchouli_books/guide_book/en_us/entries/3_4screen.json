@@ -1,0 +1,27 @@
+{
+    "name": "The Transmitter Screen",
+    "icon": "minecraft:oak_sign",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Transmitter Screen is the screen that you see upon right-clicking a held Transmitter or Server Transmitter block which allows you to use the playlist controls to control the playback of MIDI files from the Transmitter."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Adding Songs",
+            "text": "When using a Transmitter (or, in single player / as a LAN host, a Server Transmitter) the folder button in the top-left corner will open the folder you should put the MIDI files that you want to load into.$(br2)When you have added/removed files, click the refresh button in the top-right corner to load them into the playlist.$(br2)Only MIDI files ending in \".mid\" or \".midi\" will be detected."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Filtering Songs",
+            "text": "When using a Transmitter you can use the buttons in the top-right to filter the playlist of songs by source (your PC, the server, or all) (only for handheld Transmitters) and by favorites (favorited, unfavorited, or all).$(br2)To mark a song as a favorite, use the heart-plus button to the right of the selected song's name. The same button is used to unfavorite the song if it is already favorited."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Song Playback",
+            "text": "The playlist controls in the bottom-left are used to change the selected song and control its playback.$(br2)The buttons to the right of the playlist controls let you change the loop (one, all, or none) and shuffle (shuffled or unshuffled) modes.$(br2)The playback bar in the bottom-right shows you how far into the selected song you currently are."
+        }
+    ],
+    "sortnum": 4
+}

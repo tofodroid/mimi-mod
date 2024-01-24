@@ -1,16 +1,13 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "RO",
-        "NR",
-        ""
+        " O ",
+        " N ",
+        "   "
     ],
     "key": {
         "O": {
             "item": "minecraft:observer"
-        },
-        "R": {
-            "item": "minecraft:redstone"
         },
         "N": {
             "item": "minecraft:note_block"

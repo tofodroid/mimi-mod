@@ -1,0 +1,20 @@
+{
+    "name": "LED Cube",
+    "icon": "mimi:ledcube_a",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "LED Cube",
+            "item": "mimi:ledcube_a",
+            "text": "The LED Cube is a block that can be set to one of 16 different colors and will glow when powered by Redstone.$(br2)LED Cubes work well with Listeners and Receivers because they react quickly to Redstone. However, LED Cubes do not change the light level around them and won't stop mobs from spawning."
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "Recipe",
+            "recipe": "mimi:ledcube_a",
+            "text": "LED Cube designs can be changed by placing one stack into a crafting grid.$(br2)To change the color, right-click it while crouched or put 2 LED Cubes in a crafting grid to copy the color from the left one to the right one."
+        }
+    ],
+    "sortnum": 4
+}

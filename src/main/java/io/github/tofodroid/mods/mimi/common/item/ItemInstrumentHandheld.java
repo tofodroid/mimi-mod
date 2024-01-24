@@ -32,7 +32,7 @@ import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     protected final String REGISTRY_NAME;
-    protected final String defaultChannels;
+    protected final Integer defaultChannels;
     protected final InstrumentSpec spec;
 
     public ItemInstrumentHandheld(InstrumentSpec spec) {
@@ -161,7 +161,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     }
 
     @Override
-    public String getDefaultChannels() {
+    public Integer getDefaultChannels() {
         return this.defaultChannels;
     }
 

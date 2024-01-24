@@ -1,0 +1,39 @@
+{
+    "name": "Using MIDI Devices",
+    "icon": "mimi:deviceconfig",
+    "category": "mimi:2instruments",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "Instruments in MIMI can also be played using a MIDI Input Device (such as a digital piano or synthesizer) connected to your PC.$(br2)To configure which MIDI Input Device MIMI Instruments should receive notes you can use the Device Config Screen which can be opened at any time with a key bind ($(l)$(k:key.mimi.midi.gui.settings)$()) or by crafting and right-clicking a Device Config item."
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:deviceconfig",
+            "text": "The Device Config Screen shows a list of MIDI Input Devices detected by your system at the bottom. Use the arrows to step through the devices and the save button to select one which will be saved and used by default if you restart the game."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "The device that you have selected will appear at the top of the Device Config Screen. The light next to the device name will change colors based on the device's status.$(br)$(li)$(l)Green$() - The device is ready to use.$(br)$(li)$(l)Yellow$() - The game must be restarted to configure this device.$(br)$(li)$(l)Red$() - The device is no longer available or is incompatible."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Connecting Instruments",
+            "text": "Once you have a MIDI Input Device selected and ready to use you can send notes from the device to MIMI by enabling the \"Sys MIDI Device\" toggle in the instrument's MIDI Settings.$(br2)You will also need to enable the MIDI Channels on the instrument that your MIDI Input Device sends its notes to (usually channel 1 or 2), or just enable all of them to be safe. :)"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "You should now be able to play notes on your MIDI Input Device and hear them played by your instrument.$(br2)In the same way as with Transmitters, your MIMI instrument will continue to play any MIDI Input Device notes once you close the Instrument Screen as long as you continue to hold or remain seated at the instrument."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Troubleshooting",
+            "text": "Sometimes MIDI and Minecraft don't get along very well so here are some things to try if it just won't work.$(br2)$(l)Device Doesn't Show$()$(br2)1. Plug it in and ensure it's detected by your PC before starting Minecraft.$(br2)2. Restart it and/or unplug it and plug it back in. Seriously, this fixes most problems for me like 70% of the time!"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(l)Device Is Red$()$(br2)1. The same things from \"Device Doesn't Show\".$(br2)2. Ensure the device is not already being used by another program on your PC. Most MIDI Input Devices can only be used by one program at a time."
+        }
+    ],
+    "sortnum": 7
+}

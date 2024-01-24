@@ -12,7 +12,7 @@ public interface Proxy {
     public void init();
 
     default public Long getBaselineBufferMs() {
-        return 100l;
+        return 30l;
     }
 
     default public Long getCurrentServerMillis() {

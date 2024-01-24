@@ -1,0 +1,6 @@
+{
+	"name": "Other Features",
+	"description": "This section covers the other small features of MIMI that don't need their own section.",
+	"icon": "mimi:tuningtable",
+	"sortnum": 5
+}

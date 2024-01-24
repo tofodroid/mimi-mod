@@ -1,0 +1,16 @@
+{
+    "name": "Play with Friends",
+    "icon": "minecraft:player_head",
+    "category": "mimi:1overview",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "If you want to play a song with more than 3 instruments at once, one way to do that is to play with a friend!$(br2)If you link an instrument to your Transmitter it will continue to play notes from your Transmitter even when being used by another player, as long as they are close by."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "Other players can also link their instruments to your Transmitter by right-clicking you while holding the instrument that they want to link."
+        }
+    ],
+    "sortnum": 4
+}

@@ -190,34 +190,7 @@ The process for adding a new block instrument is similar to the process for hand
         }
         ```
 
-6. **Block Loot Table:** Letting Minecraft know to give you the correct item when you break your block in-game.
-    * **File:** `data/mimi/loot_tables/blocks/<registryname>.json`
-    * **Content:** The loot table definition for your block following the spec [here](https://minecraft.fandom.com/wiki/Loot_table).
-    * **Example:** 
-        ```json
-        {
-            "type": "minecraft:block",
-            "pools": [
-                {
-                    "name": "epiano",
-                    "rolls": 1,
-                    "entries": [
-                        {
-                            "type": "minecraft:item",
-                            "name": "mimi:epiano"
-                        }
-                    ],
-                    "conditions": [
-                        {
-                            "condition": "minecraft:survives_explosion"
-                        }
-                    ]
-                }
-            ]
-        }
-        ```
-
-7. **Block Recipe:** Adding the crafting recipe for your instrument.
+6. **Block Recipe:** Adding the crafting recipe for your instrument.
     * **File:** `data/mimi/recipes/<registryname>.json`
     * **Content:** A crafting recipe definition following the spec [here](https://minecraft.fandom.com/wiki/Recipe#JSON_format)
     * **Example:**
@@ -246,7 +219,7 @@ The process for adding a new block instrument is similar to the process for hand
         }
         ```
 
-8. **Recipe Advancement (Optional):** Adding the trigger to "unlock" this recipe in the in-game crafting book.
+7. **Recipe Advancement (Optional):** Adding the trigger to "unlock" this recipe in the in-game crafting book.
     * **File:** `data/mimi/advancements/recipes/<registryname>.json`
     * **Content:** The advancement definition to unlock the recipe following the spec [here](https://minecraft.fandom.com/wiki/Advancement/JSON_format)
     * **Example:**

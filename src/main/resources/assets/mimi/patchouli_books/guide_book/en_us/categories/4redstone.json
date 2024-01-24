@@ -1,0 +1,6 @@
+{
+	"name": "Sensors",
+	"description": "MIMI contains a number of Redstone-enabled blocks that allows MIMI instruemnts and Transmitters to interact with Redstone in different ways.$(br2)To copy MIDI Settings from one sensor block to another, place the two blocks next to eachother in a crafting grid. The sensor block on the right will have its settings set to the values from the sensor block on the left.",
+	"icon": "mimi:receiver",
+	"sortnum": 4
+}

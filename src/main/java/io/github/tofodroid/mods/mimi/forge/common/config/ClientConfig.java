@@ -36,15 +36,8 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
 
-    // DEBUG
-    public ForgeConfigSpec.IntValue blockColor;
-
-
     public ClientConfig(ForgeConfigSpec.Builder builder) {
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
-        blockColor = builder.comment("Debug: BlockColor")
-            .translation(MIMIMod.MODID + ".config.debug.blockColor")
-            .defineInRange("blockColor", 0, 0, Integer.MAX_VALUE);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
             .translation(MIMIMod.MODID + ".config.instrument.keyboard.layout")
             .defineEnum("instrumentKeyboardLayout", KEYBOARD_LAYOUTS.MIMI);
@@ -80,7 +73,7 @@ public class ClientConfig {
             .define("soundfontPath", "");
         noteBufferMs = builder.comment("How long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be slightly off-tempo.","Allowed values: 0-100")
             .translation(MIMIMod.MODID + ".config.midi.synth.extrabufferms")
-            .defineInRange("synthBufferMillis",0, 0, 100);
+            .defineInRange("synthBufferMillis",10, 0, 100);
         builder.pop();
     }
 }

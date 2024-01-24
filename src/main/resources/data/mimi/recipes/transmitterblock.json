@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "PTP",
+        " R ",
+        "   "
+    ],
+    "key": {
+        "T": {
+            "item": "mimi:endertransmitter"
+        },
+        "R": {
+            "item": "minecraft:redstone_block"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:transmitterblock"
+    }
+}

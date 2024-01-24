@@ -1,0 +1,22 @@
+{
+    "name": "Play your Instrument",
+    "icon": "mimi:ocarina",
+    "category": "mimi:1overview",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Instrument Screen allows you to manage the instrument's MIDI settings (covered later) and play notes using your Keyboard or by clicking on them.$(br2)The keyboard layout can be toggled between the MIMI and Virtual Piano ('VPiano') layouts and the notes visible on-screen can be adjusted using the shift controls."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Handheld",
+            "text": "Select a handheld instrument on your hotbar or place it in your off-hand (shield) slot. Right click while holding the instrument to open the Instrument Screen.$(br2)When holding instruments in both hands, right-clicking will open the Instrument Screen for your main hand. Using key binds you can directly open the instruments in your main ($(bold)$(k:key.mimi.midi.gui.main)$()) or off  ($(bold)$(k:key.mimi.midi.gui.off)$()) hands."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Block",
+            "text": "Place the instrument as a block in the world. Right click the instrument block to sit down at it (like a boat) and then again to open the Instrument Screen.$(br2)When holding an instrument and sitting at an instrument it can be confusing as to which Instrument Screen is opened when clicking. Using a key bind you can directly open the instrument you are seated at ($(bold)$(k:key.mimi.midi.gui.seat)$()).$(br2)"
+        }
+    ],
+    "sortnum": 2
+}

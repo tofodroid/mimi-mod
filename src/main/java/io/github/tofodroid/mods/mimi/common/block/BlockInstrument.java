@@ -50,7 +50,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     protected final Map<Direction, VoxelShape> SHAPES;
     protected final InstrumentSpec spec;
-    protected final String defaultChannels;
+    protected final Integer defaultChannels;
     protected final String REGISTRY_NAME;
 
     public BlockInstrument(InstrumentSpec spec) {
@@ -187,7 +187,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         return spec.instrumentId;
     }
 
-    public String getDefaultChannels() {
+    public Integer getDefaultChannels() {
         return this.defaultChannels;
     }
 

@@ -1,0 +1,22 @@
+{
+    "name": "Common Config File",
+    "icon": "minecraft:player_head",
+    "category": "mimi:6settings",
+    "pages": [
+        {
+            "type": "text",
+            "text": "MIMI also includes a common configuration file with several additional settings that apply to the client in singleplayer and server in multiplayer.$(br2)Like other mods, the configuration file for MIMI can be found in your Minecraft instance $(#0046ff)config$() folder and can be modified with any text editor or IDE."
+        },
+        {
+            "type": "text",
+            "title": "Instrumentalist Shop",
+            "text": "$(l)Param:$() enableInstrumentalistShop$(br)$(l)Type:$() Boolean$(br)$(l)Default:$() true$(br2)This parameter stores whether or not Instrumentalist Shops should generate in villages."
+        },
+        {
+            "type": "text",
+            "title": "Instrument Mobs",
+            "text": "$(l)Param:$() allowedInstrumentMobs$(br)$(l)Type:$() Boolean$(br)$(l)Default:$() minecraft:zombie,minecraft:husk,minecraft:skeleton,minecraft:stray,minecraft:wither_skeleton$(br2)This parameter stores a comma separated list of mobs that should be able to hold instruments."
+        }
+    ],
+    "sortnum": 4
+}

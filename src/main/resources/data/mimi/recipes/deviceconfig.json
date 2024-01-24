@@ -1,16 +1,16 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " R ",
-        "RIR",
-        " R "
+        " I ",
+        "RRR",
+        "   "
     ],
     "key": {
         "I": {
-            "item": "mimi:switchboard"
+            "item": "mimi:iron_nugget"
         },
         "R": {
-            "item": "minecraft:redstone"
+            "item": "minecraft:stone_button"
         }
     },
     "result": {

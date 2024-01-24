@@ -1,0 +1,53 @@
+{
+    "name": "Play a MIDI File",
+    "icon": "mimi:endertransmitter",
+    "category": "mimi:1overview",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "One of the best features of MIMI is the ability to easily play MIDI files from your PC.$(br2)MIDI files are like a digital form of sheet music that computers can read (often used by Karaoke machines) and in MIMI you can use them to have your instruments play full songs.$(br2)To play a MIDI file in MIMI you must first craft a Transmitter."
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "Recipes",
+            "recipe": "mimi:endertransmitter"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Finding MIDI Files",
+            "text": "To use the Transmitter you should first get some MIDI files for it to play.$(br2)MIDI files are not like regular music that you would listen to on your computer (such as MP3 files) and MIMI does not support playing any other kinds of music files. Normal music files are a recording of instruments playing notes but MIDI files are the notes themselves instructions for how they should be played."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "MIDI has been around for a long time so there are lots of songs available online, but it may be hard to find newer songs that have had MIDI files created for them. Here are some links to sites that have lots of free MIDI files:$(br2)1. $(l:https://bitmidi.com/)BitMidi.com$()$(br)2. $(l:https://freemidi.org/)FreeMidi.org$()$(br)3. $(l:https://www.midiworld.com/files/)MidiWorld.com$()$(br)4. $(l:https://freemidis.net)FreeMidis.net$()$(br)5. $(l:https://midifind.com/)MidiFind.com$()$(br2)More can easily be found via Google!"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Using the Transmitter",
+            "text": "Put a Transmitter in your hand and right-click to open it.$(br2)The Transmitter Screen lets you see and play all of the MIDI files in MIMI's \"midi_files\" folder, as well as any files provided by the server you're on (in multiplayer).$(br2)To add songs from your PC, click the folder button in the top-left corner to open MIMI's \"midi_files\" folder and put your MIDI files there."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "Once your files are in the folder, click the refresh button in the top-right corner to have MIMI load the songs into the Transmitter's playlist.$(br2)Use the playlist controls in the bottom-left to select and play your song (and toggle the loop and shuffle modes).$(br2)The buttons in the top-right can be used to filter the list by source (your PC or the server) and favorites (set with the heart button by the selected song's name)."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Connecting Instruments",
+            "text": "The last step is to connect your instrument(s) to the Transmitter. Open the Instrument Screen for an instrument and click the Edit (pencil) button to bring up the Instrument's MIDI settings.$(br2)In the bottom left corner click the \"ME\" button to link the instrument to your Transmitter.$(br2)You should now hear your song!"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "You can close the Instrument Screen once your instrument starts playing and it will continue to play as long as you continue to hold it in either hand (handheld instruments) or remain seated at it (block instruments). This means you can play up to 3 instruments at the same time!$(br2)A Transmitter must remain either in one of your hands or on your hotbar to continue playing. Using a key bind you can open the Transmitter Screen at any time ($(bold)$(k:key.mimi.midi.gui.transmitter)$())."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Changing Channels",
+            "text": "MIDI Channels represent separate parts of the song (like a singer, lead guitar, and drums); Some MIDI Files may use all 16 Channels while others may only use 1. Channel 10 is always reserved for drums.$(br2)Looking at the Channel assignments on the Transmitter Screen for a song will help you decide which MIMI instruments might sound best playing which Channels for that song."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "Try playing around with enabling and disabling particular Channels on each of the instruments that you're playing to remix the way a song sounds.$(br2)Remember that Channel 10 is always used for drums so it will likely not sound good when enabled on any other instruments."
+        }
+    ],
+    "sortnum": 3
+}

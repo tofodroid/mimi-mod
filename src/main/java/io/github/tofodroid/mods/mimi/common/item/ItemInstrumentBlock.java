@@ -54,7 +54,7 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     }
 
     @Override
-    public String getDefaultChannels() {
+    public Integer getDefaultChannels() {
         return ((BlockInstrument)getBlock()).getDefaultChannels();
     }
     

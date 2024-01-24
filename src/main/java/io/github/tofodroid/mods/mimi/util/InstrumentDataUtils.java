@@ -36,6 +36,8 @@ public abstract class InstrumentDataUtils {
     public static final Byte DEFAULT_INSTRUMENT_VOLUME = 5;
     public static final Byte MIN_INSTRUMENT_VOLUME = 0;
     public static final Integer ALL_CHANNELS_INT = 65535;
+    public static final Integer ALL_BUT_10_CHANNELS_INT = 65023;
+    public static final Integer JUST_CHANNEL_10_INT = 512;
     public static final Integer NONE_CHANNELS_INT = 0;
     
     private static Map<Byte,String> INSTRUMENT_NAME_MAP = null;
@@ -104,7 +106,14 @@ public abstract class InstrumentDataUtils {
     }
 
     public static Integer getEnabledChannelsInt(ItemStack stack) {
-        return TagUtils.getIntOrDefault(stack, ENABLED_CHANNELS_TAG, 0);
+        return TagUtils.getIntOrDefault(stack, ENABLED_CHANNELS_TAG, getDefaultChannelsInt(stack));
+    }
+
+    public static Integer getDefaultChannelsInt(ItemStack stack) {
+        if(stack.getItem() instanceof IInstrumentItem) {
+            return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+        }
+        return NONE_CHANNELS_INT;
     }
 
     public static void toggleChannel(ItemStack switchStack, Byte channelId) {
@@ -296,11 +305,11 @@ public abstract class InstrumentDataUtils {
         return result;
     }
 
-    public static String getDefaultChannelsForBank(Integer bankNumber) {
+    public static Integer getDefaultChannelsForBank(Integer bankNumber) {
         if(bankNumber == PERCUSSION_BANK) {
-            return "10";
+            return JUST_CHANNEL_10_INT;
         }
-        return "1,2,3,4,5,6,7,8,9,11,12,13,14,15,16";
+        return ALL_BUT_10_CHANNELS_INT;
     }
     
     public static String getFilteredNotesAsString(ItemStack stack) {

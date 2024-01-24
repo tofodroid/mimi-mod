@@ -1,0 +1,18 @@
+{
+    "name": "The Transmitter",
+    "icon": "mimi:endertransmitter",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Transmitter is used to transmit notes from a MIDI File to instruments in MIMI.$(br2)To use a Transmitter, craft one, place it into your main or off hand, and right-click to open the Transmitter Screen.$(br2)The Transmitter acts a bit like an Ender Chest in that each player only has one, and every Transmitter item will be the same for that player."
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:endertransmitter",
+            "link_recipe": true,
+            "text": "Once a song is playing it will continue playing as long as one Transmitter is in one of your hands or on your hotbar.$(br2)To open a Transmitter on your hotbar without selecting it, you can use a key bind ($(l)$(k:key.mimi.midi.gui.transmitter)$())."
+        }
+    ],
+    "sortnum": 2
+}
