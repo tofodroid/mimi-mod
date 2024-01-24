@@ -48,14 +48,17 @@ public class BlockLedCube extends AColoredBlock {
 
    @Override
    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-      if (worldIn.isClientSide) {
-         worldIn.playLocalSound(pos, SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.BLOCKS, 1.0f, 1.0f, false);
-         return InteractionResult.SUCCESS;
-      } else {
-         Integer dyeId = state.getValue(DYE_ID);
-         worldIn.setBlock(pos, state.setValue(DYE_ID, dyeId >= 15 ? 0 : dyeId + 1), 2);
-         return InteractionResult.CONSUME;
+      if(player.isCrouching()) {
+         if (worldIn.isClientSide) {
+            worldIn.playLocalSound(pos, SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.BLOCKS, 1.0f, 1.0f, false);
+            return InteractionResult.SUCCESS;
+         } else {
+            Integer dyeId = state.getValue(DYE_ID);
+            worldIn.setBlock(pos, state.setValue(DYE_ID, dyeId >= 15 ? 0 : dyeId + 1), 2);
+            return InteractionResult.CONSUME;
+         }
       }
+      return InteractionResult.PASS;
    }
 
    @Override

@@ -427,8 +427,12 @@ public abstract class InstrumentDataUtils {
         }
 
         // Note Source
-        tooltip.add(Component.literal("  Play Notes From: " + (getMidiSourceIsTransmitter(stack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.literal("  " + getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        if(getMidiSource(stack) != null) {
+            tooltip.add(Component.literal("  Play Notes From: " + (getMidiSourceIsTransmitter(stack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.literal("  " + getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        } else {
+            tooltip.add(Component.literal("  Play Notes From: None").withStyle(ChatFormatting.GREEN));
+        }
 
         // Instrument Volume
         tooltip.add(Component.literal("  Volume: " + getInstrumentVolume(stack)).withStyle(ChatFormatting.GREEN));

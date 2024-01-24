@@ -1,13 +1,16 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import java.util.Arrays;
+import java.util.List;
+
+import io.github.tofodroid.mods.mimi.common.block.AColoredBlock;
+import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
@@ -15,15 +18,13 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
-import java.util.Arrays;
+public class CopyBlockDyeRecipe extends CustomRecipe {
+    public static final String REGISTRY_NAME = "copyblockdye";
+    public static final String COPY_TAG = AColoredBlock.DYE_ID.getName();
 
-public class CloneMidiSettingsRecipe extends CustomRecipe {
-    public static final String REGISTRY_NAME = "clonemidi";
-    public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER);
-	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
+	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CopyBlockDyeRecipe>(CopyBlockDyeRecipe::new);
 
-    public CloneMidiSettingsRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
+    public CopyBlockDyeRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
         super(recipeId, category);
     }
 
@@ -33,9 +34,9 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         Integer foundSlots = 1;
         List<Integer> validSlots = null;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for(int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stackI = inv.getItem(i);
-            if (!stackI.isEmpty() && !canStoreMidiSettings(stackI)) {
+            if(!stackI.isEmpty() && !isAllowedItem(stackI)) {
                 // Invalid item found
                 return false;
             } else if(!stackI.isEmpty() && source.isEmpty()) {
@@ -46,10 +47,10 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
                 } else {
                     return false;
                 }
-            } else if(!source.isEmpty())  {
-                if(validSlots.contains(i) && canCopyFromSourceToTarget(source, stackI)) {
+            } else if(!source.isEmpty()) {
+                if(validSlots.contains(i) && isAllowedItem(stackI)) {
                     foundSlots++;
-                } else if(!stackI.isEmpty() && (!validSlots.contains(i) || !canCopyFromSourceToTarget(source, stackI))) {
+                } else if(!validSlots.contains(i) && !stackI.isEmpty()) {
                     return false;
                 }
             }
@@ -65,6 +66,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stackI = inv.getItem(i);
+
             if(!stackI.isEmpty() && source.isEmpty()) {
                 source = stackI;
             } else if(!stackI.isEmpty() && !source.isEmpty()) {
@@ -73,32 +75,23 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         }
         
         if(!source.isEmpty() && !target.isEmpty()) {
+            CompoundTag targetTag = target.getOrCreateTag().copy();
+            targetTag.putInt(COPY_TAG, TagUtils.getIntOrDefault(source, COPY_TAG, 0));
             ItemStack result = target.copyWithCount(1);
-            InstrumentDataUtils.setMidiSource(result, InstrumentDataUtils.getMidiSource(source), InstrumentDataUtils.getMidiSourceName(source, false));
-            InstrumentDataUtils.setEnabledChannelsInt(result, InstrumentDataUtils.getEnabledChannelsInt(source));
-
-            if(source.getItem() instanceof IInstrumentItem) {
-                InstrumentDataUtils.setSysInput(result, InstrumentDataUtils.getSysInput(source));
-                InstrumentDataUtils.setInstrumentVolume(result, InstrumentDataUtils.getInstrumentVolume(source));
-            } else {
-                InstrumentDataUtils.setFilterOct(result, InstrumentDataUtils.getFilterOct(source));
-                InstrumentDataUtils.setFilterNote(result, InstrumentDataUtils.getFilterNote(source));
-                InstrumentDataUtils.setInvertNoteOct(result, InstrumentDataUtils.getInvertNoteOct(source));
-                InstrumentDataUtils.setFilterInstrument(result, InstrumentDataUtils.getFilterInstrument(source));
-                InstrumentDataUtils.setInvertInstrument(result, InstrumentDataUtils.getInvertInstrument(source));
-            }
+            result.setTag(targetTag);
             return result;
         }
 
         return ItemStack.EMPTY;
     }
 
+
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
         NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 
         for(int i = 0; i < nonnulllist.size(); ++i) {
-            if(canStoreMidiSettings(inv.getItem(i))) {
+            if(isAllowedItem(inv.getItem(i))) {
                 nonnulllist.set(i, inv.getItem(i).copyWithCount(1));
                 break;
             }
@@ -106,11 +99,6 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
 
         return nonnulllist;
    }
-
-    protected Boolean canStoreMidiSettings(ItemStack stack) {
-        return stack.getItem() instanceof IInstrumentItem ||
-            MIDI_ITEMS.contains(stack.getItem());
-    }
 
     protected List<Integer> getValidSlots(Integer slot, Integer width, Integer height) {
         // Validate
@@ -123,9 +111,9 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         return null;
     }
 
-    protected Boolean canCopyFromSourceToTarget(ItemStack source, ItemStack target) {
-        return (source.getItem() instanceof IInstrumentItem && target.getItem() instanceof IInstrumentItem) ||
-            source.getItem().equals(target.getItem());
+    protected Boolean isAllowedItem(ItemStack stack) {
+        return stack.getItem() instanceof BlockItem &&
+            ((BlockItem)stack.getItem()).getBlock() instanceof AColoredBlock;
     }
 
     @Override

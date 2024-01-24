@@ -9,7 +9,7 @@
         },
         {
             "type": "patchouli:text",
-            "text": "To copy MIDI Settings from one instrument to another, place the two instruments next to eachother in a crafting grid. The instrument on the right will have its settings set to the values from the instrument on the left."
+            "text": "To copy MIDI Settings from one instrument to another, place the two instruments directly next to eachother in a crafting grid. The instrument on the right will have its settings set to the values from the instrument on the left."
         }
     ],
     "sortnum": 4

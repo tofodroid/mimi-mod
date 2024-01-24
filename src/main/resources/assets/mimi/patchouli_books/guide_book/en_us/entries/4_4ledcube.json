@@ -13,7 +13,7 @@
             "type": "patchouli:crafting",
             "title": "Recipe",
             "recipe": "mimi:ledcube_a",
-            "text": "LED Cube designs can be changed by placing one stack into a crafting grid.$(br2)To change the color, right-click it while crouched or put 2 LED Cubes in a crafting grid to copy the color from the left one to the right one."
+            "text": "LED Cube designs can be changed by placing 4 cubes in a square in a crafting grid.$(br)To change the color, right-click a block while crouched or put 2 blocks directly next to eachother in a crafting grid to copy the color from the left to the right."
         }
     ],
     "sortnum": 4
