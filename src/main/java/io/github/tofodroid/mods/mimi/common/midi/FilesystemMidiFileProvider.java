@@ -109,13 +109,9 @@ public class FilesystemMidiFileProvider {
 
             if(midiFiles != null) {
                 this.clear();
-                MIMIMod.LOGGER.info("Changed - Load: " + midiFiles.length);
                 List<LocalMidiInfo> allFiles = loadFilesystemSongs(midiFiles);
                 this.songMap = this.buildSongMap(allFiles);
                 this.orderedSongList = this.buildOrderList(allFiles);
-                MIMIMod.LOGGER.info("Changed - Loaded: " + this.orderedSongList.size());
-            } else {
-                MIMIMod.LOGGER.info("Unchanged - Keep: " + this.orderedSongList.size());
             }
         } else {
             this.clear();
