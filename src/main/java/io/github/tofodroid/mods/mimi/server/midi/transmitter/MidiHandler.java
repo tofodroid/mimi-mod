@@ -123,7 +123,7 @@ public class MidiHandler {
                     this.play();
                 }
             } catch(Exception e) {
-                MIMIMod.LOGGER.error("Failed to load sequence: ", e);
+                MIMIMod.LOGGER.error("Failed to load sequence: " + info.fileName + " - " + e.getMessage());
             }
         }
     }

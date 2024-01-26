@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import javax.sound.midi.Sequence;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
-import io.github.tofodroid.mods.mimi.common.midi.IMidiFileProvider.LocalMidiInfo;
+import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
+import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 
 public abstract class AServerMusicTransmitter implements AutoCloseable {
     protected UUID id;
@@ -26,13 +26,26 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
     public void onLoad() {
         this.refreshSongs();
 
-        if(this.playlistHandler.getSelectedSongInfo() != null) {
-            this.loadSong(this.playlistHandler.getSelectedSongInfo());
+        if(this.playlistHandler.getFilterHasSongs()) {
+            this.playlistHandler.selectDisplaySong(0);
+
+            if(this.playlistHandler.getSelectedSongInfo() != null) {
+                this.loadSong(this.playlistHandler.getSelectedSongInfo());
+            }
         }
     }
 
     public void refreshSongs() {
-        this.playlistHandler.refreshFilteredSongs();
+        // If refresh can't find current song and currently playing set load failed
+        Boolean wasPlaying = ServerMusicTransmitterManager.isPlaying(this.id);
+
+        if(!this.playlistHandler.refreshFilteredSongs()) {
+            if(wasPlaying) {
+                this.loadFailed = true;
+            } else {
+                this.playlistHandler.selectNextSong();
+            }
+        }
     }
 
     public void play() {
@@ -81,6 +94,7 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
         if(info != null && (this.midiHandler.getSequenceInfo() == null || !this.midiHandler.getSequenceInfo().fileId.toString().equals(info.fileId.toString()))) {
             this.startLoadSequence(info);
         } else if(info == null) {
+            this.stop();
             this.midiHandler.unloadSong();
         }
     }
@@ -158,13 +172,15 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
         this.loading = true;
         this.loadFailed = false;
         this.shouldPlayNextLoad = this.shouldPlayNextLoad || this.midiHandler.isPlaying();
+        this.stop();
+        this.midiHandler.unloadSong();
 
         if(info.serverMidi) {
             this.loading = false;
-            LocalMidiInfo localInfo = MIMIMod.getProxy().serverMidiFiles().getInfoById(info.fileId);
+            LocalMidiInfo serverSongInfo = ServerMidiManager.getServerSongById(info.fileId);
 
-            if(localInfo != null) {
-                Sequence sequence = localInfo.loadSequenceFromFile();
+            if(serverSongInfo != null) {
+                Sequence sequence = serverSongInfo.loadSequenceFromFile();
 
                 if(sequence != null) {
                     this.finishLoadSequence(info, sequence);
@@ -175,7 +191,6 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
             // Failure if it gets here
             this.onSequenceLoadFailed(info);
         } else {
-            this.midiHandler.unloadSong();
             ServerMusicTransmitterManager.startLoadSequence(this.id, this.playlistHandler.getClientSourceId(), info);
         }
     }

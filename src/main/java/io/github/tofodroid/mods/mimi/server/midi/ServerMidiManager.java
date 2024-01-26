@@ -6,13 +6,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 
 public abstract class ServerMidiManager {
     private static final Map<UUID, List<BasicMidiInfo>> CACHE_MAP = new HashMap<>();
+
+    public static void refreshServerSongs(Boolean forceFromDisk) {
+        MIMIMod.getProxy().serverMidiFiles().refresh(forceFromDisk);
+        ServerMusicTransmitterManager.onServerSongsRefreshed();
+    }
+
+    public static LocalMidiInfo getServerSongById(UUID id) {
+        return MIMIMod.getProxy().serverMidiFiles().getInfoById(id);
+    }
+
+    public static List<BasicMidiInfo> getServerSongs() {
+        return MIMIMod.getProxy().serverMidiFiles().getSortedSongInfos();
+    }
 
     public static List<BasicMidiInfo> getMidiInfosForSourceId(UUID sourceId) {
         return CACHE_MAP.containsKey(sourceId) ? CACHE_MAP.get(sourceId) : new ArrayList<>();

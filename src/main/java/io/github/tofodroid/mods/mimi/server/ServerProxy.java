@@ -7,10 +7,11 @@ import net.minecraft.Util;
 public class ServerProxy implements Proxy {
     private Boolean initialized = false;
     private final Long serverStartEpoch = Util.getEpochMillis();
-    private FilesystemMidiFileProvider MIDI_FILES = new FilesystemMidiFileProvider(true);
+    private FilesystemMidiFileProvider MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
 
     @Override
     public void init() {
+        MIDI_FILES.refresh(true);
         this.initialized = true;
     }
 

@@ -9,18 +9,13 @@ import net.minecraft.network.FriendlyByteBuf;
 
 public class ClientMidiListPacket {
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
-
-    public final Boolean doUpdateServerFileList;
     public final List<BasicMidiInfo> infos;
 
     public ClientMidiListPacket() {
-        this.doUpdateServerFileList = false;
         this.infos = new ArrayList<>();
     }
 
-    public ClientMidiListPacket(Boolean doUpdateServerFileList, List<BasicMidiInfo> infos) {
-        this.doUpdateServerFileList = doUpdateServerFileList;
-
+    public ClientMidiListPacket(List<BasicMidiInfo> infos) {
         if(infos.size() > 50) {
             MIMIMod.LOGGER.warn("ClientMidiListPacket can only accept up to 50 files. Trimming list ot 50.");
             this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 50);
@@ -31,14 +26,13 @@ public class ClientMidiListPacket {
 
     public static ClientMidiListPacket decodePacket(FriendlyByteBuf buf) {
         try {
-            Boolean doUpdateServerFileList = buf.readBoolean();
             byte numInfos = buf.readByte();
             List<BasicMidiInfo> decodeInfos = new ArrayList<>();
 
             for(int i = 0; i < numInfos; i++) {
                 decodeInfos.add(new BasicMidiInfo(buf.readUtf(MAX_FILE_NAME_LENGTH), buf.readUUID(), false));
             }
-            return new ClientMidiListPacket(doUpdateServerFileList, decodeInfos);
+            return new ClientMidiListPacket(decodeInfos);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ClientMidiListPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -46,7 +40,6 @@ public class ClientMidiListPacket {
     }
 
     public static void encodePacket(ClientMidiListPacket pkt, FriendlyByteBuf buf) {
-        buf.writeBoolean(pkt.doUpdateServerFileList);
         buf.writeByte(pkt.infos.size());
         for(int i = 0; i < pkt.infos.size(); i++) {
             buf.writeUtf(pkt.infos.get(i).fileName, MAX_FILE_NAME_LENGTH);

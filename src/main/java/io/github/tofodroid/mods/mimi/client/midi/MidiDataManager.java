@@ -33,7 +33,7 @@ public class MidiDataManager {
             return this.playerEnderTransmitterStatusPacket;
         }
         return null;
-    } 
+    }
 
     @SuppressWarnings("resource")
     public Boolean connectedToServer() {

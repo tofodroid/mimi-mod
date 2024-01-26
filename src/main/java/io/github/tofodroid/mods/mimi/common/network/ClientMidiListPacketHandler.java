@@ -8,19 +8,16 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ClientMidiListPacketHandler {
     public static void handlePacketClient(final ClientMidiListPacket message) {
-        MIMIMod.getProxy().clientMidiFiles().refresh();
-        NetworkProxy.sendToServer(new ClientMidiListPacket(false, MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
+        MIMIMod.getProxy().clientMidiFiles().refresh(true);
+        NetworkProxy.sendToServer(new ClientMidiListPacket(MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
     }
     
     public static void handlePacketServer(final ClientMidiListPacket message, ServerPlayer sender) {
         ServerMidiManager.setCacheInfosForSource(sender.getUUID(), message.infos);
         AServerMusicTransmitter player = ServerMusicTransmitterManager.getMusicPlayer(sender.getUUID());
 
-        if(message.doUpdateServerFileList) {
-            MIMIMod.getProxy().serverMidiFiles().refresh();
-        }
-
         if(player != null) {
+            ServerMidiManager.refreshServerSongs(false);
             player.refreshSongs();
         } else {
             ServerMusicTransmitterManager.createTransmitter(sender);

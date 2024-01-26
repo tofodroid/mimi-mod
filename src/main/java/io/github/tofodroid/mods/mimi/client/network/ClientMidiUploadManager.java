@@ -7,7 +7,7 @@ import java.util.List;
 
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.IMidiFileProvider.LocalMidiInfo;
+import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 

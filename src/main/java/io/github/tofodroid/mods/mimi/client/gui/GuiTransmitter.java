@@ -2,11 +2,13 @@ package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
 import org.joml.Vector2i;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
@@ -15,6 +17,8 @@ import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CON
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class GuiTransmitter extends BaseGui {
@@ -26,6 +30,7 @@ public class GuiTransmitter extends BaseGui {
     protected static final Vector2i FAVORITE_FILTER_BUTTON = new Vector2i(300,32);
     protected static final Vector2i FAVORITE_FILTER_SCREEN = new Vector2i(318,33);
     protected static final Vector2i REFRESH_SONGS_BUTTON = new Vector2i(335,32);
+    protected static final Vector2i OPEN_LOCAL_FOLDER_BUTTON = new Vector2i(10,32);
 
     // Song Controls
     protected static final Vector2i TOGGLE_FAVORITE_BUTTON = new Vector2i(335,149);
@@ -53,7 +58,8 @@ public class GuiTransmitter extends BaseGui {
     protected UUID musicPlayerId;
     protected ServerMusicPlayerStatusPacket musicStatus;
     protected ServerMusicPlayerSongListPacket songList;
-    
+    protected Boolean awaitRefresh = false;
+
     public GuiTransmitter(UUID musicPlayerId) {
         super(360, 288, 360, "textures/gui/container_transmitter.png", "item.MIMIMod.gui_transmitter");
         this.musicPlayerId = musicPlayerId;
@@ -100,6 +106,7 @@ public class GuiTransmitter extends BaseGui {
 
     public void handleMusicplayerSongListPacket(ServerMusicPlayerSongListPacket packet) {
         this.songList = packet;
+        this.awaitRefresh = false;
     }
 
     @Override
@@ -109,6 +116,8 @@ public class GuiTransmitter extends BaseGui {
 
         if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(FAVORITE_FILTER_BUTTON))) {
             this.sendTransmitterCommand(CONTROL.FAVE_M);
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OPEN_LOCAL_FOLDER_BUTTON)) && this.isSinglePlayerOrLANHost()) {
+            Util.getPlatform().openUri(Path.of(MIMIMod.getProxy().serverMidiFiles().getCurrentFolderPath()).toUri());
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_SONGS_BUTTON))) {
             this.startRefreshSongList();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(TOGGLE_FAVORITE_BUTTON))) {
@@ -143,6 +152,12 @@ public class GuiTransmitter extends BaseGui {
         
         return super.mouseClicked(mouseX, mouseY, button);
     }
+    
+
+    @SuppressWarnings("resource")
+    public Boolean isSinglePlayerOrLANHost() {
+        return Minecraft.getInstance().player != null && Minecraft.getInstance().hasSingleplayerServer();
+    }
 
     @Override
     protected  GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
@@ -152,11 +167,8 @@ public class GuiTransmitter extends BaseGui {
         // Background
         graphics.blit(guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
-        // Title
-        this.renderTitle(graphics);
-
         // Selected Song Box
-        if(!this.songList.infos.isEmpty() && this.musicStatus.fileIndex != null) {
+        if(!this.songList.infos.isEmpty() && this.musicStatus.fileIndex != null && !this.awaitRefresh) {
             Integer songOffset = getSongOffset();            
             Integer boxY = (getFirstSongY() - 2) + (11 * songOffset);
             graphics.blit(guiTexture, START_X + 10, START_Y + boxY, 1, 290, 340, 11, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -169,6 +181,10 @@ public class GuiTransmitter extends BaseGui {
             graphics.blit(guiTexture, START_X + 49, START_Y + 265, 1 + this.loadingAnimationFrame*13, 345, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
+        // Server Folder Button
+        if(this.isSinglePlayerOrLANHost()) {
+            graphics.blit(guiTexture, START_X + 9, START_Y + 31, 173, 302, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        }
 
         // Toggle Favorite Button
         graphics.blit(guiTexture, START_X + 336, START_Y + 150, this.musicStatus.isFileFavorite ? 40 : 27, 316, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -198,7 +214,7 @@ public class GuiTransmitter extends BaseGui {
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Playlist
-        if(!this.songList.infos.isEmpty()) {
+        if(!this.songList.infos.isEmpty() && !this.awaitRefresh) {
             Integer minSong = getMinSong();
 
             for(int i = 0; i < getVisibleSongs(); i++) {
@@ -210,25 +226,21 @@ public class GuiTransmitter extends BaseGui {
                     break;
                 }            
             }
+        } else {
+            graphics.drawString(font, this.awaitRefresh ? "Loading..." : "No songs found", START_X + 12, START_Y + getFirstSongY(), 0xFF00E600);
         }
 
         // Current Song
-        if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
+        if(!this.musicStatus.isLoading && this.musicStatus.isLoadFailed) {
+            graphics.drawString(font, "Song failed to load:", START_X + 12, START_Y + 168, 0xFF00E600);
+            graphics.drawString(font, "It may be invalid or may have been deleted. Refresh the", START_X + 12, START_Y + 192, 0xFF00E600);
+            graphics.drawString(font, "list with the button in the top right and select a new song.", START_X + 12, START_Y + 202, 0xFF00E600);
+        } else if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
             BasicMidiInfo info = this.songList.infos.get(this.musicStatus.fileIndex);
             graphics.drawString(font, this.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 153, 0xFF00E600);
 
             if(this.musicStatus.isLoading) {
                 graphics.drawString(font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 168, 0xFF00E600);
-            } else if(!this.musicStatus.isLoading && this.musicStatus.isLoadFailed) {
-                graphics.drawString(font, "Failed to load selected song:", START_X + 12, START_Y + 168, 0xFF00E600);
-
-                if(info.serverMidi) {
-                    graphics.drawString(font, "It may be invalid or may have been deleted from the server.", START_X + 12, START_Y + 192, 0xFF00E600);
-                } else {
-                    graphics.drawString(font, "It may be invalid or may have been deleted from your MIDI folder.", START_X + 12, START_Y + 192, 0xFF00E600);
-                }
-
-                graphics.drawString(font, "Try refreshing the the MIDI list with the button in the top right.", START_X + 12, START_Y + 202, 0xFF00E600);
             } else if(this.musicStatus.channelMapping != null) {
                 Map<Integer, String> instrumentMapping = MidiFileUtils.getInstrumentMapping(this.musicStatus.channelMapping);
                 graphics.drawString(font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 168, 0xFF00E600);
@@ -254,11 +266,6 @@ public class GuiTransmitter extends BaseGui {
 
     protected Integer maxPlaylistSongTitleWidth() {
         return 324;
-    }
-
-    protected GuiGraphics renderTitle(GuiGraphics graphics) {
-        graphics.blit(guiTexture, START_X + 132, START_Y + 6, 53, 330, 97, 14, TEXTURE_SIZE, TEXTURE_SIZE);
-        return graphics;
     }
 
     protected GuiGraphics renderPlaylistSongBadges(GuiGraphics graphics, BasicMidiInfo info, Integer songIndex, Integer minSong) {
@@ -307,5 +314,6 @@ public class GuiTransmitter extends BaseGui {
 
     protected void startRefreshSongList() {
         NetworkProxy.sendToServer(new ServerMusicPlayerSongListPacket(this.musicPlayerId));
+        this.awaitRefresh = true;
     }
 }

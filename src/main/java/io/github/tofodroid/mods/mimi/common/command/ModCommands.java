@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -17,8 +17,8 @@ public class ModCommands {
         );
 
     private static int reloadServerMusicList(CommandSourceStack source) {
-        MIMIMod.getProxy().serverMidiFiles().refresh();
-        source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + MIMIMod.getProxy().serverMidiFiles().getSongCount() + " files"), true);
+        ServerMidiManager.refreshServerSongs(true);
+        source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + ServerMidiManager.getServerSongs().size() + " files."), true);
         return 0;
     }
 }

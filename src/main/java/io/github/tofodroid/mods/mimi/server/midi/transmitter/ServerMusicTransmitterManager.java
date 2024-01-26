@@ -27,7 +27,9 @@ public abstract class ServerMusicTransmitterManager {
         AServerMusicTransmitter handler = PLAYER_MAP.get(player.getUUID());
         
         if(handler == null) {
-            PLAYER_MAP.put(player.getUUID(), new PlayerTransmitterMusicTransmitter(player));
+            handler = new PlayerTransmitterMusicTransmitter(player);
+            PLAYER_MAP.put(player.getUUID(), handler);
+            handler.onLoad();
         }
     }
 
@@ -35,8 +37,14 @@ public abstract class ServerMusicTransmitterManager {
         AServerMusicTransmitter handler = PLAYER_MAP.get(tile.getUUID());
         
         if(handler == null) {
-            PLAYER_MAP.put(tile.getUUID(), new TileTransmitterMusicTransmitter(tile));
+            handler = new TileTransmitterMusicTransmitter(tile);
+            PLAYER_MAP.put(tile.getUUID(), handler);
+            handler.onLoad();
         }
+    }
+
+    public static Boolean isPlaying(UUID id) {
+        return PLAYING_LIST.contains(id);
     }
 
     public static void addPlaying(UUID id) {
@@ -98,6 +106,12 @@ public abstract class ServerMusicTransmitterManager {
 
     public static void onServerStopping() {
         clearMusicPlayers();
+    }
+
+    public static void onServerSongsRefreshed() {
+        for(AServerMusicTransmitter transmitter : PLAYER_MAP.values()) {
+            transmitter.refreshSongs();
+        }
     }
 
     public static void onLivingDeath(LivingEntity entity) {

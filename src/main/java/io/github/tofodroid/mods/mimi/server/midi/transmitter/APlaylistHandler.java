@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 
@@ -57,7 +56,7 @@ public abstract class APlaylistHandler {
         }
         
         if(source != SourceMode.CLIENT) {
-            result.addAll(MIMIMod.getProxy().serverMidiFiles().getSortedSongInfos());
+            result.addAll(ServerMidiManager.getServerSongs());
         }
 
         return result;
@@ -132,7 +131,7 @@ public abstract class APlaylistHandler {
         return isNowFavorite;
     }
 
-    public void refreshFilteredSongs() {
+    public Boolean refreshFilteredSongs() {
         ArrayList<BasicMidiInfo> allSongsSorted = this.getSourceSongsSorted(this.getSourceMode());
         ArrayList<UUID> favoriteSongs = this.getFavoriteSongs();
         if(this.getFavoriteMode() != FavoriteMode.ALL) {
@@ -160,8 +159,10 @@ public abstract class APlaylistHandler {
         
         if(newSelectedIndex != null) {
             this.selectedDisplayIndex = newSelectedIndex;
+            return true;
         } else {
-            this.selectDisplaySong(0);
+            this.selectDisplaySong(-1);
+            return false;
         }
     }
 

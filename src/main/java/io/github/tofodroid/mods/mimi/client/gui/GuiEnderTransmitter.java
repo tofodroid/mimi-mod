@@ -10,6 +10,7 @@ import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CONTROL;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
+import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -54,14 +55,14 @@ public class GuiEnderTransmitter extends GuiTransmitter {
     }
 
     @Override
-    protected GuiGraphics renderTitle(GuiGraphics graphics) {
-        graphics.blit(guiTexture, START_X + 111, START_Y + 6, 1, 330, 149, 14, TEXTURE_SIZE, TEXTURE_SIZE);
-        return graphics;
-    }
-
-    @Override
     protected Integer maxPlaylistSongTitleWidth() {
         return 318;
+    }
+    
+    @Override
+    public Boolean isSinglePlayerOrLANHost() {
+        // Always return false because this GUI always shows the local folder button in the same spot
+        return false;
     }
     
     @Override
@@ -76,7 +77,8 @@ public class GuiEnderTransmitter extends GuiTransmitter {
     
     @Override
     protected void startRefreshSongList() {
-        MIMIMod.getProxy().clientMidiFiles().refresh();
-        NetworkProxy.sendToServer(new ClientMidiListPacket(true, MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
+        MIMIMod.getProxy().clientMidiFiles().refresh(true);
+        NetworkProxy.sendToServer(new ClientMidiListPacket(MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
+        NetworkProxy.sendToServer(new ServerMusicPlayerSongListPacket(musicPlayerId));
     }
 }
