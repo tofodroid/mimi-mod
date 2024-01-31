@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiTile;
+import io.github.tofodroid.mods.mimi.common.tile.AConfigurableTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -21,14 +22,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 
-public abstract class AConfigurableMidiBlock<B extends AConfigurableMidiTile> extends AContainerBlock<B> {
+public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extends AContainerBlock<B> {
 
-    public AConfigurableMidiBlock(Properties builder) {
+    public AConfigurableTileBlock(Properties builder) {
         super(builder);
     }
 
     protected abstract void openGui(Level worldIn, Player player, B tile);
-    protected abstract void appendMidiSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip);
+    protected abstract void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip);
 
     @Override
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -47,7 +48,7 @@ public abstract class AConfigurableMidiBlock<B extends AConfigurableMidiTile> ex
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter blockGetter, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, blockGetter, tooltip, flag);
-        this.appendMidiSettingsTooltip(stack, tooltip);
+        this.appendSettingsTooltip(stack, tooltip);
     }
     
     @Override

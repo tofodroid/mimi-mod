@@ -17,10 +17,6 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
         super(ModTiles.RECEIVER, pos, state);
     }
 
-    public static void doTick(Level world, BlockPos pos, BlockState state, TileReceiver self) {
-        self.tick(world, pos, state);
-    }
-    
     @Override
     public void tick(Level world, BlockPos pos, BlockState state) {
         super.tick(world, pos, state);

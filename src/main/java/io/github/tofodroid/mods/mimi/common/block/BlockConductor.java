@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.Block;
 
-public class BlockConductor extends AConfigurableMidiBlock<TileConductor> {
+public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
    public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
     public static final String REGISTRY_NAME = "conductor";
 
@@ -102,7 +102,7 @@ public class BlockConductor extends AConfigurableMidiBlock<TileConductor> {
         return ModTiles.CONDUCTOR;
     }
     @Override
-    protected void appendMidiSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 

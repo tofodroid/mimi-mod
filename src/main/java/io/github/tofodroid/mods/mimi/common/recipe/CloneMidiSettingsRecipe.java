@@ -86,6 +86,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
                 InstrumentDataUtils.setInvertNoteOct(result, InstrumentDataUtils.getInvertNoteOct(source));
                 InstrumentDataUtils.setFilterInstrument(result, InstrumentDataUtils.getFilterInstrument(source));
                 InstrumentDataUtils.setInvertInstrument(result, InstrumentDataUtils.getInvertInstrument(source));
+                InstrumentDataUtils.setInvertSignal(result, InstrumentDataUtils.getInvertSignal(source));
             }
             return result;
         }

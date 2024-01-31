@@ -29,6 +29,7 @@ public abstract class InstrumentDataUtils {
     public static final String INSTRUMENT_TAG = "filter_instrument";
     public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
     public static final String VOLUME_TAG = "instrument_volume";
+    public static final String INVERT_SIGNAL_TAG = "invert_signal";
     public static final String TRANSMITTER_SOURCE_PREFIX = ";T;";
     public static final Byte INSTRUMENT_ALL = -1;
     public static final Byte MAX_INSTRUMENT_VOLUME = 10;
@@ -257,6 +258,18 @@ public abstract class InstrumentDataUtils {
         return TagUtils.getBooleanOrDefault(stack, INVERT_INSTRUMENT_TAG, false);
     }
 
+    public static Boolean getInvertSignal(ItemStack stack) {
+        return TagUtils.getBooleanOrDefault(stack, INVERT_SIGNAL_TAG, false);
+    }
+
+    public static void setInvertSignal(ItemStack stack, Boolean invert) {
+        if (invert) {
+            stack.getOrCreateTag().putBoolean(INVERT_SIGNAL_TAG, invert);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(INVERT_SIGNAL_TAG);
+        }
+    }
+
     public static void setInstrumentVolume(ItemStack stack, Byte volume) {
         if(volume > MAX_INSTRUMENT_VOLUME) {
             volume = MAX_INSTRUMENT_VOLUME;
@@ -411,7 +424,7 @@ public abstract class InstrumentDataUtils {
                (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(stack)));
     }
 
-    public static void appendMidiSettingsTooltip(ItemStack stack, List<Component> tooltip) {
+    public static void appendSettingsTooltip(ItemStack stack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 

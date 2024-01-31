@@ -1,13 +1,19 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import io.github.tofodroid.mods.mimi.util.TagUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,22 +42,37 @@ public abstract class AColoredBlock extends Block {
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide) {
-            ItemStack itemstack = new ItemStack(this.asItem(), 1);
-            itemstack.getOrCreateTag().putInt(DYE_ID.getName(), state.getOptionalValue(DYE_ID).orElse(0));
-
-            ItemEntity itementity = new ItemEntity(level, (double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, itemstack);
-            itementity.setDefaultPickUpDelay();
-            level.addFreshEntity(itementity);
+            ItemStack itemstack = this.getCloneItemStack(level, pos, state);
+            level.addFreshEntity(getItemEntity(level, pos, itemstack));
         }
 
-      super.playerWillDestroy(level, pos, state, player);
-   }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    protected ItemEntity getItemEntity(Level level, BlockPos pos, ItemStack itemstack) {
+        ItemEntity itementity = new ItemEntity(level, (double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, itemstack);
+        itementity.setDefaultPickUpDelay();
+        return itementity;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter blockGetter, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, blockGetter, tooltip, flag);
+        this.appendSettingsTooltip(stack, tooltip);
+    }
    
     @Override
+    @SuppressWarnings("deprecation")
     public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-        ItemStack itemstack = new ItemStack(this.asItem(), 1);
+        ItemStack itemstack = super.getCloneItemStack(getter, pos, state);
         itemstack.getOrCreateTag().putInt(DYE_ID.getName(), state.getOptionalValue(DYE_ID).orElse(0));
         return itemstack;
+    }
+
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+        tooltip.add(Component.literal(""));
+        tooltip.add(Component.literal("Dyed:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        tooltip.add(Component.literal("  " + DyeColor.byId(TagUtils.getIntOrDefault(blockItemStack, DYE_ID.getName(), 0)).name()).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
     }
 
     public static final Integer getDecimalColorFromState(BlockState state) {

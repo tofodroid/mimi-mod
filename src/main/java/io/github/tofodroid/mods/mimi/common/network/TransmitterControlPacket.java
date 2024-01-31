@@ -87,7 +87,6 @@ public class TransmitterControlPacket {
         }
     }
 
-    @SuppressWarnings("null")
     public static void encodePacket(TransmitterControlPacket pkt, FriendlyByteBuf buf) {
         buf.writeUUID(pkt.transmitterId);
         buf.writeByte(Integer.valueOf(pkt.control.ordinal()).byteValue());

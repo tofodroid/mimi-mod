@@ -48,6 +48,10 @@ public abstract class ClientGuiWrapper {
     public static void openConfigGui(Level world, Player player) {
         openGui(world, new GuiMidiInputConfig(player));
     }
+
+    public static void openEffectEmitterGui(Level world, BlockPos tilePos, ItemStack emitterStack) {
+        openGui(world, new GuiEffectEmitter(world, tilePos, emitterStack));
+    }
     
     public static void openGui(Level world, Screen screen) {
         if(world.isClientSide) {

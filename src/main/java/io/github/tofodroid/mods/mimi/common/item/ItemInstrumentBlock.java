@@ -34,7 +34,7 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
 
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
-            InstrumentDataUtils.appendMidiSettingsTooltip(stack, tooltip);
+            InstrumentDataUtils.appendSettingsTooltip(stack, tooltip);
         }
     }
 

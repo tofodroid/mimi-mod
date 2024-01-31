@@ -42,6 +42,46 @@ public abstract class TagUtils {
         return defaultVal;
     }
 
+    public static void setOrRemoveUUID(ItemStack stack, String tag, UUID value) {
+        if (value != null) {
+            stack.getOrCreateTag().putUUID(tag, value);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(tag);
+        }
+    }
+
+    public static void setOrRemoveInt(ItemStack stack, String tag, Integer value) {
+        if (value != null) {
+            stack.getOrCreateTag().putInt(tag, value);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(tag);
+        }
+    }
+
+    public static void setOrRemoveByte(ItemStack stack, String tag, Byte value) {
+        if (value != null) {
+            stack.getOrCreateTag().putByte(tag, value);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(tag);
+        }
+    }
+
+    public static void setOrRemoveBoolean(ItemStack stack, String tag, Boolean value) {
+        if (value != null) {
+            stack.getOrCreateTag().putBoolean(tag, value);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(tag);
+        }
+    }
+
+    public static void setOrRemoveString(ItemStack stack, String tag, String value) {
+        if (value != null) {
+            stack.getOrCreateTag().putString(tag, value);
+        } else if (stack.hasTag()) {
+            stack.getTag().remove(tag);
+        }
+    }
+
     protected static Tag getTagOrExcept(ItemStack stack, String tag) throws NoStackTraceException {
         if(stack != null) {
             Tag nbt = stack.getOrCreateTag().get(tag);

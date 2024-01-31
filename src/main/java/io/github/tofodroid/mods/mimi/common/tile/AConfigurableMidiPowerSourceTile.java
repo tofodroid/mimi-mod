@@ -3,7 +3,8 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.block.APoweredConfigurableMidiBlock;
+import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
+import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -24,15 +25,23 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public Boolean isBlockValid() {
-        return getBlockState().getBlock() instanceof APoweredConfigurableMidiBlock;
+        return getBlockState().getBlock() instanceof AConfigurableMidiPowerSourceBlock;
     }
 
     public Boolean isTriggered() {
-        return getBlockState().getValue(APoweredConfigurableMidiBlock.TRIGGERED);
+        return getBlockState().getValue(AConfigurableMidiPowerSourceBlock.TRIGGERED);
     }
 
     public Boolean isPowered() {
-        return getBlockState().getValue(APoweredConfigurableMidiBlock.POWERED);
+        return getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWERED);
+    }
+
+    public Boolean isInverted() {
+        return getBlockState().getValue(AConfigurableMidiPowerSourceBlock.INVERTED);
+    }
+
+    public Boolean stackIsInverted() {
+        return InstrumentDataUtils.getInvertSignal(getSourceStack());
     }
 
     public Integer stayPoweredForTicks() {
@@ -43,13 +52,24 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         return 1;
     }
 
-    @SuppressWarnings("null")
+    public void setInverted(Boolean inverted) {
+        this.getLevel().setBlockAndUpdate(
+            getBlockPos(), 
+            getBlockState()
+                .setValue(AConfigurableMidiPowerSourceBlock.INVERTED, inverted)
+        );
+        
+        for(Direction direction : Direction.values()) {
+            getLevel().updateNeighborsAt(getBlockPos().relative(direction), getBlockState().getBlock());
+        }
+    }
+
     public void setTriggeredAndPower(Boolean triggered, Boolean powered) {
         this.getLevel().setBlockAndUpdate(
             getBlockPos(), 
             getBlockState()
-                .setValue(APoweredConfigurableMidiBlock.TRIGGERED, triggered)
-                .setValue(APoweredConfigurableMidiBlock.POWERED, powered)
+                .setValue(AConfigurableMidiPowerSourceBlock.TRIGGERED, triggered)
+                .setValue(AConfigurableMidiPowerSourceBlock.POWERED, powered)
         );
         
         for(Direction direction : Direction.values()) {
@@ -64,6 +84,10 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     @Override
     public void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {
         if(this.isBlockValid()) {
+            if(this.stackIsInverted() != this.isInverted()) {
+                this.setInverted(this.stackIsInverted());
+            }
+
             if(this.isPowered()) {
                 if(this.poweredTickCount > this.stayPoweredForTicks()) {
                     this.poweredTickCount = 0;

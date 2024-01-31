@@ -7,6 +7,7 @@ import org.joml.Vector2i;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
@@ -24,9 +25,11 @@ public class GuiListener extends BaseGui {
     private static final Vector2i FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2i(9,40);
     private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(150,40);
     private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(169,40);
+    private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(289,5);
 
     // Widgets
     private NoteFilterWidget noteFilter;
+    private InvertSignalWidget invertSignal;
 
     // Input Data
     protected List<Byte> INSTRUMENT_ID_LIST;
@@ -54,6 +57,7 @@ public class GuiListener extends BaseGui {
         super.init();
         this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(InstrumentDataUtils.getFilterInstrument(listenerStack));
         this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
+        this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2i(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
     }
 
     public void syncListenerToServer() {
@@ -77,6 +81,8 @@ public class GuiListener extends BaseGui {
             this.syncListenerToServer();
         } else if(noteFilter.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
+        } else if(invertSignal.mouseClicked(imouseX, imouseY, mouseButton)) {
+            this.syncListenerToServer();
         }
 
         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
@@ -96,6 +102,7 @@ public class GuiListener extends BaseGui {
         }
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
+        this.invertSignal.renderGraphics(graphics, mouseX, mouseY);
         
         return graphics;
     }
@@ -104,6 +111,7 @@ public class GuiListener extends BaseGui {
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         graphics.drawString(font, InstrumentDataUtils.getInstrumentName(InstrumentDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
+        this.invertSignal.renderText(graphics, font, mouseX, mouseY);
         return graphics;
     }
 

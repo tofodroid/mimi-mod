@@ -20,6 +20,7 @@ public class ModBlocks {
     public static final BlockReceiver RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockReceiver());
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro());
     public static final BlockConductor CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockConductor());
+    public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter());
 
     // Village Blocks
     public static final BlockTuningTable TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockTuningTable());

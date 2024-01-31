@@ -9,6 +9,8 @@ import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
+import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
@@ -80,6 +82,7 @@ public class NetworkManager {
         MOD_CHANNEL.registerMessage(6, ConfigurableMidiTileSyncPacket.class, ConfigurableMidiTileSyncPacket::encodePacket, ConfigurableMidiTileSyncPacket::decodePacket, createHandler(ConfigurableMidiTileSyncPacketHandler::handlePacketClient, ConfigurableMidiTileSyncPacketHandler::handlePacketServer));
         MOD_CHANNEL.registerMessage(7, TransmitterControlPacket.class, TransmitterControlPacket::encodePacket, TransmitterControlPacket::decodePacket, createHandler(TransmitterControlPacketHandler::handlePacketClient, TransmitterControlPacketHandler::handlePacketServer));
         MOD_CHANNEL.registerMessage(8, ServerMidiUploadPacket.class, ServerMidiUploadPacket::encodePacket, ServerMidiUploadPacket::decodePacket, createHandler(ServerMidiUploadPacketHandler::handlePacketClient, ServerMidiUploadPacketHandler::handlePacketServer));
+        MOD_CHANNEL.registerMessage(9, EffectEmitterUpdatePacket.class, EffectEmitterUpdatePacket::encodePacket, EffectEmitterUpdatePacket::decodePacket, createHandler(EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer));
     }
 
     public static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> createHandler(Consumer<T> handleClient, BiConsumer<T, ServerPlayer> handleServer) {

@@ -1,10 +1,16 @@
 {
     "variants": {
-        "powered=false": {
+        "powered=false,inverted=false": {
             "model": "mimi:block/midi/receiver"
         },
-        "powered=true": {
+        "powered=false,inverted=true": {
             "model": "mimi:block/midi/receiver_lit"
+        },
+        "powered=true,inverted=false": {
+            "model": "mimi:block/midi/receiver_lit"
+        },
+        "powered=true,inverted=true": {
+            "model": "mimi:block/midi/receiver"
         }
     }
 }

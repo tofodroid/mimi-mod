@@ -18,11 +18,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
+public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceiver> {
     public static final String REGISTRY_NAME = "receiver";
 
     public BlockReceiver() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
     }
 
     @Override
-    protected void appendMidiSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
@@ -66,6 +66,11 @@ public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
             }
         }
 
+        // Invert Signal
+        tooltip.add(Component.literal("  Invert Power: " 
+            + (InstrumentDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
+        );
+
         // Note Source
         if(InstrumentDataUtils.getMidiSource(blockItemStack) != null) {
             tooltip.add(Component.literal("  Recieve Notes From: " + (InstrumentDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
@@ -74,10 +79,9 @@ public class BlockReceiver extends APoweredConfigurableMidiBlock<TileReceiver> {
             tooltip.add(Component.literal("  Recieve Notes From: None").withStyle(ChatFormatting.GREEN));
         }
 
-
         // Filter Note
         tooltip.add(Component.literal("  Note(s): " 
-            + (InstrumentDataUtils.getInvertNoteOct(blockItemStack) ? " Not " : "")
+            + (InstrumentDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
             + InstrumentDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
         );
     }

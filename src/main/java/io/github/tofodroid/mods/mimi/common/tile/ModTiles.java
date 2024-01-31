@@ -21,6 +21,7 @@ public class ModTiles {
     public static BlockEntityType<TileReceiver> RECEIVER = create(TileReceiver.REGISTRY_NAME, TileReceiver::new, ModBlocks.RECEIVER);
     public static BlockEntityType<TileConductor> CONDUCTOR = create(TileConductor.REGISTRY_NAME, TileConductor::new, ModBlocks.CONDUCTOR);
     public static BlockEntityType<TileMechanicalMaestro> MECHANICALMAESTRO = create(TileMechanicalMaestro.REGISTRY_NAME, TileMechanicalMaestro::new, ModBlocks.MECHANICALMAESTRO);
+    public static BlockEntityType<TileEffectEmitter> EFFECTEMITTER = create(TileEffectEmitter.REGISTRY_NAME, TileEffectEmitter::new, ModBlocks.EFFECTEMITTER);
 
     @SuppressWarnings("unchecked")
     private static <T extends BlockEntity> BlockEntityType<T> create(String id, BlockEntityType.BlockEntitySupplier<T> blockEntity, Block... blocks) {

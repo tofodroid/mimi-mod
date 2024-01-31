@@ -48,7 +48,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
 
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
-            InstrumentDataUtils.appendMidiSettingsTooltip(stack, tooltip);
+            InstrumentDataUtils.appendSettingsTooltip(stack, tooltip);
         }
     }
 

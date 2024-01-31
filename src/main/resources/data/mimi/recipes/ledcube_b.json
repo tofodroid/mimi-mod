@@ -1,0 +1,17 @@
+{
+    "type": "mimi:changeledcube",
+    "pattern": [
+        "CC ",
+        "CC ",
+        "   "
+    ],
+    "key": {
+        "C": {
+            "item": "mimi:ledcube_a"
+        }
+    },
+    "result": {
+        "item": "mimi:ledcube_b",
+        "count": 4
+    }
+}

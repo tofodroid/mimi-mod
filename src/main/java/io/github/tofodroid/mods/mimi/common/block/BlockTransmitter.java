@@ -55,10 +55,8 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
                     player.setItemInHand(hand, handStack);
                     player.displayClientMessage(Component.literal("Linked to Transmitter"), true);
                 }
-                return InteractionResult.CONSUME;
             } else if(worldIn.isClientSide) {
                 ClientGuiWrapper.openTransmitterGui(worldIn, tile.getUUID());
-                return InteractionResult.CONSUME;
             }
         }
 
