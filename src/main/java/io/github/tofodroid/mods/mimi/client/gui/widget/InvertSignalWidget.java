@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui.widget;
 import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
@@ -22,7 +22,7 @@ public class InvertSignalWidget extends BaseWidget {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         // Inverted Lights
-        if(InstrumentDataUtils.getInvertSignal(midiStack)) {
+        if(MidiNbtDataUtils.getInvertSignal(midiStack)) {
             graphics.blit(GUI_TEXTURE, ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 6, 17, 17, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
@@ -30,7 +30,7 @@ public class InvertSignalWidget extends BaseWidget {
     @Override
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), BUTTON_COORDS)) {
-            InstrumentDataUtils.setInvertSignal(midiStack, !InstrumentDataUtils.getInvertSignal(midiStack));
+            MidiNbtDataUtils.setInvertSignal(midiStack, !MidiNbtDataUtils.getInvertSignal(midiStack));
             return true;
         }
         

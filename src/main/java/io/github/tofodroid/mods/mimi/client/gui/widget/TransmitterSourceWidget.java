@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
@@ -27,13 +27,13 @@ public class TransmitterSourceWidget extends BaseWidget {
 
     @Override
     public void renderText(GuiGraphics graphics, Font font, Integer mouseX, Integer mouseY) {
-        UUID source = InstrumentDataUtils.getMidiSource(this.midiStack);
+        UUID source = MidiNbtDataUtils.getMidiSource(this.midiStack);
 
         if(source == null) {
             graphics.drawString(font, "None", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
         } else {
-            String sourceName = InstrumentDataUtils.getMidiSourceName(this.midiStack, true);
-            Boolean isTransmitter = InstrumentDataUtils.getMidiSourceIsTransmitter(this.midiStack);
+            String sourceName = MidiNbtDataUtils.getMidiSourceName(this.midiStack, true);
+            Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(this.midiStack);
 
             graphics.drawString(font, isTransmitter ? "Transmitter:" : "Player:", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
 
@@ -50,10 +50,10 @@ public class TransmitterSourceWidget extends BaseWidget {
     @Override
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), SOURCE_SELF_BUTTON_COORDS)) {
-            InstrumentDataUtils.setMidiSource(midiStack, playerId, playerName);
+            MidiNbtDataUtils.setMidiSource(midiStack, playerId, playerName);
             return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), SOURCE_CLEAR_BUTTON_COORDS)) {
-            InstrumentDataUtils.setMidiSource(midiStack, null, "None");
+            MidiNbtDataUtils.setMidiSource(midiStack, null, "None");
             return true;
         }
         

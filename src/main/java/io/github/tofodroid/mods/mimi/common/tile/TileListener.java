@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -41,8 +41,8 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
 
         if(!sourceStack.isEmpty()) {
             return 
-                (note == null || InstrumentDataUtils.isNoteFiltered(filteredNotes, invertFilterNoteOct, note)) && 
-                (instrumentId == null || InstrumentDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId))
+                (note == null || MidiNbtDataUtils.isNoteFiltered(filteredNotes, invertFilterNoteOct, note)) && 
+                (instrumentId == null || MidiNbtDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId))
             ;
         }
 

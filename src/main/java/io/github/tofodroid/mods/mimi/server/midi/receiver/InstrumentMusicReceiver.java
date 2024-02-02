@@ -7,7 +7,7 @@ import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.server.ServerExecutor;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -23,11 +23,11 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     protected InteractionHand handIn;
 
     public InstrumentMusicReceiver(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim, UUID notePlayerId, ItemStack instrumentStack, InteractionHand handIn) {
-        super(InstrumentDataUtils.getMidiSource(instrumentStack), pos, dim);
+        super(MidiNbtDataUtils.getMidiSource(instrumentStack), pos, dim);
         this.notePlayerId = notePlayerId;
-        this.instrumentId = InstrumentDataUtils.getInstrumentId(instrumentStack);
-        this.enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(instrumentStack);
-        this.volume = InstrumentDataUtils.getInstrumentVolume(instrumentStack);
+        this.instrumentId = MidiNbtDataUtils.getInstrumentId(instrumentStack);
+        this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack);
+        this.volume = MidiNbtDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;
     }
 
@@ -39,7 +39,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
 
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get()) && InstrumentDataUtils.isChannelEnabled(this.enabledChannels, packet.channel);
+        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get()) && MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, packet.channel);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
         if(packet.isControlEvent()) {
             notePacket = MidiNotePacket.createControlPacket(packet.getControllerNumber(), packet.getControllerValue(), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
         } else {
-            notePacket = MidiNotePacket.createNotePacket(packet.note, InstrumentDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
+            notePacket = MidiNotePacket.createNotePacket(packet.note, MidiNbtDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
         }
 
         ServerExecutor.executeOnServerThread(

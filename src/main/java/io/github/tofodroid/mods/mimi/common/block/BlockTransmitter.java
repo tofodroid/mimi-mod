@@ -11,7 +11,7 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -51,7 +51,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
             if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER))) {
                 if(!worldIn.isClientSide) {
                     String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
-                    InstrumentDataUtils.setMidiSourceFromTransmitter(handStack, tile.getUUID(), transmitterName);
+                    MidiNbtDataUtils.setMidiSourceFromTransmitter(handStack, tile.getUUID(), transmitterName);
                     player.setItemInHand(hand, handStack);
                     player.displayClientMessage(Component.literal("Linked to Transmitter"), true);
                 }

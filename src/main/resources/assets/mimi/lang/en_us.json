@@ -71,6 +71,7 @@
   "block.mimi.listener": "Listener",
   "block.mimi.receiver": "Receiver",
   "block.mimi.mechanicalmaestro": "Mechanical Maestro",
+  "block.mimi.effectemitter": "Effect Emitter",
   "block.mimi.conductor": "WIP",
   "block.mimi.piano": "Piano (Grand)",
   "block.mimi.piano2": "Piano (Bright)",

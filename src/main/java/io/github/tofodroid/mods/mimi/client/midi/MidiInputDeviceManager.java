@@ -16,7 +16,7 @@ import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.midi.AMidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -116,7 +116,7 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
     
     public List<Pair<InteractionHand, ItemStack>> getLocalInstrumentsForMidiDevice(Player player, Byte channel) {
         return localInstrumentsToPlay.stream()
-            .filter(instrumentStack -> InstrumentDataUtils.getSysInput(instrumentStack.getRight()) && InstrumentDataUtils.isChannelEnabled(instrumentStack.getRight(), channel))
+            .filter(instrumentStack -> MidiNbtDataUtils.getSysInput(instrumentStack.getRight()) && MidiNbtDataUtils.isChannelEnabled(instrumentStack.getRight(), channel))
             .collect(Collectors.toList());
     }
 

@@ -8,7 +8,7 @@ import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -48,7 +48,7 @@ public class GuiConductor extends BaseGui {
     @Override
     public void init() {
         super.init();
-        this.broadcastNote = InstrumentDataUtils.getBroadcastNote(conductorStack);
+        this.broadcastNote = MidiNbtDataUtils.getBroadcastNote(conductorStack);
         this.midiChannelToggle = new MidiChannelToggleWidget(conductorStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
     }
 
@@ -92,7 +92,7 @@ public class GuiConductor extends BaseGui {
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Broadcast note
-        graphics.drawString(font, InstrumentDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
+        graphics.drawString(font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
 
         this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
 
@@ -109,7 +109,7 @@ public class GuiConductor extends BaseGui {
         } else {
             broadcastNote = Integer.valueOf(broadcastNote - 11).byteValue();
         }
-        InstrumentDataUtils.setBroadcastNote(conductorStack, broadcastNote);
+        MidiNbtDataUtils.setBroadcastNote(conductorStack, broadcastNote);
     }
     
     protected void shiftBroadcastNoteOctave() {
@@ -122,6 +122,6 @@ public class GuiConductor extends BaseGui {
         } else {
             broadcastNote = Integer.valueOf(broadcastNote - 120).byteValue();
         }
-        InstrumentDataUtils.setBroadcastNote(conductorStack, broadcastNote);
+        MidiNbtDataUtils.setBroadcastNote(conductorStack, broadcastNote);
     }
 }

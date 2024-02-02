@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -34,7 +34,7 @@ public abstract class AConfigurableMidiTile extends AConfigurableTile {
             String itemId = stackTag.getString("id");
 
             if(itemId.equalsIgnoreCase("mimi:switchboard")) {
-                convertStack = initializeSourceStack(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
+                convertStack = initializeSourceStack(MidiNbtDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
             }
         }
 

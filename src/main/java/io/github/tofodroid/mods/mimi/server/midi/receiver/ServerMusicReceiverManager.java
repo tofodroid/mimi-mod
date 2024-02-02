@@ -13,7 +13,7 @@ import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -49,7 +49,7 @@ public abstract class ServerMusicReceiverManager {
         List<InstrumentMusicReceiver> receivers = new ArrayList<>();
 
         tile.getInstrumentStacks().forEach(instrumentStack -> {
-            if(tile.getLevel() != null && instrumentStack != null && InstrumentDataUtils.getMidiSource(instrumentStack) != null) {
+            if(tile.getLevel() != null && instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
                 InstrumentMusicReceiver newReceiver = new InstrumentMusicReceiver(
                     tile::getBlockPos,
                     () -> tile.getLevel().dimension(),
@@ -82,7 +82,7 @@ public abstract class ServerMusicReceiverManager {
                 ItemInstrumentHandheld.getEntityHeldInstrumentStack(entity, hand) : 
                 BlockInstrument.getTileInstrumentStackForEntity(entity);
             
-            if(entity.level() != null && instrumentStack != null && InstrumentDataUtils.getMidiSource(instrumentStack) != null) {
+            if(entity.level() != null && instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
                 InstrumentMusicReceiver newReceiver = new InstrumentMusicReceiver(
                     entity::getOnPos,
                     () -> entity.level().dimension(),
@@ -114,7 +114,7 @@ public abstract class ServerMusicReceiverManager {
     public static void loadConfigurableMidiNoteResponsiveTileReceiver(AConfigurableMidiNoteResponsiveTile tile) { 
         List<ConfigurableMidiNoteResponsiveTileReceiver> receivers = new ArrayList<>();
 
-        if(tile.getLevel() != null && InstrumentDataUtils.getMidiSource(tile.getSourceStack()) != null) {
+        if(tile.getLevel() != null && MidiNbtDataUtils.getMidiSource(tile.getSourceStack()) != null) {
             receivers.add(new ConfigurableMidiNoteResponsiveTileReceiver(tile));
         }
         

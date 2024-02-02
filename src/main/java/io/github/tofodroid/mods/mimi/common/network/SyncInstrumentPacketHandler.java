@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
@@ -22,10 +22,10 @@ public class SyncInstrumentPacketHandler {
             instrumentStack = tileInstrument.getInstrumentStack();
         }
         
-        InstrumentDataUtils.setMidiSource(instrumentStack, message.midiSource, message.midiSourceName);
-        InstrumentDataUtils.setEnabledChannelsInt(instrumentStack, message.enabledChannelsInt);
-        InstrumentDataUtils.setSysInput(instrumentStack, message.sysInput);
-        InstrumentDataUtils.setInstrumentVolume(instrumentStack, message.volume);
+        MidiNbtDataUtils.setMidiSource(instrumentStack, message.midiSource, message.midiSourceName);
+        MidiNbtDataUtils.setEnabledChannelsInt(instrumentStack, message.enabledChannelsInt);
+        MidiNbtDataUtils.setSysInput(instrumentStack, message.sysInput);
+        MidiNbtDataUtils.setInstrumentVolume(instrumentStack, message.volume);
         
         if(tileInstrument == null) {
             sender.setItemInHand(message.handIn, instrumentStack);

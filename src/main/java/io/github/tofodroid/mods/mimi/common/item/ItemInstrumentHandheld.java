@@ -28,7 +28,7 @@ import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     protected final String REGISTRY_NAME;
@@ -39,7 +39,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
         super(new Properties().stacksTo(1));
         this.spec = spec;
         this.REGISTRY_NAME = spec.registryName;
-        this.defaultChannels = InstrumentDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
 
         // Client-side only
         if(worldIn != null && worldIn.isClientSide) {
-            InstrumentDataUtils.appendSettingsTooltip(stack, tooltip);
+            MidiNbtDataUtils.appendSettingsTooltip(stack, tooltip);
         }
     }
 
@@ -85,7 +85,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity target, InteractionHand handIn) {
         if(target instanceof Player) {
             if(!user.level().isClientSide) {
-                InstrumentDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
+                MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
                 user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
                 MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.level(), null);
@@ -127,7 +127,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
                     String itemId = stackTag.getString("id");
 
                     if(itemId.equalsIgnoreCase("mimi:switchboard") && stackTag.contains("tag", 10)) {
-                        tag = tag.merge(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
+                        tag = tag.merge(MidiNbtDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
                         tag.remove("inventory");
                     }
                 }

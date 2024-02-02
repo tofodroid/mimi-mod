@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui.widget;
 import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,7 @@ public class MidiChannelToggleWidget extends BaseWidget {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         // Channel Output Status Lights
-        SortedArraySet<Byte> acceptedChannels = InstrumentDataUtils.getEnabledChannelsSet(this.midiStack);
+        SortedArraySet<Byte> acceptedChannels = MidiNbtDataUtils.getEnabledChannelsSet(this.midiStack);
 
         if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
             for(Byte channelId : acceptedChannels) {
@@ -37,10 +37,10 @@ public class MidiChannelToggleWidget extends BaseWidget {
     @Override
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), CLEAR_MIDI_BUTTON_COORDS)) {
-            InstrumentDataUtils.clearEnabledChannels(midiStack);
+            MidiNbtDataUtils.clearEnabledChannels(midiStack);
             return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), ALL_MIDI_BUTTON_COORDS)) {
-            InstrumentDataUtils.setEnableAllChannels(midiStack);
+            MidiNbtDataUtils.setEnableAllChannels(midiStack);
             return true;
         } else {
             // Individual Midi Channel Buttons
@@ -51,7 +51,7 @@ public class MidiChannelToggleWidget extends BaseWidget {
                 );
 
                 if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), buttonCoords)) {
-                    InstrumentDataUtils.toggleChannel(midiStack, i);
+                    MidiNbtDataUtils.toggleChannel(midiStack, i);
                     return true;
                 }
             }

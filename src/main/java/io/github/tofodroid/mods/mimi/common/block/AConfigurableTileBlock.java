@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiTile;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -66,8 +65,8 @@ public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extend
     public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
         BlockEntity tile = getter.getBlockEntity(pos);
         
-        if(tile != null && tile instanceof AConfigurableMidiTile) {
-            return ((AConfigurableMidiTile)tile).getSourceStack();
+        if(tile != null && tile instanceof AConfigurableTile) {
+            return ((AConfigurableTile)tile).getSourceStack();
         }
 
         return super.getCloneItemStack(getter, pos, state);

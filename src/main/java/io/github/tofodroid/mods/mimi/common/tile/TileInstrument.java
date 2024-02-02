@@ -8,7 +8,7 @@ import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -146,7 +146,7 @@ public class TileInstrument extends AStaticInventoryTile {
             String itemId = stackTag.getString("id");
 
             if(itemId.equalsIgnoreCase("mimi:switchboard")) {
-                convertStack = initializeInstrumentStack(InstrumentDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
+                convertStack = initializeInstrumentStack(MidiNbtDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
 
                 if(compound.contains(COLOR_TAG)) {
                     ((IColorableItem)convertStack.getItem()).setColor(convertStack, compound.getInt(COLOR_TAG));

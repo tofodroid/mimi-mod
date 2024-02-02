@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEffectEmitter extends AConfigurableTile {
     public static final String REGISTRY_NAME = "effectemitter";
-    public static final String INVERTED_TAG = InstrumentDataUtils.INVERT_SIGNAL_TAG;
+    public static final String INVERTED_TAG = MidiNbtDataUtils.INVERT_SIGNAL_TAG;
     public static final String SOUND_ID_TAG = "sound";
     public static final String PARTICLE_ID_TAG = "particle";
     public static final String VOLUME_TAG = "volume";
@@ -47,10 +47,12 @@ public class TileEffectEmitter extends AConfigurableTile {
     private Integer ticksSinceSound = 0;
     private Integer ticksSinceParticle = 0;
     private Boolean wasPowered;
+    private Boolean wasInverted;
 
     public TileEffectEmitter(BlockPos pos, BlockState state) {
         super(ModTiles.EFFECTEMITTER, pos, state, 1);
         wasPowered = state.getValue(BlockEffectEmitter.POWERED);
+        wasInverted = state.getValue(BlockEffectEmitter.INVERTED);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class TileEffectEmitter extends AConfigurableTile {
         this._particleLoop = null;
         this.ticksSinceSound = 0;
         this.ticksSinceParticle = 0;
+        this.updateBlockstate();
         this.setChanged();
     }
 
@@ -75,15 +78,31 @@ public class TileEffectEmitter extends AConfigurableTile {
     public void load(CompoundTag compound) {
         super.load(compound);
         
-        // Client-side trigger
-        if(this.level != null && this.level.isClientSide) {
-            if(this.wasPowered != this.getBlockState().getValue(BlockEffectEmitter.POWERED)) {
-                this.wasPowered = !this.wasPowered;
+        if(this.level != null && this.getBlockState() != null) {
+            if(this.level.isClientSide) {
+                // Client-side trigger
+                if(this.wasPowered != this.getBlockState().getValue(BlockEffectEmitter.POWERED) || this.wasInverted != this.getBlockState().getValue(BlockEffectEmitter.INVERTED)) {
+                    this.wasPowered = this.getBlockState().getValue(BlockEffectEmitter.POWERED);
+                    this.wasInverted = this.getBlockState().getValue(BlockEffectEmitter.INVERTED);
 
-                if(this.wasPowered != this.isInverted()) {
-                    this.playParticleLocal();
-                    this.playSoundLocal();
+                    if(this.wasPowered != this.isInverted()) {
+                        this.playParticleLocal();
+                        this.playSoundLocal();
+                    }
                 }
+            } else {
+                // Server-side state
+                this.updateBlockstate();
+            }
+        }
+    }
+
+    public void updateBlockstate() {
+        if(this.level != null && this.getBlockState() != null && !this.level.isClientSide) {
+            BlockState current = this.getBlockState();
+
+            if(this.isInverted() != current.getValue(BlockEffectEmitter.INVERTED)) {
+                this.level.setBlock(this.getBlockPos(), current.cycle(BlockEffectEmitter.INVERTED), 2);
             }
         }
     }

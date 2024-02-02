@@ -6,7 +6,7 @@ import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -55,34 +55,34 @@ public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceive
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        Integer enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(blockItemStack);
+        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(blockItemStack);
         if(enabledChannels != null) {
-            if(enabledChannels.equals(InstrumentDataUtils.ALL_CHANNELS_INT)) {
+            if(enabledChannels.equals(MidiNbtDataUtils.ALL_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
-            } else if(enabledChannels.equals(InstrumentDataUtils.NONE_CHANNELS_INT)) {
+            } else if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
             } else {
-                tooltip.add(Component.literal("  Channels: " + InstrumentDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
             }
         }
 
         // Invert Signal
         tooltip.add(Component.literal("  Invert Power: " 
-            + (InstrumentDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
+            + (MidiNbtDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
         );
 
         // Note Source
-        if(InstrumentDataUtils.getMidiSource(blockItemStack) != null) {
-            tooltip.add(Component.literal("  Recieve Notes From: " + (InstrumentDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
-            tooltip.add(Component.literal("  " + InstrumentDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        if(MidiNbtDataUtils.getMidiSource(blockItemStack) != null) {
+            tooltip.add(Component.literal("  Recieve Notes From: " + (MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.literal("  " + MidiNbtDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("  Recieve Notes From: None").withStyle(ChatFormatting.GREEN));
         }
 
         // Filter Note
         tooltip.add(Component.literal("  Note(s): " 
-            + (InstrumentDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
-            + InstrumentDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
+            + (MidiNbtDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
+            + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
         );
     }
 }

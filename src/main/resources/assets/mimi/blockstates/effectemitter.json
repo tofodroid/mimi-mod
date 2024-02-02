@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "powered=false,inverted=false": {
+            "model": "mimi:block/midi/effectemitter"
+        },
+        "powered=false,inverted=true": {
+            "model": "mimi:block/midi/effectemitter_lit"
+        },
+        "powered=true,inverted=false": {
+            "model": "mimi:block/midi/effectemitter_lit"
+        },
+        "powered=true,inverted=true": {
+            "model": "mimi:block/midi/effectemitter"
+        }
+    }
+}

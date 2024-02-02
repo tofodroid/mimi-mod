@@ -5,7 +5,7 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -38,19 +38,19 @@ public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListene
 
         // Invert Signal
         tooltip.add(Component.literal("  Invert Power: " 
-            + (InstrumentDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
+            + (MidiNbtDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
         );
 
         // Filter Instrument
         tooltip.add(Component.literal("  Instrument: " 
-            + (InstrumentDataUtils.getInvertInstrument(blockItemStack) ? "Not " : "")
-            + InstrumentDataUtils.getInstrumentName(InstrumentDataUtils.getFilterInstrument(blockItemStack))).withStyle(ChatFormatting.GREEN)
+            + (MidiNbtDataUtils.getInvertInstrument(blockItemStack) ? "Not " : "")
+            + MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(blockItemStack))).withStyle(ChatFormatting.GREEN)
         );
 
         // Filter Note
         tooltip.add(Component.literal("  Note(s): " 
-            + (InstrumentDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
-            + InstrumentDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
+            + (MidiNbtDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
+            + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
         );
     }
 }

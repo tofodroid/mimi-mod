@@ -27,7 +27,7 @@ import io.github.tofodroid.mods.mimi.common.network.SyncInstrumentPacket;
 import io.github.tofodroid.mods.mimi.forge.common.config.ClientConfig;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -172,8 +172,8 @@ public class GuiInstrument extends BaseGui {
         this.handIn = handIn;
         this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount());
         this.instrumentStack.setTag(instrumentStack.getOrCreateTag().copy());
-        this.instrumentId = InstrumentDataUtils.getInstrumentId(this.instrumentStack);
-        this.instrumentNameString = InstrumentDataUtils.getInstrumentName(this.instrumentId);
+        this.instrumentId = MidiNbtDataUtils.getInstrumentId(this.instrumentStack);
+        this.instrumentNameString = MidiNbtDataUtils.getInstrumentName(this.instrumentId);
     }
 
     @Override
@@ -261,15 +261,15 @@ public class GuiInstrument extends BaseGui {
             // MIDI Controls
             if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SYS_DEVICE_BUTTON_COORDS))) {
                 // Toggle Sys Device Button
-                InstrumentDataUtils.setSysInput(instrumentStack, !InstrumentDataUtils.getSysInput(instrumentStack));
+                MidiNbtDataUtils.setSysInput(instrumentStack, !MidiNbtDataUtils.getSysInput(instrumentStack));
                 this.syncInstrumentToServer();
                 this.allNotesOff();
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(INSTRUMENT_VOLUME_UP_BUTTON_COORDS))) {
-                InstrumentDataUtils.setInstrumentVolume(instrumentStack, Integer.valueOf(InstrumentDataUtils.getInstrumentVolume(instrumentStack) + 1).byteValue());
+                MidiNbtDataUtils.setInstrumentVolume(instrumentStack, Integer.valueOf(MidiNbtDataUtils.getInstrumentVolume(instrumentStack) + 1).byteValue());
                 this.syncInstrumentToServer();
                 this.releaseHeldNotes();
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS))) {
-                InstrumentDataUtils.setInstrumentVolume(instrumentStack, Integer.valueOf(InstrumentDataUtils.getInstrumentVolume(instrumentStack) - 1).byteValue());
+                MidiNbtDataUtils.setInstrumentVolume(instrumentStack, Integer.valueOf(MidiNbtDataUtils.getInstrumentVolume(instrumentStack) - 1).byteValue());
                 this.syncInstrumentToServer();
                 this.releaseHeldNotes();
             } else if(transmitSource.mouseClicked(imouseX, imouseY, mouseButton)) {
@@ -444,7 +444,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         if(this.instrumentId != null) {
-            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, InstrumentDataUtils.applyVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos(), handIn);
+            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, MidiNbtDataUtils.applyVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);
@@ -569,7 +569,7 @@ public class GuiInstrument extends BaseGui {
             graphics.pose().popPose();
 
             // Sys MIDI Device Status Light
-            if(InstrumentDataUtils.getSysInput(this.instrumentStack)) {
+            if(MidiNbtDataUtils.getSysInput(this.instrumentStack)) {
                 graphics.blit(guiTexture, START_X + 127, START_Y + 91, 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
 
@@ -642,7 +642,7 @@ public class GuiInstrument extends BaseGui {
         if(editMode) {
             this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
             this.transmitSource.renderText(graphics, font, mouseX, mouseY);
-            graphics.drawString(font, InstrumentDataUtils.getInstrumentVolume(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
+            graphics.drawString(font, MidiNbtDataUtils.getInstrumentVolume(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
         }
 
         // Keyboard Layout

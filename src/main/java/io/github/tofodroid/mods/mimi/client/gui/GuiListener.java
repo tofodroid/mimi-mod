@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -55,7 +55,7 @@ public class GuiListener extends BaseGui {
     @Override
     public void init() {
         super.init();
-        this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(InstrumentDataUtils.getFilterInstrument(listenerStack));
+        this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(MidiNbtDataUtils.getFilterInstrument(listenerStack));
         this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
         this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2i(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
     }
@@ -77,7 +77,7 @@ public class GuiListener extends BaseGui {
             this.shiftInstrumentId(true);
             this.syncListenerToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(FILTER_INSTRUMENT_INVERT_BUTTON_COORDS))) {
-            InstrumentDataUtils.setInvertInstrument(listenerStack, !InstrumentDataUtils.getInvertInstrument(listenerStack));
+            MidiNbtDataUtils.setInvertInstrument(listenerStack, !MidiNbtDataUtils.getInvertInstrument(listenerStack));
             this.syncListenerToServer();
         } else if(noteFilter.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
@@ -97,7 +97,7 @@ public class GuiListener extends BaseGui {
         // GUI Background
         graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
-        if(InstrumentDataUtils.getInvertInstrument(listenerStack)) {
+        if(MidiNbtDataUtils.getInvertInstrument(listenerStack)) {
             graphics.blit(guiTexture, START_X + 175, START_Y + 34, 0, 64, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     
@@ -109,7 +109,7 @@ public class GuiListener extends BaseGui {
 
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        graphics.drawString(font, InstrumentDataUtils.getInstrumentName(InstrumentDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
+        graphics.drawString(font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.invertSignal.renderText(graphics, font, mouseX, mouseY);
         return graphics;
@@ -117,7 +117,7 @@ public class GuiListener extends BaseGui {
 
     public List<Byte> INSTRUMENT_ID_LIST() {
         if(this.INSTRUMENT_ID_LIST == null) {
-            this.INSTRUMENT_ID_LIST = InstrumentDataUtils.INSTRUMENT_NAME_MAP().keySet().stream().sorted().collect(Collectors.toList());
+            this.INSTRUMENT_ID_LIST = MidiNbtDataUtils.INSTRUMENT_NAME_MAP().keySet().stream().sorted().collect(Collectors.toList());
         }
         return this.INSTRUMENT_ID_LIST;
     }
@@ -137,6 +137,6 @@ public class GuiListener extends BaseGui {
             }
         }
         
-        InstrumentDataUtils.setFilterInstrument(listenerStack, INSTRUMENT_ID_LIST().get(filterInstrumentIndex));
+        MidiNbtDataUtils.setFilterInstrument(listenerStack, INSTRUMENT_ID_LIST().get(filterInstrumentIndex));
     }
 }

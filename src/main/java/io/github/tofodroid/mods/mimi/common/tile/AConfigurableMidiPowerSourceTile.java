@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -41,7 +41,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public Boolean stackIsInverted() {
-        return InstrumentDataUtils.getInvertSignal(getSourceStack());
+        return MidiNbtDataUtils.getInvertSignal(getSourceStack());
     }
 
     public Integer stayPoweredForTicks() {

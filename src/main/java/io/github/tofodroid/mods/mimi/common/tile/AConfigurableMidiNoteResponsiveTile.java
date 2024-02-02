@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -50,11 +50,11 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     protected void cacheMidiSettings() {
         if(this.getSourceStack() == null) return;
 
-        this.enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(this.getSourceStack());
-        this.filteredNotes = InstrumentDataUtils.getFilterNotes(InstrumentDataUtils.getFilterNote(this.getSourceStack()), InstrumentDataUtils.getFilterOct(this.getSourceStack()));
-        this.filteredInstrument = InstrumentDataUtils.getFilterInstrument(this.getSourceStack());
-        this.invertFilterInstrument = InstrumentDataUtils.getInvertInstrument(this.getSourceStack());
-        this.invertFilterNoteOct = InstrumentDataUtils.getInvertNoteOct(this.getSourceStack());
+        this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(this.getSourceStack());
+        this.filteredNotes = MidiNbtDataUtils.getFilterNotes(MidiNbtDataUtils.getFilterNote(this.getSourceStack()), MidiNbtDataUtils.getFilterOct(this.getSourceStack()));
+        this.filteredInstrument = MidiNbtDataUtils.getFilterInstrument(this.getSourceStack());
+        this.invertFilterInstrument = MidiNbtDataUtils.getInvertInstrument(this.getSourceStack());
+        this.invertFilterNoteOct = MidiNbtDataUtils.getInvertNoteOct(this.getSourceStack());
     }
 
     protected void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {/* Default: No-op */};

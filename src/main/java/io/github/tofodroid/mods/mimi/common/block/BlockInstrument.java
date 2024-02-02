@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,7 +56,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public BlockInstrument(InstrumentSpec spec) {
         super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
         this.spec = spec;
-        this.defaultChannels = InstrumentDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
         this.REGISTRY_NAME = spec.registryName;
         this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));

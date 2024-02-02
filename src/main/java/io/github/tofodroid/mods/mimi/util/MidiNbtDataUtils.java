@@ -14,7 +14,7 @@ import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
 @SuppressWarnings("null")
-public abstract class InstrumentDataUtils {
+public abstract class MidiNbtDataUtils {
     public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     public static final String FILTER_NOTE_TAG = "filter_note";
     public static final String FILTER_OCT_TAG = "filter_oct";
@@ -420,8 +420,8 @@ public abstract class InstrumentDataUtils {
     }
 
     public static Boolean shouldInstrumentRespondToMessage(ItemStack stack, UUID sender, Byte channel) {
-        return stack.getItem() instanceof IInstrumentItem && InstrumentDataUtils.isChannelEnabled(stack, channel) && 
-               (sender != null && sender.equals(InstrumentDataUtils.getMidiSource(stack)));
+        return stack.getItem() instanceof IInstrumentItem && MidiNbtDataUtils.isChannelEnabled(stack, channel) && 
+               (sender != null && sender.equals(MidiNbtDataUtils.getMidiSource(stack)));
     }
 
     public static void appendSettingsTooltip(ItemStack stack, List<Component> tooltip) {

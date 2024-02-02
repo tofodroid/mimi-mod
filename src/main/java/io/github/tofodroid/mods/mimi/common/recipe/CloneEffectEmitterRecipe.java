@@ -1,8 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
+import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -18,12 +18,12 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Arrays;
 
-public class CloneMidiSettingsRecipe extends CustomRecipe {
-    public static final String REGISTRY_NAME = "clonemidi";
-    public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER);
-	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
+public class CloneEffectEmitterRecipe extends CustomRecipe {
+    public static final String REGISTRY_NAME = "cloneeffectemitter";
+    public static final List<Item> ITEMS = Arrays.asList(ModItems.EFFECTEMITTER);
+	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneEffectEmitterRecipe>(CloneEffectEmitterRecipe::new);
 
-    public CloneMidiSettingsRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
+    public CloneEffectEmitterRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
         super(recipeId, category);
     }
 
@@ -35,7 +35,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stackI = inv.getItem(i);
-            if (!stackI.isEmpty() && !canStoreMidiSettings(stackI)) {
+            if (!stackI.isEmpty() && !isValid(stackI)) {
                 // Invalid item found
                 return false;
             } else if(!stackI.isEmpty() && source.isEmpty()) {
@@ -47,9 +47,9 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
                     return false;
                 }
             } else if(!source.isEmpty())  {
-                if(validSlots.contains(i) && canCopyFromSourceToTarget(source, stackI)) {
+                if(validSlots.contains(i) && isValid(stackI)) {
                     foundSlots++;
-                } else if(!stackI.isEmpty() && (!validSlots.contains(i) || !canCopyFromSourceToTarget(source, stackI))) {
+                } else if(!stackI.isEmpty() && (!validSlots.contains(i) || !isValid(stackI))) {
                     return false;
                 }
             }
@@ -74,20 +74,19 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         
         if(!source.isEmpty() && !target.isEmpty()) {
             ItemStack result = target.copyWithCount(1);
-            MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
-            MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
-
-            if(source.getItem() instanceof IInstrumentItem) {
-                MidiNbtDataUtils.setSysInput(result, MidiNbtDataUtils.getSysInput(source));
-                MidiNbtDataUtils.setInstrumentVolume(result, MidiNbtDataUtils.getInstrumentVolume(source));
-            } else {
-                MidiNbtDataUtils.setFilterOct(result, MidiNbtDataUtils.getFilterOct(source));
-                MidiNbtDataUtils.setFilterNote(result, MidiNbtDataUtils.getFilterNote(source));
-                MidiNbtDataUtils.setInvertNoteOct(result, MidiNbtDataUtils.getInvertNoteOct(source));
-                MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
-                MidiNbtDataUtils.setInvertInstrument(result, MidiNbtDataUtils.getInvertInstrument(source));
-                MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
-            }
+            TagUtils.setOrRemoveString(result, TileEffectEmitter.SOUND_ID_TAG, TagUtils.getStringOrDefault(source, TileEffectEmitter.SOUND_ID_TAG,  ""));
+            TagUtils.setOrRemoveString(result, TileEffectEmitter.PARTICLE_ID_TAG, TagUtils.getStringOrDefault(source, TileEffectEmitter.PARTICLE_ID_TAG,  ""));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.VOLUME_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.VOLUME_TAG,  5));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.PITCH_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.PITCH_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SIDE_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SIDE_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPREAD_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPREAD_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.COUNT_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.COUNT_TAG,  1));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPEED_X_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPEED_X_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPEED_Y_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPEED_Y_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPEED_Z_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPEED_Z_TAG,  0));
+            TagUtils.setOrRemoveInt(result, TileEffectEmitter.SOUND_LOOP_TAG, TagUtils.getIntOrDefault(source, TileEffectEmitter.SOUND_LOOP_TAG,  0));
+            TagUtils.setOrRemoveInt(result, TileEffectEmitter.PARTICLE_LOOP_TAG, TagUtils.getIntOrDefault(source, TileEffectEmitter.PARTICLE_LOOP_TAG,  0));
+            TagUtils.setOrRemoveBoolean(result, TileEffectEmitter.INVERTED_TAG, TagUtils.getBooleanOrDefault(source, TileEffectEmitter.INVERTED_TAG,  false));
             return result;
         }
 
@@ -99,7 +98,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 
         for(int i = 0; i < nonnulllist.size(); ++i) {
-            if(canStoreMidiSettings(inv.getItem(i))) {
+            if(isValid(inv.getItem(i))) {
                 nonnulllist.set(i, inv.getItem(i).copyWithCount(1));
                 break;
             }
@@ -108,9 +107,8 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         return nonnulllist;
    }
 
-    protected Boolean canStoreMidiSettings(ItemStack stack) {
-        return stack.getItem() instanceof IInstrumentItem ||
-            MIDI_ITEMS.contains(stack.getItem());
+    protected Boolean isValid(ItemStack stack) {
+        return ITEMS.contains(stack.getItem());
     }
 
     protected List<Integer> getValidSlots(Integer slot, Integer width, Integer height) {
@@ -124,11 +122,6 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         return null;
     }
 
-    protected Boolean canCopyFromSourceToTarget(ItemStack source, ItemStack target) {
-        return (source.getItem() instanceof IInstrumentItem && target.getItem() instanceof IInstrumentItem) ||
-            source.getItem().equals(target.getItem());
-    }
-
     @Override
     public boolean canCraftInDimensions(int width, int height) {
         return width * height >= 2;
@@ -136,6 +129,6 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CloneMidiSettingsRecipe.SERIALIZER;
+        return CloneEffectEmitterRecipe.SERIALIZER;
     }
 }

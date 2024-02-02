@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+      "particle": "mimi:block/effectemitter/side",
+      "north": "mimi:block/effectemitter/side",
+      "south": "mimi:block/effectemitter/side",
+      "east": "mimi:block/effectemitter/side",
+      "west": "mimi:block/effectemitter/side",
+      "up": "mimi:block/effectemitter/side",
+      "down": "mimi:block/effectemitter/side"
+    }
+}

@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,15 +36,15 @@ public class ConfigurableMidiTileSyncPacket {
     
     public ConfigurableMidiTileSyncPacket(ItemStack sourceStack, BlockPos tilePos) {
         this.tilePos = tilePos;
-        this.midiSource = InstrumentDataUtils.getMidiSource(sourceStack);
-        this.midiSourceName = InstrumentDataUtils.getMidiSourceName(sourceStack, false);
-        this.filterOct = InstrumentDataUtils.getFilterOct(sourceStack);
-        this.filterNote = InstrumentDataUtils.getFilterNote(sourceStack);
-        this.invertNoteOct = InstrumentDataUtils.getInvertNoteOct(sourceStack);
-        this.enabledChannelsInt = InstrumentDataUtils.getEnabledChannelsInt(sourceStack);
-        this.instrumentId = InstrumentDataUtils.getFilterInstrument(sourceStack);
-        this.invertInstrument = InstrumentDataUtils.getInvertInstrument(sourceStack);
-        this.invertSignal = InstrumentDataUtils.getInvertSignal(sourceStack);
+        this.midiSource = MidiNbtDataUtils.getMidiSource(sourceStack);
+        this.midiSourceName = MidiNbtDataUtils.getMidiSourceName(sourceStack, false);
+        this.filterOct = MidiNbtDataUtils.getFilterOct(sourceStack);
+        this.filterNote = MidiNbtDataUtils.getFilterNote(sourceStack);
+        this.invertNoteOct = MidiNbtDataUtils.getInvertNoteOct(sourceStack);
+        this.enabledChannelsInt = MidiNbtDataUtils.getEnabledChannelsInt(sourceStack);
+        this.instrumentId = MidiNbtDataUtils.getFilterInstrument(sourceStack);
+        this.invertInstrument = MidiNbtDataUtils.getInvertInstrument(sourceStack);
+        this.invertSignal = MidiNbtDataUtils.getInvertSignal(sourceStack);
     }
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {

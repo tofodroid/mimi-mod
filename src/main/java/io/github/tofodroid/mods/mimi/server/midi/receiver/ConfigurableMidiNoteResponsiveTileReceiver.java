@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
@@ -13,7 +13,7 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
 
     @SuppressWarnings("null")
     public ConfigurableMidiNoteResponsiveTileReceiver(AConfigurableMidiNoteResponsiveTile tile) {        
-        super(InstrumentDataUtils.getMidiSource(tile.getSourceStack()), tile::getBlockPos, () -> tile.getLevel().dimension());
+        super(MidiNbtDataUtils.getMidiSource(tile.getSourceStack()), tile::getBlockPos, () -> tile.getLevel().dimension());
         this.tile = tile;
     }
 

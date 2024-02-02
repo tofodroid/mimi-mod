@@ -46,7 +46,7 @@ public abstract class AConfigurableTile extends AStaticInventoryTile {
             MIMIMod.LOGGER.warn("ConfigurableTile had no saved source stack! Re-initializing.");
             this.setSourceStack(this.initializeSourceStack(null));
         } else {
-            this.onSourceStackChanged();
+            this.setSourceStack(this.items.get(0));
         }
     }
 

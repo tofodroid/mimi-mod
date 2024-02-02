@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -13,7 +14,6 @@ import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
@@ -86,8 +86,8 @@ public class GuiEffectEmitter extends BaseGui {
 
         if(emitterStack == null || emitterStack.isEmpty()) {
             MIMIMod.LOGGER.error("Emitter stack is null or empty. Force closing GUI!");
-            Minecraft.getInstance().forceSetScreen((Screen)null);
             this.emitterStack = null;
+            Minecraft.getInstance().player.closeContainer();
             return;
         }
         this.emitterStack = new ItemStack(emitterStack.getItem(), emitterStack.getCount());
@@ -365,7 +365,7 @@ public class GuiEffectEmitter extends BaseGui {
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5).toString(), START_X + VOL_TEXT_COORDS.x, START_Y + VOL_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0).toString(), START_X + PITCH_TEXT_COORDS.x, START_Y + PITCH_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0).toString(), START_X + SPREAD_TEXT_COORDS.x, START_Y + SPREAD_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
+        graphics.drawString(font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1).toString(), START_X + COUNT_TEXT_COORDS.x, START_Y + COUNT_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);
@@ -381,23 +381,5 @@ public class GuiEffectEmitter extends BaseGui {
             return "None";
         }
         return loop.toString();
-    }
-
-    public String getSideFromByte(Byte side) {
-        switch(side) {
-            case 0:
-            default:
-                return "T";
-            case 1:
-                return "B";
-            case 2:
-                return "N";
-            case 3:
-                return "E";
-            case 4:
-                return "S";
-            case 5:
-                return "W";
-        }
     }
 }

@@ -29,6 +29,7 @@ public class ModRecipes {
         new ResourceLocation(MIMIMod.MODID, TuningTableRecipe.Serializer.REGISTRY_NAME), TuningTableRecipe.SERIALIZER,
         new ResourceLocation(MIMIMod.MODID, ChangeLedCubeRecipe.ChangeLedSerializer.REGISTRY_NAME), ChangeLedCubeRecipe.SERIALIZER,
         new ResourceLocation(MIMIMod.MODID, CloneMidiSettingsRecipe.REGISTRY_NAME), CloneMidiSettingsRecipe.SERIALIZER,
+        new ResourceLocation(MIMIMod.MODID, CloneEffectEmitterRecipe.REGISTRY_NAME), CloneEffectEmitterRecipe.SERIALIZER,
         new ResourceLocation(MIMIMod.MODID, CopyBlockDyeRecipe.REGISTRY_NAME), CopyBlockDyeRecipe.SERIALIZER,
         new ResourceLocation(MIMIMod.MODID, ColoredItemRecipe.REGISTRY_NAME), ColoredItemRecipe.SERIALIZER
     );

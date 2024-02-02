@@ -4,7 +4,7 @@ import java.util.Set;
 
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -22,10 +22,10 @@ public class TileConductor extends AConfigurableMidiTile {
         Level level = getLevel();
         if(level instanceof ServerLevel) {
             ItemStack sourceStack = getSourceStack();
-            Set<Byte> channels = InstrumentDataUtils.getEnabledChannelsSet(sourceStack);
+            Set<Byte> channels = MidiNbtDataUtils.getEnabledChannelsSet(sourceStack);
 
             if(channels.size() > 0) {
-                Byte note = InstrumentDataUtils.getBroadcastNote(sourceStack);
+                Byte note = MidiNbtDataUtils.getBroadcastNote(sourceStack);
                 Byte velocity = stop ? -1 : Byte.MAX_VALUE;
                 
                 for(Byte channel : channels) {

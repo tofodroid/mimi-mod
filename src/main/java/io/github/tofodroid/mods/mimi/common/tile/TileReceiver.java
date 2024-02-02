@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -28,10 +28,10 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
         ItemStack sourceStack = getSourceStack();
         if(!sourceStack.isEmpty()) {
             return 
-                InstrumentDataUtils.isChannelEnabled(this.enabledChannels, channel)
+                MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, channel)
                 && velocity > 0
                 && (note == null || note > 0)
-                && (note == null || InstrumentDataUtils.isNoteFiltered(filteredNotes, invertFilterNoteOct, note));
+                && (note == null || MidiNbtDataUtils.isNoteFiltered(filteredNotes, invertFilterNoteOct, note));
         }
         return false;
     }

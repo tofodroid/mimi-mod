@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
@@ -27,11 +27,11 @@ public class SyncInstrumentPacket {
     }
 
     public SyncInstrumentPacket(ItemStack instrumentStack, InteractionHand handIn) {
-        this.midiSource = InstrumentDataUtils.getMidiSource(instrumentStack);
-        this.midiSourceName = InstrumentDataUtils.getMidiSourceName(instrumentStack, false);
-        this.enabledChannelsInt = InstrumentDataUtils.getEnabledChannelsInt(instrumentStack);
-        this.sysInput = InstrumentDataUtils.getSysInput(instrumentStack);
-        this.volume = InstrumentDataUtils.getInstrumentVolume(instrumentStack);
+        this.midiSource = MidiNbtDataUtils.getMidiSource(instrumentStack);
+        this.midiSourceName = MidiNbtDataUtils.getMidiSourceName(instrumentStack, false);
+        this.enabledChannelsInt = MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack);
+        this.sysInput = MidiNbtDataUtils.getSysInput(instrumentStack);
+        this.volume = MidiNbtDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;
     }
 

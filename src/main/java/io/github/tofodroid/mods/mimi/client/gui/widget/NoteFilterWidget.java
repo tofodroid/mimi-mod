@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.client.gui.widget;
 
 import org.joml.Vector2i;
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
@@ -19,22 +19,22 @@ public class NoteFilterWidget extends BaseWidget {
     public NoteFilterWidget(ItemStack midiStack, Vector2i screenOffset, Vector2i start) {
         super("textures/gui/widget/note_filter.png", 116,  new Vector2i(116,32), screenOffset, start);
         this.midiStack = midiStack;
-        this.filterNoteLetter = InstrumentDataUtils.getFilterNote(midiStack).intValue();
-        this.filterNoteOctave = InstrumentDataUtils.getFilterOct(midiStack).intValue();     
+        this.filterNoteLetter = MidiNbtDataUtils.getFilterNote(midiStack).intValue();
+        this.filterNoteOctave = MidiNbtDataUtils.getFilterOct(midiStack).intValue();     
     }
 
     @Override
     public void renderGraphics(GuiGraphics graphics, Integer mouseX, Integer mouseY) {
         super.renderGraphics(graphics, mouseX, mouseY);
 
-        if(InstrumentDataUtils.getInvertNoteOct(midiStack)) {
+        if(MidiNbtDataUtils.getInvertNoteOct(midiStack)) {
             graphics.blit(GUI_TEXTURE, ABSOLUTE_START.x() + 104, ABSOLUTE_START.y() + 8, 0, 32, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
 
     @Override
     public void renderText(GuiGraphics graphics, Font font, Integer mouseX, Integer mouseY) {
-        graphics.drawString(font, InstrumentDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
+        graphics.drawString(font, MidiNbtDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class NoteFilterWidget extends BaseWidget {
             this.shiftFilterNoteLetter();
             return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), FILTER_NOTE_INVERT_BUTTON_COORDS)) {
-            InstrumentDataUtils.setInvertNoteOct(midiStack, !InstrumentDataUtils.getInvertNoteOct(midiStack));
+            MidiNbtDataUtils.setInvertNoteOct(midiStack, !MidiNbtDataUtils.getInvertNoteOct(midiStack));
             return true;
         }
         
@@ -63,7 +63,7 @@ public class NoteFilterWidget extends BaseWidget {
             filterNoteLetter = -1;
         }
 
-        InstrumentDataUtils.setFilterNote(midiStack, filterNoteLetter.byteValue());
+        MidiNbtDataUtils.setFilterNote(midiStack, filterNoteLetter.byteValue());
     }
     
     protected void shiftFilterNoteOctave() {
@@ -76,7 +76,7 @@ public class NoteFilterWidget extends BaseWidget {
             filterNoteOctave = -1;
         }
         
-        InstrumentDataUtils.setFilterOct(midiStack, filterNoteOctave.byteValue());
+        MidiNbtDataUtils.setFilterOct(midiStack, filterNoteOctave.byteValue());
     }
     
 	protected Boolean invalidFilterNote() {

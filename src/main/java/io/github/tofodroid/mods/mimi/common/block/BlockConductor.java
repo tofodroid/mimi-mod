@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileConductor;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -106,18 +106,18 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        Integer enabledChannels = InstrumentDataUtils.getEnabledChannelsInt(blockItemStack);
+        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(blockItemStack);
         if(enabledChannels != null) {
-            if(enabledChannels.equals(InstrumentDataUtils.ALL_CHANNELS_INT)) {
+            if(enabledChannels.equals(MidiNbtDataUtils.ALL_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
-            } else if(enabledChannels.equals(InstrumentDataUtils.NONE_CHANNELS_INT)) {
+            } else if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
             } else {
-                tooltip.add(Component.literal("  Channels: " + InstrumentDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
             }
         }
 
         // Transmit Note
-        tooltip.add(Component.literal("  Transmit Note: " + InstrumentDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.literal("  Transmit Note: " + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN));
     }
 }

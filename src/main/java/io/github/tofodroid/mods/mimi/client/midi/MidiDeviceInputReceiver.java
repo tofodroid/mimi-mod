@@ -8,7 +8,7 @@ import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.util.InstrumentDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -45,9 +45,9 @@ public class MidiDeviceInputReceiver implements Receiver {
 
         if(player != null && MIMIMod.getProxy().isClient()) {
             ((ClientProxy)MIMIMod.getProxy()).getMidiData().inputDeviceManager.getLocalInstrumentsForMidiDevice(player, Integer.valueOf(message.getChannel()).byteValue()).forEach(instrumentStack -> {
-                Byte instrumentId = InstrumentDataUtils.getInstrumentId(instrumentStack.getRight());
+                Byte instrumentId = MidiNbtDataUtils.getInstrumentId(instrumentStack.getRight());
                 if(isNoteOnMessage(message)) {
-                    handleMidiNoteOn(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], InstrumentDataUtils.applyVolume(instrumentStack.getRight(), message.getMessage()[2]), player, instrumentStack.getLeft());
+                    handleMidiNoteOn(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], MidiNbtDataUtils.applyVolume(instrumentStack.getRight(), message.getMessage()[2]), player, instrumentStack.getLeft());
                 } else if(isNoteOffMessage(message)) {
                     handleMidiNoteOff(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], player, instrumentStack.getLeft());
                 } else if(isAllNotesOffMessage(message)) {
