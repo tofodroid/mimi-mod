@@ -24,6 +24,8 @@ public class ConfigurableMidiTileSyncPacketHandler {
             MidiNbtDataUtils.setInvertInstrument(midiStack, message.invertInstrument);
             MidiNbtDataUtils.setInvertNoteOct(midiStack, message.invertNoteOct);
             MidiNbtDataUtils.setInvertSignal(midiStack, message.invertSignal);
+            MidiNbtDataUtils.setTriggerMode(midiStack, message.triggerMode);
+            MidiNbtDataUtils.setHoldTicks(midiStack, message.holdTicks);
             tile.setSourceStack(midiStack);
             sender.level().sendBlockUpdated(tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 2);
         }

@@ -1,20 +1,29 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils.TriggerMode;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiNoteResponsiveTile {
-    private Integer triggeredTickCount = 0;
-    private Integer poweredTickCount = 0;
+    public static final Integer MAX_NOTE_ON_TICKS = 200;
+    
+    private Map<Byte, Map<Byte, Integer>> heldNotes = new HashMap<>();
+    private Integer offCounter = 0;
+    private TriggerMode triggerMode = TriggerMode.NOTE_ON;
+    private Byte holdTicks = 0;
 
     public AConfigurableMidiPowerSourceTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 1);
@@ -24,12 +33,43 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         super(type, pos, state, inventorySize);
     }
 
-    public Boolean isBlockValid() {
-        return getBlockState().getBlock() instanceof AConfigurableMidiPowerSourceBlock;
+    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
+        self.tick(world, pos, state);
+    }
+    
+    @Override
+    protected void cacheMidiSettings() {
+        super.cacheMidiSettings();
+        this.setInverted(MidiNbtDataUtils.getInvertSignal(getSourceStack()));
+        this.triggerMode = MidiNbtDataUtils.getTriggerMode(getSourceStack());
+        this.holdTicks = MidiNbtDataUtils.getHoldTicks(getSourceStack());
+        this.clearNotes();
     }
 
-    public Boolean isTriggered() {
-        return getBlockState().getValue(AConfigurableMidiPowerSourceBlock.TRIGGERED);
+    @Override
+    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {
+        if(this.isBlockValid()) {
+            Boolean shouldBePowered = false;
+            
+            if(this.triggerMode == TriggerMode.NOTE_HELD) {
+                shouldBePowered = tickNotes();
+            }
+
+            if(shouldBePowered) {
+                this.setPowered(true);
+                this.offCounter = 0;
+            } else if(state.getValue(AConfigurableMidiPowerSourceBlock.POWERED)) {
+                if(this.offCounter >= this.holdTicks || this.offCounter >= MAX_NOTE_ON_TICKS) {
+                    this.offCounter = 0;
+                    this.setPowered(false);
+                }
+                this.offCounter++;
+            }
+        }
+    }
+
+    public Boolean isBlockValid() {
+        return getBlockState().getBlock() instanceof AConfigurableMidiPowerSourceBlock;
     }
 
     public Boolean isPowered() {
@@ -44,79 +84,105 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         return MidiNbtDataUtils.getInvertSignal(getSourceStack());
     }
 
-    public Integer stayPoweredForTicks() {
-        return 2;
-    };
-
-    public Integer powerAfterTriggerTicks() {
-        return 1;
-    }
-
     public void setInverted(Boolean inverted) {
-        this.getLevel().setBlockAndUpdate(
-            getBlockPos(), 
-            getBlockState()
-                .setValue(AConfigurableMidiPowerSourceBlock.INVERTED, inverted)
-        );
-        
-        for(Direction direction : Direction.values()) {
-            getLevel().updateNeighborsAt(getBlockPos().relative(direction), getBlockState().getBlock());
+        if(this.getBlockState().getValue(AConfigurableMidiPowerSourceBlock.INVERTED) != inverted) {
+            this.getLevel().setBlockAndUpdate(
+                getBlockPos(), 
+                getBlockState()
+                    .setValue(AConfigurableMidiPowerSourceBlock.INVERTED, inverted)
+            );
+            
+            getLevel().updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
     }
 
-    public void setTriggeredAndPower(Boolean triggered, Boolean powered) {
-        this.getLevel().setBlockAndUpdate(
-            getBlockPos(), 
-            getBlockState()
-                .setValue(AConfigurableMidiPowerSourceBlock.TRIGGERED, triggered)
-                .setValue(AConfigurableMidiPowerSourceBlock.POWERED, powered)
-        );
-        
-        for(Direction direction : Direction.values()) {
-            getLevel().updateNeighborsAt(getBlockPos().relative(direction), getBlockState().getBlock());
+    public void setPowered(Boolean powered) {
+        if(this.getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWERED) != powered) {
+            this.getLevel().setBlockAndUpdate(
+                getBlockPos(), 
+                getBlockState()
+                    .setValue(AConfigurableMidiPowerSourceBlock.POWERED, powered)
+            );
+            
+            getLevel().updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
     }
 
-    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
-        self.tick(world, pos, state);
-    }
+    protected Boolean tickNotes() {
+        List<Byte> groupsToRemove = new ArrayList<>();
 
-    @Override
-    public void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {
-        if(this.isBlockValid()) {
-            if(this.stackIsInverted() != this.isInverted()) {
-                this.setInverted(this.stackIsInverted());
-            }
+        for(Byte groupId : this.heldNotes.keySet()) {
+            Map<Byte, Integer> group = this.heldNotes.get(groupId);
+            List<Byte> notesToRemove = new ArrayList<>();
+        
+            for(Map.Entry<Byte, Integer> note : group.entrySet()) {
+                note.setValue(note.getValue()+1);
 
-            if(this.isPowered()) {
-                if(this.poweredTickCount > this.stayPoweredForTicks()) {
-                    this.poweredTickCount = 0;
-                    this.setTriggeredAndPower(false, false);
-                } else {
-                    this.poweredTickCount++;
-                }
-            } else if(this.isTriggered()) {
-                if(this.triggeredTickCount > this.powerAfterTriggerTicks()) {
-                    this.triggeredTickCount = 0;
-                    this.setTriggeredAndPower(false, true);
-                } else {
-                    this.triggeredTickCount++;
+                if(note.getValue() >= MAX_NOTE_ON_TICKS) {
+                    notesToRemove.add(note.getKey());
                 }
             }
+
+            for(Byte note : notesToRemove) {
+                group.remove(note);
+            }
+
+            if(group.isEmpty()) {
+                groupsToRemove.add(groupId);
+            }
         }
+
+        for(Byte groupId : groupsToRemove) {
+            this.heldNotes.remove(groupId);
+        }
+
+        return !this.heldNotes.isEmpty();
+    }
+
+    protected void clearNotes() {
+        this.heldNotes.clear();
+    }
+
+    protected Boolean hasNotesOn() {
+        return !this.heldNotes.isEmpty();
     }
     
-    @Override
-    public Boolean onTrigger(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        if(isBlockValid()) {
-            if(isPowered()) {
-                this.poweredTickCount = 0;
-            } else if(!isTriggered()) {
-                this.setTriggeredAndPower(true, false);
-            }
-            return true;
+    public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        if(this.triggerMode == TriggerMode.NOTE_HELD) {
+            Byte groupKey = getNoteGroupKey(channel, instrumentId);
+            this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>()).put(note, 0);
+        } else if(this.triggerMode == TriggerMode.NOTE_ON || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
+            this.setPowered(true);
         }
-        
-        return false;
     }
+
+    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        if(this.triggerMode == TriggerMode.NOTE_HELD) {
+            Byte groupKey = getNoteGroupKey(channel, instrumentId);
+            Map<Byte, Integer> groupMap = this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>());
+            groupMap.remove(note);
+
+            if(groupMap.isEmpty()) {
+                this.heldNotes.remove(groupKey);
+            }
+        } else if(this.triggerMode == TriggerMode.NOTE_OFF || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
+            this.setPowered(true);
+        }
+    }
+
+    public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId) {
+        if(this.triggerMode == TriggerMode.NOTE_HELD) {
+            Byte groupKey = getNoteGroupKey(channel, instrumentId);
+
+            if(groupKey == null) {
+                this.heldNotes.clear();
+            } else {
+                this.heldNotes.remove(groupKey);
+            }
+        } else if(this.triggerMode == TriggerMode.NOTE_OFF || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
+            this.setPowered(true);
+        }
+    }
+
+    public abstract Byte getNoteGroupKey(@Nullable Byte channel, @Nullable Byte instrumentId);
 }

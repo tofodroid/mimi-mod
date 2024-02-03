@@ -156,7 +156,7 @@ dependencies {
 
     // Runtime
     // 
-    //implementation fg.deobf("curse.maven:spark-361579:4738952")
+    implementation fg.deobf("curse.maven:spark-361579:4738952")
 }
 
 jar {

@@ -7,8 +7,10 @@ import org.joml.Vector2i;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
+import io.github.tofodroid.mods.mimi.client.gui.widget.TriggerModeWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
@@ -22,14 +24,18 @@ import net.minecraft.world.item.ItemStack;
 public class GuiListener extends BaseGui {
     // GUI
     private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(188,26);
+    private static final Vector2i TRIGGER_MODE_WIDGET_COORDS = new Vector2i(6,59);
+    private static final Vector2i HOLD_TICKS_WIDGET_COORDS = new Vector2i(180,59);
     private static final Vector2i FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2i(9,40);
-    private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(150,40);
-    private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(169,40);
+    private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(143,40);
+    private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(161,40);
     private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(289,5);
 
     // Widgets
     private NoteFilterWidget noteFilter;
     private InvertSignalWidget invertSignal;
+    private TriggerModeWidget triggerMode;
+    private HoldTicksWidget holdTicks;
 
     // Input Data
     protected List<Byte> INSTRUMENT_ID_LIST;
@@ -38,7 +44,7 @@ public class GuiListener extends BaseGui {
     private final BlockPos tilePos;
 
     public GuiListener(BlockPos tilePos, ItemStack listenerStack) {
-        super(310, 64, 310, "textures/gui/container_listener.png", "item.MIMIMod.gui_listener");
+        super(302, 86, 302, "textures/gui/container_listener.png", "item.MIMIMod.gui_listener");
 
         if(listenerStack == null || listenerStack.isEmpty()) {
             MIMIMod.LOGGER.error("Listener stack is null or empty. Force closing GUI!");
@@ -58,6 +64,8 @@ public class GuiListener extends BaseGui {
         this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(MidiNbtDataUtils.getFilterInstrument(listenerStack));
         this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
         this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2i(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
+        this.triggerMode = new TriggerModeWidget(listenerStack, new Vector2i(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
+        this.holdTicks = new HoldTicksWidget(listenerStack, new Vector2i(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
     }
 
     public void syncListenerToServer() {
@@ -83,6 +91,10 @@ public class GuiListener extends BaseGui {
             this.syncListenerToServer();
         } else if(invertSignal.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
+        } else if(triggerMode.mouseClicked(imouseX, imouseY, mouseButton)) {
+            this.syncListenerToServer();
+        } else if(holdTicks.mouseClicked(imouseX, imouseY, mouseButton)) {
+            this.syncListenerToServer();
         }
 
         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
@@ -98,11 +110,13 @@ public class GuiListener extends BaseGui {
         graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         if(MidiNbtDataUtils.getInvertInstrument(listenerStack)) {
-            graphics.blit(guiTexture, START_X + 175, START_Y + 34, 0, 64, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.blit(guiTexture, START_X + 167, START_Y + 34, 0, 86, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
         this.invertSignal.renderGraphics(graphics, mouseX, mouseY);
+        this.triggerMode.renderGraphics(graphics, mouseX, mouseY);
+        this.holdTicks.renderGraphics(graphics, mouseX, mouseY);
         
         return graphics;
     }
@@ -112,6 +126,8 @@ public class GuiListener extends BaseGui {
         graphics.drawString(font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.invertSignal.renderText(graphics, font, mouseX, mouseY);
+        this.triggerMode.renderText(graphics, font, mouseX, mouseY);
+        this.holdTicks.renderText(graphics, font, mouseX, mouseY);
         return graphics;
     }
 

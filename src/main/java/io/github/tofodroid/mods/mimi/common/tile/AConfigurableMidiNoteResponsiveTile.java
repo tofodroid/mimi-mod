@@ -17,6 +17,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableMidiTile {
     protected Integer enabledChannels;
     protected List<Byte> filteredNotes;
+    protected Byte filterOct;
+    protected Byte filterNote;
     protected Byte filteredInstrument;
     protected Boolean invertFilterNoteOct;
     protected Boolean invertFilterInstrument;
@@ -51,13 +53,20 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
         if(this.getSourceStack() == null) return;
 
         this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(this.getSourceStack());
-        this.filteredNotes = MidiNbtDataUtils.getFilterNotes(MidiNbtDataUtils.getFilterNote(this.getSourceStack()), MidiNbtDataUtils.getFilterOct(this.getSourceStack()));
+        this.filterOct = MidiNbtDataUtils.getFilterOct(this.getSourceStack());
+        this.filterNote = MidiNbtDataUtils.getFilterNote(this.getSourceStack());
+        this.filteredNotes = MidiNbtDataUtils.getFilterNotes(this.filterNote, this.filterOct);
         this.filteredInstrument = MidiNbtDataUtils.getFilterInstrument(this.getSourceStack());
         this.invertFilterInstrument = MidiNbtDataUtils.getInvertInstrument(this.getSourceStack());
         this.invertFilterNoteOct = MidiNbtDataUtils.getInvertNoteOct(this.getSourceStack());
     }
 
     protected void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {/* Default: No-op */};
-    public abstract Boolean onTrigger(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
-    public abstract Boolean shouldTriggerFromMidiEvent(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    
+    public abstract void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    public abstract void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    public abstract void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId);
+    public abstract Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    public abstract Boolean shouldTriggerFromNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    public abstract Boolean shouldTriggerFromAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId);
 }

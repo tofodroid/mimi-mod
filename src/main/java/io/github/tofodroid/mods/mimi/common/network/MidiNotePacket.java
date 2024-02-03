@@ -97,7 +97,15 @@ public class MidiNotePacket {
     }
 
     public Boolean isControlPacket() {
-        return this.note < 0 && !isAllNotesOffPacket();
+        return this.note < 0 && this.note != ALL_NOTES_OFF;
+    }
+
+    public Boolean isNoteOnPacket() {
+        return this.note >= 0 && this.velocity > 0;
+    }
+
+    public Boolean isNoteOffPacket() {
+        return this.note >= 0  && this.velocity <= 0;
     }
 
     public Byte getControllerNumber() {

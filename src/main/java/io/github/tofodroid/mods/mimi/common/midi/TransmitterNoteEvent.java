@@ -37,12 +37,16 @@ public class TransmitterNoteEvent {
         return this.note == ALL_NOTES_OFF;
     }
 
-    public Boolean isNoteOffEvent() {
-        return !isControlEvent() && velocity <= 0;
+    public Boolean isControlEvent() {
+        return this.note < 0 && this.note != ALL_NOTES_OFF;
     }
 
-    public Boolean isControlEvent() {
-        return this.note < 0 && !isAllNotesOffEvent();
+    public Boolean isNoteOnEvent() {
+        return this.note >= 0 && velocity > 0;
+    }
+
+    public Boolean isNoteOffEvent() {
+        return this.note >= 0 && velocity <= 0;
     }
 
     public Byte getControllerNumber() {

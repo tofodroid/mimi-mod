@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerLevel;
 public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
     AConfigurableMidiNoteResponsiveTile tile;
 
-    @SuppressWarnings("null")
     public ConfigurableMidiNoteResponsiveTileReceiver(AConfigurableMidiNoteResponsiveTile tile) {        
         super(MidiNbtDataUtils.getMidiSource(tile.getSourceStack()), tile::getBlockPos, () -> tile.getLevel().dimension());
         this.tile = tile;
@@ -19,12 +18,26 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
 
     @Override
     protected void doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        tile.onTrigger(packet.channel, packet.note, packet.velocity, null);
+        if(packet.isNoteOnEvent()) {
+            tile.onNoteOn(packet.channel, packet.note, packet.velocity, null);
+        } else if(packet.isNoteOffEvent()) {
+            tile.onNoteOff(packet.channel, packet.note, packet.velocity, null);
+        } else if(packet.isAllNotesOffEvent()) {
+            tile.onAllNotesOff(packet.channel, null);
+        }
     }
 
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get()) && 
-                tile.shouldTriggerFromMidiEvent(packet.channel, packet.note, packet.velocity, null);
+        if(Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get())) {
+            if(packet.isNoteOnEvent()) {
+                return tile.shouldTriggerFromNoteOn(packet.channel, packet.note, packet.velocity, null);
+            } else if(packet.isNoteOffEvent()) {
+                return tile.shouldTriggerFromNoteOff(packet.channel, packet.note, packet.velocity, null);
+            } else if(packet.isAllNotesOffEvent()) {
+                return tile.shouldTriggerFromAllNotesOff(packet.channel, null);
+            }
+        }
+        return false;
     }
 }

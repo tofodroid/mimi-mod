@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public abstract class AConfigurableMidiPowerSourceBlock<B extends AConfigurableMidiPowerSourceTile> extends AConfigurableTileBlock<B> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
 
     public AConfigurableMidiPowerSourceBlock(Properties builder) {
@@ -28,7 +27,6 @@ public abstract class AConfigurableMidiPowerSourceBlock<B extends AConfigurableM
         this.registerDefaultState(
             this.stateDefinition.any()
                 .setValue(POWERED, defaultPowerState)
-                .setValue(TRIGGERED, defaultTriggeredState)
                 .setValue(INVERTED, defaultInvertedState)
         );
     }
@@ -41,7 +39,7 @@ public abstract class AConfigurableMidiPowerSourceBlock<B extends AConfigurableM
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWERED, TRIGGERED, INVERTED);
+        state.add(POWERED, INVERTED);
     }
     
     @Override

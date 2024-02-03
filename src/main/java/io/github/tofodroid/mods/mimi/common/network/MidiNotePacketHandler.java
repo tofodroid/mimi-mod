@@ -59,7 +59,7 @@ public class MidiNotePacketHandler {
             });
 
             // Process Listeners and Sculk
-            if(!message.isControlPacket() && message.velocity > 0) {
+            if(!message.isControlPacket()) {
                 List<EntityNoteResponsiveTile> potentialEntities = ENTITY_CACHE_MAP.computeIfAbsent(
                     packetCacheKey,
                     (key) -> {
@@ -70,8 +70,12 @@ public class MidiNotePacketHandler {
                 );
                 
                 for(TileListener listener : filterToListeners(potentialEntities)) {
-                    if(listener.shouldTriggerFromMidiEvent(null, message.note, message.velocity, message.instrumentId)) {
-                        listener.onTrigger(null, message.note, message.velocity, message.instrumentId);
+                    if(message.isNoteOnPacket() && listener.shouldTriggerFromNoteOn(null, message.note, message.velocity, message.instrumentId)) {
+                        listener.onNoteOn(null, message.note, message.velocity, message.instrumentId);
+                    } else if(message.isNoteOffPacket() && listener.shouldTriggerFromNoteOff(null, message.note, message.velocity, message.instrumentId)) {
+                        listener.onNoteOff(null, message.note, message.velocity, message.instrumentId);
+                    } else if(message.isAllNotesOffPacket() && listener.shouldTriggerFromAllNotesOff(null, message.instrumentId)) {
+                        listener.onAllNotesOff(null, message.instrumentId);
                     }
                 };
             }

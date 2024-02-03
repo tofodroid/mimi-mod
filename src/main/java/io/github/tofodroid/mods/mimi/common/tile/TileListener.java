@@ -36,16 +36,31 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
     } 
     
     @Override
-    public Boolean shouldTriggerFromMidiEvent(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+    public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
         ItemStack sourceStack = getSourceStack();
 
         if(!sourceStack.isEmpty()) {
             return 
-                (note == null || MidiNbtDataUtils.isNoteFiltered(filteredNotes, invertFilterNoteOct, note)) && 
+                (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOct, invertFilterNoteOct, note)) && 
                 (instrumentId == null || MidiNbtDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId))
             ;
         }
 
         return false;
+    }
+    
+    @Override
+    public Boolean shouldTriggerFromNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        return this.shouldTriggerFromNoteOn(channel, note, velocity, instrumentId);
+    }
+
+    @Override
+    public Boolean shouldTriggerFromAllNotesOff(Byte channel, Byte instrumentId) {
+        return this.shouldTriggerFromNoteOn(channel, null, null, instrumentId);
+    }
+
+    @Override
+    public Byte getNoteGroupKey(Byte channel, Byte instrumentId) {
+        return instrumentId;
     }
 }

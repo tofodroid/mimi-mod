@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
-@SuppressWarnings("null")
 public abstract class MidiNbtDataUtils {
     public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     public static final String FILTER_NOTE_TAG = "filter_note";
@@ -30,8 +29,12 @@ public abstract class MidiNbtDataUtils {
     public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
     public static final String VOLUME_TAG = "instrument_volume";
     public static final String INVERT_SIGNAL_TAG = "invert_signal";
+    public static final String TRIGGER_MODE_TAG = "trigger_mode";
+    public static final String HOLD_TICKS_TAG = "hold_ticks";
     public static final String TRANSMITTER_SOURCE_PREFIX = ";T;";
     public static final Byte INSTRUMENT_ALL = -1;
+    public static final Byte MAX_TRIGGER_MODE = 3;
+    public static final Byte MAX_HOLD_TICKS = 20;
     public static final Byte MAX_INSTRUMENT_VOLUME = 10;
     public static final Integer PERCUSSION_BANK = 120;
     public static final Byte DEFAULT_INSTRUMENT_VOLUME = 5;
@@ -40,6 +43,32 @@ public abstract class MidiNbtDataUtils {
     public static final Integer ALL_BUT_10_CHANNELS_INT = 65023;
     public static final Integer JUST_CHANNEL_10_INT = 512;
     public static final Integer NONE_CHANNELS_INT = 0;
+
+    public static enum TriggerMode {
+        NOTE_HELD(0),
+        NOTE_ON(1),
+        NOTE_ON_OFF(2),
+        NOTE_OFF(3);
+        
+        public static TriggerMode byValue(int value) {
+            for(TriggerMode mode : TriggerMode.values()) {
+                if(mode.getValue() == value) {
+                    return mode;
+                }
+            }
+            return null;
+        }
+        
+        private final int value;
+
+        private TriggerMode(int value) {
+            this.value = value;
+        }
+    
+        public Integer getValue() {
+            return value;
+        }
+    }
     
     private static Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
@@ -270,6 +299,80 @@ public abstract class MidiNbtDataUtils {
         }
     }
 
+    public static void decrementTriggerMode(ItemStack stack) {
+        Byte triggerMode = Integer.valueOf(TagUtils.getByteOrDefault(stack, TRIGGER_MODE_TAG, 0) - 1).byteValue();
+
+        if(triggerMode > TriggerMode.values().length-1) {
+            triggerMode = Integer.valueOf(TriggerMode.values().length-1).byteValue();
+        } else if(triggerMode < 0) {
+            triggerMode = 0;
+        }
+
+        stack.getOrCreateTag().putByte(TRIGGER_MODE_TAG, triggerMode);
+    }
+
+    public static void incrementTriggerMode(ItemStack stack) {
+        Byte triggerMode = Integer.valueOf(TagUtils.getByteOrDefault(stack, TRIGGER_MODE_TAG, 0) + 1).byteValue();
+
+        if(triggerMode > TriggerMode.values().length-1) {
+            triggerMode = Integer.valueOf(TriggerMode.values().length-1).byteValue();
+        } else if(triggerMode < 0) {
+            triggerMode = 0;
+        }
+
+        stack.getOrCreateTag().putByte(TRIGGER_MODE_TAG, triggerMode);
+    }
+
+    public static void setTriggerMode(ItemStack stack, TriggerMode mode) {
+        Byte triggerMode = mode.getValue().byteValue();
+
+        if(triggerMode > TriggerMode.values().length-1) {
+            triggerMode = Integer.valueOf(TriggerMode.values().length-1).byteValue();
+        } else if(triggerMode < 0) {
+            triggerMode = 0;
+        }
+
+        stack.getOrCreateTag().putByte(TRIGGER_MODE_TAG, triggerMode);
+    }
+
+    public static TriggerMode getTriggerMode(Byte ord) {
+        Integer triggerMode = Math.min(ord, TriggerMode.values().length-1);
+        return TriggerMode.byValue(triggerMode);
+    }
+
+    public static TriggerMode getTriggerMode(ItemStack stack) {
+        return getTriggerMode(TagUtils.getByteOrDefault(stack, TRIGGER_MODE_TAG, 0));
+    }
+
+    public static String getTriggerModeString(TriggerMode triggerMode) {
+        switch(triggerMode) {
+            case NOTE_ON:
+                return "Note On";
+            case NOTE_HELD:
+                return "Note Held";
+            case NOTE_ON_OFF:
+                return "Note On/Off";
+            case NOTE_OFF:
+                return "Note Off";
+            default:
+                return "Unknown";
+        }
+    }
+
+    public static void setHoldTicks(ItemStack stack, Byte holdTicks) {
+        if(holdTicks > MAX_HOLD_TICKS) {
+            holdTicks = MAX_HOLD_TICKS;
+        } else if(holdTicks < 0) {
+            holdTicks = 0;
+        }
+
+        stack.getOrCreateTag().putByte(HOLD_TICKS_TAG, holdTicks);
+    }
+
+    public static Byte getHoldTicks(ItemStack stack) {
+        return TagUtils.getByteOrDefault(stack, HOLD_TICKS_TAG, 0);
+    }
+
     public static void setInstrumentVolume(ItemStack stack, Byte volume) {
         if(volume > MAX_INSTRUMENT_VOLUME) {
             volume = MAX_INSTRUMENT_VOLUME;
@@ -384,6 +487,20 @@ public abstract class MidiNbtDataUtils {
     public static Boolean isNoteFiltered(ItemStack stack, Byte note) {
         List<Byte> filteredNotes = getFilterNotes(getFilterOct(stack), getFilterNote(stack));
         return isNoteFiltered(filteredNotes, getInvertNoteOct(stack), note);
+    }
+
+    public static Boolean isNoteFiltered(Byte filterNote, Byte filterOct, Boolean invertNoteOct, Byte note) {
+        Boolean isFiltered = true;
+
+        if(filterNote != FILTER_NOTE_OCT_ALL) {
+            isFiltered = note % 12 == filterNote;
+        }
+
+        if(filterOct != FILTER_NOTE_OCT_ALL && isFiltered) {
+            isFiltered = note >= filterOct * 12 && note < (filterOct+1) * 12;
+        }
+
+        return invertNoteOct ? !isFiltered : isFiltered;
     }
 
     public static Boolean isNoteFiltered(List<Byte> filteredNotes, Boolean invertNoteOct, Byte note) {

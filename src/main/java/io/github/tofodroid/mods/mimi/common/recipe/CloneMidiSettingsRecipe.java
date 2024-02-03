@@ -87,6 +87,8 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
                 MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
                 MidiNbtDataUtils.setInvertInstrument(result, MidiNbtDataUtils.getInvertInstrument(source));
                 MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
+                MidiNbtDataUtils.setTriggerMode(result, MidiNbtDataUtils.getTriggerMode(source));
+                MidiNbtDataUtils.setHoldTicks(result, MidiNbtDataUtils.getHoldTicks(source));
             }
             return result;
         }

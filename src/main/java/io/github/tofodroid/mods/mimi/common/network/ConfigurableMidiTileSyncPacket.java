@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils.TriggerMode;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,8 +21,10 @@ public class ConfigurableMidiTileSyncPacket {
     public final Integer enabledChannelsInt;
     public final Boolean invertInstrument;
     public final Boolean invertSignal;
+    public final TriggerMode triggerMode;
+    public final Byte holdTicks;
 
-    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertInstrument, Boolean invertSignal) {
+    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertInstrument, Boolean invertSignal, TriggerMode triggerMode, Byte holdTicks) {
         this.tilePos = tilePos;
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
@@ -32,6 +35,8 @@ public class ConfigurableMidiTileSyncPacket {
         this.instrumentId = instrumentId;
         this.invertInstrument = invertInstrument;
         this.invertSignal = invertSignal;
+        this.triggerMode = triggerMode;
+        this.holdTicks = holdTicks;
     }
     
     public ConfigurableMidiTileSyncPacket(ItemStack sourceStack, BlockPos tilePos) {
@@ -45,6 +50,8 @@ public class ConfigurableMidiTileSyncPacket {
         this.instrumentId = MidiNbtDataUtils.getFilterInstrument(sourceStack);
         this.invertInstrument = MidiNbtDataUtils.getInvertInstrument(sourceStack);
         this.invertSignal = MidiNbtDataUtils.getInvertSignal(sourceStack);
+        this.triggerMode = MidiNbtDataUtils.getTriggerMode(sourceStack);
+        this.holdTicks = MidiNbtDataUtils.getHoldTicks(sourceStack);
     }
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
@@ -68,8 +75,10 @@ public class ConfigurableMidiTileSyncPacket {
             Byte instrumentId = buf.readByte();
             Boolean invertInstrument = buf.readBoolean();
             Boolean invertSignal = buf.readBoolean();
+            TriggerMode triggerMode = MidiNbtDataUtils.getTriggerMode(buf.readByte());
+            Byte holdTicks = buf.readByte();
 
-            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertInstrument, invertSignal);
+            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertInstrument, invertSignal, triggerMode, holdTicks);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ConfigurableMidiTileSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -103,5 +112,7 @@ public class ConfigurableMidiTileSyncPacket {
         buf.writeByte(pkt.instrumentId);
         buf.writeBoolean(pkt.invertInstrument);
         buf.writeBoolean(pkt.invertSignal);
+        buf.writeByte(pkt.triggerMode.getValue().byteValue());
+        buf.writeByte(pkt.holdTicks);
     }
 }
