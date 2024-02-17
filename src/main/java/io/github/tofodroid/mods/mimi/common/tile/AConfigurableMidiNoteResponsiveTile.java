@@ -1,5 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -7,6 +10,7 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -14,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableMidiTile {
     protected Integer enabledChannels;
+    protected SortedArraySet<Byte> enabledChannelsList;
     protected Integer filterOctMin;
     protected Integer filterOctMax;
     protected Byte filterNote;
@@ -47,10 +52,15 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
         this.cacheMidiSettings();
     }
 
+    public List<Byte> getEnabledChannelsList() {
+        return new ArrayList<>(this.enabledChannelsList);
+    }
+
     protected void cacheMidiSettings() {
         if(this.getSourceStack() == null) return;
 
         this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(this.getSourceStack());
+        this.enabledChannelsList = MidiNbtDataUtils.getEnabledChannelsSet(this.getSourceStack());
         Byte filterOct = MidiNbtDataUtils.getFilterOct(this.getSourceStack());
         this.filterOctMin = filterOct * 12;
         this.filterOctMax = (filterOct+1) * 12;

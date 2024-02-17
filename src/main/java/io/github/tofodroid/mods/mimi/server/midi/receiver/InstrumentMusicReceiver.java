@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.server.midi.receiver;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -23,7 +24,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     protected InteractionHand handIn;
 
     public InstrumentMusicReceiver(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim, UUID notePlayerId, ItemStack instrumentStack, InteractionHand handIn) {
-        super(MidiNbtDataUtils.getMidiSource(instrumentStack), pos, dim);
+        super(MidiNbtDataUtils.getMidiSource(instrumentStack), new ArrayList<>(MidiNbtDataUtils.getEnabledChannelsSet(instrumentStack)), pos, dim);
         this.notePlayerId = notePlayerId;
         this.instrumentId = MidiNbtDataUtils.getInstrumentId(instrumentStack);
         this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack);
@@ -39,7 +40,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
 
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get()) && MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, packet.channel);
+        return sourceLevel.dimension().equals(dimension.get()) && MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, packet.channel) && Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16);
     }
 
     @Override

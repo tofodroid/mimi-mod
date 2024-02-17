@@ -5,7 +5,6 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
-import me.lucko.spark.forge.ForgeWorldInfoProvider.Server;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
@@ -13,7 +12,7 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
     AConfigurableMidiNoteResponsiveTile tile;
 
     public ConfigurableMidiNoteResponsiveTileReceiver(AConfigurableMidiNoteResponsiveTile tile) {        
-        super(MidiNbtDataUtils.getMidiSource(tile.getSourceStack()), tile::getBlockPos, () -> tile.getLevel().dimension());
+        super(MidiNbtDataUtils.getMidiSource(tile.getSourceStack()), tile.getEnabledChannelsList(), tile::getBlockPos, () -> tile.getLevel().dimension());
         this.tile = tile;
     }
 
@@ -38,7 +37,7 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
 
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        if(isPacketSameLevel(packet, sourceLevel) && isPacketInRange(packet, sourcePos)) {
+        if(/*isPacketSameLevel(packet, sourceLevel) &&*/ isPacketInRange(packet, sourcePos)) {
             if(packet.isNoteOnEvent()) {
                 return tile.shouldTriggerFromNoteOn(packet.channel, packet.note, packet.velocity, null);
             } else if(packet.isNoteOffEvent()) {
