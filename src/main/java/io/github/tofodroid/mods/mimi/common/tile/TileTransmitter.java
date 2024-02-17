@@ -5,7 +5,6 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -25,23 +24,41 @@ public class TileTransmitter extends AConfigurableMidiTile {
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
+
+        // Create music player for existing tiles from world save
+        if(this.hasLevel() && !this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {
+            ServerMusicTransmitterManager.createTransmitter(this);
+            this.setUnpowered();
+        }
     }
 
     @Override
-    @SuppressWarnings({"null", "resource"})
     public void onLoad() {
         super.onLoad();
 
         // Create music player for existing tiles from world save
-        if(!this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {
+        if(this.hasLevel() && !this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {
             ServerMusicTransmitterManager.createTransmitter(this);
+            this.setUnpowered();
         }
-        this.setUnpowered();
     }
 
     @Override
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(!this.getLevel().isClientSide()) {
+            ServerMusicTransmitterManager.removeTransmitter(this.getUUID());
+        }
+    }
+ 
+    @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
+
+        if(!this.getLevel().isClientSide()) {
+            ServerMusicTransmitterManager.removeTransmitter(this.getUUID());
+        }
     }
     
     public UUID getUUID() {
@@ -64,16 +81,12 @@ public class TileTransmitter extends AConfigurableMidiTile {
         this.setPowerAndUpdate(false);
     }
 
-    @SuppressWarnings("null")
     protected void setPowerAndUpdate(Boolean powered) {
         this.getLevel().setBlockAndUpdate(
             getBlockPos(), 
             getBlockState()
                 .setValue(BlockTransmitter.POWERED, powered)
         );
-        
-        for(Direction direction : Direction.values()) {
-            getLevel().updateNeighborsAt(getBlockPos().relative(direction), getBlockState().getBlock());
-        }
+        this.getLevel().updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
     }
 }

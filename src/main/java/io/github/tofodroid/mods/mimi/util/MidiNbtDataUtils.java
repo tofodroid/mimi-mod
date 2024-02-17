@@ -484,27 +484,18 @@ public abstract class MidiNbtDataUtils {
         return "";
     }
 
-    public static Boolean isNoteFiltered(ItemStack stack, Byte note) {
-        List<Byte> filteredNotes = getFilterNotes(getFilterOct(stack), getFilterNote(stack));
-        return isNoteFiltered(filteredNotes, getInvertNoteOct(stack), note);
-    }
-
-    public static Boolean isNoteFiltered(Byte filterNote, Byte filterOct, Boolean invertNoteOct, Byte note) {
+    public static Boolean isNoteFiltered(Byte filterNote, Integer filterOctMin, Integer filterOctMax, Boolean invertNoteOct, Byte note) {
         Boolean isFiltered = true;
 
-        if(filterNote != FILTER_NOTE_OCT_ALL) {
+        if(filterOctMin >= 0) {
+            isFiltered = note >= filterOctMin && note < filterOctMax;
+        }
+
+        if(isFiltered && filterNote >= 0) {
             isFiltered = note % 12 == filterNote;
         }
 
-        if(filterOct != FILTER_NOTE_OCT_ALL && isFiltered) {
-            isFiltered = note >= filterOct * 12 && note < (filterOct+1) * 12;
-        }
-
         return invertNoteOct ? !isFiltered : isFiltered;
-    }
-
-    public static Boolean isNoteFiltered(List<Byte> filteredNotes, Boolean invertNoteOct, Byte note) {
-        return filteredNotes.isEmpty() ? !invertNoteOct : invertNoteOct ? !filteredNotes.contains(note) : filteredNotes.contains(note);
     }
 
     public static Boolean isInstrumentFiltered(ItemStack stack, Byte instrument) {

@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.entity;
 
 import java.util.List;
+
 import org.joml.Vector3d;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
@@ -91,9 +92,23 @@ public class EntitySeat extends Entity {
         return seatExists(world, newSeat.getX(), newSeat.getY(), newSeat.getZ());
     }
 
+    public static EntitySeat getExisting(Level world, BlockPos pos, Vector3d sitOffsetPos) {
+        EntitySeat newSeat = new EntitySeat(world, pos, sitOffsetPos, null);
+        return getExisting(world, newSeat.getX(), newSeat.getY(), newSeat.getZ());
+    }
+
     private static Boolean seatExists(Level world, Double posX, Double posY, Double posZ) {
         List<EntitySeat> seats = world.getEntitiesOfClass(EntitySeat.class, new AABB(posX - 0.05, posY - 0.05, posZ - 0.05, posX + 0.05, posY + 0.05, posZ + 0.05));
         return !seats.isEmpty();
+    }
+
+    private static EntitySeat getExisting(Level world, Double posX, Double posY, Double posZ) {
+        List<EntitySeat> seats = world.getEntitiesOfClass(EntitySeat.class, new AABB(posX - 0.05, posY - 0.05, posZ - 0.05, posX + 0.05, posY + 0.05, posZ + 0.05));
+    
+        if(!seats.isEmpty()) {
+            return seats.get(0);
+        }
+        return null;
     }
     
     public static EntitySeat create(Level world, BlockPos pos, Vector3d sitOffsetPos, Player player) {

@@ -19,10 +19,12 @@ import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 
 public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 2;
     protected Boolean loggingOff = false;
+    protected Boolean dead = false;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     protected LocalPlayerMIMISynth localSynth;
@@ -66,10 +68,12 @@ public class MidiMultiSynthManager {
     public void handleLogout() {
         this.close();
         this.loggingOff = true;
+        this.dead = true;
     }
 
     public void handleLogin() {
         this.loggingOff = false;
+        this.dead = false;
         this.reloadSynths();
         NetworkProxy.sendToServer(new ServerTimeSyncPacket());
     }
@@ -107,7 +111,7 @@ public class MidiMultiSynthManager {
         }
     }
 
-    @SuppressWarnings({"resource", "null"})
+    @SuppressWarnings("resource")
     public void sendToGui(MidiNotePacket message) {
         if(Minecraft.getInstance().player == null || !message.player.equals(Minecraft.getInstance().player.getUUID()) || Minecraft.getInstance().screen == null || !(Minecraft.getInstance().screen instanceof GuiInstrument)) {
             return;
@@ -155,6 +159,17 @@ public class MidiMultiSynthManager {
                 }
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
                 localSynth.controlChange(message, Util.getEpochMillis());
+            }
+        }
+    }
+
+    @SuppressWarnings("resource")
+    public void handlePlayerTick(Player player) {
+        if(player.getUUID().equals(Minecraft.getInstance().player.getUUID())) {
+            if(!player.isAlive() && !this.dead) {
+                this.allNotesOff();
+            } else {
+                this.dead = !player.isAlive();
             }
         }
     }

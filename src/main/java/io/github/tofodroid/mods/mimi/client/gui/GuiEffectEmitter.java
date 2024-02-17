@@ -14,6 +14,7 @@ import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
@@ -86,8 +87,8 @@ public class GuiEffectEmitter extends BaseGui {
 
         if(emitterStack == null || emitterStack.isEmpty()) {
             MIMIMod.LOGGER.error("Emitter stack is null or empty. Force closing GUI!");
+            Minecraft.getInstance().forceSetScreen((Screen)null);
             this.emitterStack = null;
-            Minecraft.getInstance().player.closeContainer();
             return;
         }
         this.emitterStack = new ItemStack(emitterStack.getItem(), emitterStack.getCount());
@@ -365,7 +366,7 @@ public class GuiEffectEmitter extends BaseGui {
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5).toString(), START_X + VOL_TEXT_COORDS.x, START_Y + VOL_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0).toString(), START_X + PITCH_TEXT_COORDS.x, START_Y + PITCH_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0).toString(), START_X + SPREAD_TEXT_COORDS.x, START_Y + SPREAD_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
+        graphics.drawString(font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)).substring(0,1), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1).toString(), START_X + COUNT_TEXT_COORDS.x, START_Y + COUNT_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
         graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);

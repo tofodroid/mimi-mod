@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +19,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiNoteResponsiveTile {
-    public static final Integer MAX_NOTE_ON_TICKS = 200;
+    public static final Integer MAX_NOTE_ON_SECONDS = 8;
     
-    private Map<Byte, Map<Byte, Integer>> heldNotes = new HashMap<>();
+    // Runtime data
+    private Map<Byte, Map<Byte, Long>> heldNotes = new HashMap<>();
     private Integer offCounter = 0;
+
+    // Config data
     private TriggerMode triggerMode = TriggerMode.NOTE_ON;
     private Byte holdTicks = 0;
 
@@ -35,6 +39,24 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
 
     public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
         self.tick(world, pos, state);
+    }
+    
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(!this.getLevel().isClientSide()) {
+            this.offCounter = 0;
+        }
+    }
+ 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+    
+        if(!this.getLevel().isClientSide()) {
+            this.offCounter = 0;
+        }
     }
     
     @Override
@@ -59,11 +81,12 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
                 this.setPowered(true);
                 this.offCounter = 0;
             } else if(state.getValue(AConfigurableMidiPowerSourceBlock.POWERED)) {
-                if(this.offCounter >= this.holdTicks || this.offCounter >= MAX_NOTE_ON_TICKS) {
+                if(this.offCounter >= this.holdTicks) {
                     this.offCounter = 0;
                     this.setPowered(false);
+                } else {
+                    this.offCounter++;
                 }
-                this.offCounter++;
             }
         }
     }
@@ -110,15 +133,15 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
 
     protected Boolean tickNotes() {
         List<Byte> groupsToRemove = new ArrayList<>();
+        Long nowTime = Instant.now().toEpochMilli();
 
+        // Find notes held for longer than MAX_NOTE_ON_SECONDS and time out
         for(Byte groupId : this.heldNotes.keySet()) {
-            Map<Byte, Integer> group = this.heldNotes.get(groupId);
+            Map<Byte, Long> group = this.heldNotes.get(groupId);
             List<Byte> notesToRemove = new ArrayList<>();
         
-            for(Map.Entry<Byte, Integer> note : group.entrySet()) {
-                note.setValue(note.getValue()+1);
-
-                if(note.getValue() >= MAX_NOTE_ON_TICKS) {
+            for(Map.Entry<Byte, Long> note : group.entrySet()) {
+                if(nowTime - note.getValue() >= MAX_NOTE_ON_SECONDS * 1000) {
                     notesToRemove.add(note.getKey());
                 }
             }
@@ -140,6 +163,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     protected void clearNotes() {
+        this.offCounter = 0;
         this.heldNotes.clear();
     }
 
@@ -147,23 +171,33 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         return !this.heldNotes.isEmpty();
     }
     
-    public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+    public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
+        Byte groupKey = getNoteGroupKey(channel, instrumentId);
+
         if(this.triggerMode == TriggerMode.NOTE_HELD) {
-            Byte groupKey = getNoteGroupKey(channel, instrumentId);
-            this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>()).put(note, 0);
+            this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>()).put(note, noteTime);
+            this.setPowered(true);
         } else if(this.triggerMode == TriggerMode.NOTE_ON || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
             this.setPowered(true);
         }
     }
 
     public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        Byte groupKey = getNoteGroupKey(channel, instrumentId);
+    
         if(this.triggerMode == TriggerMode.NOTE_HELD) {
-            Byte groupKey = getNoteGroupKey(channel, instrumentId);
-            Map<Byte, Integer> groupMap = this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>());
-            groupMap.remove(note);
+            Map<Byte, Long> groupMap = this.heldNotes.get(groupKey);
+            
+            if(groupMap != null) {
+                groupMap.remove(note);
 
-            if(groupMap.isEmpty()) {
-                this.heldNotes.remove(groupKey);
+                if(groupMap.isEmpty()) {
+                    this.heldNotes.remove(groupKey);
+
+                    if(this.holdTicks == 0 && this.heldNotes.isEmpty()) {
+                        this.setPowered(false);
+                    }
+                }
             }
         } else if(this.triggerMode == TriggerMode.NOTE_OFF || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
             this.setPowered(true);
@@ -171,13 +205,21 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId) {
-        if(this.triggerMode == TriggerMode.NOTE_HELD) {
-            Byte groupKey = getNoteGroupKey(channel, instrumentId);
+        Byte groupKey = getNoteGroupKey(channel, instrumentId);
 
+        if(this.triggerMode == TriggerMode.NOTE_HELD) {
             if(groupKey == null) {
                 this.heldNotes.clear();
+
+                if(this.holdTicks == 0) {
+                    this.setPowered(false);
+                }
             } else {
                 this.heldNotes.remove(groupKey);
+
+                if(this.holdTicks == 0 && this.heldNotes.isEmpty()) {
+                    this.setPowered(false);
+                }
             }
         } else if(this.triggerMode == TriggerMode.NOTE_OFF || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
             this.setPowered(true);

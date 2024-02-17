@@ -36,7 +36,7 @@ public class MidiNotePacketHandler {
     }
     
     public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {
-        if(message != null) {
+        if(message != null && worldIn.isLoaded(message.pos)) {
             String packetCacheKey = worldIn.dimensionTypeId().location().toString() + message.pos.toShortString();
 
             // Find nearby players
@@ -59,7 +59,7 @@ public class MidiNotePacketHandler {
             });
 
             // Process Listeners and Sculk
-            if(!message.isControlPacket()) {
+            if(!message.isControlPacket() && worldIn.isLoaded(message.pos)) {
                 List<EntityNoteResponsiveTile> potentialEntities = ENTITY_CACHE_MAP.computeIfAbsent(
                     packetCacheKey,
                     (key) -> {
@@ -71,7 +71,7 @@ public class MidiNotePacketHandler {
                 
                 for(TileListener listener : filterToListeners(potentialEntities)) {
                     if(message.isNoteOnPacket() && listener.shouldTriggerFromNoteOn(null, message.note, message.velocity, message.instrumentId)) {
-                        listener.onNoteOn(null, message.note, message.velocity, message.instrumentId);
+                        listener.onNoteOn(null, message.note, message.velocity, message.instrumentId, message.noteServerTime);
                     } else if(message.isNoteOffPacket() && listener.shouldTriggerFromNoteOff(null, message.note, message.velocity, message.instrumentId)) {
                         listener.onNoteOff(null, message.note, message.velocity, message.instrumentId);
                     } else if(message.isAllNotesOffPacket() && listener.shouldTriggerFromAllNotesOff(null, message.instrumentId)) {

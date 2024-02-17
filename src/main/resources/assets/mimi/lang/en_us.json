@@ -67,7 +67,6 @@
   "item.mimi.deviceconfig": "Device Config",
   "item.mimi.switchboard": "Switchboard",
   "item.mimi.endertransmitter": "Transmitter",
-  "item.mimi.floppydisk": "Floppy Disk",
   "block.mimi.listener": "Listener",
   "block.mimi.receiver": "Receiver",
   "block.mimi.mechanicalmaestro": "Mechanical Maestro",
@@ -114,7 +113,13 @@
   "block.mimi.edrums": "E-Drums (Standard)",
   "block.mimi.edrums2": "E-Drums (TR-808)",
   "block.mimi.tuningtable": "Tuning Table",
-  "block.mimi.diskwriter": "Disk Writer",
   "block.mimi.transmitterblock": "Server Transmitter",
-  "block.mimi.ledcube_white": "White LED Cube"
+  "block.mimi.ledcube_a": "LED Cube",
+  "block.mimi.ledcube_b": "LED Cube - Panels",
+  "block.mimi.ledcube_c": "LED Cube - X",
+  "block.mimi.ledcube_d": "LED Cube - O",
+  "block.mimi.ledcube_e": "LED Cube - Micro",
+  "block.mimi.ledcube_f": "LED Cube - Array",
+  "block.mimi.ledcube_g": "LED Cube - Cobbled",
+  "block.mimi.ledcube_h": "LED Cube - Creeper"
 }

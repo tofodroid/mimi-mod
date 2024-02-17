@@ -5,6 +5,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import me.lucko.spark.forge.ForgeWorldInfoProvider.Server;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
@@ -19,7 +20,7 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
     @Override
     protected void doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
         if(packet.isNoteOnEvent()) {
-            tile.onNoteOn(packet.channel, packet.note, packet.velocity, null);
+            tile.onNoteOn(packet.channel, packet.note, packet.velocity, null, packet.noteServerTime);
         } else if(packet.isNoteOffEvent()) {
             tile.onNoteOff(packet.channel, packet.note, packet.velocity, null);
         } else if(packet.isAllNotesOffEvent()) {
@@ -27,9 +28,17 @@ public class ConfigurableMidiNoteResponsiveTileReceiver extends AMusicReceiver {
         }
     }
 
+    protected Boolean isPacketInRange(TransmitterNoteEvent packet, BlockPos sourcePos) {
+        return Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 32);
+    }
+
+    protected Boolean isPacketSameLevel(TransmitterNoteEvent packet, ServerLevel sourceLevel) {
+        return sourceLevel.dimension().equals(dimension.get());
+    }
+
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        if(Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16) && sourceLevel.dimension().equals(dimension.get())) {
+        if(isPacketSameLevel(packet, sourceLevel) && isPacketInRange(packet, sourcePos)) {
             if(packet.isNoteOnEvent()) {
                 return tile.shouldTriggerFromNoteOn(packet.channel, packet.note, packet.velocity, null);
             } else if(packet.isNoteOffEvent()) {

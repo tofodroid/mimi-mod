@@ -22,6 +22,10 @@ public abstract class AConfigurableMidiTile extends AConfigurableTile {
         super(type, pos, state, inventorySize);
     }
 
+    protected Boolean isValid() {
+        return !(this.isRemoved() || this.level == null);
+    }
+
     @Override
     public void loadItems(CompoundTag compound) {
         // START TEMPORARY LEGACY COMPATIBILITY CODE

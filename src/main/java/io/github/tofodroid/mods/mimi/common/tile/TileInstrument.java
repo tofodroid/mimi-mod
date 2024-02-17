@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,6 +38,13 @@ public class TileInstrument extends AStaticInventoryTile {
 
         if(newSeat != null) {
             this.currentSeat = newSeat;
+        }
+    }
+
+    public void ejectPlayer() {
+        if(this.currentSeat != null && !this.currentSeat.isRemoved()) {
+            this.currentSeat.ejectPassengers();
+            this.currentSeat.remove(RemovalReason.DISCARDED);
         }
     }
 
@@ -73,6 +81,26 @@ public class TileInstrument extends AStaticInventoryTile {
             if(this.getCurrentPlayer() != null) {
                 ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
             }
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(this.getCurrentPlayer() != null && !this.getLevel().isClientSide()) {
+            this.ejectPlayer();
+            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
+        }
+    }
+ 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+
+        if(this.getCurrentPlayer() != null && !this.getLevel().isClientSide()) {
+            this.ejectPlayer();
+            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
         }
     }
 

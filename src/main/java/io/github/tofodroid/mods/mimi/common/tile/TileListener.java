@@ -24,6 +24,10 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
     protected void tick(Level world, BlockPos pos, BlockState state) {
         super.tick(world, pos, state);
 
+        if(!isValid()) {
+            return;
+        }
+
         if(this.updateTickCount >= UPDATE_EVERY_TICKS) {
             this.updateTickCount = 0;
 
@@ -33,15 +37,15 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
         } else {
             this.updateTickCount++;
         }
-    } 
+    }
     
     @Override
     public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
         ItemStack sourceStack = getSourceStack();
 
-        if(!sourceStack.isEmpty()) {
+        if(isValid() && !sourceStack.isEmpty()) {
             return 
-                (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOct, invertFilterNoteOct, note)) && 
+                (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note)) && 
                 (instrumentId == null || MidiNbtDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId))
             ;
         }

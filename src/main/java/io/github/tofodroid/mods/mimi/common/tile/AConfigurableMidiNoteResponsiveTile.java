@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -16,8 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableMidiTile {
     protected Integer enabledChannels;
-    protected List<Byte> filteredNotes;
-    protected Byte filterOct;
+    protected Integer filterOctMin;
+    protected Integer filterOctMax;
     protected Byte filterNote;
     protected Byte filteredInstrument;
     protected Boolean invertFilterNoteOct;
@@ -53,9 +51,10 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
         if(this.getSourceStack() == null) return;
 
         this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(this.getSourceStack());
-        this.filterOct = MidiNbtDataUtils.getFilterOct(this.getSourceStack());
+        Byte filterOct = MidiNbtDataUtils.getFilterOct(this.getSourceStack());
+        this.filterOctMin = filterOct * 12;
+        this.filterOctMax = (filterOct+1) * 12;
         this.filterNote = MidiNbtDataUtils.getFilterNote(this.getSourceStack());
-        this.filteredNotes = MidiNbtDataUtils.getFilterNotes(this.filterNote, this.filterOct);
         this.filteredInstrument = MidiNbtDataUtils.getFilterInstrument(this.getSourceStack());
         this.invertFilterInstrument = MidiNbtDataUtils.getInvertInstrument(this.getSourceStack());
         this.invertFilterNoteOct = MidiNbtDataUtils.getInvertNoteOct(this.getSourceStack());
@@ -63,7 +62,7 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
 
     protected void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {/* Default: No-op */};
     
-    public abstract void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
+    public abstract void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime);
     public abstract void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
     public abstract void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId);
     public abstract Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);

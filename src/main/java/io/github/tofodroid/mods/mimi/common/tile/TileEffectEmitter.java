@@ -112,7 +112,7 @@ public class TileEffectEmitter extends AConfigurableTile {
     }
 
     public void tick(Level world, BlockPos pos, BlockState state) {
-        if(world.isClientSide) {
+        if(world.isClientSide && !this.isRemoved() && world.isLoaded(pos)) {
             Boolean powered = state.getValue(BlockEffectEmitter.POWERED);
 
             if(powered != this.isInverted()) {

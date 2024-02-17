@@ -103,6 +103,7 @@ public class ClientProxy implements Proxy {
     public void onPlayerTick(Player player) {
         if(this.isInitialized()) {
             this.getMidiData().handlePlayerTick(player);
-        }        
+            this.getMidiSynth().handlePlayerTick(player);
+        }
     }
 }

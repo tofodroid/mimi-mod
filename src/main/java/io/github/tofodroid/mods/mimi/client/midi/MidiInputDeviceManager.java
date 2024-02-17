@@ -17,6 +17,7 @@ import io.github.tofodroid.mods.mimi.common.midi.AMidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -84,11 +85,17 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
         return devices;
     }
 
+    @SuppressWarnings("resource")
     public void handlePlayerTick(Player player) {
-        if(!player.isLocalPlayer()) {
+        if(!player.getUUID().equals(Minecraft.getInstance().player.getUUID())) {
             return;
         }
-        this.localInstrumentsToPlay = localInstrumentsToPlay(player);
+
+        if(player.isAlive() && player.isAddedToWorld()) {
+            this.localInstrumentsToPlay = localInstrumentsToPlay(player);
+        } else {
+            this.localInstrumentsToPlay.clear();
+        }
     }
     
     protected List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay(Player player) {

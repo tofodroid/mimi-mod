@@ -77,11 +77,6 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
     }
 
     @Override
-    public void onChunkUnloaded() {
-        super.onChunkUnloaded();
-    }
-
-    @Override
     public void setItem(int i, ItemStack item) {
         this.items.set(i, item);
         if (item.getCount() > this.getMaxStackSize()) {

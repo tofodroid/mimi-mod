@@ -22,14 +22,32 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
         super.tick(world, pos, state);
         ServerMusicReceiverManager.loadConfigurableMidiNoteResponsiveTileReceiver(this);
     }
+    
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(!this.getLevel().isClientSide()) {
+            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        }
+    }
+ 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+    
+        if(!this.getLevel().isClientSide()) {
+            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        }
+    }
 
     @Override
     public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
         ItemStack sourceStack = getSourceStack();
-        if(!sourceStack.isEmpty()) {
+        if(!sourceStack.isEmpty() && this.isValid()) {
             return 
                 MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, channel)
-                && (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOct, invertFilterNoteOct, note));
+                && (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note));
         }
         return false;
     }

@@ -10,9 +10,16 @@ import net.minecraft.server.level.ServerLevel;
 public class TileTransmitterMidiReceiver extends AServerMidiInputReceiver {
     protected TileTransmitter tile;
 
+    protected UUID tileId;
+    protected BlockPos tilePos;
+    protected ServerLevel tileLevel;
+
     public TileTransmitterMidiReceiver(TileTransmitter tile) {
         super();
         this.tile = tile;
+        this.tileId = tile.getUUID();
+        this.tilePos = tile.getBlockPos();
+        this.tileLevel = (ServerLevel)tile.getLevel();
     }
 
     @Override
@@ -35,16 +42,16 @@ public class TileTransmitterMidiReceiver extends AServerMidiInputReceiver {
 
     @Override
     protected UUID getTransmitterId() {
-        return tile.getUUID();
+        return tileId;
     }
 
     @Override
     protected BlockPos getTransmitterPos() {
-        return tile.getBlockPos();
+        return tilePos;
     }
 
     @Override
     protected ServerLevel getTransmitterLevel() {
-        return (ServerLevel)tile.getLevel();
+        return tileLevel;
     }
 }

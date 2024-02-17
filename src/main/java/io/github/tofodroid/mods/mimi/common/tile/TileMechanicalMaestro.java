@@ -11,6 +11,7 @@ import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
@@ -86,11 +87,44 @@ public class TileMechanicalMaestro extends AContainerTile {
         this.refreshMidiReceivers();
     }
 
+    @Override
+    public void load(CompoundTag compound) {
+        super.load(compound);
+        this.refreshMidiReceivers();
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        this.refreshMidiReceivers();
+    }
+    
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(!this.getLevel().isClientSide()) {
+            this.allNotesOff();
+            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        }
+    }
+ 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+
+        if(!this.getLevel().isClientSide()) {
+            this.allNotesOff();
+            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        }
+    }
+
     public void refreshMidiReceivers() {
         if(this.hasLevel() && !this.level.isClientSide) {
             if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
                 ServerMusicReceiverManager.loadMechanicalMaestroInstrumentReceivers(this);
             } else {
+                this.allNotesOff();
                 ServerMusicReceiverManager.removeReceivers(this.getUUID());
             }
         }
