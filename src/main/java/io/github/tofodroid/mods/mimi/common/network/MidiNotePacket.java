@@ -45,8 +45,7 @@ public class MidiNotePacket {
         return new MidiNotePacket(note, velocity, instrumentId, player, pos, noteServerTime, instrumentHand);
     }
 
-    @SuppressWarnings("null")
-    private MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
+    protected MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
         this.note = note;
         this.velocity = velocity;
         this.instrumentId = instrumentId;

@@ -120,6 +120,10 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public void setPowered(Boolean powered) {
+        if(!this.isValid()) {
+            return;
+        }
+
         if(this.getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWERED) != powered) {
             this.getLevel().setBlockAndUpdate(
                 getBlockPos(), 

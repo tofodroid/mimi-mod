@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableMidiTile {
+    protected Boolean firstTick = true;
     protected Integer enabledChannels;
     protected SortedArraySet<Byte> enabledChannelsList;
     protected Integer filterOctMin;
@@ -37,6 +38,11 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     protected void tick(Level world, BlockPos pos, BlockState state) {
         if(world instanceof ServerLevel) {
             this.execServerTick((ServerLevel)world, pos, state);
+
+            if(firstTick) {
+                this.cacheMidiSettings();
+                this.firstTick = false;
+            }
         }
     }
     
@@ -51,9 +57,31 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
         super.setSourceStack(stack);
         this.cacheMidiSettings();
     }
+    
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(!this.getLevel().isClientSide()) {
+            this.firstTick = true;
+        }
+    }
+ 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+    
+        if(!this.getLevel().isClientSide()) {
+            this.firstTick = true;
+        }
+    }
 
     public List<Byte> getEnabledChannelsList() {
         return new ArrayList<>(this.enabledChannelsList);
+    }
+
+    public Integer getEnabledChannelsInt() {
+        return this.enabledChannels;
     }
 
     protected void cacheMidiSettings() {

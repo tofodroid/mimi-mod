@@ -19,15 +19,13 @@ import net.minecraft.world.level.Level;
 public class InstrumentMusicReceiver extends AMusicReceiver {
     protected Byte instrumentId;
     protected UUID notePlayerId;
-    protected Integer enabledChannels;
     protected Byte volume;
     protected InteractionHand handIn;
 
     public InstrumentMusicReceiver(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dim, UUID notePlayerId, ItemStack instrumentStack, InteractionHand handIn) {
-        super(MidiNbtDataUtils.getMidiSource(instrumentStack), new ArrayList<>(MidiNbtDataUtils.getEnabledChannelsSet(instrumentStack)), pos, dim);
+        super(MidiNbtDataUtils.getMidiSource(instrumentStack), MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack), new ArrayList<>(MidiNbtDataUtils.getEnabledChannelsSet(instrumentStack)), pos, dim);
         this.notePlayerId = notePlayerId;
         this.instrumentId = MidiNbtDataUtils.getInstrumentId(instrumentStack);
-        this.enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack);
         this.volume = MidiNbtDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;
     }
@@ -40,7 +38,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
 
     @Override
     protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        return sourceLevel.dimension().equals(dimension.get()) && MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, packet.channel) && Math.abs(Math.sqrt(sourcePos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 16);
+        return true;
     }
 
     @Override
@@ -58,7 +56,7 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     }
 
     @Override
-    protected void doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+    protected MidiNotePacket doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
         MidiNotePacket notePacket;
 
         if(packet.isControlEvent()) {
@@ -67,8 +65,6 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
             notePacket = MidiNotePacket.createNotePacket(packet.note, MidiNbtDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
         }
 
-        ServerExecutor.executeOnServerThread(
-            () -> MidiNotePacketHandler.handlePacketServer(notePacket, sourceLevel, null)
-        );
+        return notePacket;
     }
 }

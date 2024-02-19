@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -20,7 +19,15 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
     @Override
     public void tick(Level world, BlockPos pos, BlockState state) {
         super.tick(world, pos, state);
-        ServerMusicReceiverManager.loadConfigurableMidiNoteResponsiveTileReceiver(this);
+    }
+
+    @Override
+    public void cacheMidiSettings() {
+        super.cacheMidiSettings();
+
+        if(this.hasLevel() && !this.getLevel().isClientSide) {
+            ServerMusicReceiverManager.loadReceiverTileReceiver(this);
+        }
     }
     
     @Override
@@ -43,13 +50,7 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
 
     @Override
     public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        ItemStack sourceStack = getSourceStack();
-        if(!sourceStack.isEmpty() && this.isValid()) {
-            return 
-                MidiNbtDataUtils.isChannelEnabled(this.enabledChannels, channel)
-                && (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note));
-        }
-        return false;
+        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note));
     }
     
     @Override

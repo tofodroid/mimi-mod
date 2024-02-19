@@ -166,9 +166,6 @@ public abstract class MidiNbtDataUtils {
     }
     
     public static Boolean isChannelEnabled(Integer enabledChannels, Byte channelId) {
-        if(ALL_CHANNELS.equals(channelId)) {
-            return true;
-        }
         return ((enabledChannels >> channelId) & 1) == 1;
     }
 

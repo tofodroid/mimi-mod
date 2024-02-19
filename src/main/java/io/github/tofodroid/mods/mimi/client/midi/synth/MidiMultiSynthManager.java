@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import io.github.tofodroid.com.sun.media.sound.SF2SoundbankReader;
 
@@ -13,6 +16,7 @@ import javax.sound.midi.Soundbank;
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
@@ -143,6 +147,29 @@ public class MidiMultiSynthManager {
                 this.sendToGui(message);
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
                 targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
+            }
+        }
+    }
+
+    public void handleMultiPacket(MultiMidiNotePacket packet) {
+        if(loggingOff) return;
+
+        for(Map.Entry<UUID, List<MidiNotePacket>> entry : packet.packets.entrySet()) {
+            AMIMISynth<?> targetSynth = getSynthForMessage(entry.getValue().get(0));
+
+            if(targetSynth != null) {
+                for(MidiNotePacket message : entry.getValue()) {
+                    if(!message.isControlPacket()) {
+                        if(message.velocity > 0) {
+                            targetSynth.noteOn(message, getBufferTime(message.noteServerTime));
+                        } else if(message.velocity <= 0) {
+                            targetSynth.noteOff(message, getBufferTime(message.noteServerTime));
+                        }
+                        this.sendToGui(message);
+                    } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
+                        targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
+                    }
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.server.midi.receiver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,17 +11,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
-import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
+import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public abstract class ServerMusicReceiverManager {
     private static final List<InteractionHand> ENTITY_INSTRUMENT_ITER = Collections.unmodifiableList(
@@ -28,21 +35,43 @@ public abstract class ServerMusicReceiverManager {
     );
 
     protected static final ConcurrentHashMap<UUID, List<? extends AMusicReceiver>> OWNED_RECEIVERS = new ConcurrentHashMap<>();
-    protected static final ConcurrentHashMap<UUID, List<AMusicReceiver>> SOURCE_LINKED_RECEIVERS = new ConcurrentHashMap<>();
+    //protected static final ConcurrentHashMap<UUID, List<AMusicReceiver>> SOURCE_LINKED_RECEIVERS = new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<ResourceKey<Level>, ConcurrentHashMap<UUID, ConcurrentHashMap<Byte, List<AMusicReceiver>>>> RECEIVER_LOOKUP = new ConcurrentHashMap<>();
 
     public static void handlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        List<AMusicReceiver> receivers = SOURCE_LINKED_RECEIVERS.get(sourceId);
+        List<AMusicReceiver> receivers = null;
+        ConcurrentHashMap<UUID, ConcurrentHashMap<Byte, List<AMusicReceiver>>> sourceMap = RECEIVER_LOOKUP.get(sourceLevel.dimension());
 
-        if(receivers != null) {
-            receivers.stream().forEach(receiver -> 
-                receiver.handlePacket(packet, sourceId, sourcePos, sourceLevel)
-            );
+        if(sourceMap != null) {
+            ConcurrentHashMap<Byte, List<AMusicReceiver>> channelMap = sourceMap.get(sourceId);
+
+            if(channelMap != null) {
+                receivers = channelMap.get(packet.channel);
+            }
+        }
+
+        if(receivers != null && !receivers.isEmpty()) {
+            HashMap<UUID, List<MidiNotePacket>> packetList = new HashMap<>();
+
+            receivers.forEach(receiver -> {
+                MidiNotePacket sendPacket = receiver.handlePacket(packet, sourceId, sourcePos, sourceLevel);
+
+                if(sendPacket != null) {
+                    packetList.computeIfAbsent(sendPacket.player, u -> new ArrayList<MidiNotePacket>()).add(sendPacket);
+                }
+            });
+
+            if(!packetList.isEmpty()) {
+                ServerExecutor.executeOnServerThread(
+                    () -> MidiNotePacketHandler.handlePacketServer(new MultiMidiNotePacket(packetList, packet.note, packet.noteServerTime, packet.isNoteOffEvent()), sourceLevel)
+                );
+            }
         }
     }
 
     @SuppressWarnings("resource")
     public static void loadMechanicalMaestroInstrumentReceivers(TileMechanicalMaestro tile) {
-        if(!(tile.getLevel() instanceof ServerLevel)) {
+        if(tile == null || !(tile.getLevel() instanceof ServerLevel)) {
             return;
         }
 
@@ -71,7 +100,7 @@ public abstract class ServerMusicReceiverManager {
 
     @SuppressWarnings("resource")
     public static void loadEntityInstrumentReceivers(LivingEntity entity) {
-        if(!(entity.level() instanceof ServerLevel)) {
+        if(entity == null || !(entity.level() instanceof ServerLevel)) {
             return;
         }
 
@@ -107,15 +136,16 @@ public abstract class ServerMusicReceiverManager {
 
         if(oldReceivers != null) {
             oldReceivers.stream()
+                .filter(r -> !newRecievers.contains(r))
                 .forEach(r -> ((InstrumentMusicReceiver)r).allNotesOff(ownerLevel));
         }
     }
-    
-    public static void loadConfigurableMidiNoteResponsiveTileReceiver(AConfigurableMidiNoteResponsiveTile tile) { 
-        List<ConfigurableMidiNoteResponsiveTileReceiver> receivers = new ArrayList<>();
+
+    public static void loadReceiverTileReceiver(TileReceiver tile) { 
+        List<ReceiverTileReceiver> receivers = new ArrayList<>();
 
         if(tile.getLevel() != null && MidiNbtDataUtils.getMidiSource(tile.getSourceStack()) != null) {
-            receivers.add(new ConfigurableMidiNoteResponsiveTileReceiver(tile));
+            receivers.add(new ReceiverTileReceiver(tile));
         }
         
         if(!receivers.isEmpty()) {
@@ -178,24 +208,40 @@ public abstract class ServerMusicReceiverManager {
 
     public static void onServerTick() {
         if(!ServerMusicTransmitterManager.hasPlayingTransmitters()) {
-            SOURCE_LINKED_RECEIVERS.clear();
+            RECEIVER_LOOKUP.clear();
             return;
         }
         
         // Identify linked receivers
-        SOURCE_LINKED_RECEIVERS.clear();
+        RECEIVER_LOOKUP.clear();
         OWNED_RECEIVERS.values().stream().forEach(receiverList -> {
             receiverList.stream().forEach(receiver -> {
-                List<AMusicReceiver> linkedReceivers = SOURCE_LINKED_RECEIVERS.computeIfAbsent(
-                    receiver.getLinkedId(), k -> Collections.synchronizedList(new ArrayList<>())
+                ConcurrentHashMap<UUID, ConcurrentHashMap<Byte, List<AMusicReceiver>>> sourceMap = RECEIVER_LOOKUP.computeIfAbsent(
+                    receiver.dimension.get(), rk -> new ConcurrentHashMap<>()
                 );
-                linkedReceivers.add(receiver);
+
+                ConcurrentHashMap<Byte, List<AMusicReceiver>> channelMap = sourceMap.computeIfAbsent(
+                    receiver.linkedId, id -> new ConcurrentHashMap<>()
+                );
+
+                // Add to ALL_CHANNELS and each enabled channel
+                List<AMusicReceiver> allReceivers = channelMap.computeIfAbsent(
+                    TransmitterNoteEvent.ALL_CHANNELS, k -> Collections.synchronizedList(new ArrayList<>())
+                );
+                allReceivers.add(receiver);
+
+                receiver.enabledChannelsList.forEach(channel -> {
+                    List<AMusicReceiver> channelReceivers = channelMap.computeIfAbsent(
+                        channel, k -> Collections.synchronizedList(new ArrayList<>())
+                    );
+                    channelReceivers.add(receiver);
+                });
             });            
         });
     }
 
     public static void onServerStopping() {
         OWNED_RECEIVERS.clear();
-        SOURCE_LINKED_RECEIVERS.clear();
+        RECEIVER_LOOKUP.clear();
     }
 }

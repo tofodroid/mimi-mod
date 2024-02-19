@@ -78,8 +78,10 @@ public class TileInstrument extends AStaticInventoryTile {
                 this.color = ((IColorableItem)stack.getItem()).getColor(stack);
             }
 
-            if(this.getCurrentPlayer() != null) {
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
+            Player currentPlayer = this.getCurrentPlayer();
+
+            if(currentPlayer != null) {
+                ServerMusicReceiverManager.loadEntityInstrumentReceivers(currentPlayer);
             }
         }
     }
@@ -88,9 +90,11 @@ public class TileInstrument extends AStaticInventoryTile {
     public void setRemoved() {
         super.setRemoved();
 
-        if(this.getCurrentPlayer() != null && !this.getLevel().isClientSide()) {
+        Player currentPlayer = this.getCurrentPlayer();
+
+        if(currentPlayer != null && !this.getLevel().isClientSide()) {
             this.ejectPlayer();
-            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
+            ServerMusicReceiverManager.loadEntityInstrumentReceivers(currentPlayer);
         }
     }
  
@@ -98,9 +102,11 @@ public class TileInstrument extends AStaticInventoryTile {
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
 
-        if(this.getCurrentPlayer() != null && !this.getLevel().isClientSide()) {
+        Player currentPlayer = this.getCurrentPlayer();
+
+        if(currentPlayer != null && !this.getLevel().isClientSide()) {
             this.ejectPlayer();
-            ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.getCurrentPlayer());
+            ServerMusicReceiverManager.loadEntityInstrumentReceivers(currentPlayer);
         }
     }
 
