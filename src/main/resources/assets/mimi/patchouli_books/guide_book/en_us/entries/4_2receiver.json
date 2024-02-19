@@ -1,11 +1,11 @@
 {
-    "name": "The Receiver",
+    "name": "Receiver",
     "icon": "mimi:receiver",
     "category": "mimi:4redstone",
     "pages": [
         {
             "type": "patchouli:spotlight",
-            "title": "The Receiver",
+            "title": "Receiver",
             "item": "mimi:receiver",
             "text": "The Receiver is a block that will receive notes that are transmitted around it and output a Redstone signal if a note matches the Receiver's configured filter criteria."
         },
@@ -22,7 +22,7 @@
         },
         {
             "type": "patchouli:text",
-            "text": "$(li)$(l)Enabled MIDI Channels$(): Which MIDI channels this Receiver should respond to notes from."
+            "text": "$(li)$(l)Enabled MIDI Channels$(): Which MIDI channels this Receiver should respond to notes from.$(br)$(li)$(l)Trigger Mode$(): Whether the listener should emit redstone the entire time a note is held or just when a note starts."
         }
     ],
     "sortnum": 2

@@ -13,7 +13,11 @@
             "type": "patchouli:crafting",
             "title": "Recipe",
             "recipe": "mimi:ledcube_a",
-            "text": "LED Cube designs can be changed by placing 4 cubes in a square in a crafting grid.$(br)To change the color, right-click a block while crouched or put 2 blocks directly next to eachother in a crafting grid to copy the color from the left to the right."
+            "text": "LED Cube designs can be changed by placing 4 cubes with the same design in a square in a crafting grid.$(br2)You can also place two stacks of LED Cubes directly next to eachother in a crafting grid to copy the design, color, and inverted settings from the stack on the left to the stack on the right."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "To change the color of an LED Cube in the world simply right-click it with an empty hand.$(br2)You can invert an LED Cube (make it light up without a redstone signal) in the world but right-clicking it while holding a redstone torch or a block of redstone."
         }
     ],
     "sortnum": 4

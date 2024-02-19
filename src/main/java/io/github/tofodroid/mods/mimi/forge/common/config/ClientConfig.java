@@ -28,7 +28,7 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<String> selectedMidiDevice;
 
     // SYNTH
-    public ForgeConfigSpec.IntValue noteBufferMs;
+    public ForgeConfigSpec.IntValue localBufferms;
     public ForgeConfigSpec.BooleanValue jitterCorrection;
     public ForgeConfigSpec.IntValue latency;
     public ForgeConfigSpec.IntValue localLatency;
@@ -71,9 +71,9 @@ public class ClientConfig {
         soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
-        noteBufferMs = builder.comment("How long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be slightly off-tempo.","Allowed values: 0-100")
-            .translation(MIMIMod.MODID + ".config.midi.synth.extrabufferms")
-            .defineInRange("synthBufferMillis",10, 0, 100);
+        localBufferms = builder.comment("How long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be slightly off-tempo.","Allowed values: 0-100")
+            .translation(MIMIMod.MODID + ".config.midi.synth.localBufferms")
+            .defineInRange("localBufferms",10, 0, 100);
         builder.pop();
     }
 }

@@ -14,8 +14,8 @@
         },
         {
             "type": "text",
-            "title": "Note Buffer MS",
-            "text": "$(l)Param:$() noteBufferMs$(br)$(l)Type:$() Integer$(br)$(l)Default:$() 10$(br2)This parameter stores how long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be appear off-tempo.$(br2)Valid Values: 0-100."
+            "title": "Local Buffer MS",
+            "text": "$(l)Param:$() localBufferMs$(br)$(l)Type:$() Integer$(br)$(l)Default:$() 10$(br2)This parameter stores how long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be appear off-tempo.$(br2)Valid Values: 0-100."
         },
         {
             "type": "text",

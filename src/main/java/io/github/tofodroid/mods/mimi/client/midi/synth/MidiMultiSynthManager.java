@@ -95,7 +95,7 @@ public class MidiMultiSynthManager {
     }
 
     public Long getBufferTime(Long noteServerTime) {
-        return (MIMIMod.getProxy().getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0)) + (MIMIMod.getProxy().getServerStartEpoch() + noteServerTime);
+        return (MIMIMod.getProxy().getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.localBufferms.get() : 0)) + (MIMIMod.getProxy().getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {

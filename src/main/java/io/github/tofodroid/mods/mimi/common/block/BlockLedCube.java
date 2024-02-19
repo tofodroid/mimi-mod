@@ -61,7 +61,7 @@ public class BlockLedCube extends AColoredBlock {
 
    @Override
    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-      if(Items.REDSTONE_TORCH.equals(player.getItemInHand(handIn).getItem())) {
+      if(Items.REDSTONE_TORCH.equals(player.getItemInHand(handIn).getItem()) || Items.REDSTONE_BLOCK.equals(player.getItemInHand(handIn).getItem())) {
          if(!worldIn.isClientSide) {
             worldIn.setBlock(pos, state.cycle(INVERTED), 2);
             worldIn.playSound(null, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS);
