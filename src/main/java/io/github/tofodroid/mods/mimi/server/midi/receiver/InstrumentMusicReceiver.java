@@ -37,7 +37,17 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     }
 
     @Override
-    protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+    protected Boolean willHandleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return true;
+    }
+
+    @Override
+    protected Boolean willHandleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return true;
+    }
+
+    @Override
+    protected Boolean willHandleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
         return true;
     }
 
@@ -56,15 +66,17 @@ public class InstrumentMusicReceiver extends AMusicReceiver {
     }
 
     @Override
-    protected MidiNotePacket doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        MidiNotePacket notePacket;
+    protected MidiNotePacket doHandleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return MidiNotePacket.createNotePacket(packet.note, MidiNbtDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
+    }
 
-        if(packet.isControlEvent()) {
-            notePacket = MidiNotePacket.createControlPacket(packet.getControllerNumber(), packet.getControllerValue(), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
-        } else {
-            notePacket = MidiNotePacket.createNotePacket(packet.note, MidiNbtDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
-        }
+    @Override
+    protected MidiNotePacket doHandleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return MidiNotePacket.createNotePacket(packet.note, MidiNbtDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
+    }
 
-        return notePacket;
+    @Override
+    protected MidiNotePacket doHandleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return MidiNotePacket.createNotePacket(packet.note, MidiNbtDataUtils.applyVolume(this.volume, packet.velocity), instrumentId, notePlayerId, blockPos.get(), packet.noteServerTime, handIn);
     }
 }

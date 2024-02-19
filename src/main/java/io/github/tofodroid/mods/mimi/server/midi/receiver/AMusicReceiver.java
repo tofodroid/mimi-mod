@@ -45,15 +45,31 @@ public abstract class AMusicReceiver {
         return sourceLevel.dimension().equals(dimension.get());
     }
 
-    public MidiNotePacket handlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        if(isPacketInRange(packet, sourcePos)) {
-            if(willHandlePacket(packet, sourceId, sourcePos, sourceLevel)) {
-                return this.doHandlePacket(packet, sourceId, sourcePos, sourceLevel);
-            }
+    public MidiNotePacket handleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        if(willHandleNoteOnPacket(packet, sourceId, sourcePos, sourceLevel) && isPacketInRange(packet, sourcePos)) {
+            return this.doHandleNoteOnPacket(packet, sourceId, sourcePos, sourceLevel);
+        }
+        return null;
+    }
+
+    public MidiNotePacket handleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        if(willHandleNoteOffPacket(packet, sourceId, sourcePos, sourceLevel) && isPacketInRange(packet, sourcePos)) {
+            return this.doHandleNoteOffPacket(packet, sourceId, sourcePos, sourceLevel);
+        }
+        return null;
+    }
+
+    public MidiNotePacket handleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        if(willHandleAllNotesOffPacket(packet, sourceId, sourcePos, sourceLevel) && isPacketInRange(packet, sourcePos)) {
+            return this.doHandleAllNotesOffPacket(packet, sourceId, sourcePos, sourceLevel);
         }
         return null;
     }
     
-    protected abstract Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
-    protected abstract MidiNotePacket doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
+    protected abstract Boolean willHandleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
+    protected abstract MidiNotePacket doHandleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
+    protected abstract Boolean willHandleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
+    protected abstract MidiNotePacket doHandleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
+    protected abstract Boolean willHandleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
+    protected abstract MidiNotePacket doHandleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel);
 }

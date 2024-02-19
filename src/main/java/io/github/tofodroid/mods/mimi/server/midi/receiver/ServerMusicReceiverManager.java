@@ -6,7 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
+import java.util.function.BiFunction;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
@@ -30,43 +31,82 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public abstract class ServerMusicReceiverManager {
+    private static class PacketHandlerArgs {
+        public final TransmitterNoteEvent event;
+        public final UUID sourceId;
+        public final BlockPos sourcePos;
+        public final ServerLevel sourceLevel;
+
+        public PacketHandlerArgs(TransmitterNoteEvent event, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+            this.event = event;
+            this.sourceId = sourceId;
+            this.sourcePos = sourcePos;
+            this.sourceLevel = sourceLevel;
+        }
+    }
+
     private static final List<InteractionHand> ENTITY_INSTRUMENT_ITER = Collections.unmodifiableList(
         Arrays.asList(InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND, null)
     );
 
-    protected static final ConcurrentHashMap<UUID, List<? extends AMusicReceiver>> OWNED_RECEIVERS = new ConcurrentHashMap<>();
-    //protected static final ConcurrentHashMap<UUID, List<AMusicReceiver>> SOURCE_LINKED_RECEIVERS = new ConcurrentHashMap<>();
-    protected static final ConcurrentHashMap<ResourceKey<Level>, ConcurrentHashMap<UUID, ConcurrentHashMap<Byte, List<AMusicReceiver>>>> RECEIVER_LOOKUP = new ConcurrentHashMap<>();
+    protected static final LinkedHashMap<UUID, List<? extends AMusicReceiver>> OWNED_RECEIVERS = new LinkedHashMap<>();
+    //protected static final LinkedHashMap<UUID, List<AMusicReceiver>> SOURCE_LINKED_RECEIVERS = new LinkedHashMap<>();
+    protected static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<UUID, LinkedHashMap<Byte, List<AMusicReceiver>>>> RECEIVER_LOOKUP = new LinkedHashMap<>();
 
     public static void handlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        List<AMusicReceiver> receivers = null;
-        ConcurrentHashMap<UUID, ConcurrentHashMap<Byte, List<AMusicReceiver>>> sourceMap = RECEIVER_LOOKUP.get(sourceLevel.dimension());
-
+        LinkedHashMap<UUID, LinkedHashMap<Byte, List<AMusicReceiver>>> sourceMap = RECEIVER_LOOKUP.get(sourceLevel.dimension());
+        
         if(sourceMap != null) {
-            ConcurrentHashMap<Byte, List<AMusicReceiver>> channelMap = sourceMap.get(sourceId);
+            LinkedHashMap<Byte, List<AMusicReceiver>> channelMap = sourceMap.get(sourceId);
 
             if(channelMap != null) {
-                receivers = channelMap.get(packet.channel);
-            }
-        }
+                final List<AMusicReceiver> receivers = channelMap.get(packet.channel);
 
-        if(receivers != null && !receivers.isEmpty()) {
-            HashMap<UUID, List<MidiNotePacket>> packetList = new HashMap<>();
-
-            receivers.forEach(receiver -> {
-                MidiNotePacket sendPacket = receiver.handlePacket(packet, sourceId, sourcePos, sourceLevel);
-
-                if(sendPacket != null) {
-                    packetList.computeIfAbsent(sendPacket.player, u -> new ArrayList<MidiNotePacket>()).add(sendPacket);
+                if(receivers != null && !receivers.isEmpty()) {
+                    HashMap<UUID, List<MidiNotePacket>> packetList = new HashMap<>();
+                    
+                    final BiFunction<PacketHandlerArgs, AMusicReceiver, MidiNotePacket> handler;
+        
+                    if(packet.isNoteOffEvent()) {
+                        handler = ServerMusicReceiverManager::handleNoteOff;
+                    } else if(packet.isNoteOnEvent()) {
+                        handler = ServerMusicReceiverManager::handleNoteOn;
+                    } else if(packet.isAllNotesOffEvent()) {
+                        handler = ServerMusicReceiverManager::handleAllNotesOff;
+                    } else {
+                        handler = null;
+                    }
+        
+                    if(handler != null) {
+                        ServerExecutor.executeOnServerThread(() -> {
+                            for(AMusicReceiver receiver : receivers) {
+                                MidiNotePacket sendPacket = handler.apply(new PacketHandlerArgs(packet, sourceId, sourcePos, sourceLevel), receiver);
+                
+                                if(sendPacket != null) {
+                                    packetList.computeIfAbsent(sendPacket.player, u -> new ArrayList<MidiNotePacket>()).add(sendPacket);
+                                }
+                            }
+                
+                            if(!packetList.isEmpty()) {
+                                MidiNotePacketHandler.handlePacketServer(new MultiMidiNotePacket(packetList, packet.note, packet.noteServerTime, packet.isNoteOffEvent()), sourceLevel);
+                            }
+                        });
+                    }
                 }
-            });
-
-            if(!packetList.isEmpty()) {
-                ServerExecutor.executeOnServerThread(
-                    () -> MidiNotePacketHandler.handlePacketServer(new MultiMidiNotePacket(packetList, packet.note, packet.noteServerTime, packet.isNoteOffEvent()), sourceLevel)
-                );
             }
         }
+    }
+
+    public static MidiNotePacket handleNoteOn(PacketHandlerArgs packet, AMusicReceiver receiver) {
+        return receiver.handleNoteOnPacket(packet.event, packet.sourceId, packet.sourcePos, packet.sourceLevel);
+    }
+
+    public static MidiNotePacket handleNoteOff(PacketHandlerArgs packet, AMusicReceiver receiver) {
+        return receiver.handleNoteOffPacket(packet.event, packet.sourceId, packet.sourcePos, packet.sourceLevel);
+    }
+
+    public static MidiNotePacket handleAllNotesOff(PacketHandlerArgs packet, AMusicReceiver receiver) {
+        return receiver.handleAllNotesOffPacket(packet.event, packet.sourceId, packet.sourcePos, packet.sourceLevel);
     }
 
     @SuppressWarnings("resource")
@@ -216,23 +256,23 @@ public abstract class ServerMusicReceiverManager {
         RECEIVER_LOOKUP.clear();
         OWNED_RECEIVERS.values().stream().forEach(receiverList -> {
             receiverList.stream().forEach(receiver -> {
-                ConcurrentHashMap<UUID, ConcurrentHashMap<Byte, List<AMusicReceiver>>> sourceMap = RECEIVER_LOOKUP.computeIfAbsent(
-                    receiver.dimension.get(), rk -> new ConcurrentHashMap<>()
+                LinkedHashMap<UUID, LinkedHashMap<Byte, List<AMusicReceiver>>> sourceMap = RECEIVER_LOOKUP.computeIfAbsent(
+                    receiver.dimension.get(), rk -> new LinkedHashMap<>()
                 );
 
-                ConcurrentHashMap<Byte, List<AMusicReceiver>> channelMap = sourceMap.computeIfAbsent(
-                    receiver.linkedId, id -> new ConcurrentHashMap<>()
+                LinkedHashMap<Byte, List<AMusicReceiver>> channelMap = sourceMap.computeIfAbsent(
+                    receiver.linkedId, id -> new LinkedHashMap<>()
                 );
 
                 // Add to ALL_CHANNELS and each enabled channel
                 List<AMusicReceiver> allReceivers = channelMap.computeIfAbsent(
-                    TransmitterNoteEvent.ALL_CHANNELS, k -> Collections.synchronizedList(new ArrayList<>())
+                    TransmitterNoteEvent.ALL_CHANNELS, k -> new ArrayList<>()
                 );
                 allReceivers.add(receiver);
 
                 receiver.enabledChannelsList.forEach(channel -> {
                     List<AMusicReceiver> channelReceivers = channelMap.computeIfAbsent(
-                        channel, k -> Collections.synchronizedList(new ArrayList<>())
+                        channel, k -> new ArrayList<>()
                     );
                     channelReceivers.add(receiver);
                 });

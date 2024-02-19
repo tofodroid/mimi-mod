@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,9 +21,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class MidiNotePacketHandler {
-    private static final ConcurrentHashMap<ResourceKey<Level>, ConcurrentHashMap<Long, List<TileListener>>> LISTENER_CACHE_MAP = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<ResourceKey<Level>, ConcurrentHashMap<Long, List<ServerPlayer>>> PLAYER_CACHE_MAP = new ConcurrentHashMap<>();
-    private static final Integer CLEAR_CACHE_EVERY_TICKS = 10;
+    private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, List<TileListener>>> LISTENER_CACHE_MAP = new LinkedHashMap<>();
+    private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, List<ServerPlayer>>> PLAYER_CACHE_MAP = new LinkedHashMap<>();
+    private static final Integer CLEAR_CACHE_EVERY_TICKS = 5;
     private static Integer cacheClearTickCounter = 0;
 
     public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
@@ -37,7 +37,7 @@ public class MidiNotePacketHandler {
     public static void handlePacketServer(final MultiMidiNotePacket message, ServerLevel worldIn) {
         // Note: Only used by transmitters
         if(message != null) {
-            HashSet<ServerPlayer> potentialPlayers = new HashSet<>();
+            ArrayList<ServerPlayer> potentialPlayers = new ArrayList<>();
 
             for(Map.Entry<UUID, List<MidiNotePacket>> entry : message.packets.entrySet()) {
                 // Forward to nearby players
@@ -56,9 +56,9 @@ public class MidiNotePacketHandler {
             }
 
             // Send
-            potentialPlayers.forEach(player -> {
+            for(ServerPlayer player : (message.packets.size() > 1 ? potentialPlayers : new HashSet<>(potentialPlayers))) {
                 NetworkProxy.sendToPlayer(player, message);
-            });
+            }
         }
     }
     
@@ -90,10 +90,10 @@ public class MidiNotePacketHandler {
             List<TileListener> listenerTiles = getCacheListeners(worldIn, message.pos);
             
             for(TileListener listener : listenerTiles) {
-                if(message.isNoteOnPacket() && listener.shouldTriggerFromNoteOn(null, message.note, message.velocity, message.instrumentId)) {
-                    listener.onNoteOn(null, message.note, message.velocity, message.instrumentId, message.noteServerTime);
-                } else if(message.isNoteOffPacket() && listener.shouldTriggerFromNoteOff(null, message.note, message.velocity, message.instrumentId)) {
+                if(message.isNoteOffPacket() && listener.shouldTriggerFromNoteOff(null, message.note, message.velocity, message.instrumentId)) {
                     listener.onNoteOff(null, message.note, message.velocity, message.instrumentId);
+                } else if(message.isNoteOnPacket() && listener.shouldTriggerFromNoteOn(null, message.note, message.velocity, message.instrumentId)) {
+                    listener.onNoteOn(null, message.note, message.velocity, message.instrumentId, message.noteServerTime);
                 } else if(message.isAllNotesOffPacket() && listener.shouldTriggerFromAllNotesOff(null, message.instrumentId)) {
                     listener.onAllNotesOff(null, message.instrumentId);
                 }
@@ -122,8 +122,8 @@ public class MidiNotePacketHandler {
     }
 
     public static List<TileListener> getCacheListeners(ServerLevel level, BlockPos pos) {
-        ConcurrentHashMap<Long, List<TileListener>> entityMap = LISTENER_CACHE_MAP.computeIfAbsent(
-            level.dimension(), d -> new ConcurrentHashMap<>() 
+        LinkedHashMap<Long, List<TileListener>> entityMap = LISTENER_CACHE_MAP.computeIfAbsent(
+            level.dimension(), d -> new LinkedHashMap<>() 
         );
 
         return entityMap.computeIfAbsent(
@@ -135,8 +135,8 @@ public class MidiNotePacketHandler {
     }
 
     public static List<ServerPlayer> getCachePlayers(ServerLevel level, BlockPos pos) {
-        ConcurrentHashMap<Long, List<ServerPlayer>> playerMap = PLAYER_CACHE_MAP.computeIfAbsent(
-            level.dimension(), d -> new ConcurrentHashMap<>() 
+        LinkedHashMap<Long, List<ServerPlayer>> playerMap = PLAYER_CACHE_MAP.computeIfAbsent(
+            level.dimension(), d -> new LinkedHashMap<>() 
         );
 
         return playerMap.computeIfAbsent(

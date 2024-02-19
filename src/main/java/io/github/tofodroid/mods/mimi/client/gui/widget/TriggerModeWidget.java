@@ -29,16 +29,16 @@ public class TriggerModeWidget extends BaseWidget {
     public void renderText(GuiGraphics graphics, Font font, Integer mouseX, Integer mouseY) {
         super.renderText(graphics, font, mouseX, mouseY);
 
-        graphics.drawString(font, MidiNbtDataUtils.getTriggerModeString(MidiNbtDataUtils.getTriggerMode(midiStack)), ABSOLUTE_START.x() + VALUE_TEXT_COORDS.x, ABSOLUTE_START.y() + VALUE_TEXT_COORDS.y, 0xFF00E600);
+        graphics.drawString(font, MidiNbtDataUtils.getTriggerNoteStart(midiStack) ? "Note Start" : "Note Held", ABSOLUTE_START.x() + VALUE_TEXT_COORDS.x, ABSOLUTE_START.y() + VALUE_TEXT_COORDS.y, 0xFF00E600);
     }
 
     @Override
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), DOWN_BUTTON_COORDS)) {
-            MidiNbtDataUtils.decrementTriggerMode(midiStack);
+            MidiNbtDataUtils.setTriggerNoteStart(midiStack, !MidiNbtDataUtils.getTriggerNoteStart(midiStack));
             return true;
         } else if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), UP_BUTTON_COORDS)) {
-            MidiNbtDataUtils.incrementTriggerMode(midiStack);
+            MidiNbtDataUtils.setTriggerNoteStart(midiStack, !MidiNbtDataUtils.getTriggerNoteStart(midiStack));
             return true;
         }
         

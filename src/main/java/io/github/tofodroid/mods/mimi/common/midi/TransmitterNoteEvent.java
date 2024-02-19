@@ -25,7 +25,6 @@ public class TransmitterNoteEvent {
         return new TransmitterNoteEvent(channel, Integer.valueOf(-controller).byteValue(), value, MIMIMod.getProxy().getCurrentServerMillis());
     }
 
-    @SuppressWarnings("null")
     private TransmitterNoteEvent(Byte channel, Byte note, Byte velocity, Long noteServerTime) {
         this.channel = channel;
         this.note = note;

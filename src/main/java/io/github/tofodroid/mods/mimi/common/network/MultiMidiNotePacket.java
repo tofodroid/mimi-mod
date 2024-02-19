@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.InteractionHand;
 
 public class MultiMidiNotePacket {
     public final @Nonnull Map<UUID, List<MidiNotePacket>> packets;
@@ -81,11 +82,14 @@ public class MultiMidiNotePacket {
                 for(MidiNotePacket packet : entry.getValue()) {
                     buf.writeByte(packet.velocity);
                     buf.writeByte(packet.instrumentId);
-                    buf.writeBoolean(packet.instrumentHand != null);
 
-                    if(packet.instrumentHand != null) {
-                        buf.writeBoolean(MidiNotePacket.handToBool(packet.instrumentHand));
+                    InteractionHand hand = packet.instrumentHand;
+
+                    if(hand != null) {
+                        buf.writeBoolean(true);
+                        buf.writeBoolean(InteractionHand.MAIN_HAND.equals(hand));
                     }
+                    buf.writeBoolean(false);
                 }
             }
         }

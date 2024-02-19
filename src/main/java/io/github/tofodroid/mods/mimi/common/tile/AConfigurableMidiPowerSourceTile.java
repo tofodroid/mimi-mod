@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
-import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils.TriggerMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -22,12 +21,13 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     public static final Integer MAX_NOTE_ON_SECONDS = 8;
     
     // Runtime data
-    private Map<Byte, Map<Byte, Long>> heldNotes = new HashMap<>();
-    private Integer offCounter = 0;
+    protected Map<Byte, Map<Byte, Long>> heldNotes = new HashMap<>();
+    protected Boolean noteHeld;
+    protected Integer offCounter = 0;
 
     // Config data
-    private TriggerMode triggerMode = TriggerMode.NOTE_ON;
-    private Byte holdTicks = 0;
+    protected Boolean triggerHeld = false;
+    protected Byte holdTicks = 0;
 
     public AConfigurableMidiPowerSourceTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 1);
@@ -63,7 +63,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     protected void cacheMidiSettings() {
         super.cacheMidiSettings();
         this.setInverted(MidiNbtDataUtils.getInvertSignal(getSourceStack()));
-        this.triggerMode = MidiNbtDataUtils.getTriggerMode(getSourceStack());
+        this.triggerHeld = !MidiNbtDataUtils.getTriggerNoteStart(getSourceStack());
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(getSourceStack());
         this.clearNotes();
     }
@@ -73,8 +73,9 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         if(this.isBlockValid()) {
             Boolean shouldBePowered = false;
             
-            if(this.triggerMode == TriggerMode.NOTE_HELD) {
+            if(this.triggerHeld) {
                 shouldBePowered = tickNotes();
+                this.noteHeld = shouldBePowered;
             }
 
             if(shouldBePowered) {
@@ -89,6 +90,16 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
                 }
             }
         }
+    }
+
+    @Override
+    public Boolean shouldTriggerFromNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        return this.triggerHeld && this.noteHeld && this.shouldTriggerFromNoteOn(channel, note, velocity, instrumentId);
+    }
+
+    @Override
+    public Boolean shouldTriggerFromAllNotesOff(Byte channel, Byte instrumentId) {
+        return this.triggerHeld && this.noteHeld && this.shouldTriggerFromNoteOn(channel, null, null, instrumentId);
     }
 
     public Boolean isBlockValid() {
@@ -120,11 +131,11 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public void setPowered(Boolean powered) {
-        if(!this.isValid()) {
-            return;
-        }
-
         if(this.getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWERED) != powered) {
+            if(!this.isValid()) {
+                return;
+            }
+
             this.getLevel().setBlockAndUpdate(
                 getBlockPos(), 
                 getBlockState()
@@ -178,55 +189,42 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
         Byte groupKey = getNoteGroupKey(channel, instrumentId);
 
-        if(this.triggerMode == TriggerMode.NOTE_HELD) {
+        if(this.triggerHeld) {
             this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>()).put(note, noteTime);
-            this.setPowered(true);
-        } else if(this.triggerMode == TriggerMode.NOTE_ON || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
+            this.noteHeld = true;
+        } else {
             this.setPowered(true);
         }
     }
 
-    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        Byte groupKey = getNoteGroupKey(channel, instrumentId);
-    
-        if(this.triggerMode == TriggerMode.NOTE_HELD) {
+    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {    
+        if(this.triggerHeld && this.noteHeld) {
+            Byte groupKey = getNoteGroupKey(channel, instrumentId);
             Map<Byte, Long> groupMap = this.heldNotes.get(groupKey);
             
-            if(groupMap != null) {
+            if(groupMap != null && !groupMap.isEmpty()) {
                 groupMap.remove(note);
 
                 if(groupMap.isEmpty()) {
                     this.heldNotes.remove(groupKey);
 
-                    if(this.holdTicks == 0 && this.heldNotes.isEmpty()) {
-                        this.setPowered(false);
+                    if(this.heldNotes.isEmpty()) {
+                        this.noteHeld = false;
                     }
                 }
             }
-        } else if(this.triggerMode == TriggerMode.NOTE_OFF || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
-            this.setPowered(true);
         }
     }
 
     public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId) {
         Byte groupKey = getNoteGroupKey(channel, instrumentId);
 
-        if(this.triggerMode == TriggerMode.NOTE_HELD) {
+        if(this.triggerHeld) {
             if(groupKey == null) {
                 this.heldNotes.clear();
-
-                if(this.holdTicks == 0) {
-                    this.setPowered(false);
-                }
             } else {
                 this.heldNotes.remove(groupKey);
-
-                if(this.holdTicks == 0 && this.heldNotes.isEmpty()) {
-                    this.setPowered(false);
-                }
             }
-        } else if(this.triggerMode == TriggerMode.NOTE_OFF || this.triggerMode == TriggerMode.NOTE_ON_OFF) {
-            this.setPowered(true);
         }
     }
 

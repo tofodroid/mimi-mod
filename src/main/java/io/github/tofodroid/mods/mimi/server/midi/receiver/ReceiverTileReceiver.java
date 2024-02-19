@@ -19,31 +19,34 @@ public class ReceiverTileReceiver extends AMusicReceiver {
     }
 
     @Override
-    protected MidiNotePacket doHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {        
-        if(packet.isNoteOnEvent()) {
-            tile.onNoteOn(packet.channel, packet.note, packet.velocity, null, packet.noteServerTime);
-        } else if(packet.isNoteOffEvent()) {
-            tile.onNoteOff(packet.channel, packet.note, packet.velocity, null);
-        } else if(packet.isAllNotesOffEvent()) {
-            tile.onAllNotesOff(packet.channel, null);
-        }
-
+    protected MidiNotePacket doHandleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        tile.onNoteOn(packet.channel, packet.note, packet.velocity, null, packet.noteServerTime);
+        return null;
+    }
+    
+    @Override
+    protected MidiNotePacket doHandleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        tile.onNoteOff(packet.channel, packet.note, packet.velocity, null);
         return null;
     }
 
     @Override
-    protected Boolean willHandlePacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
-        if(packet.isControlEvent()) {
-            return false;
-        }
+    protected MidiNotePacket doHandleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        tile.onAllNotesOff(packet.channel, null);
+        return null;
+    }
+    @Override
+    protected Boolean willHandleNoteOnPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return tile.shouldTriggerFromNoteOn(packet.channel, packet.note, packet.velocity, null);
+    }
 
-        if(packet.isNoteOnEvent()) {
-            return tile.shouldTriggerFromNoteOn(packet.channel, packet.note, packet.velocity, null);
-        } else if(packet.isNoteOffEvent()) {
-            return tile.shouldTriggerFromNoteOff(packet.channel, packet.note, packet.velocity, null);
-        } else if(packet.isAllNotesOffEvent()) {
-            return tile.shouldTriggerFromAllNotesOff(packet.channel, null);
-        }
-        return false;
+    @Override
+    protected Boolean willHandleNoteOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return tile.shouldTriggerFromNoteOff(packet.channel, packet.note, packet.velocity, null);
+    }
+
+    @Override
+    protected Boolean willHandleAllNotesOffPacket(TransmitterNoteEvent packet, UUID sourceId, BlockPos sourcePos, ServerLevel sourceLevel) {
+        return tile.shouldTriggerFromAllNotesOff(packet.channel, null);
     }
 }

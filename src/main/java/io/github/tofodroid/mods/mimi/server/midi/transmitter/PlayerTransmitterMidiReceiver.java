@@ -34,8 +34,6 @@ public class PlayerTransmitterMidiReceiver extends AServerMidiInputReceiver {
             this.sendTransmitterNoteOffPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1]);
         } else if(isAllNotesOffMessage(message)) {
             this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
-        } else if(isSupportedControlMessage(message)) {
-            this.sendTransmitterControllerPacket(Integer.valueOf(message.getChannel()).byteValue(), message.getMessage()[1], message.getMessage()[2]);
         }
     }
     

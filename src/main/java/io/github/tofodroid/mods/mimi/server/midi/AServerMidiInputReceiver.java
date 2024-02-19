@@ -7,7 +7,6 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
-import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -37,9 +36,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createNoteEvent(channel, midiNote, velocity);
-        ServerExecutor.executeOnServerThread(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
-        });        
+        ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
     }
     
     public void sendTransmitterNoteOffPacket(Byte channel, Byte midiNote) {
@@ -47,9 +44,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createNoteEvent(channel, midiNote, Integer.valueOf(0).byteValue());
-        ServerExecutor.executeOnServerThread(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
-        });     
+        ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
     }
 
     public void sendTransmitterAllNotesOffPacket() {
@@ -61,9 +56,7 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createAllNotesOffEvent(channel);
-        ServerExecutor.executeOnServerThread(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
-        });     
+        ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
     }
 
     public void sendTransmitterControllerPacket(Byte channel, Byte controller, Byte value) {
@@ -71,18 +64,16 @@ public abstract class AServerMidiInputReceiver implements Receiver {
             return;
         }
         TransmitterNoteEvent packet = TransmitterNoteEvent.createControllerEvent(channel, controller, value);
-        ServerExecutor.executeOnServerThread(() -> {
-            ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
-        });     
+        ServerMusicReceiverManager.handlePacket(packet, getTransmitterId(), getTransmitterPos(), (ServerLevel)getTransmitterLevel());
     }
 
     // Message Utils
     protected Boolean isNoteOnMessage(ShortMessage msg) {
-        return ShortMessage.NOTE_ON == msg.getCommand() && msg.getData2() > 0;
+        return msg.getData1() >= 0 && ShortMessage.NOTE_ON == msg.getCommand() && msg.getData2() > 0;
     }
 
     protected Boolean isNoteOffMessage(ShortMessage msg) {
-        return ShortMessage.NOTE_OFF == msg.getCommand() || (ShortMessage.NOTE_ON == msg.getCommand() && msg.getData2() == 0);
+        return msg.getData1() >= 0 && (ShortMessage.NOTE_OFF == msg.getCommand() || (ShortMessage.NOTE_ON == msg.getCommand() && msg.getData2() == 0));
     }
 
     protected Boolean isAllNotesOffMessage(ShortMessage msg) {
