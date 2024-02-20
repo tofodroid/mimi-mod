@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "mimi:item/endertransmitter"
+        "layer0": "mimi:item/transmitter"
     }
 }

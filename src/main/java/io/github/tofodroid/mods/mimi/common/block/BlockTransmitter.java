@@ -56,7 +56,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
                     player.displayClientMessage(Component.literal("Linked to Transmitter"), true);
                 }
             } else if(worldIn.isClientSide) {
-                ClientGuiWrapper.openTransmitterGui(worldIn, tile.getUUID());
+                ClientGuiWrapper.openTransmitterBlockGui(worldIn, tile.getUUID());
             }
         }
 

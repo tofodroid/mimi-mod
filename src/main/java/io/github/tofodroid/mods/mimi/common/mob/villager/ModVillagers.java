@@ -70,7 +70,7 @@ public class ModVillagers {
             
             trades.get(3).addAll(Arrays.asList(
                 new ItemsForItemsTrade(ModItems.BLOCK_INSTRUMENT_ITEMS, 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
-                new ItemsForItemsTrade(Arrays.asList(ModItems.ENDERTRANSMITTER), 4, Arrays.asList(Items.EMERALD), 1, 16, 30)
+                new ItemsForItemsTrade(Arrays.asList(ModItems.TRANSMITTER), 4, Arrays.asList(Items.EMERALD), 1, 16, 30)
             ));
             
             trades.get(4).addAll(Arrays.asList(

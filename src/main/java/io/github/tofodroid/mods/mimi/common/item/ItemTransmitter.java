@@ -19,10 +19,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
-public class ItemEnderTransmitter extends Item {
-    public static final String REGISTRY_NAME = "endertransmitter";
+public class ItemTransmitter extends Item {
+    public static final String REGISTRY_NAME = "transmitter";
 
-    public ItemEnderTransmitter() {
+    public ItemTransmitter() {
         super(new Properties().stacksTo(1));
     }
 
@@ -54,7 +54,7 @@ public class ItemEnderTransmitter extends Item {
         final ItemStack heldItem = playerIn.getItemInHand(handIn);
 
         if(worldIn.isClientSide && !playerIn.isCrouching()) {
-            ClientGuiWrapper.openEnderTransmitterGui(worldIn, playerIn);
+            ClientGuiWrapper.openTransmitterGui(worldIn, playerIn);
             return new InteractionResultHolder<>(InteractionResult.SUCCESS, heldItem);
         }
 

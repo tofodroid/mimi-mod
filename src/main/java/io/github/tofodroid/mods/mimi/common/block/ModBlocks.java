@@ -15,7 +15,7 @@ public class ModBlocks {
     public static final Map<ResourceLocation, Block> BLOCKS = new HashMap<>();
 
     // Redstone Blocks
-    public static final BlockTransmitter TRANSMITTER = create(BlockTransmitter.REGISTRY_NAME, new BlockTransmitter());
+    public static final BlockTransmitter TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockTransmitter());
     public static final BlockListener LISTENER = create(BlockListener.REGISTRY_NAME, new BlockListener());
     public static final BlockReceiver RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockReceiver());
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro());

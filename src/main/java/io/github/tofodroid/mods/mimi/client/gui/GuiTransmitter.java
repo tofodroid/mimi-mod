@@ -14,13 +14,13 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPac
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class GuiEnderTransmitter extends GuiTransmitterBlock {
+public class GuiTransmitter extends GuiTransmitterBlock {
     // Local File Controls
     protected static final Vector2i SOURCE_FILTER_BUTTON = new Vector2i(265,32);
     protected static final Vector2i SOURCE_FILTER_SCREEN = new Vector2i(283,33);
     protected static final Vector2i OPEN_LOCAL_FOLDER_BUTTON = new Vector2i(10,32);
 
-    public GuiEnderTransmitter(UUID musicPlayerId) {
+    public GuiTransmitter(UUID musicPlayerId) {
         super(musicPlayerId);
     }
     

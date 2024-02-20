@@ -38,10 +38,10 @@ public final class ModItems {
 
     // Other
     public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig());
-    public static ItemEnderTransmitter ENDERTRANSMITTER = create(ItemEnderTransmitter.REGISTRY_NAME, new ItemEnderTransmitter());
+    public static ItemTransmitter TRANSMITTER = create(ItemTransmitter.REGISTRY_NAME, new ItemTransmitter());
 
     // Blocks - Redstone
-    public static BlockItem TRANSMITTER = create(BlockTransmitter.REGISTRY_NAME, new BlockItem(ModBlocks.TRANSMITTER, new Item.Properties().stacksTo(64)));
+    public static BlockItem TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockItem(ModBlocks.TRANSMITTERBLOCK, new Item.Properties().stacksTo(64)));
     public static BlockItem LISTENER = create(BlockListener.REGISTRY_NAME, new BlockItem(ModBlocks.LISTENER, new Item.Properties().stacksTo(64)));
     public static BlockItem RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockItem(ModBlocks.RECEIVER, new Item.Properties().stacksTo(64)));
     public static BlockItem MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().stacksTo(64)));
@@ -72,12 +72,12 @@ public final class ModItems {
             output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
             output.acceptAll(getStacksForItems(Arrays.asList(
                 DEVICECONFIG,
-                ENDERTRANSMITTER,
+                TRANSMITTER,
                 LISTENER,
                 RECEIVER,
                 MECHANICALMAESTRO,
                 EFFECTEMITTER,
-                TRANSMITTER,
+                TRANSMITTERBLOCK,
                 TUNINGTABLE,
                 LEDCUBE_A,
                 LEDCUBE_B,

@@ -16,7 +16,7 @@ public class ModTiles {
     public static final Map<ResourceLocation, BlockEntityType<?>> BLOCK_ENTITIES = new HashMap<>();
 
     public static BlockEntityType<TileInstrument> INSTRUMENT = create(TileInstrument.REGISTRY_NAME, TileInstrument::new, ModBlocks.INSTRUMENTS.toArray(new BlockInstrument[ModBlocks.INSTRUMENTS.size()]));
-    public static BlockEntityType<TileTransmitter> TRANSMITTER = create(TileTransmitter.REGISTRY_NAME, TileTransmitter::new, ModBlocks.TRANSMITTER);
+    public static BlockEntityType<TileTransmitter> TRANSMITTER = create(TileTransmitter.REGISTRY_NAME, TileTransmitter::new, ModBlocks.TRANSMITTERBLOCK);
     public static BlockEntityType<TileListener> LISTENER = create(TileListener.REGISTRY_NAME, TileListener::new, ModBlocks.LISTENER);
     public static BlockEntityType<TileReceiver> RECEIVER = create(TileReceiver.REGISTRY_NAME, TileReceiver::new, ModBlocks.RECEIVER);
     public static BlockEntityType<TileConductor> CONDUCTOR = create(TileConductor.REGISTRY_NAME, TileConductor::new, ModBlocks.CONDUCTOR);

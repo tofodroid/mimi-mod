@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 public class MidiDataManager {
     public static final Integer UPDATE_MUSIC_PLAYER_STATUS_EVERY_TICKS = 10;
     public final MidiInputDeviceManager inputDeviceManager;
-    private ServerMusicPlayerStatusPacket playerEnderTransmitterStatusPacket;
+    private ServerMusicPlayerStatusPacket playerTransmitterStatusPacket;
     private Integer updateTickCount = 0;
 
     public MidiDataManager() {
@@ -18,19 +18,19 @@ public class MidiDataManager {
 
     public void setPlayerStatusPakcet(ServerMusicPlayerStatusPacket packet) {
         if(connectedToServer()) {
-            this.playerEnderTransmitterStatusPacket = packet;
+            this.playerTransmitterStatusPacket = packet;
         } else {
-            this.playerEnderTransmitterStatusPacket = null;
+            this.playerTransmitterStatusPacket = null;
         }
     }
 
     public Boolean hasPlayerStatus() {
-        return connectedToServer() && this.playerEnderTransmitterStatusPacket != null;
+        return connectedToServer() && this.playerTransmitterStatusPacket != null;
     }
 
     public ServerMusicPlayerStatusPacket getPlayerStatusPacket() {
         if(connectedToServer()) {
-            return this.playerEnderTransmitterStatusPacket;
+            return this.playerTransmitterStatusPacket;
         }
         return null;
     }
@@ -57,7 +57,7 @@ public class MidiDataManager {
     }
 
     public void handleLoginLogout() {
-        playerEnderTransmitterStatusPacket = null;
+        playerTransmitterStatusPacket = null;
         updateTickCount = 0;
     }
 }
