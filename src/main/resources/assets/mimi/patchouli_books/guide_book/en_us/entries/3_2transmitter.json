@@ -1,6 +1,6 @@
 {
     "name": "Transmitter",
-    "icon": "mimi:endertransmitter",
+    "icon": "mimi:transmitter",
     "category": "mimi:3transmitter",
     "pages": [
         {
@@ -9,7 +9,7 @@
         },
         {
             "type": "patchouli:crafting",
-            "recipe": "mimi:endertransmitter",
+            "recipe": "mimi:transmitter",
             "link_recipe": true,
             "text": "Once a song is playing it will continue playing as long as one Transmitter is in one of your hands or on your hotbar.$(br2)To open a Transmitter on your hotbar without selecting it, you can use a key bind ($(l)$(k:key.mimi.midi.gui.transmitter)$())."
         }

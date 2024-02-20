@@ -21,7 +21,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class GuiTransmitter extends BaseGui {
+public class GuiTransmitterBlock extends BaseGui {
     protected static final Integer UPDATE_STATUS_EVERY_TICKS = 10;
     protected static final Integer ANIM_FRAME_EVERY_TICKS = 3;
     protected static final Integer LOADING_ANIMATION_FRAMES = 4;
@@ -60,7 +60,7 @@ public class GuiTransmitter extends BaseGui {
     protected ServerMusicPlayerSongListPacket songList;
     protected Boolean awaitRefresh = false;
 
-    public GuiTransmitter(UUID musicPlayerId) {
+    public GuiTransmitterBlock(UUID musicPlayerId) {
         super(360, 288, 360, "textures/gui/container_transmitter.png", "item.MIMIMod.gui_transmitter");
         this.musicPlayerId = musicPlayerId;
         this.musicStatus = new ServerMusicPlayerStatusPacket(musicPlayerId);

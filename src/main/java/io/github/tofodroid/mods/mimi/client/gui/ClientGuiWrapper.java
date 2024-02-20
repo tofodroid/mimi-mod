@@ -42,7 +42,7 @@ public abstract class ClientGuiWrapper {
     }
 
     public static void openTransmitterGui(Level world, UUID transmitterTileId) {
-        openGui(world, new GuiTransmitter(transmitterTileId));
+        openGui(world, new GuiTransmitterBlock(transmitterTileId));
     }
 
     public static void openConfigGui(Level world, Player player) {

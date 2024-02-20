@@ -23,8 +23,13 @@ import net.minecraft.world.level.gameevent.GameEvent;
 public class MidiNotePacketHandler {
     private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, List<TileListener>>> LISTENER_CACHE_MAP = new LinkedHashMap<>();
     private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, List<ServerPlayer>>> PLAYER_CACHE_MAP = new LinkedHashMap<>();
-    private static final Integer CLEAR_CACHE_EVERY_TICKS = 5;
+    private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, Boolean>> EVENT_CACHE_MAP = new LinkedHashMap<>();
+
+
+    private static final Integer CLEAR_CACHE_EVERY_TICKS = 10;
+    private static final Integer CLEAR_EVENT_CACHE_EVERY_TICKS = 60;
     private static Integer cacheClearTickCounter = 0;
+    private static Integer eventCacheClearTickCounter = 0;
 
     public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
         handlePacketServer(message, sender.serverLevel(), sender);
@@ -49,10 +54,11 @@ public class MidiNotePacketHandler {
                     potentialPlayers.add(sourcePlayer);
                 }
 
-                // Process Listeners
-                entry.getValue().forEach(packet ->
-                    processListeners(packet, worldIn)
-                );
+                // Process Listeners and sculk
+                entry.getValue().forEach(packet -> {
+                    processListeners(packet, worldIn);
+                    processSculk(packet, worldIn);
+                });
             }
 
             // Send
@@ -75,6 +81,7 @@ public class MidiNotePacketHandler {
 
             // Process Listeners and Sculk
             processListeners(message, worldIn);
+            processSculk(message, worldIn);
 
             // Send
             potentialPlayers.forEach(player -> {
@@ -101,6 +108,24 @@ public class MidiNotePacketHandler {
         }
     }
 
+    protected static void processSculk(MidiNotePacket message, ServerLevel worldIn) {
+        if(message.isNoteOnPacket()) {
+            LinkedHashMap<Long, Boolean> eventMap = EVENT_CACHE_MAP.computeIfAbsent(
+                worldIn.dimension(), d -> new LinkedHashMap<>() 
+            );
+    
+            eventMap.computeIfAbsent(
+                message.pos.asLong(),
+                (key) -> {
+                    if(worldIn.isLoaded(message.pos)) {
+                        worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, message.pos, GameEvent.Context.of(worldIn.getBlockState(message.pos)));
+                    }
+                    return true;
+                }
+            );
+        }
+    }
+
     public static void handlePacketClient(final MidiNotePacket message) {
         if(MIMIMod.getProxy().isClient()) ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(message); 
     }
@@ -118,7 +143,14 @@ public class MidiNotePacketHandler {
             PLAYER_CACHE_MAP.clear();
         } else {
             cacheClearTickCounter++;
-        }        
+        }
+
+        if(eventCacheClearTickCounter >= CLEAR_EVENT_CACHE_EVERY_TICKS) {
+            eventCacheClearTickCounter = 0;
+            EVENT_CACHE_MAP.clear();
+        } else {
+            eventCacheClearTickCounter++;
+        }
     }
 
     public static List<TileListener> getCacheListeners(ServerLevel level, BlockPos pos) {
@@ -129,7 +161,6 @@ public class MidiNotePacketHandler {
         return entityMap.computeIfAbsent(
             pos.asLong(),
             (key) -> {
-                level.gameEvent(GameEvent.INSTRUMENT_PLAY, pos, GameEvent.Context.of(level.getBlockState(pos)));
                 return getPotentialListeners(level, pos, 64).stream().map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
         });
     }

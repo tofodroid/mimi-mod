@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
-import io.github.tofodroid.mods.mimi.client.gui.GuiTransmitter;
+import io.github.tofodroid.mods.mimi.client.gui.GuiTransmitterBlock;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.AServerMusicTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
@@ -18,8 +18,8 @@ public class ServerMusicPlayerStatusPacketHandler {
 
     @SuppressWarnings({"resource"})
     public static void handlePacketClient(final ServerMusicPlayerStatusPacket message) {
-        if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiTransmitter && message.musicPlayerId.equals(((GuiTransmitter)Minecraft.getInstance().screen).getMusicPlayerId())) {
-            ((GuiTransmitter)Minecraft.getInstance().screen).handleMusicPlayerStatusPacket(message);
+        if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiTransmitterBlock && message.musicPlayerId.equals(((GuiTransmitterBlock)Minecraft.getInstance().screen).getMusicPlayerId())) {
+            ((GuiTransmitterBlock)Minecraft.getInstance().screen).handleMusicPlayerStatusPacket(message);
         }
 
         if(message.musicPlayerId.equals(Minecraft.getInstance().player.getUUID())) {

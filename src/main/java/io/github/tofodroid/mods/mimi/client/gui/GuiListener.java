@@ -23,13 +23,13 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiListener extends BaseGui {
     // GUI
-    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(188,26);
+    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(180,26);
     private static final Vector2i TRIGGER_MODE_WIDGET_COORDS = new Vector2i(6,59);
     private static final Vector2i HOLD_TICKS_WIDGET_COORDS = new Vector2i(180,59);
     private static final Vector2i FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2i(9,40);
     private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(143,40);
     private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(161,40);
-    private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(289,5);
+    private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(281,5);
 
     // Widgets
     private NoteFilterWidget noteFilter;

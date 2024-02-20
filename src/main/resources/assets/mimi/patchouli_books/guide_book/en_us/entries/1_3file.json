@@ -1,6 +1,6 @@
 {
     "name": "Play a MIDI File",
-    "icon": "mimi:endertransmitter",
+    "icon": "mimi:transmitter",
     "category": "mimi:1overview",
     "pages": [
         {
@@ -10,7 +10,7 @@
         {
             "type": "patchouli:crafting",
             "title": "Recipes",
-            "recipe": "mimi:endertransmitter"
+            "recipe": "mimi:transmitter"
         },
         {
             "type": "patchouli:text",
