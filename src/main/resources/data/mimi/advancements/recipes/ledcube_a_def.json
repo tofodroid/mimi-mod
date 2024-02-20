@@ -2,7 +2,7 @@
     "parent": "minecraft:recipes/root",
     "rewards": {
       "recipes": [
-        "mimi:transmitter"
+        "mimi:ledcube_a_def"
       ]
     },
     "criteria": {
@@ -11,7 +11,7 @@
         "conditions": {
           "items": [
             {
-              "item": "minecraft:iron_ingot"
+              "item": "minecraft:redstone_lamp"
             }
           ]
         }
@@ -19,7 +19,7 @@
       "has_the_recipe": {
         "trigger": "minecraft:recipe_unlocked",
         "conditions": {
-          "recipe": "mimi:transmitter"
+          "recipe": "mimi:ledcube_a_def"
         }
       }
     },
@@ -30,3 +30,4 @@
       ]
     ]
 }
+  

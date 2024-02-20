@@ -2,7 +2,7 @@
     "parent": "minecraft:recipes/root",
     "rewards": {
       "recipes": [
-        "mimi:broadcaster"
+        "mimi:transmitterblock"
       ]
     },
     "criteria": {
@@ -11,7 +11,7 @@
         "conditions": {
           "items": [
             {
-              "item": "mimi:transmitter"
+              "item": "minecraft:iron_ingot"
             }
           ]
         }
@@ -19,7 +19,7 @@
       "has_the_recipe": {
         "trigger": "minecraft:recipe_unlocked",
         "conditions": {
-          "recipe": "mimi:broadcaster"
+          "recipe": "mimi:transmitterblock"
         }
       }
     },
@@ -30,3 +30,4 @@
       ]
     ]
 }
+  

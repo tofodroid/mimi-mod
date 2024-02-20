@@ -1,13 +1,13 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "PTP",
-        " R ",
-        "   "
+        " P ",
+        "IRI",
+        " P "
     ],
     "key": {
-        "T": {
-            "item": "mimi:endertransmitter"
+        "I": {
+            "item": "minecraft:iron_ingot"
         },
         "R": {
             "item": "minecraft:redstone_block"

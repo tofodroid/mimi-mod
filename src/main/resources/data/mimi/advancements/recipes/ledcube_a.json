@@ -1,0 +1,33 @@
+{
+    "parent": "minecraft:recipes/root",
+    "rewards": {
+      "recipes": [
+        "mimi:ledcube_a"
+      ]
+    },
+    "criteria": {
+      "has_note": {
+        "trigger": "minecraft:inventory_changed",
+        "conditions": {
+          "items": [
+            {
+              "item": "minecraft:ledcube_a"
+            }
+          ]
+        }
+      },
+      "has_the_recipe": {
+        "trigger": "minecraft:recipe_unlocked",
+        "conditions": {
+          "recipe": "mimi:ledcube_a"
+        }
+      }
+    },
+    "requirements": [
+      [
+        "has_note",
+        "has_the_recipe"
+      ]
+    ]
+}
+  
