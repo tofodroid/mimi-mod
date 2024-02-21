@@ -1,14 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.container.slot;
 
-import java.util.List;
-
 import io.github.tofodroid.mods.mimi.common.CommonEventHooksProxy;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.RecipeHolder;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -47,10 +44,6 @@ public class SlotTuningResult extends Slot {
         if (this.removeCount > 0) {
             p_40185_.onCraftedBy(this.player.level(), this.player, this.removeCount);
             CommonEventHooksProxy.firePlayerCraftingEvent(this.player, p_40185_, this.craftSlots);
-        }
-
-        if (this.container instanceof RecipeHolder) {
-            ((RecipeHolder)this.container).awardUsedRecipes(player, List.of(p_40185_));
         }
 
         this.removeCount = 0;

@@ -79,8 +79,8 @@ public class EntitySeat extends Entity {
     }
 
     @Override
-    public double getPassengersRidingOffset() {
-        return -0.2;
+    public float ridingOffset(Entity e) {
+        return -0.2f;
     }
     
     public BlockPos getSource() {

@@ -5,7 +5,6 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,9 +21,9 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "clonemidi";
     public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER);
 	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
-
-    public CloneMidiSettingsRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    
+    public CloneMidiSettingsRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
@@ -138,6 +137,6 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CloneMidiSettingsRecipe.SERIALIZER;
+        return SERIALIZER;
     }
 }

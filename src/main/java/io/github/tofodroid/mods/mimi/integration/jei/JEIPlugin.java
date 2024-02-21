@@ -30,7 +30,7 @@ public class JEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
 		RecipeManager manager = Objects.requireNonNull(MC.level).getRecipeManager();
-		registration.addRecipes(TuningTableRecipeCategory.RECIPE_TYPE, manager.getRecipes().parallelStream().filter(recipe -> recipe.getType().equals(ModRecipes.TUNING_TYPE)).map(r -> (TuningTableRecipe) r).collect(Collectors.toList()));
+		registration.addRecipes(TuningTableRecipeCategory.RECIPE_TYPE, manager.getRecipes().parallelStream().filter(recipe -> recipe.value().getType().equals(ModRecipes.TUNING_TYPE)).map(r -> (TuningTableRecipe) r.value()).collect(Collectors.toList()));
 	}
 
 	@Override

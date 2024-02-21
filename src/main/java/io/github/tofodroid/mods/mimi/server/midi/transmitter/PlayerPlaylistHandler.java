@@ -6,15 +6,23 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.level.saveddata.SavedData;
 
 public class PlayerPlaylistHandler extends APlaylistHandler {
     protected PlaylistData data;
+
+    private static final SavedData.Factory<PlaylistData> DATA_FACTORY = new SavedData.Factory<>(
+        PlaylistData::new,
+        PlaylistData::loadFromTag,
+        DataFixTypes.OPTIONS
+    );
 
     public PlayerPlaylistHandler(ServerPlayer player) {
         super(player.getUUID());
 
         // Load from world saved data
-        this.data = player.getServer().overworld().getDataStorage().computeIfAbsent(PlaylistData::loadFromTag, PlaylistData::new, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
+        this.data = player.getServer().overworld().getDataStorage().computeIfAbsent(DATA_FACTORY, MIMIMod.MODID + "-ender-playlist-" + player.getUUID().toString());
         this.data.setDirty();
     }
 

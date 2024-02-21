@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 
 import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
@@ -20,8 +19,8 @@ public class ColoredItemRecipe extends CustomRecipe {
 
 	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<ColoredItemRecipe>(ColoredItemRecipe::new);
 
-    public ColoredItemRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public ColoredItemRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override

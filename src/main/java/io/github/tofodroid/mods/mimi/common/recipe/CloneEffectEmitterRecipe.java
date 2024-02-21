@@ -5,7 +5,6 @@ import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,8 +22,8 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
     public static final List<Item> ITEMS = Arrays.asList(ModItems.EFFECTEMITTER);
 	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneEffectEmitterRecipe>(CloneEffectEmitterRecipe::new);
 
-    public CloneEffectEmitterRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public CloneEffectEmitterRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
@@ -129,6 +128,6 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CloneEffectEmitterRecipe.SERIALIZER;
+        return SERIALIZER;
     }
 }

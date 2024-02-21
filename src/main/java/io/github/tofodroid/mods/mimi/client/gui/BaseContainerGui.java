@@ -56,7 +56,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if(shouldRenderBackground()) {
-            this.renderBackground(graphics);
+            this.renderBackground(graphics, mouseX, mouseY, partialTicks);
         }
 		super.render(graphics, mouseX, mouseY, partialTicks);
 		this.renderTooltip(graphics, mouseX, mouseY);
@@ -67,7 +67,6 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     }
 
     @Override
-    @SuppressWarnings("null")
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         InputConstants.Key invKey = InputConstants.getKey(keyCode, scanCode);
 

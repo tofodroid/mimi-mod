@@ -8,7 +8,6 @@ import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -24,8 +23,8 @@ public class CopyBlockDyeRecipe extends CustomRecipe {
 
 	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CopyBlockDyeRecipe>(CopyBlockDyeRecipe::new);
 
-    public CopyBlockDyeRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public CopyBlockDyeRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
@@ -123,6 +122,6 @@ public class CopyBlockDyeRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CloneMidiSettingsRecipe.SERIALIZER;
+        return SERIALIZER;
     }
 }

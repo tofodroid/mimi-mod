@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class ContainerTuningTable extends APlayerInventoryContainer {
     private static final int INSTRUMENT_SLOT_POS_X = 27;
@@ -101,17 +102,15 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     }
   
     @Override
-    @SuppressWarnings("null")
     public void slotsChanged(Container container) {
         if (container == craftingInventory && !this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
-            Optional<TuningTableRecipe> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level());
+            Optional<RecipeHolder<TuningTableRecipe>> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level());
             
             if (optional.isPresent()) {
-                TuningTableRecipe recipe = optional.get();
-               if (this.resultInventory.setRecipeUsed(serverplayer.level(), serverplayer, recipe)) {
-                  itemstack = recipe.assemble(this.craftingInventory, null);
+               if (this.resultInventory.setRecipeUsed(serverplayer.level(), serverplayer, optional.get())) {
+                  itemstack = optional.get().value().assemble(this.craftingInventory, null);
                }
             }
    
