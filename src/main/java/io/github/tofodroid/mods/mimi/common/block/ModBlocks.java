@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.block.legacycompat.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +22,10 @@ public class ModBlocks {
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro());
     public static final BlockConductor CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockConductor());
     public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter());
+
+    // Legacy Compat
+    public static final BlockBroadcaster BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockBroadcaster());
+
 
     // Village Blocks
     public static final BlockTuningTable TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockTuningTable());

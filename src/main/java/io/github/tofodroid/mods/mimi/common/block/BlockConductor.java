@@ -4,17 +4,14 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileConductor;
-import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -76,15 +73,15 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
 
     @Override
     public void tick(BlockState blockState, ServerLevel level, BlockPos blockPos, RandomSource random) {
-        if (blockState.getValue(TRIGGERED)) {
-            if(level.hasNeighborSignal(blockPos)) {
-                getTileForBlock(level, blockPos).startNote();
-                level.scheduleTick(blockPos, this, 4);
-            } else {
-                getTileForBlock(level, blockPos).stopNote();
-                level.setBlock(blockPos, blockState.cycle(TRIGGERED), 2);
-            }
-        }
+        // if (blockState.getValue(TRIGGERED)) {
+        //     if(level.hasNeighborSignal(blockPos)) {
+        //         getTileForBlock(level, blockPos).startNote();
+        //         level.scheduleTick(blockPos, this, 4);
+        //     } else {
+        //         getTileForBlock(level, blockPos).stopNote();
+        //         level.setBlock(blockPos, blockState.cycle(TRIGGERED), 2);
+        //     }
+        // }
     }
 
    @Override
@@ -94,30 +91,35 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
 
     @Override
     protected void openGui(Level worldIn, Player player, TileConductor tile) {
-        ClientGuiWrapper.openConductorGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
+        //ClientGuiWrapper.openConductorGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
+
+        player.sendSystemMessage(Component.translatableWithFallback("block.mimi.conductor.wip", "Coming soon!"));
     }
 
     @Override
     public BlockEntityType<TileConductor> getTileType() {
         return ModTiles.CONDUCTOR;
     }
+
     @Override
     protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
-        tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        tooltip.add(Component.translatableWithFallback("block.mimi.conductor.wip", "Coming soon!"));
 
-        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(blockItemStack);
-        if(enabledChannels != null) {
-            if(enabledChannels.equals(MidiNbtDataUtils.ALL_CHANNELS_INT)) {
-                tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
-            } else if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
-                tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
-            } else {
-                tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
-            }
-        }
+        // tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        // Transmit Note
-        tooltip.add(Component.literal("  Transmit Note: " + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN));
+        // Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(blockItemStack);
+        // if(enabledChannels != null) {
+        //     if(enabledChannels.equals(MidiNbtDataUtils.ALL_CHANNELS_INT)) {
+        //         tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
+        //     } else if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
+        //         tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
+        //     } else {
+        //         tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
+        //     }
+        // }
+
+        // // Transmit Note
+        // tooltip.add(Component.literal("  Transmit Note: " + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN));
     }
 }

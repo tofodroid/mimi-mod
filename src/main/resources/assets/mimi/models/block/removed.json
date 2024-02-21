@@ -1,0 +1,12 @@
+{
+    "parent": "minecraft:block/cube",
+    "textures": {
+      "particle": "mimi:block/removed",
+      "north": "mimi:block/removed",
+      "south": "mimi:block/removed",
+      "east": "mimi:block/removed",
+      "west": "mimi:block/removed",
+      "up": "mimi:block/removed",
+      "down": "mimi:block/removed"
+    }
+  }

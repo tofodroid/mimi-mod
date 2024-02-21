@@ -24,9 +24,11 @@ import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
 import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
+import io.github.tofodroid.mods.mimi.common.block.legacycompat.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.block.BlockLedCube;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
+import io.github.tofodroid.mods.mimi.common.item.legacycompat.ItemFileCaster;
 
 public final class ModItems {
     public static Map<ResourceLocation, Item> ITEMS = new HashMap<>();
@@ -35,6 +37,10 @@ public final class ModItems {
     // Instruments
     public static List<ItemInstrumentHandheld> INSTRUMENT_ITEMS = buildHandheldInstruments();
     public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS = buildBlockInstruments();
+
+    // Legacy Compat
+    public static ItemFileCaster FILECASTER = create(ItemFileCaster.REGISTRY_NAME, new ItemFileCaster());
+    public static BlockItem BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockItem(ModBlocks.BROADCASTER, new Item.Properties().stacksTo(64)));
 
     // Other
     public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig());

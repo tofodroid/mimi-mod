@@ -1,10 +1,12 @@
 package io.github.tofodroid.mods.mimi.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.ChatFormatting;
@@ -20,7 +22,6 @@ public abstract class MidiNbtDataUtils {
     public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
     public static final Byte FILTER_NOTE_OCT_ALL = -1;
     public static final String BROADCAST_NOTE_TAG = "broadcast_note";
-    public static final String BROADCAST_PUBLIC_TAG = "broadcast_public";
     public static final String SOURCE_TAG = "source_uuid";
     public static final String SOURCE_NAME_TAG = "source_name";
     public static final String SYS_INPUT_TAG = "sys_input";
@@ -438,13 +439,27 @@ public abstract class MidiNbtDataUtils {
             instrumentTag.putInt(ENABLED_CHANNELS_TAG, NONE_CHANNELS_INT);
         }
         
+        // OLD ENABLED CHANNELS STRING --> ENABLED CHANNELS INT
         if(instrumentTag.contains("enabled_channels")) {
-            instrumentTag.remove("enabled_channels");
+            Integer enabledChannelsInt = Arrays.asList(instrumentTag.getString("enabled_channels").split(",", -1)).stream()
+                .map(s -> Integer.valueOf(Byte.valueOf(s) - 1))
+                .reduce(NONE_CHANNELS_INT, (enabledChannels, channelId) -> enabledChannels ^ (1 << channelId));
+            instrumentTag.putInt(ENABLED_CHANNELS_TAG, enabledChannelsInt);     
+            instrumentTag.remove("enabled_channels");       
+        }
+
+        // OLD DEFAULT SOURCE ID OR PUBLIC SOURCE ID --> NONE
+        final UUID NONE_SOURCE_ID = new UUID(0,0);
+        final UUID PUBLIC_SOURCE_ID = new UUID(0,2);
+
+        if(instrumentTag.contains(SOURCE_TAG) && (instrumentTag.getUUID(SOURCE_TAG).equals(NONE_SOURCE_ID) || instrumentTag.getUUID(SOURCE_TAG).equals(PUBLIC_SOURCE_ID))) {
+            instrumentTag.remove(SOURCE_TAG);
+            instrumentTag.remove(SOURCE_NAME_TAG);
         }
 
         // OLD DEFAULT SOURCE NAME --> NONE
-        if(!instrumentTag.contains(SOURCE_NAME_TAG)|| instrumentTag.getString(SOURCE_NAME_TAG).isBlank()) {
-            instrumentTag.putString(SOURCE_NAME_TAG, "None");
+        if(instrumentTag.contains(SOURCE_NAME_TAG) && instrumentTag.getString(SOURCE_NAME_TAG).isBlank()) {
+            instrumentTag.remove(SOURCE_NAME_TAG);
         }
 
         return instrumentTag;
