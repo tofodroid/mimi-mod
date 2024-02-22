@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileConductor;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,18 +26,24 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.Block;
 
 public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
-   public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
+    public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
     public static final String REGISTRY_NAME = "conductor";
+    public static final MapCodec<BlockConductor> CODEC = simpleCodec(BlockConductor::new);
+ 
+    @Override
+    public MapCodec<BlockConductor> codec() {
+       return CODEC;
+    }
 
-    public BlockConductor() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+    public BlockConductor(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.defaultBlockState().setValue(TRIGGERED, Boolean.valueOf(false)));
-   }
+    }
 
-   @Nullable
-   public BlockState getStateForPlacement(BlockPlaceContext p_55659_) {
+    @Nullable
+    public BlockState getStateForPlacement(BlockPlaceContext p_55659_) {
         return this.defaultBlockState().setValue(TRIGGERED, Boolean.valueOf(p_55659_.getLevel().hasNeighborSignal(p_55659_.getClickedPos())));
-   }
+    }
    
     @Override
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -84,10 +92,10 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
         // }
     }
 
-   @Override
-   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-      builder.add(TRIGGERED);
-   }
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(TRIGGERED);
+    }
 
     @Override
     protected void openGui(Level worldIn, Player player, TileConductor tile) {

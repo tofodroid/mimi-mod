@@ -3,10 +3,16 @@ package io.github.tofodroid.mods.mimi.common.block;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
@@ -25,6 +31,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -32,6 +39,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -47,19 +55,50 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class BlockInstrument extends AContainerBlock<TileInstrument> implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
+    public static final MapCodec<BlockInstrument> CODEC = instrumentCodec(BlockInstrument::new);
 
     protected final Map<Direction, VoxelShape> SHAPES;
-    protected final InstrumentSpec spec;
+    protected final Byte instrumentId;
     protected final Integer defaultChannels;
+    protected final Integer defaultColor;
+    protected final Boolean colorable;
     protected final String REGISTRY_NAME;
+ 
+    @Override
+    public MapCodec<BlockInstrument> codec() {
+       return CODEC;
+    }
 
-    public BlockInstrument(InstrumentSpec spec) {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
-        this.spec = spec;
-        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
-        this.REGISTRY_NAME = spec.registryName;
+    public BlockInstrument(Properties props, Byte instrumentId) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        InstrumentSpec spec = InstrumentConfig.getBydId(instrumentId);
         this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+    }
+
+    public BlockInstrument(Properties props, InstrumentSpec spec) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = spec.instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
+        this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+    }
+
+    public static MapCodec<BlockInstrument> instrumentCodec(BiFunction<BlockBehaviour.Properties, Byte, BlockInstrument> p_312290_) {
+        return RecordCodecBuilder.mapCodec((p_309873_) -> {
+            return p_309873_.group(
+                propertiesCodec(),
+                Codec.BYTE.fieldOf("instrumentId").forGetter(BlockInstrument::getInstrumentId)
+            ).apply(p_309873_, p_312290_);
+        });
     }
 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
@@ -105,14 +144,14 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     @Override
     @SuppressWarnings("deprecation")
-    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-        TileInstrument tileInstrument = getter.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
+    public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
+        TileInstrument tileInstrument = reader.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
         
         if(tileInstrument != null) {
             return tileInstrument.getInstrumentStack();
         }
 
-        return super.getCloneItemStack(getter, pos, state);
+        return super.getCloneItemStack(reader, pos, state);
     }
     
     @Override
@@ -172,19 +211,15 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     public Boolean isColorable() {
-        return this.spec.isColorable();
+        return this.colorable;
     }
 
     public Integer getDefaultColor() {
-        return this.spec.defaultColor();
-    }
-
-    public InstrumentSpec getSpec() {
-        return spec;
+        return this.defaultColor;
     }
 
     public Byte getInstrumentId() {
-        return spec.instrumentId;
+        return this.instrumentId;
     }
 
     public Integer getDefaultChannels() {

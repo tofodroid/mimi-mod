@@ -2,6 +2,8 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import java.util.List;
 
+import com.mojang.serialization.MapCodec;
+
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
@@ -27,9 +29,15 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
     public static final String REGISTRY_NAME = "effectemitter";
+    public static final MapCodec<BlockEffectEmitter> CODEC = simpleCodec(BlockEffectEmitter::new);
+ 
+    @Override
+    public MapCodec<BlockEffectEmitter> codec() {
+       return CODEC;
+    }
 
-    public BlockEffectEmitter() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.COPPER));
+    public BlockEffectEmitter(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.COPPER));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED,false).setValue(INVERTED,false));
     }
     

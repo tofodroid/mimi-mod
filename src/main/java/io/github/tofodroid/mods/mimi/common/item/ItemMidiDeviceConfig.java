@@ -14,8 +14,8 @@ import net.minecraft.world.level.Level;
 public class ItemMidiDeviceConfig extends Item {
     public static final String REGISTRY_NAME = "deviceconfig";
 
-    public ItemMidiDeviceConfig() {
-        super(new Properties().stacksTo(1));
+    public ItemMidiDeviceConfig(Properties props) {
+        super(props.stacksTo(1));
     }
 
     @Override

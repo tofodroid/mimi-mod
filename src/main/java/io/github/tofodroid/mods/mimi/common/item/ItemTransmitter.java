@@ -22,8 +22,8 @@ import net.minecraft.world.level.Level;
 public class ItemTransmitter extends Item {
     public static final String REGISTRY_NAME = "transmitter";
 
-    public ItemTransmitter() {
-        super(new Properties().stacksTo(1));
+    public ItemTransmitter(Properties props) {
+        super(props.stacksTo(1));
     }
 
     @Override

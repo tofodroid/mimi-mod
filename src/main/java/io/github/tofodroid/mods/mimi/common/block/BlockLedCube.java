@@ -19,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -101,8 +102,8 @@ public class BlockLedCube extends AColoredBlock {
    }
    
    @Override
-   public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-      ItemStack itemstack = super.getCloneItemStack(getter, pos, state);
+   public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
+      ItemStack itemstack = super.getCloneItemStack(reader, pos, state);
       itemstack.getOrCreateTag().putBoolean(INVERTED.getName(), state.getOptionalValue(INVERTED).orElse(false));
       return itemstack;
    }

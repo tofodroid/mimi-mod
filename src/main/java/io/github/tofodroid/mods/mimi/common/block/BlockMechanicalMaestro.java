@@ -1,5 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import com.mojang.serialization.MapCodec;
+
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
@@ -23,9 +25,15 @@ import net.minecraft.world.phys.BlockHitResult;
 public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestro> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final String REGISTRY_NAME = "mechanicalmaestro";
+    public static final MapCodec<BlockMechanicalMaestro> CODEC = simpleCodec(BlockMechanicalMaestro::new);
+ 
+    @Override
+    public MapCodec<BlockMechanicalMaestro> codec() {
+       return CODEC;
+    }
 
-    public BlockMechanicalMaestro() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+    public BlockMechanicalMaestro(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, Boolean.valueOf(false)));
     }
         

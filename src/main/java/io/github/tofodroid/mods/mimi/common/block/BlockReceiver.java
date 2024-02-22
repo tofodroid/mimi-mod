@@ -2,6 +2,8 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import java.util.List;
 
+import com.mojang.serialization.MapCodec;
+
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
@@ -20,9 +22,15 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceiver> {
     public static final String REGISTRY_NAME = "receiver";
+    public static final MapCodec<BlockReceiver> CODEC = simpleCodec(BlockReceiver::new);
+ 
+    @Override
+    public MapCodec<BlockReceiver> codec() {
+       return CODEC;
+    }
 
-    public BlockReceiver() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
+    public BlockReceiver(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
     }
 
     @Override
