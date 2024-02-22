@@ -188,7 +188,7 @@ public class TileEffectEmitter extends AConfigurableTile {
     public Float getVolume() {
         if(this._volume == null) {
             Byte volByte = TagUtils.getByteOrDefault(getSourceStack(), VOLUME_TAG, 5);
-            this._volume = 2 * (volByte / 10.f);
+            this._volume = 5 * (volByte / 10.f);
         }
         return this._volume;
     }

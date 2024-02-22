@@ -1,12 +1,9 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -33,39 +30,6 @@ public class MidiNotePacketHandler {
 
     public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
         handlePacketServer(message, sender.serverLevel(), sender);
-    }
-
-    public static void handlePacketServer(final MultiMidiNotePacket message, ServerPlayer sender) {
-        MIMIMod.LOGGER.warn("Server received unexpected MultiMidiNotePacket");
-    }
-    
-    public static void handlePacketServer(final MultiMidiNotePacket message, ServerLevel worldIn) {
-        // Note: Only used by transmitters
-        if(message != null) {
-            ArrayList<ServerPlayer> potentialPlayers = new ArrayList<>();
-
-            for(Map.Entry<UUID, List<MidiNotePacket>> entry : message.packets.entrySet()) {
-                // Forward to nearby players
-                potentialPlayers.addAll(getCachePlayers(worldIn, entry.getValue().get(0).pos));
-
-                // Ensure source player is included if this is coming from music reciever
-                ServerPlayer sourcePlayer = (ServerPlayer)worldIn.getPlayerByUUID(entry.getKey());
-                if(sourcePlayer != null) {
-                    potentialPlayers.add(sourcePlayer);
-                }
-
-                // Process Listeners and sculk
-                entry.getValue().forEach(packet -> {
-                    processListeners(packet, worldIn);
-                    processSculk(packet, worldIn);
-                });
-            }
-
-            // Send
-            for(ServerPlayer player : (message.packets.size() > 1 ? potentialPlayers : new HashSet<>(potentialPlayers))) {
-                NetworkProxy.sendToPlayer(player, message);
-            }
-        }
     }
     
     public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {
@@ -128,12 +92,6 @@ public class MidiNotePacketHandler {
 
     public static void handlePacketClient(final MidiNotePacket message) {
         if(MIMIMod.getProxy().isClient()) ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(message); 
-    }
-
-    public static void handlePacketClient(final  MultiMidiNotePacket message) {
-        if(MIMIMod.getProxy().isClient()) {
-            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleMultiPacket(message); 
-        }
     }
 
     public static void onServerTick() {

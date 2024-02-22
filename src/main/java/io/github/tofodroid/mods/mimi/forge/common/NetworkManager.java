@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.forge.common;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -13,7 +14,6 @@ import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
@@ -27,6 +27,7 @@ import io.github.tofodroid.mods.mimi.common.network.SyncInstrumentPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacketHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -74,17 +75,24 @@ public class NetworkManager {
 
     @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
-        MOD_CHANNEL.registerMessage(0, MidiNotePacket.class, MidiNotePacket::encodePacket, MidiNotePacket::decodePacket, createHandler(MidiNotePacketHandler::handlePacketClient, MidiNotePacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(1, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, createHandler(SyncInstrumentPacketHandler::handlePacketClient, SyncInstrumentPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(2, ClientMidiListPacket.class, ClientMidiListPacket::encodePacket, ClientMidiListPacket::decodePacket, createHandler(ClientMidiListPacketHandler::handlePacketClient, ClientMidiListPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(3, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, createHandler(ServerMusicPlayerStatusPacketHandler::handlePacketClient, ServerMusicPlayerStatusPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(4, ServerMusicPlayerSongListPacket.class, ServerMusicPlayerSongListPacket::encodePacket, ServerMusicPlayerSongListPacket::decodePacket, createHandler(ServerMusicPlayerSongListPacketHandler::handlePacketClient, ServerMusicPlayerSongListPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(5, ServerTimeSyncPacket.class, ServerTimeSyncPacket::encodePacket, ServerTimeSyncPacket::decodePacket, createHandler(ServerTimeSyncPacketHandler::handlePacketClient, ServerTimeSyncPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(6, ConfigurableMidiTileSyncPacket.class, ConfigurableMidiTileSyncPacket::encodePacket, ConfigurableMidiTileSyncPacket::decodePacket, createHandler(ConfigurableMidiTileSyncPacketHandler::handlePacketClient, ConfigurableMidiTileSyncPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(7, TransmitterControlPacket.class, TransmitterControlPacket::encodePacket, TransmitterControlPacket::decodePacket, createHandler(TransmitterControlPacketHandler::handlePacketClient, TransmitterControlPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(8, ServerMidiUploadPacket.class, ServerMidiUploadPacket::encodePacket, ServerMidiUploadPacket::decodePacket, createHandler(ServerMidiUploadPacketHandler::handlePacketClient, ServerMidiUploadPacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(9, EffectEmitterUpdatePacket.class, EffectEmitterUpdatePacket::encodePacket, EffectEmitterUpdatePacket::decodePacket, createHandler(EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer));
-        MOD_CHANNEL.registerMessage(10, MultiMidiNotePacket.class, MultiMidiNotePacket::encodePacket, MultiMidiNotePacket::decodePacket, createHandler(MidiNotePacketHandler::handlePacketClient, MidiNotePacketHandler::handlePacketServer));
+        registerMessage(0, MidiNotePacket.class, MidiNotePacket::encodePacket, MidiNotePacket::decodePacket, createHandler(MidiNotePacketHandler::handlePacketClient, MidiNotePacketHandler::handlePacketServer));
+        registerMessage(1, SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, createHandler(SyncInstrumentPacketHandler::handlePacketClient, SyncInstrumentPacketHandler::handlePacketServer));
+        registerMessage(2, ClientMidiListPacket.class, ClientMidiListPacket::encodePacket, ClientMidiListPacket::decodePacket, createHandler(ClientMidiListPacketHandler::handlePacketClient, ClientMidiListPacketHandler::handlePacketServer));
+        registerMessage(3, ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, createHandler(ServerMusicPlayerStatusPacketHandler::handlePacketClient, ServerMusicPlayerStatusPacketHandler::handlePacketServer));
+        registerMessage(4, ServerMusicPlayerSongListPacket.class, ServerMusicPlayerSongListPacket::encodePacket, ServerMusicPlayerSongListPacket::decodePacket, createHandler(ServerMusicPlayerSongListPacketHandler::handlePacketClient, ServerMusicPlayerSongListPacketHandler::handlePacketServer));
+        registerMessage(5, ServerTimeSyncPacket.class, ServerTimeSyncPacket::encodePacket, ServerTimeSyncPacket::decodePacket, createHandler(ServerTimeSyncPacketHandler::handlePacketClient, ServerTimeSyncPacketHandler::handlePacketServer));
+        registerMessage(6, ConfigurableMidiTileSyncPacket.class, ConfigurableMidiTileSyncPacket::encodePacket, ConfigurableMidiTileSyncPacket::decodePacket, createHandler(ConfigurableMidiTileSyncPacketHandler::handlePacketClient, ConfigurableMidiTileSyncPacketHandler::handlePacketServer));
+        registerMessage(7, TransmitterControlPacket.class, TransmitterControlPacket::encodePacket, TransmitterControlPacket::decodePacket, createHandler(TransmitterControlPacketHandler::handlePacketClient, TransmitterControlPacketHandler::handlePacketServer));
+        registerMessage(8, ServerMidiUploadPacket.class, ServerMidiUploadPacket::encodePacket, ServerMidiUploadPacket::decodePacket, createHandler(ServerMidiUploadPacketHandler::handlePacketClient, ServerMidiUploadPacketHandler::handlePacketServer));
+        registerMessage(9, EffectEmitterUpdatePacket.class, EffectEmitterUpdatePacket::encodePacket, EffectEmitterUpdatePacket::decodePacket, createHandler(EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer));
+    }
+
+    public static <T> void registerMessage(Integer index, Class<T> messageClass, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<NetworkEvent.Context>> handler) {
+        MOD_CHANNEL.messageBuilder(messageClass, index)
+            .encoder(encoder)
+            .decoder(decoder)
+            .consumerNetworkThread(handler)
+            .add();
     }
 
     public static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> createHandler(Consumer<T> handleClient, BiConsumer<T, ServerPlayer> handleServer) {
