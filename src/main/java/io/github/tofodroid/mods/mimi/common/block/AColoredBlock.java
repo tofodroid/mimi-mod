@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 
 public abstract class AColoredBlock extends Block {
     public static final IntegerProperty DYE_ID = IntegerProperty.create("dye_id", 0, 15);
@@ -40,13 +41,13 @@ public abstract class AColoredBlock extends Block {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide) {
             ItemStack itemstack = this.getCloneItemStack(level, pos, state);
             level.addFreshEntity(getItemEntity(level, pos, itemstack));
         }
 
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     protected ItemEntity getItemEntity(Level level, BlockPos pos, ItemStack itemstack) {
@@ -63,8 +64,8 @@ public abstract class AColoredBlock extends Block {
    
     @Override
     @SuppressWarnings("deprecation")
-    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-        ItemStack itemstack = super.getCloneItemStack(getter, pos, state);
+    public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
+        ItemStack itemstack = super.getCloneItemStack(reader, pos, state);
         itemstack.getOrCreateTag().putInt(DYE_ID.getName(), state.getOptionalValue(DYE_ID).orElse(0));
         return itemstack;
     }

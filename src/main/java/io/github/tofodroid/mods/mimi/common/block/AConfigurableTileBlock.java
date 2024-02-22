@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -62,14 +63,14 @@ public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extend
     
     @Override
     @SuppressWarnings("deprecation")
-    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-        BlockEntity tile = getter.getBlockEntity(pos);
+    public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
+        BlockEntity tile = reader.getBlockEntity(pos);
         
         if(tile != null && tile instanceof AConfigurableTile) {
             return ((AConfigurableTile)tile).getSourceStack();
         }
 
-        return super.getCloneItemStack(getter, pos, state);
+        return super.getCloneItemStack(reader, pos, state);
     }
 
     @Override
