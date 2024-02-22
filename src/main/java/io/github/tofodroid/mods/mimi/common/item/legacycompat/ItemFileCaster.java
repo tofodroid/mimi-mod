@@ -20,8 +20,8 @@ import net.minecraft.world.level.Level;
 public class ItemFileCaster extends Item {
     public static final String REGISTRY_NAME = "filecaster";
 
-    public ItemFileCaster() {
-        super(new Properties().stacksTo(1));
+    public ItemFileCaster(Properties props) {
+        super(props.stacksTo(1));
     }
     
     @Override

@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListener> {
     public static final String REGISTRY_NAME = "listener";
 
-    public BlockListener() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
+    public BlockListener(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
     }
 
     @Override

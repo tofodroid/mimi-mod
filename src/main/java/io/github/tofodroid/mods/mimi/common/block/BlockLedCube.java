@@ -101,8 +101,8 @@ public class BlockLedCube extends AColoredBlock {
    }
    
    @Override
-   public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-      ItemStack itemstack = super.getCloneItemStack(getter, pos, state);
+   public ItemStack getCloneItemStack(BlockGetter reader, BlockPos pos, BlockState state) {
+      ItemStack itemstack = super.getCloneItemStack(reader, pos, state);
       itemstack.getOrCreateTag().putBoolean(INVERTED.getName(), state.getOptionalValue(INVERTED).orElse(false));
       return itemstack;
    }

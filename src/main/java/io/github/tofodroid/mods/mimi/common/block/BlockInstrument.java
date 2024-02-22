@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
@@ -49,16 +50,32 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
     protected final Map<Direction, VoxelShape> SHAPES;
-    protected final InstrumentSpec spec;
+    protected final Byte instrumentId;
     protected final Integer defaultChannels;
+    protected final Integer defaultColor;
+    protected final Boolean colorable;
     protected final String REGISTRY_NAME;
 
-    public BlockInstrument(InstrumentSpec spec) {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
-        this.spec = spec;
-        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
-        this.REGISTRY_NAME = spec.registryName;
+    public BlockInstrument(Properties props, Byte instrumentId) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        InstrumentSpec spec = InstrumentConfig.getBydId(instrumentId);
         this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
+        this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+    }
+
+    public BlockInstrument(Properties props, InstrumentSpec spec) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = spec.instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
     }
 
@@ -105,14 +122,14 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     @Override
     @SuppressWarnings("deprecation")
-    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-        TileInstrument tileInstrument = getter.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
+    public ItemStack getCloneItemStack(BlockGetter reader, BlockPos pos, BlockState state) {
+        TileInstrument tileInstrument = reader.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
         
         if(tileInstrument != null) {
             return tileInstrument.getInstrumentStack();
         }
 
-        return super.getCloneItemStack(getter, pos, state);
+        return super.getCloneItemStack(reader, pos, state);
     }
     
     @Override
@@ -172,19 +189,15 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     public Boolean isColorable() {
-        return this.spec.isColorable();
+        return this.colorable;
     }
 
     public Integer getDefaultColor() {
-        return this.spec.defaultColor();
-    }
-
-    public InstrumentSpec getSpec() {
-        return spec;
+        return this.defaultColor;
     }
 
     public Byte getInstrumentId() {
-        return spec.instrumentId;
+        return this.instrumentId;
     }
 
     public Integer getDefaultChannels() {

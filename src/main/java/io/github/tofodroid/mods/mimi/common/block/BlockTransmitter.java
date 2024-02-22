@@ -36,8 +36,8 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final String REGISTRY_NAME = "transmitterblock";
 
-    public BlockTransmitter() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+    public BlockTransmitter(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 

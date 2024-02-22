@@ -28,8 +28,8 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
     public static final String REGISTRY_NAME = "effectemitter";
 
-    public BlockEffectEmitter() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.COPPER));
+    public BlockEffectEmitter(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.COPPER));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED,false).setValue(INVERTED,false));
     }
     
