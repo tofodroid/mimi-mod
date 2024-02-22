@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.server.midi.receiver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.LinkedHashMap;
@@ -14,7 +13,6 @@ import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
 import io.github.tofodroid.mods.mimi.server.ServerExecutor;
@@ -62,9 +60,7 @@ public abstract class ServerMusicReceiverManager {
             if(channelMap != null) {
                 final List<AMusicReceiver> receivers = channelMap.get(packet.channel);
 
-                if(receivers != null && !receivers.isEmpty()) {
-                    HashMap<UUID, List<MidiNotePacket>> packetList = new HashMap<>();
-                    
+                if(receivers != null && !receivers.isEmpty()) {                    
                     final BiFunction<PacketHandlerArgs, AMusicReceiver, MidiNotePacket> handler;
         
                     if(packet.isNoteOffEvent()) {
@@ -83,12 +79,8 @@ public abstract class ServerMusicReceiverManager {
                                 MidiNotePacket sendPacket = handler.apply(new PacketHandlerArgs(packet, sourceId, sourcePos, sourceLevel), receiver);
                 
                                 if(sendPacket != null) {
-                                    packetList.computeIfAbsent(sendPacket.player, u -> new ArrayList<MidiNotePacket>()).add(sendPacket);
+                                    MidiNotePacketHandler.handlePacketServer(sendPacket, sourceLevel, null);
                                 }
-                            }
-                
-                            if(!packetList.isEmpty()) {
-                                MidiNotePacketHandler.handlePacketServer(new MultiMidiNotePacket(packetList, packet.note, packet.noteServerTime, packet.isNoteOffEvent()), sourceLevel);
                             }
                         });
                     }

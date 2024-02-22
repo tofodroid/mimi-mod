@@ -2,12 +2,15 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -21,7 +24,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     public static final Integer MAX_NOTE_ON_SECONDS = 8;
     
     // Runtime data
-    protected Map<Byte, Map<Byte, Long>> heldNotes = new HashMap<>();
+    protected Map<Byte, Map<Byte, Long>> heldNotes = new LinkedHashMap<>();
+    protected List<Pair<Byte, Byte>> notesToTurnOff = Collections.synchronizedList(new ArrayList<>());
     protected Boolean noteHeld;
     protected Integer offCounter = 0;
 
@@ -74,15 +78,16 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
             Boolean shouldBePowered = false;
             
             if(this.triggerHeld) {
-                shouldBePowered = tickNotes();
-                this.noteHeld = shouldBePowered;
+                this.noteHeld = tickNotes();
+                shouldBePowered = this.noteHeld;
+                this.applyNotesOff();
             }
 
             if(shouldBePowered) {
                 this.setPowered(true);
                 this.offCounter = 0;
             } else if(state.getValue(AConfigurableMidiPowerSourceBlock.POWERED)) {
-                if(this.offCounter >= this.holdTicks) {
+                if(this.offCounter >= (this.holdTicks-1)) {
                     this.offCounter = 0;
                     this.setPowered(false);
                 } else {
@@ -146,6 +151,24 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         }
     }
 
+    protected void applyNotesOff() {
+        for(Pair<Byte,Byte> noteOff : this.notesToTurnOff) {
+            Map<Byte, Long> groupMap = this.heldNotes.get(noteOff.getLeft());
+
+            if(groupMap != null && !groupMap.isEmpty()) {
+                if(groupMap.remove(noteOff.getRight()) != null && groupMap.isEmpty()) {
+                    this.heldNotes.remove(noteOff.getLeft());
+                }
+            }
+        }
+
+        if(this.heldNotes.isEmpty()) {
+            this.noteHeld = false;
+        }
+
+        this.notesToTurnOff.clear();
+    }
+
     protected Boolean tickNotes() {
         List<Byte> groupsToRemove = new ArrayList<>();
         Long nowTime = Instant.now().toEpochMilli();
@@ -190,7 +213,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         Byte groupKey = getNoteGroupKey(channel, instrumentId);
 
         if(this.triggerHeld) {
-            this.heldNotes.computeIfAbsent(groupKey, (key) -> new HashMap<>()).put(note, noteTime);
+            this.heldNotes.computeIfAbsent(groupKey, (key) -> new LinkedHashMap<>()).put(note, noteTime);
             this.noteHeld = true;
         } else {
             this.setPowered(true);
@@ -200,19 +223,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {    
         if(this.triggerHeld && this.noteHeld) {
             Byte groupKey = getNoteGroupKey(channel, instrumentId);
-            Map<Byte, Long> groupMap = this.heldNotes.get(groupKey);
-            
-            if(groupMap != null && !groupMap.isEmpty()) {
-                groupMap.remove(note);
-
-                if(groupMap.isEmpty()) {
-                    this.heldNotes.remove(groupKey);
-
-                    if(this.heldNotes.isEmpty()) {
-                        this.noteHeld = false;
-                    }
-                }
-            }
+            notesToTurnOff.add(Pair.of(groupKey, note));
         }
     }
 

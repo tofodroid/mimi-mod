@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
@@ -32,14 +33,28 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     protected final String REGISTRY_NAME;
+    protected final Byte instrumentId;
     protected final Integer defaultChannels;
-    protected final InstrumentSpec spec;
+    protected final Integer defaultColor;
+    protected final Boolean colorable;
 
-    public ItemInstrumentHandheld(InstrumentSpec spec) {
-        super(new Properties().stacksTo(1));
-        this.spec = spec;
+    public ItemInstrumentHandheld(Properties props, Byte instrumentId) {
+        super(props.stacksTo(1));
+        InstrumentSpec spec = InstrumentConfig.getBydId(instrumentId);
         this.REGISTRY_NAME = spec.registryName;
         this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
+    }
+
+    public ItemInstrumentHandheld(Properties props, InstrumentSpec spec) {
+        super(props.stacksTo(1));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = spec.instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
     }
 
     @Override
@@ -54,17 +69,17 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
 
     @Override
     public Boolean isColorable() {
-        return this.spec.isColorable();
+        return this.colorable;
     }
 
     @Override
     public Integer getDefaultColor() {
-        return this.spec.defaultColor();
+        return this.defaultColor;
     }
 
     @Override
     public Byte getInstrumentId() {
-        return this.spec.instrumentId;
+        return this.instrumentId;
     }
 
     @Override

@@ -11,17 +11,18 @@ import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class ModBlocks {
     public static final Map<ResourceLocation, Block> BLOCKS = new HashMap<>();
 
     // Redstone Blocks
-    public static final BlockTransmitter TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockTransmitter());
-    public static final BlockListener LISTENER = create(BlockListener.REGISTRY_NAME, new BlockListener());
-    public static final BlockReceiver RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockReceiver());
-    public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro());
-    public static final BlockConductor CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockConductor());
-    public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter());
+    public static final BlockTransmitter TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockTransmitter(Properties.of()));
+    public static final BlockListener LISTENER = create(BlockListener.REGISTRY_NAME, new BlockListener(Properties.of()));
+    public static final BlockReceiver RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockReceiver(Properties.of()));
+    public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro(Properties.of()));
+    public static final BlockConductor CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockConductor(Properties.of()));
+    public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter(Properties.of()));
 
     // Legacy Compat
     public static final BlockBroadcaster BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockBroadcaster());
@@ -46,7 +47,7 @@ public class ModBlocks {
     public static List<BlockInstrument> buildInstruments()  {
         List<BlockInstrument> result = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
-            result.add(create(instrument.registryName, new BlockInstrument(instrument)));
+            result.add(create(instrument.registryName, new BlockInstrument(Properties.of(), instrument)));
         }
         return result;
     }

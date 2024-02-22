@@ -21,8 +21,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceiver> {
     public static final String REGISTRY_NAME = "receiver";
 
-    public BlockReceiver() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
+    public BlockReceiver(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
     }
 
     @Override

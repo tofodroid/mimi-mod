@@ -6,6 +6,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.Block;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,12 +40,12 @@ public final class ModItems {
     public static List<ItemInstrumentBlock> BLOCK_INSTRUMENT_ITEMS = buildBlockInstruments();
 
     // Legacy Compat
-    public static ItemFileCaster FILECASTER = create(ItemFileCaster.REGISTRY_NAME, new ItemFileCaster());
+    public static ItemFileCaster FILECASTER = create(ItemFileCaster.REGISTRY_NAME, new ItemFileCaster(new Properties()));
     public static BlockItem BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockItem(ModBlocks.BROADCASTER, new Item.Properties().stacksTo(64)));
 
     // Other
-    public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig());
-    public static ItemTransmitter TRANSMITTER = create(ItemTransmitter.REGISTRY_NAME, new ItemTransmitter());
+    public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig(new Properties()));
+    public static ItemTransmitter TRANSMITTER = create(ItemTransmitter.REGISTRY_NAME, new ItemTransmitter(new Properties()));
 
     // Blocks - Redstone
     public static BlockItem TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockItem(ModBlocks.TRANSMITTERBLOCK, new Item.Properties().stacksTo(64)));
@@ -103,7 +104,7 @@ public final class ModItems {
     public static List<ItemInstrumentHandheld> buildHandheldInstruments() {
         List<ItemInstrumentHandheld> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getItemInstruments()) {
-            list.add(create(instrument.registryName, new ItemInstrumentHandheld(instrument)));
+            list.add(create(instrument.registryName, new ItemInstrumentHandheld(new Properties(), instrument)));
         }
         return list;
     }

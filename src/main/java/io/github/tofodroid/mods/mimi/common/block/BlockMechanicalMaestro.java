@@ -24,8 +24,8 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final String REGISTRY_NAME = "mechanicalmaestro";
 
-    public BlockMechanicalMaestro() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+    public BlockMechanicalMaestro(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, Boolean.valueOf(false)));
     }
         

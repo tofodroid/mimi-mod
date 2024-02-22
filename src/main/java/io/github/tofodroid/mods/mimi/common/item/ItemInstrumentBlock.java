@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -20,12 +19,12 @@ import net.minecraft.world.level.Level;
 
 public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     protected final String REGISTRY_NAME;
-    protected final InstrumentSpec spec;
+    protected final BlockInstrument instrumentBlock;
 
-    public ItemInstrumentBlock(BlockInstrument blockIn, Properties builder, String name) {
-        super(blockIn, builder);
+    public ItemInstrumentBlock(BlockInstrument blockIn, Properties props, String name) {
+        super(blockIn, props);
         this.REGISTRY_NAME = name;
-        this.spec = blockIn.getSpec();
+        this.instrumentBlock = blockIn;
     }
 
     @Override
@@ -40,22 +39,22 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
 
     @Override
     public Byte getInstrumentId() {
-        return spec.instrumentId;
+        return this.instrumentBlock.getInstrumentId();
     }
 
     @Override
     public Boolean isColorable() {
-        return spec.isColorable();
+        return this.instrumentBlock.isColorable();
     }
 
     @Override
     public Integer getDefaultColor() {
-        return spec.defaultColor();
+        return this.instrumentBlock.getDefaultColor();
     }
 
     @Override
     public Integer getDefaultChannels() {
-        return ((BlockInstrument)getBlock()).getDefaultChannels();
+        return this.instrumentBlock.getDefaultChannels();
     }
     
     @Override
