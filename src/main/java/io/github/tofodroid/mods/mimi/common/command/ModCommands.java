@@ -18,7 +18,7 @@ public class ModCommands {
 
     private static int reloadServerMusicList(CommandSourceStack source) {
         ServerMidiManager.refreshServerSongs(true);
-        source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + ServerMidiManager.getServerSongs().size() + " files."), true);
+        source.sendSuccess(Component.literal("Server saved music reloaded. Found " + ServerMidiManager.getServerSongs().size() + " files."), true);
         return 0;
     }
 }

@@ -1,12 +1,13 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import org.joml.Vector2f;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -44,17 +45,17 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack graphics, float partialTicks, int mouseX, int mouseY) {
         graphics = renderGraphics(graphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void renderLabels(PoseStack graphics, int mouseX, int mouseY) {
         graphics = renderText(graphics, mouseX, mouseY);
     }
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         if(shouldRenderBackground()) {
             this.renderBackground(graphics);
         }
@@ -82,8 +83,8 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
     }
 
-    protected abstract GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks);
-    protected abstract GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY);
+    protected abstract PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks);
+    protected abstract PoseStack renderText(PoseStack graphics, int mouseX, int mouseY);
 
     protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
         Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();

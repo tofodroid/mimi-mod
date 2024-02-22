@@ -31,7 +31,7 @@ public class SyncInstrumentPacketHandler {
             sender.setItemInHand(message.handIn, instrumentStack);
         } else {
             tileInstrument.setInstrumentStack(instrumentStack);
-            sender.level().sendBlockUpdated(tileInstrument.getBlockPos(), tileInstrument.getBlockState(), tileInstrument.getBlockState(), 2);
+            sender.getLevel().sendBlockUpdated(tileInstrument.getBlockPos(), tileInstrument.getBlockState(), tileInstrument.getBlockState(), 2);
         }
     }
 }

@@ -16,7 +16,7 @@ public class EffectEmitterUpdatePacketHandler {
     
     public static void handlePacketServer(final EffectEmitterUpdatePacket message, ServerPlayer sender) {
         // Apply
-        Optional<TileEffectEmitter> tile = sender.level().getBlockEntity(message.tilePos, ModTiles.EFFECTEMITTER);
+        Optional<TileEffectEmitter> tile = sender.getLevel().getBlockEntity(message.tilePos, ModTiles.EFFECTEMITTER);
 
         if(tile.isPresent()) {
             ItemStack sourceStack = tile.get().getSourceStack().copy();
@@ -34,7 +34,7 @@ public class EffectEmitterUpdatePacketHandler {
             TagUtils.setOrRemoveInt(sourceStack, TileEffectEmitter.SOUND_LOOP_TAG, message.sound_loop);
             TagUtils.setOrRemoveInt(sourceStack, TileEffectEmitter.PARTICLE_LOOP_TAG, message.particle_loop);
             tile.get().setSourceStack(sourceStack);
-            sender.level().sendBlockUpdated(tile.get().getBlockPos(), tile.get().getBlockState(), tile.get().getBlockState(), 2);
+            sender.getLevel().sendBlockUpdated(tile.get().getBlockPos(), tile.get().getBlockState(), tile.get().getBlockState(), 2);
         }
     }
 }

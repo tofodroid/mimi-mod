@@ -49,14 +49,14 @@ public class EntitySeat extends Entity {
     @Override
     @SuppressWarnings("resource")
     public void remove(Entity.RemovalReason p_146834_) {
-        if(!this.level().isClientSide) {
+        if(!this.getLevel().isClientSide) {
             this.ejectPassengers();
 
             if(this.rider != null) {
                 ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.rider);
             }
 
-            this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());
+            this.getLevel().updateNeighbourForOutputSignal(source, this.getLevel().getBlockState(source).getBlock());
         }
         super.remove(p_146834_);
     }
@@ -66,8 +66,8 @@ public class EntitySeat extends Entity {
     public void tick() {
         super.tick();
 
-        if(!this.level().isClientSide) {
-            BlockEntity blockEntity = this.level().getBlockEntity(this.source);
+        if(!this.getLevel().isClientSide) {
+            BlockEntity blockEntity = this.getLevel().getBlockEntity(this.source);
             if(source == null || this.getPassengers().isEmpty() || blockEntity == null || !(blockEntity instanceof TileInstrument) || this.getPassengers().stream().allMatch(e -> !e.isAddedToWorld() || !e.isAlive() || !(e instanceof Player))) {
                 this.discard();
             }

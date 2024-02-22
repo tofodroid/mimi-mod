@@ -40,7 +40,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -180,7 +180,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
     
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    public List<ItemStack> getDrops(BlockState p_60537_, LootContext.Builder p_60538_) {
         return Arrays.asList();
     }
 
@@ -231,7 +231,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
             BlockPos pos = getSeatForEntity(entity).getSource();
 
             if(pos != null && Level.isInSpawnableBounds(pos)) {
-                BlockEntity sourceEntity = entity.level().getBlockEntity(getSeatForEntity(entity).getSource());
+                BlockEntity sourceEntity = entity.getLevel().getBlockEntity(getSeatForEntity(entity).getSource());
                 return sourceEntity != null && sourceEntity instanceof TileInstrument ? (TileInstrument) sourceEntity : null;
             }
         }

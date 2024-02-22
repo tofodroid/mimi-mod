@@ -38,8 +38,8 @@ public class EntityNoteResponsiveTile extends Entity {
     public void tick() {
         super.tick();
 
-        if(!this.level().isClientSide && !this.isRemoved()) {
-            if(source == null || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(this.source) instanceof AConfigurableMidiNoteResponsiveTile)) {
+        if(!this.getLevel().isClientSide && !this.isRemoved()) {
+            if(source == null || this.getLevel().getBlockEntity(this.source) == null || !(this.getLevel().getBlockEntity(this.source) instanceof AConfigurableMidiNoteResponsiveTile)) {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
@@ -50,7 +50,7 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     public AConfigurableMidiNoteResponsiveTile getTile() {
-        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.level().getBlockEntity(this.source) : null;
+        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.getLevel().getBlockEntity(this.source) : null;
         return tile != null && tile instanceof AConfigurableMidiNoteResponsiveTile ? (AConfigurableMidiNoteResponsiveTile) tile : null;
     }
     

@@ -29,7 +29,7 @@ public class MidiNotePacketHandler {
     private static Integer eventCacheClearTickCounter = 0;
 
     public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
-        handlePacketServer(message, sender.serverLevel(), sender);
+        handlePacketServer(message, sender.getLevel(), sender);
     }
     
     public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {

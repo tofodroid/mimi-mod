@@ -64,7 +64,7 @@ public class CommonForgeEventHandler {
 
     @SubscribeEvent
     public static void onLivingEquipmentChange(LivingEquipmentChangeEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
+        if(!(event.getEntity().getLevel() instanceof ServerLevel)) {
             return;
         }
         ServerMusicReceiverManager.onLivingEquipmentChange(event.getFrom(), event.getTo(), event.getEntity());
@@ -72,7 +72,7 @@ public class CommonForgeEventHandler {
 
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
+        if(!(event.getEntity().getLevel() instanceof ServerLevel)) {
             return;
         }
         ServerMusicReceiverManager.onLivingDeath(event.getEntity());
@@ -81,7 +81,7 @@ public class CommonForgeEventHandler {
 
     @SubscribeEvent
     public static void onEntityTeleport(EntityTeleportEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
+        if(!(event.getEntity().getLevel() instanceof ServerLevel)) {
             return;
         }
         ServerMusicReceiverManager.onEntityTeleport(event.getEntity());
@@ -90,7 +90,7 @@ public class CommonForgeEventHandler {
     
     @SubscribeEvent
     public static void onEntityChangeDimension(EntityTravelToDimensionEvent event) {
-        if(!(event.getEntity().level() instanceof ServerLevel)) {
+        if(!(event.getEntity().getLevel() instanceof ServerLevel)) {
             return;
         }
         ServerMusicReceiverManager.onEntityChangeDimension(event.getEntity());

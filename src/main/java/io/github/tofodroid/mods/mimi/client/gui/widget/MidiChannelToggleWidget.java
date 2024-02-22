@@ -4,7 +4,10 @@ import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
-import net.minecraft.client.gui.GuiGraphics;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
@@ -21,7 +24,7 @@ public class MidiChannelToggleWidget extends BaseWidget {
     }
 
     @Override
-    public void renderGraphics(GuiGraphics graphics, Integer mouseX, Integer mouseY) {
+    public void renderGraphics(PoseStack graphics, Integer mouseX, Integer mouseY) {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         // Channel Output Status Lights
@@ -29,7 +32,7 @@ public class MidiChannelToggleWidget extends BaseWidget {
 
         if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
             for(Byte channelId : acceptedChannels) {
-                graphics.blit(GUI_TEXTURE, ABSOLUTE_START.x() + 28 + (channelId % 8) * 19, ABSOLUTE_START.y() + 35 + (channelId / 8) * 25, 0, 67, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                Screen.blit(graphics, ABSOLUTE_START.x() + 28 + (channelId % 8) * 19, ABSOLUTE_START.y() + 35 + (channelId / 8) * 25, 0, 67, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
     }

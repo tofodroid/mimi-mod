@@ -9,6 +9,8 @@ import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -42,7 +44,12 @@ public abstract class CommonRegistrationHandler {
         event.register(Registries.MENU, (reg) -> ModContainers.MENU_TYPES.forEach(reg::register));
 
         // Create Tabs
-        event.register(Registries.CREATIVE_MODE_TAB, (reg) -> ModItems.CREATIVE_TABS.forEach(reg::register));
+        // Event Based in 1.19.x and below
+    }
+    
+    @SubscribeEvent
+    public static void register(CreativeModeTabEvent.Register event) {
+        event.registerCreativeModeTab(new ResourceLocation(MIMIMod.MODID, "group"), builder -> ModItems.buildCreativeTab(builder));
     }
 
     @SubscribeEvent

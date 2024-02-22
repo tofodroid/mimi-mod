@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.Block;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,33 +70,35 @@ public final class ModItems {
     public static BlockItem TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockItem(ModBlocks.TUNINGTABLE, new Item.Properties().stacksTo(64)));
 
     // Creative Tabs
-    public static CreativeModeTab CREATIVE_TAB = create("group", CreativeModeTab.builder()
-        .title(Component.translatable("itemGroup." + MIMIMod.MODID + ".group"))
-        // Set icon of creative tab
-        .icon(() -> new ItemStack(ModBlocks.INSTRUMENTS.get(0)))
-        // Add default items to tab
-        .displayItems((parameters, output) -> {
-            output.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
-            output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
-            output.acceptAll(getStacksForItems(Arrays.asList(
-                DEVICECONFIG,
-                TRANSMITTER,
-                LISTENER,
-                RECEIVER,
-                MECHANICALMAESTRO,
-                EFFECTEMITTER,
-                TRANSMITTERBLOCK,
-                TUNINGTABLE,
-                LEDCUBE_A,
-                LEDCUBE_B,
-                LEDCUBE_C,
-                LEDCUBE_D,
-                LEDCUBE_E,
-                LEDCUBE_F,
-                LEDCUBE_G,
-                LEDCUBE_H
-            )));
-        }));
+    public static CreativeModeTab.Builder buildCreativeTab(final CreativeModeTab.Builder builder) {
+        // Set name of tab to display
+        return builder.title(Component.translatable("itemGroup." + MIMIMod.MODID + ".group"))
+            // Set icon of creative tab
+            .icon(() -> new ItemStack(ModBlocks.INSTRUMENTS.get(0)))
+            // Add default items to tab
+            .displayItems((parameters, output) -> {
+                output.acceptAll(getStacksForItems(INSTRUMENT_ITEMS));
+                output.acceptAll(getStacksForItems(BLOCK_INSTRUMENT_ITEMS));
+                output.acceptAll(getStacksForItems(Arrays.asList(
+                    DEVICECONFIG,
+                    TRANSMITTER,
+                    LISTENER,
+                    RECEIVER,
+                    MECHANICALMAESTRO,
+                    EFFECTEMITTER,
+                    TRANSMITTERBLOCK,
+                    TUNINGTABLE,
+                    LEDCUBE_A,
+                    LEDCUBE_B,
+                    LEDCUBE_C,
+                    LEDCUBE_D,
+                    LEDCUBE_E,
+                    LEDCUBE_F,
+                    LEDCUBE_G,
+                    LEDCUBE_H
+                )));
+            });
+    }
     
     public static List<ItemStack> getStacksForItems(List<? extends Item> items) {
         return items.stream().map(i -> new ItemStack(i)).collect(Collectors.toList());

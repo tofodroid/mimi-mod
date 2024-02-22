@@ -4,7 +4,10 @@ import org.joml.Vector2i;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
-import net.minecraft.client.gui.GuiGraphics;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
 
 public class InvertSignalWidget extends BaseWidget {
@@ -18,12 +21,12 @@ public class InvertSignalWidget extends BaseWidget {
     }
 
     @Override
-    public void renderGraphics(GuiGraphics graphics, Integer mouseX, Integer mouseY) {
+    public void renderGraphics(PoseStack graphics, Integer mouseX, Integer mouseY) {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         // Inverted Lights
         if(MidiNbtDataUtils.getInvertSignal(midiStack)) {
-            graphics.blit(GUI_TEXTURE, ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 6, 17, 17, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
+            Screen.blit(graphics, ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 6, 17, 17, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
 

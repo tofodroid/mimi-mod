@@ -18,7 +18,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extends AContainerBlock<B> {
@@ -73,7 +73,7 @@ public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extend
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    public List<ItemStack> getDrops(BlockState p_60537_, LootContext.Builder p_60538_) {
         return Arrays.asList();
     }
 }

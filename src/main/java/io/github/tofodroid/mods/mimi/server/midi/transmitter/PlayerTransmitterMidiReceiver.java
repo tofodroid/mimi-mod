@@ -21,7 +21,7 @@ public class PlayerTransmitterMidiReceiver extends AServerMidiInputReceiver {
     protected void handleMessage(ShortMessage message) {
         // Try to find new instance of player if died
         if(this.player.isDeadOrDying()) {
-            this.player = this.player.level().getPlayerByUUID(this.player.getUUID());
+            this.player = this.player.getLevel().getPlayerByUUID(this.player.getUUID());
         }
 
         if(this.player.isDeadOrDying()) {
@@ -54,6 +54,6 @@ public class PlayerTransmitterMidiReceiver extends AServerMidiInputReceiver {
 
     @Override
     protected ServerLevel getTransmitterLevel() {
-        return (ServerLevel)player.level();
+        return (ServerLevel)player.getLevel();
     }
 }

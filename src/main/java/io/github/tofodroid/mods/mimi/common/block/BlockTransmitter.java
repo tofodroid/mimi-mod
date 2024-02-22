@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
@@ -97,7 +97,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    public List<ItemStack> getDrops(BlockState p_60537_, LootContext.Builder p_60538_) {
         return Arrays.asList();
     }
 

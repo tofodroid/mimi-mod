@@ -99,18 +99,18 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @SuppressWarnings({"resource", "deprecation"})
     public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity target, InteractionHand handIn) {
         if(target instanceof Player) {
-            if(!user.level().isClientSide) {
+            if(!user.getLevel().isClientSide) {
                 MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
                 user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
-                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.level(), null);
+                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.getLevel(), null);
             }
              return InteractionResult.CONSUME;
         } else if(target instanceof Mob) {
-            if(!user.level().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
+            if(!user.getLevel().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
                 user.setItemInHand(handIn, ItemStack.EMPTY);
                 target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
-                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.level(), null);
+                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.getLevel(), null);
             }
             return InteractionResult.CONSUME;
         }

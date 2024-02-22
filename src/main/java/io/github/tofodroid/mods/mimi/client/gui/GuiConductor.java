@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import org.joml.Vector2i;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -10,7 +11,6 @@ import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPack
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
@@ -77,12 +77,12 @@ public class GuiConductor extends BaseGui {
 
     // Render Functions
     @Override
-    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     
         this.midiChannelToggle.renderGraphics(graphics, mouseX, mouseY);
         
@@ -90,9 +90,9 @@ public class GuiConductor extends BaseGui {
     }
 
     @Override
-    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // Broadcast note
-        graphics.drawString(font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
+        drawString(graphics, font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
 
         this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
 

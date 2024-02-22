@@ -29,7 +29,7 @@ import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -515,7 +515,7 @@ public class GuiInstrument extends BaseGui {
 
     // Render Functions
     @Override
-    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         setAlpha(1.0f);
 
         // Set Texture
@@ -523,28 +523,28 @@ public class GuiInstrument extends BaseGui {
 
         // Visible Notes
         Integer keyboardTextureShift = (visibleNoteShift % (NOTE_WIDTH/2)) * NOTE_WIDTH;
-        graphics.blit(guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y - 1, keyboardTextureShift, 276, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y - 1, keyboardTextureShift, 276, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Labels
         if(ClientConfig.KEYBOARD_LAYOUTS.MIMI.equals(ModConfigs.CLIENT.keyboardLayout.get())) {
-            graphics.blit(guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(graphics, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
             if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
                 Integer widthShift = (V_PIANO_MIN_SHIFT - visibleNoteShift) * NOTE_WIDTH;
-                graphics.blit(guiTexture, START_X + NOTE_OFFSET_X - 1 + widthShift, START_Y + NOTE_OFFSET_Y + 70, 0, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(graphics, START_X + NOTE_OFFSET_X - 1 + widthShift, START_Y + NOTE_OFFSET_Y + 70, 0, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift >= V_PIANO_MIN_SHIFT && visibleNoteShift <= V_PIANO_MAX_SHIFT) {
-                graphics.blit(guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(graphics, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             } else if(visibleNoteShift <= V_PIANO_MAX_NOTE) {
                 Integer widthShift = (V_PIANO_MAX_SHIFT - visibleNoteShift) * -NOTE_WIDTH;
-                graphics.blit(guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(graphics, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, (visibleNoteShift - V_PIANO_MIN_SHIFT) * NOTE_WIDTH, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);
             }
         }
 
         // Note Edges
         if(visibleNoteShift == 0) {
-            graphics.blit(guiTexture, START_X + NOTE_OFFSET_X, START_Y + NOTE_OFFSET_Y, 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(graphics, START_X + NOTE_OFFSET_X, START_Y + NOTE_OFFSET_Y, 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         } else if(visibleNoteShift == MAX_NOTE_SHIFT) {
-            graphics.blit(guiTexture, START_X + 311, START_Y + NOTE_OFFSET_Y, 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(graphics, START_X + 311, START_Y + NOTE_OFFSET_Y, 392, 276, 6, 86, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Active Notes
@@ -555,22 +555,22 @@ public class GuiInstrument extends BaseGui {
         setAlpha(1.0f);
 
         // GUI Background
-        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Key Covers
-        graphics.blit(guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 55, keyboardTextureShift, 250, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 55, keyboardTextureShift, 250, 308, 26, TEXTURE_SIZE, TEXTURE_SIZE);
         
         // Switchboard Edit Panel
         if(editMode) {
             // Switchboard Background Panel
-            graphics.pose().pushPose();
-            graphics.pose().mulPose(Axis.ZN.rotationDegrees(90.0F));
-            graphics.blit(guiTexture, -(START_Y + 29 + 126),  START_X + 11, 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
-            graphics.pose().popPose();
+            graphics.pushPose();
+            graphics.mulPose(Axis.ZN.rotationDegrees(90.0F));
+            blit(graphics, -(START_Y + 29 + 126),  START_X + 11, 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
+            graphics.popPose();
 
             // Sys MIDI Device Status Light
             if(MidiNbtDataUtils.getSysInput(this.instrumentStack)) {
-                graphics.blit(guiTexture, START_X + 127, START_Y + 91, 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+                blit(graphics, START_X + 127, START_Y + 91, 329, 42, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
             }
 
             this.midiChannelToggle.renderGraphics(graphics, mouseX, mouseY);
@@ -580,7 +580,7 @@ public class GuiInstrument extends BaseGui {
         return graphics;
     }
 
-    private GuiGraphics renderAndCleanNoteSet(GuiGraphics graphics, ConcurrentHashMap<Byte,Instant> noteMap, Integer sustainMillis, Boolean held, Consumer<Entry<Byte,Instant>> removeHandler) {
+    private PoseStack renderAndCleanNoteSet(PoseStack graphics, ConcurrentHashMap<Byte,Instant> noteMap, Integer sustainMillis, Boolean held, Consumer<Entry<Byte,Instant>> removeHandler) {
         List<Entry<Byte,Instant>> notesToRemove = new ArrayList<>();
         if(!noteMap.isEmpty()) {
             for(Entry<Byte,Instant> entry : noteMap.entrySet()) {
@@ -596,7 +596,7 @@ public class GuiInstrument extends BaseGui {
         return graphics;
     }
 
-    private GuiGraphics renderNote(GuiGraphics graphics, Byte note, Boolean held, Instant releaseTime) {
+    private PoseStack renderNote(PoseStack graphics, Byte note, Boolean held, Instant releaseTime) {
         Float alpha = 1.0f;
         Integer keyNum = midiNoteToKeyNum(note);
 
@@ -611,45 +611,37 @@ public class GuiInstrument extends BaseGui {
         
         setAlpha(alpha);
 
-        graphics.blit(
-            guiTexture, 
-            START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
-            START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
-            
-            342 - (keyNum % 2) * 13, 
-            0, 12, 41, 
-            TEXTURE_SIZE, TEXTURE_SIZE
-        );
+        blit(graphics, START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 342 - (keyNum % 2) * 13, 0, 12, 41, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return graphics;
     }
 
     @Override
-    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // Instrument Name
-        graphics.drawString(font, this.instrumentNameString, START_X + 198, START_Y + 13, 0xFF00E600);
+        drawString(graphics, font, this.instrumentNameString, START_X + 198, START_Y + 13, 0xFF00E600);
 
         // Note Text: Left
-        graphics.drawString(font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 165, 0xFF00E600);
+        drawString(graphics, font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 165, 0xFF00E600);
 
         // Note Text: Middle
-        graphics.drawString(font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 165, 0xFF00E600);
+        drawString(graphics, font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 165, 0xFF00E600);
 
         // Note Text: Right
-        graphics.drawString(font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 165, 0xFF00E600);
+        drawString(graphics, font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 165, 0xFF00E600);
 
         // MIDI Source Name & Volume
         if(editMode) {
             this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
             this.transmitSource.renderText(graphics, font, mouseX, mouseY);
-            graphics.drawString(font, MidiNbtDataUtils.getInstrumentVolume(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
+            drawString(graphics, font, MidiNbtDataUtils.getInstrumentVolume(this.instrumentStack).toString(), START_X + 88, START_Y + 66, 0xFF00E600);
         }
 
         // Keyboard Layout
         if(editMode) {
-            graphics.drawString(font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF003600);
+            drawString(graphics, font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF003600);
         } else { 
-            graphics.drawString(font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF00E600);
+            drawString(graphics, font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF00E600);
         }
 
         return graphics;

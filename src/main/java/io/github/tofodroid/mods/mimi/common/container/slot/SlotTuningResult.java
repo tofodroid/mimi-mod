@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.common.container.slot;
 
-import java.util.List;
-
 import io.github.tofodroid.mods.mimi.common.CommonEventHooksProxy;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import net.minecraft.core.NonNullList;
@@ -45,12 +43,12 @@ public class SlotTuningResult extends Slot {
 
     protected void checkTakeAchievements(ItemStack p_40185_) {
         if (this.removeCount > 0) {
-            p_40185_.onCraftedBy(this.player.level(), this.player, this.removeCount);
+            p_40185_.onCraftedBy(this.player.getLevel(), this.player, this.removeCount);
             CommonEventHooksProxy.firePlayerCraftingEvent(this.player, p_40185_, this.craftSlots);
         }
 
         if (this.container instanceof RecipeHolder) {
-            ((RecipeHolder)this.container).awardUsedRecipes(player, List.of(p_40185_));
+            ((RecipeHolder)this.container).awardUsedRecipes(player);
         }
 
         this.removeCount = 0;
@@ -59,7 +57,7 @@ public class SlotTuningResult extends Slot {
     public void onTake(Player p_150638_, ItemStack p_150639_) {
         this.checkTakeAchievements(p_150639_);
         CommonEventHooksProxy.setCraftingPlayer(p_150638_);
-        NonNullList<ItemStack> nonnulllist = p_150638_.level().getRecipeManager().getRemainingItemsFor(ModRecipes.TUNING_TYPE, this.craftSlots, p_150638_.level());
+        NonNullList<ItemStack> nonnulllist = p_150638_.getLevel().getRecipeManager().getRemainingItemsFor(ModRecipes.TUNING_TYPE, this.craftSlots, p_150638_.getLevel());
         CommonEventHooksProxy.setCraftingPlayer(null);
         
         for(int i = 0; i < nonnulllist.size(); ++i) {

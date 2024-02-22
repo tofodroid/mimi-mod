@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CON
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiTransmitter extends GuiTransmitterBlock {
     // Local File Controls
@@ -39,17 +39,17 @@ public class GuiTransmitter extends GuiTransmitterBlock {
     }
 
     @Override
-    protected  GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected  PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         super.renderGraphics(graphics, mouseX, mouseY, partialTicks);
 
         // Local Folder Button
-        graphics.blit(guiTexture, START_X + 9, START_Y + 31, 173, 302, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + 9, START_Y + 31, 173, 302, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Source Filter Button & Screen Background
-        graphics.blit(guiTexture, START_X + 264, START_Y + 31, 191, 302, 33, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + 264, START_Y + 31, 191, 302, 33, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Source Filter Screen
-        graphics.blit(guiTexture, START_X + 283, START_Y + 33, 105 + (this.musicStatus.sourceMode.ordinal() * 13), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + 283, START_Y + 33, 105 + (this.musicStatus.sourceMode.ordinal() * 13), 302, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return graphics;
     }
@@ -66,11 +66,11 @@ public class GuiTransmitter extends GuiTransmitterBlock {
     }
     
     @Override
-    protected GuiGraphics renderPlaylistSongBadges(GuiGraphics graphics, BasicMidiInfo info, Integer songIndex, Integer minSong) {
+    protected PoseStack renderPlaylistSongBadges(PoseStack graphics, BasicMidiInfo info, Integer songIndex, Integer minSong) {
         super.renderPlaylistSongBadges(graphics, info, songIndex, minSong);
 
         // Source Badge
-        graphics.blit(guiTexture, START_X + 329, START_Y + getFirstSongY() - 1 + songIndex * 11, !info.serverMidi ? 163 : 154, 302, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + 329, START_Y + getFirstSongY() - 1 + songIndex * 11, !info.serverMidi ? 163 : 154, 302, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
 
         return graphics;
     }

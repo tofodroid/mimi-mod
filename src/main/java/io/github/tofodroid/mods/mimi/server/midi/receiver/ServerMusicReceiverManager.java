@@ -132,7 +132,7 @@ public abstract class ServerMusicReceiverManager {
 
     @SuppressWarnings("resource")
     public static void loadEntityInstrumentReceivers(LivingEntity entity) {
-        if(entity == null || !(entity.level() instanceof ServerLevel)) {
+        if(entity == null || !(entity.getLevel() instanceof ServerLevel)) {
             return;
         }
 
@@ -143,10 +143,10 @@ public abstract class ServerMusicReceiverManager {
                 ItemInstrumentHandheld.getEntityHeldInstrumentStack(entity, hand) : 
                 BlockInstrument.getTileInstrumentStackForEntity(entity);
             
-            if(entity.level() != null && instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
+            if(entity.getLevel() != null && instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
                 InstrumentMusicReceiver newReceiver = new InstrumentMusicReceiver(
                     entity::getOnPos,
-                    () -> entity.level().dimension(),
+                    () -> entity.getLevel().dimension(),
                     entity.getUUID(),
                     instrumentStack,
                     hand
@@ -154,7 +154,7 @@ public abstract class ServerMusicReceiverManager {
                 receivers.add(newReceiver);
             }
         });
-        allNotesOffRemovedInstrumentRecievers(receivers, entity.getUUID(), (ServerLevel)entity.level());
+        allNotesOffRemovedInstrumentRecievers(receivers, entity.getUUID(), (ServerLevel)entity.getLevel());
 
         if(!receivers.isEmpty()) {
             OWNED_RECEIVERS.put(entity.getUUID(), receivers);
@@ -208,24 +208,24 @@ public abstract class ServerMusicReceiverManager {
     }
 
     public static void onLivingDeath(LivingEntity entity) {
-        allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.level());
+        allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.getLevel());
     }
 
     public static void onEntityTeleport(Entity entity) {
         if(entity instanceof LivingEntity) {
-            allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.level());
+            allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.getLevel());
         }
     }
 
     public static void onEntityChangeDimension(Entity entity) {
         if(entity instanceof LivingEntity) {
-            allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.level());
+            allInstrumentReceiverNotesOff(entity.getUUID(), (ServerLevel)entity.getLevel());
         }
     }
 
     public static void onPlayerLoggedOut(ServerPlayer player) {
-        if(player.level() instanceof ServerLevel) {
-            allInstrumentReceiverNotesOff(player.getUUID(), (ServerLevel)player.level());
+        if(player.getLevel() instanceof ServerLevel) {
+            allInstrumentReceiverNotesOff(player.getUUID(), (ServerLevel)player.getLevel());
             removeReceivers(player.getUUID());
         }
     }

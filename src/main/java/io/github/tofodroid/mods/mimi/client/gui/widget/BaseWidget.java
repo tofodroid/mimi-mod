@@ -2,9 +2,12 @@ package io.github.tofodroid.mods.mimi.client.gui.widget;
 
 import org.joml.Vector2i;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class BaseWidget {
@@ -27,9 +30,10 @@ public abstract class BaseWidget {
         );
     }
 
-    public void renderGraphics(GuiGraphics graphics, Integer mouseX, Integer mouseY) {
+    public void renderGraphics(PoseStack graphics, Integer mouseX, Integer mouseY) {
         // Background
-        graphics.blit(GUI_TEXTURE, ABSOLUTE_START.x(), ABSOLUTE_START.y(), 0, 0, WIDGET_SIZE.x(), WIDGET_SIZE.y(), TEXTURE_SIZE, TEXTURE_SIZE);
+        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
+        Screen.blit(graphics, ABSOLUTE_START.x(), ABSOLUTE_START.y(), 0, 0, WIDGET_SIZE.x(), WIDGET_SIZE.y(), TEXTURE_SIZE, TEXTURE_SIZE);
     };
 
     public final Boolean mouseClicked(Integer mouseX, Integer mouseY, Integer mouseButton) {
@@ -37,7 +41,7 @@ public abstract class BaseWidget {
     };
 
     // Default no-op methods
-    public void renderText(GuiGraphics graphics, Font font, Integer mouseX, Integer mouseY) { /* No-op */ };
+    public void renderText(PoseStack graphics, Font font, Integer mouseX, Integer mouseY) { /* No-op */ };
     public Boolean keyPressed(Integer keyCode, Integer scanCode, Integer modifiers) { /* No-op */ return false; };
     protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) { /* No-op */ return false; };
 

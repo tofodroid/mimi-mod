@@ -68,7 +68,7 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     @Override
     @SuppressWarnings("resource")
     public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity target, InteractionHand handIn) {
-        if(!user.level().isClientSide) {
+        if(!user.getLevel().isClientSide) {
             if(target instanceof Player) {
                 MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);

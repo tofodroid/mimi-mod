@@ -30,11 +30,11 @@ public class TileInstrument extends AStaticInventoryTile {
 
     @SuppressWarnings("resource")
     public void attemptSit(Player player) {
-        if(player.level().isClientSide) {
+        if(player.getLevel().isClientSide) {
             return;
         }
 
-        EntitySeat newSeat = EntitySeat.create(player.level(), this.getBlockPos(), this.getSeatOffset(getBlockState()), player);
+        EntitySeat newSeat = EntitySeat.create(player.getLevel(), this.getBlockPos(), this.getSeatOffset(getBlockState()), player);
 
         if(newSeat != null) {
             this.currentSeat = newSeat;

@@ -12,7 +12,7 @@ public class ConfigurableMidiTileSyncPacketHandler {
     }
 
     public static void handlePacketServer(final ConfigurableMidiTileSyncPacket message, ServerPlayer sender) {
-        AConfigurableMidiTile tile = (AConfigurableMidiTile)sender.level().getBlockEntity(message.tilePos);
+        AConfigurableMidiTile tile = (AConfigurableMidiTile)sender.getLevel().getBlockEntity(message.tilePos);
 
         if(tile != null) {
             ItemStack midiStack = tile.getSourceStack();
@@ -27,7 +27,7 @@ public class ConfigurableMidiTileSyncPacketHandler {
             MidiNbtDataUtils.setTriggerNoteStart(midiStack, message.triggerNoteStart);
             MidiNbtDataUtils.setHoldTicks(midiStack, message.holdTicks);
             tile.setSourceStack(midiStack);
-            sender.level().sendBlockUpdated(tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 2);
+            sender.getLevel().sendBlockUpdated(tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 2);
         }
     }
 }

@@ -14,7 +14,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -97,12 +97,12 @@ public class GuiReceiver extends BaseGui {
 
     // Render Functions
     @Override
-    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // Set Texture
         RenderSystem.setShaderTexture(0, guiTexture);
 
         // GUI Background
-        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     
         this.midiChannelToggle.renderGraphics(graphics, mouseX, mouseY);
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
@@ -115,7 +115,7 @@ public class GuiReceiver extends BaseGui {
     }
 
     @Override
-    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.transmitSource.renderText(graphics, font, mouseX, mouseY);
