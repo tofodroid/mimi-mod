@@ -40,9 +40,9 @@ public class BlockLedCube extends AColoredBlock {
    public static final String REGISTRY_NAME_G = "ledcube_g";
    public static final String REGISTRY_NAME_H = "ledcube_h";
    
-   public BlockLedCube() {
+   public BlockLedCube(Properties props) {
       super(
-         Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.LANTERN).hasPostProcess((a,b,c) -> true).emissiveRendering((a,b,c) -> {
+         props.explosionResistance(6.f).strength(2.f).sound(SoundType.LANTERN).hasPostProcess((a,b,c) -> true).emissiveRendering((a,b,c) -> {
             return BlockLedCube.isLit(a);
          })
       );
