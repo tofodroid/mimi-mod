@@ -25,21 +25,21 @@ public class ModBlocks {
     public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter(Properties.of()));
 
     // Legacy Compat
-    public static final BlockBroadcaster BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockBroadcaster());
+    public static final BlockBroadcaster BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockBroadcaster(Properties.of()));
 
 
     // Village Blocks
-    public static final BlockTuningTable TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockTuningTable());
+    public static final BlockTuningTable TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockTuningTable(Properties.of()));
 
     // LED Cube Blocks
-    public static final BlockLedCube LEDCUBE_A = create(BlockLedCube.REGISTRY_NAME_A, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_B = create(BlockLedCube.REGISTRY_NAME_B, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_C = create(BlockLedCube.REGISTRY_NAME_C, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_D = create(BlockLedCube.REGISTRY_NAME_D, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_E = create(BlockLedCube.REGISTRY_NAME_E, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_F = create(BlockLedCube.REGISTRY_NAME_F, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_G = create(BlockLedCube.REGISTRY_NAME_G, new BlockLedCube());
-    public static final BlockLedCube LEDCUBE_H = create(BlockLedCube.REGISTRY_NAME_H, new BlockLedCube());
+    public static final BlockLedCube LEDCUBE_A = create(BlockLedCube.REGISTRY_NAME_A, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_B = create(BlockLedCube.REGISTRY_NAME_B, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_C = create(BlockLedCube.REGISTRY_NAME_C, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_D = create(BlockLedCube.REGISTRY_NAME_D, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_E = create(BlockLedCube.REGISTRY_NAME_E, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_F = create(BlockLedCube.REGISTRY_NAME_F, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_G = create(BlockLedCube.REGISTRY_NAME_G, new BlockLedCube(Properties.of()));
+    public static final BlockLedCube LEDCUBE_H = create(BlockLedCube.REGISTRY_NAME_H, new BlockLedCube(Properties.of()));
 
     // Instrument Blocks
     public static final List<BlockInstrument> INSTRUMENTS = buildInstruments();

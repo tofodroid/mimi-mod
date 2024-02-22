@@ -19,8 +19,8 @@ public class BlockTuningTable extends Block {
    public static final String REGISTRY_NAME = "tuningtable";
    private static final Component CONTAINER_TITLE = Component.translatable("container.tuning");
    
-   protected BlockTuningTable() {
-      super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+   protected BlockTuningTable(Properties props) {
+      super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
    }
 
    @Override

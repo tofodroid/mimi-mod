@@ -23,8 +23,8 @@ import net.minecraft.world.phys.BlockHitResult;
 public class BlockBroadcaster extends Block {
    public static final String REGISTRY_NAME = "broadcaster";
    
-   public BlockBroadcaster() {
-      super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
+   public BlockBroadcaster(Properties props) {
+      super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
    }
 
    @Override
