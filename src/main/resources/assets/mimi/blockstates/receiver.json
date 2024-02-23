@@ -1,7 +1,16 @@
 {
     "variants": {
-        "": {
-            "model": "mimi:block/receiver"
+        "powered=false,inverted=false": {
+            "model": "mimi:block/midi/receiver"
+        },
+        "powered=false,inverted=true": {
+            "model": "mimi:block/midi/receiver_lit"
+        },
+        "powered=true,inverted=false": {
+            "model": "mimi:block/midi/receiver_lit"
+        },
+        "powered=true,inverted=true": {
+            "model": "mimi:block/midi/receiver"
         }
     }
 }

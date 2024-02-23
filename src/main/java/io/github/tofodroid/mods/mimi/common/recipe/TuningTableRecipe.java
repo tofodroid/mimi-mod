@@ -1,19 +1,19 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
@@ -23,10 +23,8 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     private final Ingredient instrument;
     private final Ingredient addition;
     private final ItemStack result;
-    private final ResourceLocation recipeId;
 
-    public TuningTableRecipe(ResourceLocation recipeId, Ingredient instrument, Ingredient addition, ItemStack result) {
-        this.recipeId = recipeId;
+    public TuningTableRecipe(Ingredient instrument, Ingredient addition, ItemStack result) {
         this.instrument = instrument;
         this.addition = addition;
         this.result = result;
@@ -40,11 +38,6 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     // JEI
     public ItemStack getIcon() {
         return new ItemStack(Blocks.SMITHING_TABLE);
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return this.recipeId;
     }
 
     @Override
@@ -78,20 +71,27 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     public static class Serializer implements RecipeSerializer<TuningTableRecipe> {
         public static final String REGISTRY_NAME = "tuning";
         
+        @SuppressWarnings("deprecation")
+        public static final Codec<ItemStack> ITEM_STACK_ITEM_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(ItemStack::getItem)
+            ).apply(instance, ItemStack::new)
+        );
+        
         @Override
-        public TuningTableRecipe fromJson(ResourceLocation resource, JsonObject json) {
-            Ingredient ingredient = Ingredient.fromJson(json.get("instrument"));
-            Ingredient ingredient1 = Ingredient.fromJson(json.get("addition"));
-            ItemStack itemstack = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("result"));
-            return new TuningTableRecipe(resource, ingredient, ingredient1, itemstack);
+        public Codec<TuningTableRecipe> codec() {
+            return RecordCodecBuilder.create(instance -> instance.group(
+						Ingredient.CODEC.fieldOf("instrument").forGetter(o -> o.instrument),
+						Ingredient.CODEC.fieldOf("addition").forGetter(o -> o.addition),
+						ITEM_STACK_ITEM_CODEC.fieldOf("result").forGetter(o -> o.result)
+            ).apply(instance, TuningTableRecipe::new));
         }
 
         @Override
-        public TuningTableRecipe fromNetwork(ResourceLocation resource, FriendlyByteBuf buffer) {
+        public TuningTableRecipe fromNetwork(FriendlyByteBuf buffer) {
             Ingredient ingredient = Ingredient.fromNetwork(buffer);
             Ingredient ingredient1 = Ingredient.fromNetwork(buffer);
             ItemStack itemstack = buffer.readItem();
-            return new TuningTableRecipe(resource, ingredient, ingredient1, itemstack);
+            return new TuningTableRecipe(ingredient, ingredient1, itemstack);
         }
 
         @Override

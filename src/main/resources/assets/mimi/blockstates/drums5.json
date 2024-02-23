@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=south": { "model": "mimi:block/drums" },
-    "facing=west": { "model": "mimi:block/drums", "y": 90 },
-    "facing=north": { "model": "mimi:block/drums", "y": 180 },
-    "facing=east": { "model": "mimi:block/drums", "y": 270 }
+    "facing=south": { "model": "mimi:block/instruments/drums" },
+    "facing=west": { "model": "mimi:block/instruments/drums", "y": 90 },
+    "facing=north": { "model": "mimi:block/instruments/drums", "y": 180 },
+    "facing=east": { "model": "mimi:block/instruments/drums", "y": 270 }
   }
 }

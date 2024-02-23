@@ -1,7 +1,10 @@
 {
     "variants": {
-        "": {
-            "model": "mimi:block/mechanicalmaestro"
+        "powered=false": {
+            "model": "mimi:block/midi/mechanicalmaestro"
+        },
+        "powered=true": {
+            "model": "mimi:block/midi/mechanicalmaestro_lit"
         }
     }
 }

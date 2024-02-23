@@ -1,65 +1,60 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
-import io.github.tofodroid.mods.mimi.common.container.ContainerReceiver;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileReceiver extends ANoteResponsiveTile {
+public class TileReceiver extends AConfigurableMidiPowerSourceTile {
+    public static final String REGISTRY_NAME = "receiver";
+
     public TileReceiver(BlockPos pos, BlockState state) {
-        super(ModTiles.RECEIVER, pos, state, 1);
+        super(ModTiles.RECEIVER, pos, state);
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
-        return new ContainerReceiver(id, playerInventory, this.getBlockPos());
+    public void tick(Level world, BlockPos pos, BlockState state) {
+        super.tick(world, pos, state);
     }
 
     @Override
-    public Component getDefaultName() {
-		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
+    public void cacheMidiSettings() {
+        super.cacheMidiSettings();
+
+        if(this.hasLevel() && !this.getLevel().isClientSide) {
+            ServerMusicReceiverManager.loadReceiverTileReceiver(this);
+        }
     }
     
     @Override
-    public void execServerTick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {
-        if (state.getValue(BlockReceiver.POWER) != 0) {
-            world.setBlock(pos, state.setValue(BlockReceiver.POWER, Integer.valueOf(0)), 3);
+    public void setRemoved() {
+        super.setRemoved();
+
+        if(!this.getLevel().isClientSide()) {
+            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        }
+    }
  
-            for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), ModBlocks.RECEIVER.get());
-            }
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+    
+        if(!this.getLevel().isClientSide()) {
+            ServerMusicReceiverManager.removeReceivers(this.getUUID());
         }
     }
 
-    public Boolean shouldHandleMessage(UUID sender, Byte channel, Byte note, Boolean publicTransmit) {
-        ItemStack switchStack = getSwitchboardStack();
-        if(!switchStack.isEmpty()) {
-            return ItemMidiSwitchboard.isChannelEnabled(switchStack, channel) && shouldAcceptNote(note) &&
-                ( 
-                    (publicTransmit && ItemMidiSwitchboard.PUBLIC_SOURCE_ID.equals(ItemMidiSwitchboard.getMidiSource(switchStack))) 
-                    || (sender != null && sender.equals(ItemMidiSwitchboard.getMidiSource(switchStack)))
-                );
-        }
-        return false;
-    }
-    
-    protected Boolean shouldAcceptNote(Byte note) {
-        ItemStack switchStack = getSwitchboardStack();
-        return !switchStack.isEmpty() ? ItemMidiSwitchboard.isNoteFiltered(switchStack, note) : false;
-    }
-    
     @Override
-    protected Boolean shouldHaveEntity() {
-        return !this.getSwitchboardStack().isEmpty();
+    public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note));
+    }
+
+    @Override
+    public Byte getNoteGroupKey(Byte channel, Byte instrumentId) {
+        return channel;
     }
 }

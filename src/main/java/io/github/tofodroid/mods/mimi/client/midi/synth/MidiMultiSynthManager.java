@@ -9,27 +9,22 @@ import io.github.tofodroid.com.sun.media.sound.SF2SoundbankReader;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Soundbank;
+
+import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.NetworkManager;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
+import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.world.entity.player.Player;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 2;
     protected Boolean loggingOff = false;
+    protected Boolean dead = false;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     protected LocalPlayerMIMISynth localSynth;
@@ -49,13 +44,8 @@ public class MidiMultiSynthManager {
         }
     }
 
-    @SubscribeEvent
     @SuppressWarnings("resource")
-    public void handleTick(ClientTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT) {
-            return;
-        }
-
+    public void handleClientTick() {
         midiTickCounter++;
 
         // Tick synths every N tickets
@@ -75,7 +65,19 @@ public class MidiMultiSynthManager {
         }
     }
 
-    @SuppressWarnings("resource")
+    public void handleLogout() {
+        this.close();
+        this.loggingOff = true;
+        this.dead = true;
+    }
+
+    public void handleLogin() {
+        this.loggingOff = false;
+        this.dead = false;
+        this.reloadSynths();
+        NetworkProxy.sendToServer(new ServerTimeSyncPacket());
+    }
+
     public void reloadSynths() {
         if(localSynth != null)
             localSynth.close();
@@ -88,21 +90,8 @@ public class MidiMultiSynthManager {
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
-    @SubscribeEvent
-    public void handleSelfLogOut(LoggingOut event) {
-        this.close();
-        this.loggingOff = true;
-    }
-
-    @SubscribeEvent
-    public void handleSelfLogin(LoggingIn event) {
-        this.loggingOff = false;
-        this.reloadSynths();
-        NetworkManager.INFO_CHANNEL.sendToServer(new ServerTimeSyncPacket());
-    }
-
     public Long getBufferTime(Long noteServerTime) {
-        return (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.noteBufferMs.get() : 0) + (MIMIMod.proxy.getServerStartEpoch() + noteServerTime);
+        return (MIMIMod.getProxy().getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.localBufferms.get() : 0)) + (MIMIMod.getProxy().getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {
@@ -122,6 +111,23 @@ public class MidiMultiSynthManager {
         }
     }
 
+    @SuppressWarnings("resource")
+    public void sendToGui(MidiNotePacket message) {
+        if(Minecraft.getInstance().player == null || !message.player.equals(Minecraft.getInstance().player.getUUID()) || Minecraft.getInstance().screen == null || !(Minecraft.getInstance().screen instanceof GuiInstrument)) {
+            return;
+        }
+
+        GuiInstrument gui = (GuiInstrument)Minecraft.getInstance().screen;
+
+        if(message.instrumentId == gui.getInstrumentId() && message.instrumentHand == gui.getHandIn()) {
+            if(message.velocity > 0) {
+                gui.onExternalNotePress(message.note);
+            } else {
+                gui.onExternalNoteRelease(message.note);
+            }
+        }
+    }
+
     public void handlePacket(MidiNotePacket message) {
         if(loggingOff) return;
 
@@ -134,13 +140,14 @@ public class MidiMultiSynthManager {
                 } else if(message.velocity <= 0) {
                     targetSynth.noteOff(message, getBufferTime(message.noteServerTime));
                 }
+                this.sendToGui(message);
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
                 targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }
         }
     }
     
-    public void handleLocalPacket(MidiNotePacket message) {
+    public void handleLocalPacketInstant(MidiNotePacket message) {
         if(loggingOff) return;
 
         if(localSynth != null) {
@@ -151,7 +158,18 @@ public class MidiMultiSynthManager {
                     localSynth.noteOff(message, Util.getEpochMillis());
                 }
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
-                localSynth.controlChange(message, getBufferTime(message.noteServerTime));
+                localSynth.controlChange(message, Util.getEpochMillis());
+            }
+        }
+    }
+
+    @SuppressWarnings("resource")
+    public void handlePlayerTick(Player player) {
+        if(player.getUUID().equals(Minecraft.getInstance().player.getUUID())) {
+            if(!player.isAlive() && !this.dead) {
+                this.allNotesOff();
+            } else {
+                this.dead = !player.isAlive();
             }
         }
     }
@@ -166,7 +184,7 @@ public class MidiMultiSynthManager {
     }
 
     protected AMIMISynth<?> getSynthForMessage(MidiNotePacket message) {
-        if(message.player.equals(TileMechanicalMaestro.MECH_UUID)) {
+        if(message.player.equals(TileMechanicalMaestro.MECH_SOURCE_ID)) {
             return mechSynth;
         } else {
             return playerSynth;

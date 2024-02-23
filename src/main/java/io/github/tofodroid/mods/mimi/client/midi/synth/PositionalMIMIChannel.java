@@ -20,7 +20,7 @@ public class PositionalMIMIChannel extends MIMIChannel{
 
     @Override
     public Boolean tick(Player clientPlayer, Boolean isClientChannel) {
-        if(!this.isIdle() && this.lastNotePos != null  && Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)) <= 72d) {
+        if(!this.isIdle() && this.lastNotePos != null && Math.sqrt(clientPlayer.getOnPos().distSqr(lastNotePos)) <= 72d) {
             if(!isClientChannel) {
                 this.channel.controlChange(7, MIMISynthUtils.getVolumeForRelativeNotePosition(clientPlayer.getOnPos(), lastNotePos));
                 this.channel.controlChange(10, MIMISynthUtils.getLRPanForRelativeNotePosition(clientPlayer.getOnPos(), lastNotePos, clientPlayer.getYHeadRot()));

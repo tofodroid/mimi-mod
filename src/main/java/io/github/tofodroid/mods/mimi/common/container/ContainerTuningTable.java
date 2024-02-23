@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.container;
 import java.util.Optional;
 
 import io.github.tofodroid.mods.mimi.common.container.slot.SlotTuningResult;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentBlock;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
@@ -14,11 +14,11 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class ContainerTuningTable extends APlayerInventoryContainer {
     private static final int INSTRUMENT_SLOT_POS_X = 27;
@@ -31,8 +31,8 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     private CraftingContainer craftingInventory = new TransientCraftingContainer(this, 1, 2);
     private ResultContainer resultInventory = new ResultContainer();
 
-    public ContainerTuningTable(MenuType<?> type, int id, Inventory playerInventory) {
-        super(type, id, playerInventory);
+    public ContainerTuningTable(int id, Inventory playerInventory) {
+        super(ModContainers.TUNINGTABLE, id, playerInventory);
         this.addSlot(buildInstrumentSlot(INSTRUMENT_SLOT_POS_X, INSTRUMENT_SLOT_POS_Y));
         this.addSlot(buildModifierSlot(MODIFIER_SLOT_POS_X, MODIFiER_SLOT_POS_Y));
         this.addSlot(buildResultSlot(RESULT_SLOT_POS_X, RESULT_SLOT_POS_Y));
@@ -106,12 +106,11 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
         if (container == craftingInventory && !this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
-            Optional<TuningTableRecipe> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level());
+            Optional<RecipeHolder<TuningTableRecipe>> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level());
             
             if (optional.isPresent()) {
-                TuningTableRecipe recipe = optional.get();
-               if (this.resultInventory.setRecipeUsed(serverplayer.level(), serverplayer, recipe)) {
-                  itemstack = recipe.assemble(this.craftingInventory, null);
+               if (this.resultInventory.setRecipeUsed(serverplayer.level(), serverplayer, optional.get())) {
+                  itemstack = optional.get().value().assemble(this.craftingInventory, null);
                }
             }
    
@@ -139,7 +138,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
         return new Slot(craftingInventory, 0, xPos, yPos) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.getItem() instanceof ItemInstrument || stack.getItem() instanceof ItemInstrumentBlock;
+                return stack.getItem() instanceof ItemInstrumentHandheld || stack.getItem() instanceof ItemInstrumentBlock;
             }
         };
     }

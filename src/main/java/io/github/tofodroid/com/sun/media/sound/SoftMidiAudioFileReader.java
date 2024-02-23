@@ -61,7 +61,7 @@ public final class SoftMidiAudioFileReader extends SunFileReader {
         return new StandardFileFormat(MIDI, format, len);
     }
 
-    @SuppressWarnings("resource")
+    @SuppressWarnings({"resource", "null"})
     private AudioInputStream getAudioInputStream(final Sequence seq)
             throws InvalidMidiDataException {
         AudioSynthesizer synth = new SoftSynthesizer();

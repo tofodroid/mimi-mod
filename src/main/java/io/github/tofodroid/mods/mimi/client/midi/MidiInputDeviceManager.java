@@ -8,30 +8,22 @@ import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
-import io.github.tofodroid.mods.mimi.common.item.ItemInstrument;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.item.ModItems;
-import io.github.tofodroid.mods.mimi.common.midi.MidiInputSourceManager;
+import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
+import io.github.tofodroid.mods.mimi.common.midi.AMidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.api.distmarker.Dist;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class MidiInputDeviceManager extends MidiInputSourceManager {
-    private List<Object> localInstrumentToPlay = new ArrayList<>();
+public class MidiInputDeviceManager extends AMidiInputSourceManager {
+    private List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay = new ArrayList<>();
     private String selectedDeviceName;
     private String midiDeviceError;
     private Boolean dirty = false;
@@ -93,58 +85,46 @@ public class MidiInputDeviceManager extends MidiInputSourceManager {
         return devices;
     }
 
-    @SubscribeEvent
-    public void handleTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.CLIENT || !event.player.isLocalPlayer()) {
+    @SuppressWarnings("resource")
+    public void handlePlayerTick(Player player) {
+        if(!player.getUUID().equals(Minecraft.getInstance().player.getUUID())) {
             return;
         }
 
-        this.localInstrumentToPlay = localInstrumentsToPlay(event.player);
+        if(player.isAlive() && player.isAddedToWorld()) {
+            this.localInstrumentsToPlay = localInstrumentsToPlay(player);
+        } else {
+            this.localInstrumentsToPlay.clear();
+        }
     }
     
-    protected List<Object> localInstrumentsToPlay(Player player) {
-        List<Object> result = new ArrayList<>();
+    protected List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay(Player player) {
+        List<Pair<InteractionHand, ItemStack>> result = new ArrayList<>();
 
         // Check for seated instrument
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
-        if(instrumentEntity != null && instrumentEntity.hasSwitchboard()) {
-            result.add(instrumentEntity);
+        if(instrumentEntity != null) {
+            result.add(Pair.of(null, instrumentEntity.getInstrumentStack()));
         }
 
         // Check for held instruments
-        ItemStack mainHand = ItemInstrument.getEntityHeldInstrumentStack(player, InteractionHand.MAIN_HAND);
-        if(mainHand != null && ItemInstrument.hasSwitchboard(mainHand)) {
-            result.add(mainHand);
+        ItemStack mainHand = ItemInstrumentHandheld.getEntityHeldInstrumentStack(player, InteractionHand.MAIN_HAND);
+        if(mainHand != null) {
+            result.add(Pair.of(InteractionHand.MAIN_HAND, mainHand));
         }
 
-        ItemStack offHand = ItemInstrument.getEntityHeldInstrumentStack(player, InteractionHand.OFF_HAND);
-        if(offHand != null &&  ItemInstrument.hasSwitchboard(offHand)) {
-            result.add(offHand);
+        ItemStack offHand = ItemInstrumentHandheld.getEntityHeldInstrumentStack(player, InteractionHand.OFF_HAND);
+        if(offHand != null) {
+            result.add(Pair.of(InteractionHand.OFF_HAND, offHand));
         }
 
         return result;
     }
     
-    public List<Pair<Byte,ItemStack>> getLocalInstrumentsForMidiDevice(Player player, Byte channel) {
-        return localInstrumentToPlay.stream().map(data -> {
-            ItemStack switchStack = ItemStack.EMPTY;
-            Byte instrumentId = null;
-
-            if(data instanceof ItemStack) {
-                switchStack = ItemInstrument.getSwitchboardStack((ItemStack)data);
-                instrumentId = ItemInstrument.getInstrumentId((ItemStack)data);
-            } else if(data instanceof TileInstrument) {
-                switchStack = ((TileInstrument)data).getSwitchboardStack();
-                instrumentId = ((TileInstrument)data).getInstrumentId();
-            }
-
-            if(ModItems.SWITCHBOARD.equals(switchStack.getItem()) && ItemMidiSwitchboard.getSysInput(switchStack) && ItemMidiSwitchboard.isChannelEnabled(switchStack, channel)) {
-                return new ImmutablePair<>(instrumentId,switchStack);
-            }
-
-            return null;
-        })
-        .filter(b -> b != null).collect(Collectors.toList());
+    public List<Pair<InteractionHand, ItemStack>> getLocalInstrumentsForMidiDevice(Player player, Byte channel) {
+        return localInstrumentsToPlay.stream()
+            .filter(instrumentStack -> MidiNbtDataUtils.getSysInput(instrumentStack.getRight()) && MidiNbtDataUtils.isChannelEnabled(instrumentStack.getRight(), channel))
+            .collect(Collectors.toList());
     }
 
     protected void openTransmitter() {

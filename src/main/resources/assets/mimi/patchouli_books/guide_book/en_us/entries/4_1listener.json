@@ -1,0 +1,29 @@
+{
+    "name": "Listener",
+    "icon": "mimi:listener",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "Listener",
+            "item": "mimi:listener",
+            "text": "The Listener is a block that will listen to notes played around it and output a Redstone signal if a note matches the Listener's configured filter criteria."
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "Recipe",
+            "link_recipe": true,
+            "recipe": "mimi:listener"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Settings",
+            "text": "$(li)$(l)Filter Note$(): Which note(s) the Listener should respond to. The value can be all, a particular note (EX: C5), any note of a octave (EX: *5), or any octave of a note (EX: C*).$(br)$(li)$(l)Filter Instrument$(): Which instrument(s) the listener should respond to. Value can be one specific instrument or any instrument $(italic)except for$() one specific instrument."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)Trigger Mode$(): Whether the listener should emit redstone the entire time a note is held or just when a note starts."
+        }
+    ],
+    "sortnum": 1
+}

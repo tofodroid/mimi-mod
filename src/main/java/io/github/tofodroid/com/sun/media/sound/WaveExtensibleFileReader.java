@@ -166,7 +166,7 @@ public final class WaveExtensibleFileReader extends SunFileReader {
     }
 
     @Override
-    @SuppressWarnings("resource")
+    @SuppressWarnings({"resource", "null"})
     StandardFileFormat getAudioFileFormatImpl(final InputStream stream)
             throws UnsupportedAudioFileException, IOException {
 

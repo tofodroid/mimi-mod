@@ -1,56 +1,51 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import io.github.tofodroid.mods.mimi.common.block.BlockListener;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
-import io.github.tofodroid.mods.mimi.common.container.ContainerListener;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileListener extends ANoteResponsiveTile {
+public class TileListener extends AConfigurableMidiPowerSourceTile {
+    public static final String REGISTRY_NAME = "listener";
+    private static final Integer UPDATE_EVERY_TICKS = 8;
+
+    private Integer updateTickCount = 0;
+
     public TileListener(BlockPos pos, BlockState state) {
-        super(ModTiles.LISTENER, pos, state, 1);
+        super(ModTiles.LISTENER, pos, state);
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
-        return new ContainerListener(id, playerInventory, this.getBlockPos());
-    }
+    protected void tick(Level world, BlockPos pos, BlockState state) {
+        super.tick(world, pos, state);
 
-    @Override
-    public Component getDefaultName() {
-		return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
-    }
-    
-    public Boolean shouldAcceptNote(Byte note, Byte instrumentId) {
-        ItemStack switchStack = getSwitchboardStack();
-
-        if(!switchStack.isEmpty()) {
-            return ItemMidiSwitchboard.isNoteFiltered(switchStack, note) && ItemMidiSwitchboard.isInstrumentFiltered(switchStack, instrumentId);
+        if(!isValid()) {
+            return;
         }
 
-        return false;
-    }
+        if(this.updateTickCount >= UPDATE_EVERY_TICKS) {
+            this.updateTickCount = 0;
 
-    @Override
-    public void execServerTick(Level world, BlockPos pos, BlockState state, ANoteResponsiveTile self) {
-        if (state.getValue(BlockListener.POWER) != 0) {
-            world.setBlock(pos, state.setValue(BlockListener.POWER, Integer.valueOf(0)), 3);
- 
-            for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), ModBlocks.LISTENER.get());
+            if(!world.isClientSide && !this.isRemoved()) {
+                EntityNoteResponsiveTile.create(world, pos);
             }
-         }
+        } else {
+            this.updateTickCount++;
+        }
     }
     
     @Override
-    protected Boolean shouldHaveEntity() {
-        return !this.getSwitchboardStack().isEmpty();
+    public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note)) && 
+            (instrumentId == null || MidiNbtDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId));
+    }
+
+    @Override
+    public Byte getNoteGroupKey(Byte channel, Byte instrumentId) {
+        return instrumentId;
     }
 }

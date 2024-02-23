@@ -1,7 +1,0 @@
-{
-    "parent": "minecraft:block/cube_column",
-    "textures": {
-        "end": "mimi:block/receiver/end",
-        "side": "mimi:block/receiver/side"
-    }
-}

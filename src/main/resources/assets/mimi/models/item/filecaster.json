@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "mimi:item/filecaster"
+        "layer0": "mimi:item/removed"
     }
 }

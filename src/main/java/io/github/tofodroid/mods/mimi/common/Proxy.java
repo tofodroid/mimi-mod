@@ -1,14 +1,19 @@
 package io.github.tofodroid.mods.mimi.common;
 
+import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import net.minecraft.Util;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-public interface Proxy {    
-    public void init(final FMLCommonSetupEvent event);
-
+public interface Proxy {
+    public Boolean isInitialized();
     public Boolean isClient();
-
     public Long getServerStartEpoch();
+    public FilesystemMidiFileProvider serverMidiFiles();
+    public FilesystemMidiFileProvider clientMidiFiles();
+    public void init();
+
+    default public Long getBaselineBufferMs() {
+        return 30l;
+    }
 
     default public Long getCurrentServerMillis() {
         return Util.getEpochMillis() - getServerStartEpoch();

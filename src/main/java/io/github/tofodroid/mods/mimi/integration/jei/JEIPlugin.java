@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.integration.jei;
 
-import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
+import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.client.gui.GuiTuningTableContainerScreen;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
@@ -29,7 +30,7 @@ public class JEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
 		RecipeManager manager = Objects.requireNonNull(MC.level).getRecipeManager();
-		registration.addRecipes(TuningTableRecipeCategory.RECIPE_TYPE, manager.getRecipes().parallelStream().filter(recipe -> recipe.getType().equals(ModRecipes.TUNING_TYPE)).map(r -> (TuningTableRecipe) r).toList());
+		registration.addRecipes(TuningTableRecipeCategory.RECIPE_TYPE, manager.getRecipes().parallelStream().filter(recipe -> recipe.value().getType().equals(ModRecipes.TUNING_TYPE)).map(r -> (TuningTableRecipe) r.value()).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class JEIPlugin implements IModPlugin {
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
 		registration.addRecipeClickArea(GuiTuningTableContainerScreen.class, 102, 39, 22, 15, TuningTableRecipeCategory.RECIPE_TYPE);
-        registration.addGuiScreenHandler(GuiInstrumentContainerScreen.class, new InstrumentGuiJEIHandler());
+        registration.addGuiScreenHandler(GuiInstrument.class, new InstrumentGuiJEIHandler());
 	}
 
 	@Override

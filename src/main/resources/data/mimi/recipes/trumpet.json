@@ -1,9 +1,9 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "BG ",
-        "BN ",
-        "GGG"
+        "BB ",
+        "GNG",
+        " G "
     ],
     "key": {
         "N": {

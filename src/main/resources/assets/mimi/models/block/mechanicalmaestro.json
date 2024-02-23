@@ -1,7 +1,0 @@
-{
-    "parent": "minecraft:block/cube_column",
-    "textures": {
-        "end": "mimi:block/mechmaestro/end",
-        "side": "mimi:block/mechmaestro/side"
-    }
-}

@@ -1,0 +1,6 @@
+{
+	"name": "Redstone Blocks",
+	"description": "MIMI contains a number of Redstone-enabled blocks that allows MIMI instruemnts and Transmitters to interact with Redstone in different ways.$(br2)To copy MIDI Settings from one block to another place them directly next to eachother in a crafting grid to copy the settings from the left block onto the right block.",
+	"icon": "mimi:receiver",
+	"sortnum": 4
+}

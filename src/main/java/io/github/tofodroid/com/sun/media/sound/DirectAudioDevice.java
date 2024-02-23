@@ -152,7 +152,6 @@ final class DirectAudioDevice extends AbstractMixer {
                 }
             }
         }
-        // todo: find out more about the buffer size ?
         if (formatArray != null) {
             return new DirectDLI(isSource?SourceDataLine.class:TargetDataLine.class,
                                  formatArray, hardwareFormatArray,
@@ -480,7 +479,6 @@ final class DirectAudioDevice extends AbstractMixer {
                     bufferSize);
 
             if (id == 0) {
-                // TODO: nicer error messages...
                 throw new LineUnavailableException(
                         "line with format "+format+" not supported.");
             }

@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " P ",
+        "IRI",
+        " P "
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:copper_ingot"
+        },
+        "R": {
+            "item": "minecraft:redstone_block"
+        },
+        "P": {
+            "tag": "minecraft:planks"
+        }
+    },
+    "result": {
+        "item": "mimi:transmitterblock"
+    }
+}

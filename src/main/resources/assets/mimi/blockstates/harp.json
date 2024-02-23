@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "mimi:block/instruments/harp" },
+    "facing=west": { "model": "mimi:block/instruments/harp", "y": 90 },
+    "facing=north": { "model": "mimi:block/instruments/harp", "y": 180 },
+    "facing=east": { "model": "mimi:block/instruments/harp", "y": 270 }
+  }
+}

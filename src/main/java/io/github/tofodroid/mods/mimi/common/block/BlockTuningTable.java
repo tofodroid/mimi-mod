@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 
 public class BlockTuningTable extends Block {
    public static final String REGISTRY_NAME = "tuningtable";
@@ -29,7 +28,7 @@ public class BlockTuningTable extends Block {
       if (worldIn.isClientSide) {
          return InteractionResult.SUCCESS;
       } else {
-         NetworkHooks.openScreen((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {});
+         ((ServerPlayer) player).openMenu(this.getMenuProvider(state, worldIn, pos));
          return InteractionResult.CONSUME;
       }
    }

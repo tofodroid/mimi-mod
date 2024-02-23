@@ -277,6 +277,7 @@ public final class SoftMixingMixer implements Mixer {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void close() {
         if (!isOpen())
             return;

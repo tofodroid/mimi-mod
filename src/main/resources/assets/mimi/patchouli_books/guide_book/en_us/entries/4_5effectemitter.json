@@ -1,0 +1,30 @@
+{
+    "name": "Effect Emitter",
+    "icon": "mimi:effectemitter",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "Effect Emitter",
+            "item": "mimi:effectemitter",
+            "text": "The Effect Emitter can play a sound and/or display a particle effect when triggered by redstone.$(br2)Multiple settings can be changed for the sound and particle and you can preview the settings for the sound and particle using the play buttons next to each text box."
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "Recipe",
+            "recipe": "mimi:effectemitter",
+            "text": "Settings can be copied from one Effect Emitter to another by placing two directly next to eachother in a crafting grid. The settings from the one on the left will be coped to the one on the right."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Sound",
+            "text": "To set a sound, type its full resource name into the sound box. You can view available sounds using the /playsound command and viewing the autocomplete suggestions.$(br2)You can change the volume, pitch, and looping delay of the sound using the arrow buttons by each setting."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Particle",
+            "text": "To set a particle, type its full resource name into the particle box. You can view available particles using the /particle command and viewing the autocomplete suggestions (there are a few that won't work).$(br2)You can change the side, area, count, speed (which sometimes changes other things), and looping delay of the particle using the arrow buttons by each setting."
+        }
+    ],
+    "sortnum": 5
+}

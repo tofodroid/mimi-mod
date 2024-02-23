@@ -1,8 +1,8 @@
 {
     "variants": {
-      "facing=south": { "model": "mimi:block/xylophone" },
-      "facing=west": { "model": "mimi:block/xylophone", "y": 90 },
-      "facing=north": { "model": "mimi:block/xylophone", "y": 180 },
-      "facing=east": { "model": "mimi:block/xylophone", "y": 270 }
+      "facing=south": { "model": "mimi:block/instruments/xylophone" },
+      "facing=west": { "model": "mimi:block/instruments/xylophone", "y": 90 },
+      "facing=north": { "model": "mimi:block/instruments/xylophone", "y": 180 },
+      "facing=east": { "model": "mimi:block/instruments/xylophone", "y": 270 }
     }
   }

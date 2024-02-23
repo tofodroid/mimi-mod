@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "BB ",
+        "GNG",
+        "GGG"
+    ],
+    "key": {
+        "N": {
+            "item": "minecraft:note_block"
+        },
+        "G": {
+            "item": "minecraft:gold_nugget"
+        },
+        "B": {
+            "item": "minecraft:stone_button"
+        }
+    },
+    "result": {
+        "item": "mimi:trombone"
+    }
+}

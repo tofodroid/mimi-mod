@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "powered=true,inverted=false": {
+            "model": "mimi:block/ledcube/ledcube_e_on"
+        },
+        "powered=true,inverted=true": {
+            "model": "mimi:block/ledcube/ledcube_e_off"
+        },
+        "powered=false,inverted=false": {
+            "model": "mimi:block/ledcube/ledcube_e_off"
+        },
+        "powered=false,inverted=true": {
+            "model": "mimi:block/ledcube/ledcube_e_on"
+        }
+    }
+}

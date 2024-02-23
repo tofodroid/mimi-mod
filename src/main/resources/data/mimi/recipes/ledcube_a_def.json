@@ -1,0 +1,26 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " B ",
+        "RLG",
+        "   "
+    ],
+    "key": {
+        "L": {
+            "item": "minecraft:redstone_lamp"
+        },
+        "R": {
+            "item": "minecraft:red_dye"
+        },
+        "G": {
+            "item": "minecraft:green_dye"
+        },
+        "B": {
+            "item": "minecraft:blue_dye"
+        }
+    },
+    "result": {
+        "item": "mimi:ledcube_a",
+        "count": 4
+    }
+}

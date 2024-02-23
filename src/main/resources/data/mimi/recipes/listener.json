@@ -1,16 +1,13 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "IRI",
-        "RNR",
-        "IRI"
+        " O ",
+        " N ",
+        "   "
     ],
     "key": {
-        "I": {
-            "item": "minecraft:iron_ingot"
-        },
-        "R": {
-            "item": "minecraft:redstone"
+        "O": {
+            "item": "minecraft:observer"
         },
         "N": {
             "item": "minecraft:note_block"

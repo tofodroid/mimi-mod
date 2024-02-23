@@ -27,6 +27,7 @@ package io.github.tofodroid.com.sun.media.sound;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -38,6 +39,8 @@ import javax.sound.midi.Patch;
 import javax.sound.midi.ShortMessage;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 
 /**
  * Software synthesizer main audio mixer.
@@ -440,7 +443,12 @@ public final class SoftMainMixer {
                 int ch = (status & 0x0F);
 
                 if(ch == channel) {
-                    iter.remove();
+                    try {
+                        iter.remove();
+                    } catch(ConcurrentModificationException e) {
+                        // No-op
+                        MIMIMod.LOGGER.warn("Failed to clear channel event due to concurrent modification.");
+                    }
                 }
             }
         }

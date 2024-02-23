@@ -1,0 +1,27 @@
+{
+    "name": "The Instrumentalist",
+    "icon": "minecraft:emerald",
+    "category": "mimi:5other",
+    "pages": [
+        {
+            "type": "patchouli:entity",
+            "entity": "minecraft:villager{VillagerData:{profession:\"mimi:instrumentalist\",level:3,type:plains}}"
+        },
+        {
+            "type": "patchouli:spotlight",
+            "item": "mimi:tuningtable",
+            "title": "Work Station",
+            "text": "The Work Station for the Instrumentalist Villager is the MIMI Tuning Table.$(br2)A Tuning Table will spawn in the Instrumentalist House when it spawns in a village, or one can be crafted using the $(l:2_5tuning)recipe$()."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Trades",
+            "text": "The Instrumentalist may trade the following items depending on their level:$(br)$(li)$(l)Level 1$() - Minecraft Cat or 13 Disc, Note Block$(br)$(li)$(l)Level 2$() - Random Handheld Instrument, Switchboard, Floppy Disk$(br)$(li)$(l)Level 3$() - Random Block Instrument, FileCaster, Transmitter, Broadcaster"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)Level 4$() - Random Handheld Instrument, Random MIMI Machine$(br)$(li)$(l)Level 5$() - Random Block Instrument, Random Minecraft Music Disc (except 'Otherside'), Disc Fragment"
+        }
+    ],
+    "sortnum": 1
+}

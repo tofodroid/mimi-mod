@@ -1,20 +1,27 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
-import org.joml.Vector3d;
+import javax.annotation.Nullable;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
+import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.item.IDyeableItem;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,6 +31,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -31,6 +39,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -39,32 +48,57 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.NetworkHooks;
 
 public class BlockInstrument extends AContainerBlock<TileInstrument> implements SimpleWaterloggedBlock {
-    public static final ResourceLocation CONTENTS = new ResourceLocation("contents");
-
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
+    public static final MapCodec<BlockInstrument> CODEC = instrumentCodec(BlockInstrument::new);
 
     protected final Map<Direction, VoxelShape> SHAPES;
     protected final Byte instrumentId;
-    protected final Boolean dyeable;
+    protected final Integer defaultChannels;
     protected final Integer defaultColor;
-    public final String REGISTRY_NAME;
+    protected final Boolean colorable;
+    protected final String REGISTRY_NAME;
+ 
+    @Override
+    public MapCodec<BlockInstrument> codec() {
+       return CODEC;
+    }
 
-    public BlockInstrument(Byte instrumentId, String registryName, Boolean dyeable, Integer defaultColor, VoxelShape collisionShape) {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+    public BlockInstrument(Properties props, Byte instrumentId) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        InstrumentSpec spec = InstrumentConfig.getBydId(instrumentId);
+        this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
         this.instrumentId = instrumentId;
-        this.dyeable = dyeable;
-        this.defaultColor = defaultColor;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
-        this.SHAPES = this.generateShapes(collisionShape);
-        this.REGISTRY_NAME = registryName;
+    }
+
+    public BlockInstrument(Properties props, InstrumentSpec spec) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
+        this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
+        this.REGISTRY_NAME = spec.registryName;
+        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
+        this.instrumentId = spec.instrumentId;
+        this.colorable = spec.isColorable();
+        this.defaultColor = this.colorable ? spec.defaultColor() : null;
+        this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+    }
+
+    public static MapCodec<BlockInstrument> instrumentCodec(BiFunction<BlockBehaviour.Properties, Byte, BlockInstrument> p_312290_) {
+        return RecordCodecBuilder.mapCodec((p_309873_) -> {
+            return p_309873_.group(
+                propertiesCodec(),
+                Codec.BYTE.fieldOf("instrumentId").forGetter(BlockInstrument::getInstrumentId)
+            ).apply(p_309873_, p_312290_);
+        });
     }
 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
@@ -77,15 +111,11 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
-                if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                    NetworkHooks.openScreen((ServerPlayer) player, this.getMenuProvider(state, worldIn, pos), buffer -> {
-                        buffer.writeByte(this.instrumentId);
-                        buffer.writeBoolean(false);
-                        buffer.writeBlockPos(pos);
-                    });
-                } else {
-                    return EntitySeat.create(worldIn, pos, this.getSeatOffset(state), player);
+                if(player.getVehicle() == null) {
+                    tileInstrument.attemptSit(player);
                 }
+            } else if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
+                ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
             }
         }
 
@@ -105,6 +135,23 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
         state.add(DIRECTION, WATERLOGGED);
+    }
+    
+    @Override
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        super.onRemove(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
+        TileInstrument tileInstrument = reader.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
+        
+        if(tileInstrument != null) {
+            return tileInstrument.getInstrumentStack();
+        }
+
+        return super.getCloneItemStack(reader, pos, state);
     }
     
     @Override
@@ -145,34 +192,26 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 	}
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if(IDyeableItem.isDyeableInstrument(stack) && ((IDyeableItem)stack.getItem()).hasColor(stack)) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-            if (tileentity instanceof TileInstrument) {
-                ((TileInstrument)tileentity).setColor(((IDyeableItem)stack.getItem()).getColor(stack));
-            }
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
+        if (tileEntity instanceof TileInstrument) {
+            ItemStack newStack = new ItemStack(stack.getItem(), stack.getCount());
+            newStack.setTag(stack.getOrCreateTag().copy());
+            ((TileInstrument)tileEntity).setInstrumentStack(newStack);
         }
     }
     
     @Override
-    @SuppressWarnings("deprecation")
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-        List<ItemStack> drops = super.getDrops(state, builder);
-        BlockEntity tileentity = builder.getParameter(LootContextParams.BLOCK_ENTITY);
-
-        if(tileentity != null && tileentity instanceof TileInstrument && ((TileInstrument)tileentity).hasColor()) {
-            for(ItemStack stack : drops) {
-                if(this.isDyeable() && stack.getItem() instanceof IDyeableItem) {
-                    ((IDyeableItem)stack.getItem()).setColor(stack, ((TileInstrument)tileentity).getColor());
-                }
-            }
-        }
-
-        return drops;
+        return Arrays.asList();
     }
 
-    public Boolean isDyeable() {
-        return this.dyeable;
+    public String getRegistryName() {
+        return this.REGISTRY_NAME;
+    }
+
+    public Boolean isColorable() {
+        return this.colorable;
     }
 
     public Integer getDefaultColor() {
@@ -180,26 +219,16 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     public Byte getInstrumentId() {
-        return instrumentId;
+        return this.instrumentId;
     }
 
-    protected Vector3d getSeatOffset(BlockState state) {
-        switch(state.getValue(DIRECTION)) {
-            case NORTH:
-                return new Vector3d(0.5, 0, 0.05);
-            case SOUTH:
-                return new Vector3d(0.5, 0, 0.95);
-            case EAST:
-                return new Vector3d(0.95, 0, 0.5);
-            case WEST:
-                return new Vector3d(0.05, 0, 0.5);
-            default:
-                return new Vector3d(0.5, 0, 0.05);
-        }
+    public Integer getDefaultChannels() {
+        return this.defaultChannels;
     }
 
+    @SuppressWarnings("null")
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
-        return entity.isPassenger() && ModEntities.SEAT.get().equals(entity.getVehicle().getType());
+        return entity.isPassenger() && entity.getVehicle() != null && ModEntities.SEAT.equals(entity.getVehicle().getType());
     }
     
     public static EntitySeat getSeatForEntity(LivingEntity entity) {
@@ -207,6 +236,15 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
             return (EntitySeat) entity.getVehicle();
         }
 
+        return null;
+    }
+
+    public static ItemStack getTileInstrumentStackForEntity(LivingEntity entity) {
+        TileInstrument tile = getTileInstrumentForEntity(entity);
+
+        if(tile != null) {
+            return tile.getInstrumentStack();
+        }
         return null;
     }
     

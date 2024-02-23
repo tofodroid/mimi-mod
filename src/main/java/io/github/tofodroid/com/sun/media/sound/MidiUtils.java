@@ -25,6 +25,9 @@
 
 package io.github.tofodroid.com.sun.media.sound;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -32,14 +35,12 @@ import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
+import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 
 import static javax.sound.midi.SysexMessage.SPECIAL_SYSTEM_EXCLUSIVE;
 import static javax.sound.midi.SysexMessage.SYSTEM_EXCLUSIVE;
-
-// TODO:
-// - define and use a global symbolic constant for 60000000 (see convertTempo)
 
 /**
  * Some utilities for MIDI (some stuff is used from javax.sound.midi)
@@ -56,6 +57,18 @@ public final class MidiUtils {
      * Suppresses default constructor, ensuring non-instantiability.
      */
     private MidiUtils() {
+    }
+
+    public static byte[] sequenceToByteArray(Sequence sequence) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        int[] types = MidiSystem.getMidiFileTypes(sequence);
+        MidiSystem.write(sequence, types[0], bos);
+        return bos.toByteArray();
+    }
+
+    public static Sequence byteArrayToSequence(byte[] bytes) throws IOException, InvalidMidiDataException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        return MidiSystem.getSequence(bis);
     }
 
     /**

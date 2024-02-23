@@ -1,0 +1,29 @@
+{
+    "name": "Receiver",
+    "icon": "mimi:receiver",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "Receiver",
+            "item": "mimi:receiver",
+            "text": "The Receiver is a block that will receive notes that are transmitted around it and output a Redstone signal if a note matches the Receiver's configured filter criteria."
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "Recipe",
+            "link_recipe": true,
+            "recipe": "mimi:receiver"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Settings",
+            "text": "$(li)$(l)Filter Note$(): Which note(s) the Receiver should respond to. The value can be all, a particular note (EX: C5), any note of an octave (EX: *5), or any octave of a note (EX: C*).$(br)$(li)$(l)Transmission Source$(): The Transmitter this Receiver is linked to. Link by setting to yourself from the Receiver Screen or right-clicking a player / Server Transmitter block with the Receiver."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)Enabled MIDI Channels$(): Which MIDI channels this Receiver should respond to notes from.$(br)$(li)$(l)Trigger Mode$(): Whether the listener should emit redstone the entire time a note is held or just when a note starts."
+        }
+    ],
+    "sortnum": 2
+}

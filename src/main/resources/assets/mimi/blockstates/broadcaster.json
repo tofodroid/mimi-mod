@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "": {
-            "model": "mimi:block/broadcaster"
-        }
-    }
+  "variants": {
+      "": {
+          "model": "mimi:block/removed"
+      }
+  }
 }

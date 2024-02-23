@@ -5,15 +5,15 @@ import mezz.jei.api.gui.handlers.IScreenHandler;
 
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.client.gui.GuiInstrumentContainerScreen;
+import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 
-public class InstrumentGuiJEIHandler implements IScreenHandler<GuiInstrumentContainerScreen> {
+public class InstrumentGuiJEIHandler implements IScreenHandler<GuiInstrument> {
 
     public InstrumentGuiJEIHandler() {
 
     }
 
-    public @Nullable IGuiProperties apply(GuiInstrumentContainerScreen guiScreen) {
+    public @Nullable IGuiProperties apply(GuiInstrument guiScreen) {
         return null;
     }
 }

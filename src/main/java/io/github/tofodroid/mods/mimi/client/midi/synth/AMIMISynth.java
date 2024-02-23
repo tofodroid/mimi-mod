@@ -26,10 +26,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList.Builder;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -135,7 +135,9 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(channel != null) {
             if(message.isAllNotesOffPacket()) {
                 channel.allNotesOff();
+                channel.reset();
                 this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
+                channelAssignmentMap.remove(channel);
             } else {
                 try {
                     this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.note, 0), getSynthEventTimestamp(timestamp));

@@ -2,28 +2,28 @@ package io.github.tofodroid.mods.mimi.common.entity;
 
 import java.util.List;
 
-import io.github.tofodroid.mods.mimi.common.tile.ANoteResponsiveTile;
+import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkHooks;
 
 public class EntityNoteResponsiveTile extends Entity {
     public BlockPos source;
 
     public EntityNoteResponsiveTile(EntityType<? extends EntityNoteResponsiveTile> type, Level world) {
-        super(ModEntities.NOTERESPONSIVETILE.get(), world);
+        super(ModEntities.NOTERESPONSIVETILE, world);
         this.noPhysics = true;
     }
 
     private EntityNoteResponsiveTile(Level world, BlockPos pos) {
-        this(ModEntities.NOTERESPONSIVETILE.get(), world);
+        this(ModEntities.NOTERESPONSIVETILE, world);
         this.source = pos;
         this.setPos(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -34,11 +34,12 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     @Override
+    @SuppressWarnings("resource")
     public void tick() {
         super.tick();
 
         if(!this.level().isClientSide && !this.isRemoved()) {
-            if(source == null || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(this.source) instanceof ANoteResponsiveTile)) {
+            if(source == null || this.level().getBlockEntity(this.source) == null || !(this.level().getBlockEntity(this.source) instanceof AConfigurableMidiNoteResponsiveTile)) {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
@@ -48,9 +49,9 @@ public class EntityNoteResponsiveTile extends Entity {
         }
     }
 
-    public ANoteResponsiveTile getTile() {
+    public AConfigurableMidiNoteResponsiveTile getTile() {
         BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.level().getBlockEntity(this.source) : null;
-        return tile != null && tile instanceof ANoteResponsiveTile ? (ANoteResponsiveTile) tile : null;
+        return tile != null && tile instanceof AConfigurableMidiNoteResponsiveTile ? (AConfigurableMidiNoteResponsiveTile) tile : null;
     }
     
     protected static EntityNoteResponsiveTile getAtPos(Level world, Double posX, Double posY, Double posZ) {
@@ -104,6 +105,6 @@ public class EntityNoteResponsiveTile extends Entity {
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 }

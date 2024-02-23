@@ -1,0 +1,33 @@
+{
+    "parent": "minecraft:recipes/root",
+    "rewards": {
+      "recipes": [
+        "mimi:tuningtable"
+      ]
+    },
+    "criteria": {
+      "has_note": {
+        "trigger": "minecraft:inventory_changed",
+        "conditions": {
+          "items": [
+            {
+              "item": "minecraft:iron_block"
+            }
+          ]
+        }
+      },
+      "has_the_recipe": {
+        "trigger": "minecraft:recipe_unlocked",
+        "conditions": {
+          "recipe": "mimi:tuningtable"
+        }
+      }
+    },
+    "requirements": [
+      [
+        "has_note",
+        "has_the_recipe"
+      ]
+    ]
+}
+  

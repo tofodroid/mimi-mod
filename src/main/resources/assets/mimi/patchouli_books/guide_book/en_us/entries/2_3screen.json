@@ -5,17 +5,17 @@
     "pages": [
         {
             "type": "patchouli:text",
-            "text": "The Instrument Screen is the screen that you see upon right-clicking a handheld or block instrument which allows you to directly play the instrument and configure its Switchboard."
+            "text": "The Instrument Screen is the screen that you see upon right-clicking a handheld or block instrument which allows you to directly play the instrument and configure its MIDI settings."
         },
         {
             "type": "patchouli:text",
             "title": "Playing",
-            "text": "You can play directly play the instrument that you have opened using the keyboard keys shown on the piano keys on the screen, or by just clicking on the piano keys.$(br2)If you hold down Spacebar while playing, notes will hold in the same way as holding the sustain pedal on a piano."
+            "text": "You can directly play the instrument that you have opened using the keyboard as shown on the piano keys on the screen, or by just clicking on the piano keys.$(br2)If you hold down Spacebar while playing, notes will hold in the same way as holding the sustain pedal on a piano.$(br2)You can change the piano keyboard layout with the button in the top-right corner."
         },
         {
             "type": "patchouli:text",
             "title": "Key Layouts",
-            "text": "$(li)$(l)MIMI$() - Keyboard keys are assigned currently visible piano keys.$(br)$(li)$(l)VPiano$() - Based on $(o)virtualPiano.net$(), assigns each keyboard key to a specific piano key meaning you can play keys that are $(o)not$() currently visible but cannot play very high or very low notes. Keyboard keys in this layout are case-sensitive.$(br2)"
+            "text": "$(li)$(l)MIMI$() - Keyboard keys are assigned only to currently visible piano keys and are not case-sensitive.$(br)$(li)$(l)VPiano$() - Based on $(o)virtualPiano.net$(), assigns each keyboard key to a specific piano key meaning you can play keys that are $(o)not$() currently visible but cannot play very high or very low notes. Keyboard keys in this layout are case-sensitive."
         },
         {
             "type": "patchouli:text",
@@ -24,12 +24,16 @@
         },
         {
             "type": "patchouli:text",
-            "title": "Switchboard",
-            "text": "The slot on the lower left side of the screen allows you to insert/remove a Switchboard item with your instrument.$(br2)The Switchboard allows your instrument to be controlled by a transmission (from a FileCaster, Transmitter, or Broadcaster) or by a MIDI Input Device and it stores several properties that define how the instrument interacts with those controllers."
+            "title": "MIDI Settings",
+            "text": "MIMI instruments can also be played by a MIDI file (by linking them to a Transmitter) or with a MIDI Input Device attached to your PC.$(br2)Clicking the Edit (pencil icon) button will bring up a menu that allows you to modify the instruments's MIDI settings. Clicking the Edit button again while the menu is open will close the menu."
         },
         {
             "type": "patchouli:text",
-            "text": "When a Switchboard is present in the instrument, clicking the Edit (pencil icon) button will bring up a menu that allows you to modify the Switchboard's properties (covered later).$(br2)Clicking the Edit button again while the menu is open will close the menu."
+            "text": "$(li)$(l)System MIDI Device$() - Whether or not this instrument should play notes from a MIDI Input Device attached to your PC.$(br)$(li)$(l)Volume$() - How loud notes from this instrument should be played.$(br)$(li)$(l)Transmission Source$() - What transmitter this instrument is linked to (will play notes from). You can link to yourself or unlink with the \"ME\" and \"X\" buttons."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)Enabled MIDI Channels$() - Which MIDI Channels this instrument should play notes from if linked to a transmitter or system MIDI input device.$(br2)MIDI Channels represent separate parts of the song (like piano, guitar, and drums). MIDI files can have up 16 Channels, but may only have 1. Channel 10 is usually for drums and will likely sound bad on other instruments. MIDI input devices usually use Channels 1 or 2."
         }
     ],
     "sortnum": 3

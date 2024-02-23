@@ -1,0 +1,17 @@
+{
+    "name": "MIDI Files",
+    "icon": "minecraft:music_disc_mellohi",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "title": "Finding MIDI Files",
+            "text": "To use the Transmitter you should first get some MIDI files for it to play.$(br2)MIDI files are not like regular music that you would listen to on your computer (such as MP3 files) and MIMI does not support playing any other kinds of music files. Normal music files are a recording of instruments playing notes but MIDI files are the notes themselves instructions for how they should be played."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "MIDI has been around for a long time so there are lots of songs available online, but it may be hard to find newer songs that have had MIDI files created for them. Here are some links to sites that have lots of free MIDI files:$(br2)1. $(l:https://bitmidi.com/)BitMidi.com$()$(br)2. $(l:https://freemidi.org/)FreeMidi.org$()$(br)3. $(l:https://www.midiworld.com/files/)MidiWorld.com$()$(br)4. $(l:https://freemidis.net)FreeMidis.net$()$(br)5. $(l:https://midifind.com/)MidiFind.com$()$(br2)More can easily be found via Google!"
+        }
+    ],
+    "sortnum": 1
+}

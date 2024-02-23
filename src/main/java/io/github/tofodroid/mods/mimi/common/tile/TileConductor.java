@@ -1,101 +1,58 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Set;
 
-import io.github.tofodroid.mods.mimi.common.container.ContainerConductor;
-import io.github.tofodroid.mods.mimi.common.item.ItemMidiSwitchboard;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.TransmitterNotePacket.TransmitMode;
+import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileConductor extends ASwitchboardContainerEntity {
-    public Byte lastNote = null;
-    public Boolean lastBroadcastPublic = null;
-    public ArrayList<Byte> lastChannels = new ArrayList<>();
+public class TileConductor extends AConfigurableMidiTile {
+    public static final String REGISTRY_NAME = "conductor";
 
     public TileConductor(BlockPos pos, BlockState state) {
-        super(ModTiles.CONDUCTOR, pos, state, 1);
+        super(ModTiles.CONDUCTOR, pos, state);
     }
 
-    public void transmitNoteOn(Level worldIn) {
-        if(!worldIn.isClientSide && worldIn instanceof ServerLevel && lastNote == null) {
-            ItemStack switchStack = getSwitchboardStack();
+    protected void sendPacket(Boolean stop) {
+        Level level = getLevel();
+        if(level instanceof ServerLevel) {
+            ItemStack sourceStack = getSourceStack();
+            Set<Byte> channels = MidiNbtDataUtils.getEnabledChannelsSet(sourceStack);
 
-            if(!switchStack.isEmpty()) {
-                lastNote = ItemMidiSwitchboard.getBroadcastNote(switchStack);
-                lastBroadcastPublic = ItemMidiSwitchboard.getPublicBroadcast(switchStack);
-
-                for(Byte channel : ItemMidiSwitchboard.getEnabledChannelsSet(switchStack)) {
-                    lastChannels.add(channel);
-                    TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, lastNote, Byte.MAX_VALUE, lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
-                    TransmitterNotePacketHandler.handlePacketServer(packet, this.getBlockPos(), (ServerLevel)worldIn, getUniqueId(), null);
+            if(channels.size() > 0) {
+                Byte note = MidiNbtDataUtils.getBroadcastNote(sourceStack);
+                Byte velocity = stop ? -1 : Byte.MAX_VALUE;
+                
+                for(Byte channel : channels) {
+                    ServerMusicReceiverManager.handlePacket(
+                        TransmitterNoteEvent.createNoteEvent(channel, note, velocity), 
+                        getUUID(),
+                        getBlockPos(), 
+                        (ServerLevel)level
+                    );
                 }
             }
+        }        
+    }
+
+    @Override
+    public void setSourceStack(ItemStack stack) {
+        if(stack.getItem().getClass().equals(this.getBlockState().getBlock().asItem().getClass())) {
+            this.stopNote();
+            this.setItem(SOURCE_STACK_SLOT, stack);
         }
     }
 
-    public void transmitNoteOff(Level worldIn) {
-        if(!worldIn.isClientSide && worldIn instanceof ServerLevel) {
-            if(!lastChannels.isEmpty() && lastNote != null) {
-                for(Byte channel : lastChannels) {
-                    TransmitterNotePacket packet = TransmitterNotePacket.createNotePacket(channel, lastNote, Integer.valueOf(-1).byteValue(), lastBroadcastPublic ? TransmitMode.PUBLIC : TransmitMode.LINKED);
-                    TransmitterNotePacketHandler.handlePacketServer(packet, this.getBlockPos(), (ServerLevel)worldIn, getUniqueId(), null);
-                }
-            }
-            lastChannels = new ArrayList<>();
-            lastNote = null;
-            lastBroadcastPublic = null;
-        }
+    public void startNote() {
+        this.sendPacket(false);
     }
 
-    @Override
-    public void setItem(int i, ItemStack item) {
-        super.setItem(i, item);
-        this.transmitNoteOff(this.level);
-        this.transmitNoteOn(this.level);
-    }
-
-    @Override
-    public ItemStack removeItem(int i, int count) {
-        ItemStack result = super.removeItem(i, count);
-        this.transmitNoteOff(this.level);
-        return result;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int i) {
-        ItemStack result = super.removeItemNoUpdate(i);
-        this.transmitNoteOff(this.level);
-        return result;
-    }
-    
-    @Override
-    public void clearContent() {
-        super.clearContent();
-        this.transmitNoteOff(this.level);
-    }
-
-    public UUID getUniqueId() {
-        String posString = "con" + this.getBlockPos().getX() + this.getBlockPos().getY() + this.getBlockPos().getZ();
-        return UUID.nameUUIDFromBytes(posString.getBytes());
-    }
-
-    @Override
-    public Component getDefaultName() {
-        return Component.translatable(this.getBlockState().getBlock().asItem().getDescriptionId());
-    }
-
-    @Override
-    protected AbstractContainerMenu createMenu(int id, Inventory playerInventory) {
-        return new ContainerConductor(id, playerInventory, this.getBlockPos());
+    public void stopNote() {
+        this.sendPacket(true);
     }
 }

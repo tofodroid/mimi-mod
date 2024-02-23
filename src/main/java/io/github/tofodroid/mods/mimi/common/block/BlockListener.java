@@ -1,74 +1,64 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import java.util.List;
+
+import com.mojang.serialization.MapCodec;
+
+import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public class BlockListener extends AContainerBlock<TileListener> {
+public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListener> {
     public static final String REGISTRY_NAME = "listener";
-    public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    public static final MapCodec<BlockListener> CODEC = simpleCodec(BlockListener::new);
+ 
+    @Override
+    public MapCodec<BlockListener> codec() {
+       return CODEC;
+    }
 
-    public BlockListener() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
-        this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
+    public BlockListener(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
+    }
+
+    @Override
+    protected void openGui(Level worldIn, Player player, TileListener tile) {
+        ClientGuiWrapper.openListenerGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
     }
 
     @Override
     public BlockEntityType<TileListener> getTileType() {
         return ModTiles.LISTENER;
     }
-    
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(POWER, Integer.valueOf(0));
-    }
-    
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWER);
-    }
-    
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ModTiles.LISTENER, TileListener::doTick);
-    }
 
     @Override
-    public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
-    }
-    
-    @Override
-    public int getDirectSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
-    }
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+        tooltip.add(Component.literal(""));
+        tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-    @Override
-    public boolean isSignalSource(BlockState p_55730_) {
-        return true;
-    }
+        // Invert Signal
+        tooltip.add(Component.literal("  Invert Power: " 
+            + (MidiNbtDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
+        );
 
-    public void powerTarget(Level world, BlockState state, int power, BlockPos pos) {
-        if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-            world.setBlock(pos, state.setValue(POWER, Integer.valueOf(power)), 3);
-            
-            for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), this);
-            }
-            world.scheduleTick(pos, this, 4);
-        }
+        // Filter Instrument
+        tooltip.add(Component.literal("  Instrument: " 
+            + (MidiNbtDataUtils.getInvertInstrument(blockItemStack) ? "Not " : "")
+            + MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(blockItemStack))).withStyle(ChatFormatting.GREEN)
+        );
+
+        // Filter Note
+        tooltip.add(Component.literal("  Note(s): " 
+            + (MidiNbtDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
+            + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
+        );
     }
 }

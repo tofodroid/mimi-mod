@@ -5,12 +5,17 @@
     "pages": [
         {
             "type": "patchouli:text",
-            "text": "Handheld instruments in MIMI are those that can be played while held in your main hand or your off hand.$(br2)You can hold instruments in both hands and play them simultaneously when playing them with MIDI (covered later)."
+            "text": "Handheld instruments in MIMI are those that can be played while held in your main hand or your off hand.$(br2)You can hold instruments in both hands and play them simultaneously when they are playing notes from a linked Transmitter."
         },
         {
             "type": "patchouli:text",
             "title": "Playing",
-            "text": "First select it on your hotbar with your main hand or place it in your off hand slot. Then, simply right click while holding the instrument to open the Instrument Screen.$(br2)When holding one instrument in each hand right-clicking will open the Instrument Screen for the instrument in your main hand. Using key binds you can directly open the instruments in your main hand ($(bold)$(k:key.mimi.midi.gui.main)$()) or off hand ($(bold)$(k:key.mimi.midi.gui.off)$())."
+            "text": "Select an instrument on your hotbar with your main hand or place it in your off hand slot. Then, right click while holding the instrument to open the Instrument Screen.$(br2)When holding one instrument in each hand right-clicking will open the Instrument Screen for the instrument in your main hand. Using key binds you can directly open the instruments in your main hand ($(bold)$(k:key.mimi.midi.gui.main)$()) or off hand ($(bold)$(k:key.mimi.midi.gui.off)$())."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Mobs",
+            "text": "Certain mobs can also be given handheld instruments by right-clicking the mob with the instrument. Mobs holding instruments that are linked to a transmitter will play notes from the transmitter.$(br2)The list of mobs that can use instruments can be configured, but by default includes:$(br2)Zombies (and variants), Skeletons (and variants), and Allays."
         }
     ],
     "sortnum": 1

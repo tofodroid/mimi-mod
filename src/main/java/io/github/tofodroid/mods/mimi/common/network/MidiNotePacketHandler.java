@@ -1,105 +1,166 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.Supplier;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
-
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class MidiNotePacketHandler {
-    public static void handlePacket(final MidiNotePacket message, Supplier<NetworkEvent.Context> ctx) {
-        if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
-            ctx.get().enqueueWork(() -> handlePacketsServer(Arrays.asList(message),(ServerLevel)ctx.get().getSender().level(), ctx.get().getSender()));
-        } else {
-            ctx.get().enqueueWork(() -> handlePacketClient(message));
-        }
-        ctx.get().setPacketHandled(true);
+    private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, List<TileListener>>> LISTENER_CACHE_MAP = new LinkedHashMap<>();
+    private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, List<ServerPlayer>>> PLAYER_CACHE_MAP = new LinkedHashMap<>();
+    private static final LinkedHashMap<ResourceKey<Level>, LinkedHashMap<Long, Boolean>> EVENT_CACHE_MAP = new LinkedHashMap<>();
+
+
+    private static final Integer CLEAR_CACHE_EVERY_TICKS = 10;
+    private static final Integer CLEAR_EVENT_CACHE_EVERY_TICKS = 60;
+    private static Integer cacheClearTickCounter = 0;
+    private static Integer eventCacheClearTickCounter = 0;
+
+    public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
+        handlePacketServer(message, sender.serverLevel(), sender);
     }
     
-    public static void handlePacketsServer(final List<MidiNotePacket> messages, ServerLevel worldIn, ServerPlayer sender) {
-        if(messages != null && !messages.isEmpty()) {
-            // Forward to players
-            for(MidiNotePacket packet : messages) {
-                if(ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
-                    NetworkManager.NOTE_CHANNEL.send(getPacketTarget(packet.pos, worldIn, sender, getQueryBoxRange(packet.velocity <= 0)), packet);
-                } else {
-                    ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
-                        if(player != sender && Math.sqrt(player.getOnPos().distSqr(packet.pos)) <= getQueryBoxRange(packet.velocity <= 0)) {
-                            NetworkManager.NOTE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
-                        }
-                    });
-                }
+    public static void handlePacketServer(final MidiNotePacket message, ServerLevel worldIn, ServerPlayer sender) {
+        if(message != null) {
+            // Forward to nearby players
+            List<ServerPlayer> potentialPlayers = getCachePlayers(worldIn, message.pos);
+
+            // Ensure source player is included if this is coming from music reciever
+            ServerPlayer sourcePlayer = (ServerPlayer)worldIn.getPlayerByUUID(message.player);
+            if(sender == null && sourcePlayer != null && !potentialPlayers.contains(sourcePlayer)) {
+                potentialPlayers.add(sourcePlayer);
             }
 
-            // Process Redstone and Sculk
-            List<EntityNoteResponsiveTile> entities = new ArrayList<>();
-            BlockPos lastPacketPos = null;
+            // Process Listeners and Sculk
+            processListeners(message, worldIn);
+            processSculk(message, worldIn);
 
-            for(MidiNotePacket packet : messages) {
-                if(!packet.isControlPacket() && packet.velocity > 0) {
-                    if(lastPacketPos != packet.pos) {  
-                        lastPacketPos = packet.pos;
-                        entities = getPotentialEntities(worldIn, packet.pos, getQueryBoxRange(false).intValue());
-                        worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, packet.pos, GameEvent.Context.of(worldIn.getBlockState(packet.pos)));
+            // Send
+            potentialPlayers.forEach(player -> {
+                if(player != sender) {
+                    NetworkProxy.sendToPlayer(player, message);
+                }
+            });
+        }
+    }
+
+    public static void processListeners(MidiNotePacket message, ServerLevel worldIn) {
+        if(!message.isControlPacket()) {
+            List<TileListener> listenerTiles = getCacheListeners(worldIn, message.pos);
+            
+            for(TileListener listener : listenerTiles) {
+                if(message.isNoteOffPacket() && listener.shouldTriggerFromNoteOff(null, message.note, message.velocity, message.instrumentId)) {
+                    listener.onNoteOff(null, message.note, message.velocity, message.instrumentId);
+                } else if(message.isNoteOnPacket() && listener.shouldTriggerFromNoteOn(null, message.note, message.velocity, message.instrumentId)) {
+                    listener.onNoteOn(null, message.note, message.velocity, message.instrumentId, message.noteServerTime);
+                } else if(message.isAllNotesOffPacket() && listener.shouldTriggerFromAllNotesOff(null, message.instrumentId)) {
+                    listener.onAllNotesOff(null, message.instrumentId);
+                }
+            };
+        }
+    }
+
+    protected static void processSculk(MidiNotePacket message, ServerLevel worldIn) {
+        if(message.isNoteOnPacket()) {
+            LinkedHashMap<Long, Boolean> eventMap = EVENT_CACHE_MAP.computeIfAbsent(
+                worldIn.dimension(), d -> new LinkedHashMap<>() 
+            );
+    
+            eventMap.computeIfAbsent(
+                message.pos.asLong(),
+                (key) -> {
+                    if(worldIn.isLoaded(message.pos)) {
+                        worldIn.gameEvent(GameEvent.INSTRUMENT_PLAY, message.pos, GameEvent.Context.of(worldIn.getBlockState(message.pos)));
                     }
-                    
-                    getPotentialListeners(entities).forEach(listener -> {
-                        if(listener.shouldAcceptNote(packet.note, packet.instrumentId)) {
-                            ModBlocks.LISTENER.get().powerTarget(worldIn, worldIn.getBlockState(listener.getBlockPos()), 15, listener.getBlockPos());
-                        }
-                    });
+                    return true;
                 }
-            }
+            );
         }
     }
 
     public static void handlePacketClient(final MidiNotePacket message) {
-        if(MIMIMod.proxy.isClient()) ((ClientProxy)MIMIMod.proxy).getMidiSynth().handlePacket(message); 
+        if(MIMIMod.getProxy().isClient()) ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(message); 
     }
 
-    protected static List<EntityNoteResponsiveTile> getPotentialEntities(ServerLevel worldIn, BlockPos notePos, Integer range) {
+    public static void onServerTick() {
+        if(cacheClearTickCounter >= CLEAR_CACHE_EVERY_TICKS) {
+            cacheClearTickCounter = 0;
+            LISTENER_CACHE_MAP.clear();
+            PLAYER_CACHE_MAP.clear();
+        } else {
+            cacheClearTickCounter++;
+        }
+
+        if(eventCacheClearTickCounter >= CLEAR_EVENT_CACHE_EVERY_TICKS) {
+            eventCacheClearTickCounter = 0;
+            EVENT_CACHE_MAP.clear();
+        } else {
+            eventCacheClearTickCounter++;
+        }
+    }
+
+    public static List<TileListener> getCacheListeners(ServerLevel level, BlockPos pos) {
+        LinkedHashMap<Long, List<TileListener>> entityMap = LISTENER_CACHE_MAP.computeIfAbsent(
+            level.dimension(), d -> new LinkedHashMap<>() 
+        );
+
+        return entityMap.computeIfAbsent(
+            pos.asLong(),
+            (key) -> {
+                return getPotentialListeners(level, pos, 64).stream().map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
+        });
+    }
+
+    public static List<ServerPlayer> getCachePlayers(ServerLevel level, BlockPos pos) {
+        LinkedHashMap<Long, List<ServerPlayer>> playerMap = PLAYER_CACHE_MAP.computeIfAbsent(
+            level.dimension(), d -> new LinkedHashMap<>() 
+        );
+
+        return playerMap.computeIfAbsent(
+            pos.asLong(),
+            (key) -> getPotentialPlayers(level, pos, 64)
+        );
+    }
+
+    protected static List<ServerPlayer> getPotentialPlayers(ServerLevel worldIn, BlockPos notePos, Integer range) {
+        List<ServerPlayer> potentialEntites = new ArrayList<>();
+
+        AABB queryBox = new AABB(notePos.getX() - range, notePos.getY() - range, notePos.getZ() - range, 
+                                                    notePos.getX() + range, notePos.getY() + range, notePos.getZ() + range);
+        // potentialEntites = worldIn.getEntitiesOfClass(ServerPlayer.class, queryBox, entity -> {
+        //     return entity.isAlive();
+        // });
+
+        for(ServerPlayer player : worldIn.players()) {
+            if(queryBox.contains(player.getX(), player.getY(), player.getZ()) && player.isAlive()) {
+                potentialEntites.add(player);
+            }
+        }
+  
+        return potentialEntites;
+    }
+
+    protected static List<EntityNoteResponsiveTile> getPotentialListeners(ServerLevel worldIn, BlockPos notePos, Integer range) {
         List<EntityNoteResponsiveTile> potentialEntites = new ArrayList<>();
 
         AABB queryBox = new AABB(notePos.getX() - range, notePos.getY() - range, notePos.getZ() - range, 
                                                     notePos.getX() + range, notePos.getY() + range, notePos.getZ() + range);
         potentialEntites = worldIn.getEntitiesOfClass(EntityNoteResponsiveTile.class, queryBox, entity -> {
-            return entity.getTile() != null;
+            return entity.getTile() != null && entity.getTile() instanceof TileListener;
         });
 
         return potentialEntites;
-    }
-
-    protected static List<TileListener> getPotentialListeners(List<EntityNoteResponsiveTile> entities) {
-        return entities.stream().filter(e -> e.getTile() instanceof TileListener).map(e -> (TileListener)e.getTile()).collect(Collectors.toList());
-    }
-    
-    protected static PacketDistributor.PacketTarget getPacketTarget(BlockPos targetPos, ServerLevel worldIn, ServerPlayer excludePlayer, Double range) {
-        return PacketDistributor.NEAR.with(() -> {
-            if(excludePlayer == null) {
-                return new PacketDistributor.TargetPoint(targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.dimension());
-            } else {
-                return new PacketDistributor.TargetPoint(excludePlayer, targetPos.getX(), targetPos.getY(), targetPos.getZ(), range, worldIn.dimension());
-            }
-        });
-    }
-
-    protected static Double getQueryBoxRange(Boolean off) {
-        return off ? 128d : 64d;
     }
 }

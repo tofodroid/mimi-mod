@@ -1,7 +1,16 @@
 {
     "variants": {
-        "": {
-            "model": "mimi:block/listener"
+        "powered=false,inverted=false": {
+            "model": "mimi:block/midi/listener"
+        },
+        "powered=false,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "powered=true,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "powered=true,inverted=true": {
+            "model": "mimi:block/midi/listener"
         }
     }
 }

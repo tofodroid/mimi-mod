@@ -1,0 +1,17 @@
+{
+    "name": "Server Transmitter",
+    "icon": "mimi:transmitterblock",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Server Transmitter is a block form of the Transmitter that doesn't need to be held by a player to play MIDI files. However, it can only play songs provided by the server.$(br2)MIDI files can be added to the Server Transmitter by placing them in the \"server_midi_files\" folder within the MIMI config folder (also works for single player and the host in LAN) and clicking the reload button."
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:transmitterblock",
+            "text": "Unlike the handheld Transmitter, where settings are saved once per player, Server Transmitter settings are saved separately on each block.$(br2)While it is playing a song, the Server Transmitter block will emit a redstone signal."
+        }
+    ],
+    "sortnum": 3
+}

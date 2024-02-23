@@ -1,0 +1,6 @@
+{
+	"name": "Transmitters",
+	"description": "A Transmitter allows MIDI files (from your PC or a server in multiplayer) to play notes on MIMI instruments.$(br2)MIDI Files are digital sheet music that computers can read with up to 16 parts (channels). They have been used in many ways from karaoke machines to music in older games ($(l:https://www.youtube.com/watch?v=SJ0Ob4PlCDU)Doom$(), $(l:https://www.youtube.com/watch?v=60d4uGPNblo)Sonic$(), and $(l:https://www.youtube.com/watch?v=QO6CMRg93dk)Warcraft$()).",
+	"icon": "mimi:transmitter",
+	"sortnum": 3
+}

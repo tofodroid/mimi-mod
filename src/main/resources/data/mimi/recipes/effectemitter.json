@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " D ",
+        " R ",
+        " N "
+    ],
+    "key": {
+        "D": {
+            "item": "minecraft:dispenser"
+        },
+        "R": {
+            "item": "minecraft:redstone_block"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        }
+    },
+    "result": {
+        "item": "mimi:effectemitter",
+        "count": 2
+    }
+}

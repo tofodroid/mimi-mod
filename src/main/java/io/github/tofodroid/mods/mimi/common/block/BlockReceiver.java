@@ -1,74 +1,96 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
+import java.util.List;
+
+import com.mojang.serialization.MapCodec;
+
+import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
+import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public class BlockReceiver extends AContainerBlock<TileReceiver> {
+public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceiver> {
     public static final String REGISTRY_NAME = "receiver";
-    public static final IntegerProperty POWER = BlockStateProperties.POWER;
-
-    public BlockReceiver() {
-        super(Properties.of().explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
-        this.registerDefaultState(this.stateDefinition.any().setValue(POWER, Integer.valueOf(0)));
+    public static final MapCodec<BlockReceiver> CODEC = simpleCodec(BlockReceiver::new);
+ 
+    @Override
+    public MapCodec<BlockReceiver> codec() {
+       return CODEC;
     }
-    
+
+    public BlockReceiver(Properties props) {
+        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).isRedstoneConductor((a,b,c) -> false));
+    }
+
+    @Override
+    protected void openGui(Level worldIn, Player player, TileReceiver tile) {
+        ClientGuiWrapper.openReceiverGui(worldIn, player, tile.getBlockPos(), tile.getSourceStack());
+    }
+
     @Override
     public BlockEntityType<TileReceiver> getTileType() {
         return ModTiles.RECEIVER;
     }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(POWER, Integer.valueOf(0));
-    }
     
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWER);
-    }
-
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ModTiles.RECEIVER, TileReceiver::doTick);
-    }
-
-    @Override
-    public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
-    }
-    
-    @Override
-    public int getDirectSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWER);
-    }
-
-    @Override
-    public boolean isSignalSource(BlockState p_55730_) {
-        return true;
-    }
-
-    public void powerTarget(Level world, BlockState state, int power, BlockPos pos) {
-        if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-            world.setBlock(pos, state.setValue(POWER, Integer.valueOf(power)), 3);
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if(!worldIn.isClientSide) {
+            if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
+                return;
+            BlockEntity blockEntity = worldIn.getBlockEntity(pos);
             
-            for(Direction direction : Direction.values()) {
-                world.updateNeighborsAt(pos.relative(direction), this);
+            if (blockEntity instanceof TileReceiver) {
+                ServerMusicReceiverManager.removeReceivers(((TileReceiver)blockEntity).getUUID());
             }
-            world.scheduleTick(pos, this, 4);
         }
+
+        super.onRemove(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Override
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+        tooltip.add(Component.literal(""));
+        tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+
+        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(blockItemStack);
+        if(enabledChannels != null) {
+            if(enabledChannels.equals(MidiNbtDataUtils.ALL_CHANNELS_INT)) {
+                tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
+            } else if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
+                tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
+            } else {
+                tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
+            }
+        }
+
+        // Invert Signal
+        tooltip.add(Component.literal("  Invert Power: " 
+            + (MidiNbtDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
+        );
+
+        // Note Source
+        if(MidiNbtDataUtils.getMidiSource(blockItemStack) != null) {
+            tooltip.add(Component.literal("  Recieve Notes From: " + (MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.literal("  " + MidiNbtDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        } else {
+            tooltip.add(Component.literal("  Recieve Notes From: None").withStyle(ChatFormatting.GREEN));
+        }
+
+        // Filter Note
+        tooltip.add(Component.literal("  Note(s): " 
+            + (MidiNbtDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
+            + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
+        );
     }
 }

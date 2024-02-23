@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=south": { "model": "mimi:block/tubularbells" },
-    "facing=west": { "model": "mimi:block/tubularbells", "y": 90 },
-    "facing=north": { "model": "mimi:block/tubularbells", "y": 180 },
-    "facing=east": { "model": "mimi:block/tubularbells", "y": 270 }
+    "facing=south": { "model": "mimi:block/instruments/tubularbells" },
+    "facing=west": { "model": "mimi:block/instruments/tubularbells", "y": 90 },
+    "facing=north": { "model": "mimi:block/instruments/tubularbells", "y": 180 },
+    "facing=east": { "model": "mimi:block/instruments/tubularbells", "y": 270 }
   }
 }

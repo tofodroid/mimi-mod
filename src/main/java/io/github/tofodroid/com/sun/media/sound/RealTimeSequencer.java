@@ -55,7 +55,7 @@ import javax.sound.midi.Transmitter;
  * @author Florian Bomers
  */
 
-/* TODO:
+/* TD:
  * - rename PlayThread to PlayEngine (because isn't a thread)
  */
 final class RealTimeSequencer extends AbstractMidiDevice
@@ -589,6 +589,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
     }
 
     @Override
+    @SuppressWarnings("null")
     public int[] addControllerEventListener(ControllerEventListener listener, int[] controllers) {
         synchronized(controllerEventListeners) {
 
@@ -617,6 +618,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
     }
 
     @Override
+    @SuppressWarnings("null")
     public int[] removeControllerEventListener(ControllerEventListener listener, int[] controllers) {
         synchronized(controllerEventListeners) {
             ControllerListElement cve = null;
@@ -746,7 +748,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
             try {
                 rec = MidiSystem.getReceiver();
             } catch (Exception e) {
-                // something went wrong. Nothing to do then!
+                // something went wrong. no-op
             }
         }
         if (rec != null) {
@@ -842,7 +844,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     private static EventDispatcher getEventDispatcher() {
         // create and start the global event thread
-        //TODO  need a way to stop this thread when the engine is done
         final ThreadGroup tg = Thread.currentThread().getThreadGroup();
         synchronized (dispatchers) {
             EventDispatcher eventDispatcher = dispatchers.get(tg);
@@ -1482,6 +1483,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
             }
         }
 
+        @SuppressWarnings("null")
         private boolean[] makeDisabledArray() {
             if (tracks == null) {
                 return null;
@@ -1876,7 +1878,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
                                 readPos = size;
                                 break;
                             }
-                            // TODO: some kind of heuristics if the MIDI messages have changed
                             // significantly (i.e. deleted or inserted a bunch of messages)
                             // since last time. Would need to set needReindex = true then
                             readPos++;
@@ -1926,7 +1927,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
                     // now patch the checkPointMillis so that
                     // it points to the exact beginning of when the loop was finished
 
-                    // $$fb TODO: although this is mathematically correct (i.e. the loop position
+                    // $$fb TD: although this is mathematically correct (i.e. the loop position
                     //            is correct, and doesn't drift away with several repetition,
                     //            there is a slight lag when looping back, probably caused
                     //            by the chasing.
