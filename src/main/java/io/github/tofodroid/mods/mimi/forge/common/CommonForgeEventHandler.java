@@ -7,7 +7,7 @@ import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -117,8 +117,8 @@ public class CommonForgeEventHandler {
     @SubscribeEvent
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
         ModStructures.registerVillageStructures(
-            event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow(),
-		    event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow()
+            event.getServer().registryAccess().registry(Registry.PROCESSOR_LIST_REGISTRY).orElseThrow(),
+		    event.getServer().registryAccess().registry(Registry.TEMPLATE_POOL_REGISTRY).orElseThrow()
         );
     }
 }

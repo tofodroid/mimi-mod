@@ -4,15 +4,13 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -21,10 +19,10 @@ import java.util.Arrays;
 public class CloneEffectEmitterRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "cloneeffectemitter";
     public static final List<Item> ITEMS = Arrays.asList(ModItems.EFFECTEMITTER);
-	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneEffectEmitterRecipe>(CloneEffectEmitterRecipe::new);
+	public static final SimpleRecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<CloneEffectEmitterRecipe>(CloneEffectEmitterRecipe::new);
 
-    public CloneEffectEmitterRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public CloneEffectEmitterRecipe(ResourceLocation recipeId) {
+        super(recipeId);
     }
 
     @Override
@@ -59,7 +57,7 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack source = ItemStack.EMPTY;
         ItemStack target = ItemStack.EMPTY;
 
@@ -73,7 +71,7 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
         }
         
         if(!source.isEmpty() && !target.isEmpty()) {
-            ItemStack result = target.copyWithCount(1);
+            ItemStack result = TagUtils.copyWithCount(target, 1);
             TagUtils.setOrRemoveString(result, TileEffectEmitter.SOUND_ID_TAG, TagUtils.getStringOrDefault(source, TileEffectEmitter.SOUND_ID_TAG,  ""));
             TagUtils.setOrRemoveString(result, TileEffectEmitter.PARTICLE_ID_TAG, TagUtils.getStringOrDefault(source, TileEffectEmitter.PARTICLE_ID_TAG,  ""));
             TagUtils.setOrRemoveByte(result, TileEffectEmitter.VOLUME_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.VOLUME_TAG,  5));
@@ -99,7 +97,7 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
 
         for(int i = 0; i < nonnulllist.size(); ++i) {
             if(isValid(inv.getItem(i))) {
-                nonnulllist.set(i, inv.getItem(i).copyWithCount(1));
+                nonnulllist.set(i, TagUtils.copyWithCount(inv.getItem(i), 1));
                 break;
             }
         }

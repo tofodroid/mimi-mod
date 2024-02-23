@@ -3,8 +3,6 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import org.joml.Vector2i;
-
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
@@ -16,9 +14,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiTransmitter extends GuiTransmitterBlock {
     // Local File Controls
-    protected static final Vector2i SOURCE_FILTER_BUTTON = new Vector2i(265,32);
-    protected static final Vector2i SOURCE_FILTER_SCREEN = new Vector2i(283,33);
-    protected static final Vector2i OPEN_LOCAL_FOLDER_BUTTON = new Vector2i(10,32);
+    protected static final Vector2Int SOURCE_FILTER_BUTTON = new Vector2Int(265,32);
+    protected static final Vector2Int SOURCE_FILTER_SCREEN = new Vector2Int(283,33);
+    protected static final Vector2Int OPEN_LOCAL_FOLDER_BUTTON = new Vector2Int(10,32);
 
     public GuiTransmitter(UUID musicPlayerId) {
         super(musicPlayerId);

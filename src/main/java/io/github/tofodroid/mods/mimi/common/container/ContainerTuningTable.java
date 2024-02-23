@@ -100,7 +100,6 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
     }
   
     @Override
-    @SuppressWarnings("null")
     public void slotsChanged(Container container) {
         if (container == craftingInventory && !this.playerInventory.player.getLevel().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
@@ -110,7 +109,7 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
             if (optional.isPresent()) {
                 TuningTableRecipe recipe = optional.get();
                if (this.resultInventory.setRecipeUsed(serverplayer.getLevel(), serverplayer, recipe)) {
-                  itemstack = recipe.assemble(this.craftingInventory, null);
+                  itemstack = recipe.assemble(this.craftingInventory);
                }
             }
    

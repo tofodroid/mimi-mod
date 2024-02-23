@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
@@ -16,8 +15,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -27,45 +26,45 @@ public class GuiEffectEmitter extends BaseGui {
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
 
     // GUI
-    private static final Vector2i INVERT_SIGNAL_WIDGET_COORDS = new Vector2i(281,5);
+    private static final Vector2Int INVERT_SIGNAL_WIDGET_COORDS = new Vector2Int(281,5);
 
-    private static final Vector2i SOUND_BOX_COORDS = new Vector2i(46,32);
-    private static final Vector2i PLAY_SOUND_BUTTON_COORDS = new Vector2i(278,29);
+    private static final Vector2Int SOUND_BOX_COORDS = new Vector2Int(46,32);
+    private static final Vector2Int PLAY_SOUND_BUTTON_COORDS = new Vector2Int(278,29);
 
-    private static final Vector2i VOL_DOWN_BUTTON_COORDS = new Vector2i(30,51);
-    private static final Vector2i VOL_UP_BUTTON_COORDS = new Vector2i(66,51);
-    private static final Vector2i VOL_TEXT_COORDS = new Vector2i(50,55);
-    private static final Vector2i PITCH_DOWN_BUTTON_COORDS = new Vector2i(116,51);
-    private static final Vector2i PITCH_UP_BUTTON_COORDS = new Vector2i(152,51);
-    private static final Vector2i PITCH_TEXT_COORDS = new Vector2i(136,55);
-    private static final Vector2i S_LOOP_DOWN_BUTTON_COORDS = new Vector2i(230, 51);
-    private static final Vector2i S_LOOP_UP_BUTTON_COORDS = new Vector2i(278, 51);
-    private static final Vector2i S_LOOP_TEXT_COORDS = new Vector2i(250, 55);
+    private static final Vector2Int VOL_DOWN_BUTTON_COORDS = new Vector2Int(30,51);
+    private static final Vector2Int VOL_UP_BUTTON_COORDS = new Vector2Int(66,51);
+    private static final Vector2Int VOL_TEXT_COORDS = new Vector2Int(50,55);
+    private static final Vector2Int PITCH_DOWN_BUTTON_COORDS = new Vector2Int(116,51);
+    private static final Vector2Int PITCH_UP_BUTTON_COORDS = new Vector2Int(152,51);
+    private static final Vector2Int PITCH_TEXT_COORDS = new Vector2Int(136,55);
+    private static final Vector2Int S_LOOP_DOWN_BUTTON_COORDS = new Vector2Int(230, 51);
+    private static final Vector2Int S_LOOP_UP_BUTTON_COORDS = new Vector2Int(278, 51);
+    private static final Vector2Int S_LOOP_TEXT_COORDS = new Vector2Int(250, 55);
 
-    private static final Vector2i PARTICLE_BOX_COORDS = new Vector2i(51,81);
-    private static final Vector2i PLAY_PARTICLE_BUTTON_COORDS = new Vector2i(278,78);
+    private static final Vector2Int PARTICLE_BOX_COORDS = new Vector2Int(51,81);
+    private static final Vector2Int PLAY_PARTICLE_BUTTON_COORDS = new Vector2Int(278,78);
     
-    private static final Vector2i SIDE_DOWN_BUTTON_COORDS = new Vector2i(32,100);
-    private static final Vector2i SIDE_UP_BUTTON_COORDS = new Vector2i(62,100);
-    private static final Vector2i SIDE_TEXT_COORDS = new Vector2i(52,104);
-    private static final Vector2i SPEED_X_DOWN_BUTTON_COORDS = new Vector2i(116,100);
-    private static final Vector2i SPEED_X_UP_BUTTON_COORDS = new Vector2i(158,100);
-    private static final Vector2i SPEED_X_TEXT_COORDS = new Vector2i(136,107);
-    private static final Vector2i SPEED_Y_DOWN_BUTTON_COORDS = new Vector2i(176,100);
-    private static final Vector2i SPEED_Y_UP_BUTTON_COORDS = new Vector2i(218,100);
-    private static final Vector2i SPEED_Y_TEXT_COORDS = new Vector2i(196,107);
-    private static final Vector2i SPEED_Z_DOWN_BUTTON_COORDS = new Vector2i(236,100);
-    private static final Vector2i SPEED_Z_UP_BUTTON_COORDS = new Vector2i(278,100);
-    private static final Vector2i SPEED_Z_TEXT_COORDS = new Vector2i(256,107);
-    private static final Vector2i SPREAD_DOWN_BUTTON_COORDS = new Vector2i(36,122);
-    private static final Vector2i SPREAD_UP_BUTTON_COORDS = new Vector2i(66,122);
-    private static final Vector2i SPREAD_TEXT_COORDS = new Vector2i(56,126);
-    private static final Vector2i COUNT_DOWN_BUTTON_COORDS = new Vector2i(116,122);
-    private static final Vector2i COUNT_UP_BUTTON_COORDS = new Vector2i(152,122);
-    private static final Vector2i COUNT_TEXT_COORDS = new Vector2i(136,126);
-    private static final Vector2i P_LOOP_DOWN_BUTTON_COORDS = new Vector2i(230, 122);
-    private static final Vector2i P_LOOP_UP_BUTTON_COORDS = new Vector2i(278, 122);
-    private static final Vector2i P_LOOP_TEXT_COORDS = new Vector2i(250, 126);
+    private static final Vector2Int SIDE_DOWN_BUTTON_COORDS = new Vector2Int(32,100);
+    private static final Vector2Int SIDE_UP_BUTTON_COORDS = new Vector2Int(62,100);
+    private static final Vector2Int SIDE_TEXT_COORDS = new Vector2Int(52,104);
+    private static final Vector2Int SPEED_X_DOWN_BUTTON_COORDS = new Vector2Int(116,100);
+    private static final Vector2Int SPEED_X_UP_BUTTON_COORDS = new Vector2Int(158,100);
+    private static final Vector2Int SPEED_X_TEXT_COORDS = new Vector2Int(136,107);
+    private static final Vector2Int SPEED_Y_DOWN_BUTTON_COORDS = new Vector2Int(176,100);
+    private static final Vector2Int SPEED_Y_UP_BUTTON_COORDS = new Vector2Int(218,100);
+    private static final Vector2Int SPEED_Y_TEXT_COORDS = new Vector2Int(196,107);
+    private static final Vector2Int SPEED_Z_DOWN_BUTTON_COORDS = new Vector2Int(236,100);
+    private static final Vector2Int SPEED_Z_UP_BUTTON_COORDS = new Vector2Int(278,100);
+    private static final Vector2Int SPEED_Z_TEXT_COORDS = new Vector2Int(256,107);
+    private static final Vector2Int SPREAD_DOWN_BUTTON_COORDS = new Vector2Int(36,122);
+    private static final Vector2Int SPREAD_UP_BUTTON_COORDS = new Vector2Int(66,122);
+    private static final Vector2Int SPREAD_TEXT_COORDS = new Vector2Int(56,126);
+    private static final Vector2Int COUNT_DOWN_BUTTON_COORDS = new Vector2Int(116,122);
+    private static final Vector2Int COUNT_UP_BUTTON_COORDS = new Vector2Int(152,122);
+    private static final Vector2Int COUNT_TEXT_COORDS = new Vector2Int(136,126);
+    private static final Vector2Int P_LOOP_DOWN_BUTTON_COORDS = new Vector2Int(230, 122);
+    private static final Vector2Int P_LOOP_UP_BUTTON_COORDS = new Vector2Int(278, 122);
+    private static final Vector2Int P_LOOP_TEXT_COORDS = new Vector2Int(250, 126);
 
     // Widgets
     private InvertSignalWidget invertSignalWidget;
@@ -98,7 +97,7 @@ public class GuiEffectEmitter extends BaseGui {
     @Override
     public void init() {
         super.init();
-        this.invertSignalWidget = new InvertSignalWidget(emitterStack, new Vector2i(START_X, START_Y), INVERT_SIGNAL_WIDGET_COORDS);
+        this.invertSignalWidget = new InvertSignalWidget(emitterStack, new Vector2Int(START_X, START_Y), INVERT_SIGNAL_WIDGET_COORDS);
         this.soundBox = this.addWidget(new EditBox(this.font, this.START_X + SOUND_BOX_COORDS.x, this.START_Y + SOUND_BOX_COORDS.y, 229, 10, CommonComponents.EMPTY));
             soundBox.setMaxLength(512);    
             soundBox.setValue(TagUtils.getStringOrDefault(emitterStack, TileEffectEmitter.SOUND_ID_TAG, ""));
@@ -294,7 +293,7 @@ public class GuiEffectEmitter extends BaseGui {
     public Boolean validateParticle(String newParticleString) {
         if(!newParticleString.trim().isBlank()) {
             try {
-                ParticleOptions options = (ParticleOptions)this.world.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(new ResourceLocation(newParticleString.trim()));
+                ParticleOptions options = (ParticleOptions)this.world.registryAccess().registry(Registry.PARTICLE_TYPE_REGISTRY).get().get(new ResourceLocation(newParticleString.trim()));
                 return options != null;
             } catch(Exception e) { /* No-op */ }
         }
@@ -304,7 +303,7 @@ public class GuiEffectEmitter extends BaseGui {
     public Boolean validateSound(String newSoundString) {
         if(!newSoundString.trim().isBlank()) {
             try {
-                return this.world.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(new ResourceLocation(newSoundString.trim()));
+                return this.world.registryAccess().registry(Registry.SOUND_EVENT_REGISTRY).get().containsKey(new ResourceLocation(newSoundString.trim()));
             } catch(Exception e) { /* No-op */ }
         }
         return false;

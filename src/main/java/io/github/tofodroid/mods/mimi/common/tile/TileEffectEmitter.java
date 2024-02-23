@@ -1,13 +1,13 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import org.joml.Vector3d;
+import com.mojang.math.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -153,7 +153,7 @@ public class TileEffectEmitter extends AConfigurableTile {
                 ParticleOptions options = null;
 
                 try {
-                    options = (ParticleOptions)this.level.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(new ResourceLocation(particleStr));
+                    options = (ParticleOptions)this.level.registryAccess().registry(Registry.PARTICLE_TYPE_REGISTRY).get().get(new ResourceLocation(particleStr));
                     particleValid = options != null;
                 } catch(Exception e) { /* No-op */ }
 
@@ -173,11 +173,11 @@ public class TileEffectEmitter extends AConfigurableTile {
                 Boolean soundValid = false;
 
                 try {
-                    soundValid = this.level.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(new ResourceLocation(soundStr));
+                    soundValid = this.level.registryAccess().registry(Registry.SOUND_EVENT_REGISTRY).get().containsKey(new ResourceLocation(soundStr));
                 } catch(Exception e) { /* No-op */ }
 
                 if(soundValid) {
-                    this._sound = SoundEvent.createVariableRangeEvent(new ResourceLocation(soundStr));
+                    this._sound = new SoundEvent(new ResourceLocation(soundStr));
                 }
             }
         }
@@ -281,7 +281,7 @@ public class TileEffectEmitter extends AConfigurableTile {
         SoundEvent sound = this.getSound();
 
         if(sound != null && this.level.isClientSide) {
-            this.getLevel().playLocalSound(this.getBlockPos(), sound, SoundSource.BLOCKS, this.getVolume(), this.getPitch(), false);
+            this.getLevel().playLocalSound(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), sound, SoundSource.BLOCKS, this.getVolume(), this.getPitch(), false);
         }
     }
 

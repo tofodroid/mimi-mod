@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import org.joml.Vector2i;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -53,15 +51,15 @@ public abstract class BaseGui extends Screen {
     protected abstract PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks);
     protected abstract PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks);
 
-    protected Vector2i screenToGuiCoords(Vector2i screenCoords) {
-        return new Vector2i(
+    protected Vector2Int screenToGuiCoords(Vector2Int screenCoords) {
+        return new Vector2Int(
             screenCoords.x() - START_X, 
             screenCoords.y() - START_Y
         );
     }
 
-    protected Vector2i guiToScreenCoords(Vector2i guiCoords) {
-        return new Vector2i(
+    protected Vector2Int guiToScreenCoords(Vector2Int guiCoords) {
+        return new Vector2Int(
             guiCoords.x() + START_X, 
             guiCoords.y() + START_Y
         );

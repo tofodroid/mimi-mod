@@ -3,16 +3,15 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -21,10 +20,10 @@ import java.util.Arrays;
 public class CloneMidiSettingsRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "clonemidi";
     public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER);
-	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
+	public static final SimpleRecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
 
-    public CloneMidiSettingsRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public CloneMidiSettingsRecipe(ResourceLocation recipeId) {
+        super(recipeId);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack source = ItemStack.EMPTY;
         ItemStack target = ItemStack.EMPTY;
 
@@ -73,7 +72,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         }
         
         if(!source.isEmpty() && !target.isEmpty()) {
-            ItemStack result = target.copyWithCount(1);
+            ItemStack result = TagUtils.copyWithCount(target, 1);
             MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
             MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
 
@@ -102,7 +101,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
 
         for(int i = 0; i < nonnulllist.size(); ++i) {
             if(canStoreMidiSettings(inv.getItem(i))) {
-                nonnulllist.set(i, inv.getItem(i).copyWithCount(1));
+                nonnulllist.set(i, TagUtils.copyWithCount(inv.getItem(i), 1));
                 break;
             }
         }

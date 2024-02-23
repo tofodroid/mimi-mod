@@ -3,8 +3,6 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.joml.Vector2i;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
@@ -23,13 +21,13 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiListener extends BaseGui {
     // GUI
-    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(180,26);
-    private static final Vector2i TRIGGER_MODE_WIDGET_COORDS = new Vector2i(6,59);
-    private static final Vector2i HOLD_TICKS_WIDGET_COORDS = new Vector2i(180,59);
-    private static final Vector2i FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2i(9,40);
-    private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(143,40);
-    private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(161,40);
-    private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(281,5);
+    private static final Vector2Int NOTE_FILTER_WIDGET_COORDS = new Vector2Int(180,26);
+    private static final Vector2Int TRIGGER_MODE_WIDGET_COORDS = new Vector2Int(6,59);
+    private static final Vector2Int HOLD_TICKS_WIDGET_COORDS = new Vector2Int(180,59);
+    private static final Vector2Int FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2Int(9,40);
+    private static final Vector2Int FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2Int(143,40);
+    private static final Vector2Int FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2Int(161,40);
+    private static final Vector2Int INVERT_POWER_WIDGET_COORDS = new Vector2Int(281,5);
 
     // Widgets
     private NoteFilterWidget noteFilter;
@@ -62,10 +60,10 @@ public class GuiListener extends BaseGui {
     public void init() {
         super.init();
         this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(MidiNbtDataUtils.getFilterInstrument(listenerStack));
-        this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
-        this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2i(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
-        this.triggerMode = new TriggerModeWidget(listenerStack, new Vector2i(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
-        this.holdTicks = new HoldTicksWidget(listenerStack, new Vector2i(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
+        this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2Int(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
+        this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2Int(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
+        this.triggerMode = new TriggerModeWidget(listenerStack, new Vector2Int(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
+        this.holdTicks = new HoldTicksWidget(listenerStack, new Vector2Int(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
     }
 
     public void syncListenerToServer() {

@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 import com.google.gson.JsonObject;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -103,7 +102,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack itemstack = this.result.copy();
         CompoundTag compoundnbt = inv.getItem(0).getTag();
         if (compoundnbt != null) {
@@ -119,7 +118,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess r) {
+    public ItemStack getResultItem() {
         return this.result;
     }
 }

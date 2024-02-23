@@ -6,26 +6,24 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.common.block.AColoredBlock;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class CopyBlockDyeRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "copyblockdye";
     public static final String COPY_TAG = AColoredBlock.DYE_ID.getName();
 
-	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CopyBlockDyeRecipe>(CopyBlockDyeRecipe::new);
+	public static final SimpleRecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<CopyBlockDyeRecipe>(CopyBlockDyeRecipe::new);
 
-    public CopyBlockDyeRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public CopyBlockDyeRecipe(ResourceLocation recipeId) {
+        super(recipeId);
     }
 
     @Override
@@ -60,7 +58,7 @@ public class CopyBlockDyeRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack source = ItemStack.EMPTY;
         ItemStack target = ItemStack.EMPTY;
 
@@ -77,7 +75,7 @@ public class CopyBlockDyeRecipe extends CustomRecipe {
         if(!source.isEmpty() && !target.isEmpty()) {
             CompoundTag targetTag = target.getOrCreateTag().copy();
             targetTag.putInt(COPY_TAG, TagUtils.getIntOrDefault(source, COPY_TAG, 0));
-            ItemStack result = target.copyWithCount(1);
+            ItemStack result = TagUtils.copyWithCount(target, 1);
             result.setTag(targetTag);
             return result;
         }
@@ -92,7 +90,7 @@ public class CopyBlockDyeRecipe extends CustomRecipe {
 
         for(int i = 0; i < nonnulllist.size(); ++i) {
             if(isAllowedItem(inv.getItem(i))) {
-                nonnulllist.set(i, inv.getItem(i).copyWithCount(1));
+                nonnulllist.set(i, TagUtils.copyWithCount(inv.getItem(i), 1));
                 break;
             }
         }

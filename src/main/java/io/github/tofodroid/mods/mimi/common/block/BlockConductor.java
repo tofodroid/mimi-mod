@@ -93,7 +93,7 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
     protected void openGui(Level worldIn, Player player, TileConductor tile) {
         //ClientGuiWrapper.openConductorGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
 
-        player.sendSystemMessage(Component.translatableWithFallback("block.mimi.conductor.wip", "Coming soon!"));
+        player.sendSystemMessage(Component.translatable("block.mimi.conductor.wip"));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
     @Override
     protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
-        tooltip.add(Component.translatableWithFallback("block.mimi.conductor.wip", "Coming soon!"));
+        tooltip.add(Component.translatable("block.mimi.conductor.wip"));
 
         // tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 

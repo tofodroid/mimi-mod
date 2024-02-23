@@ -30,8 +30,8 @@ public class BlockBroadcaster extends Block {
    @Override
    public void appendHoverText(ItemStack stack, @Nullable BlockGetter blockGetter, List<Component> tooltip, TooltipFlag flag) {
       tooltip.add(Component.literal(""));
-      tooltip.add(Component.translatableWithFallback("item.mimi.removed.tooltip", "REMOVED").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
-      tooltip.add(Component.translatableWithFallback("block.mimi.broadcaster.tooltip", "Place and right-click to convert me!"));
+      tooltip.add(Component.translatable("item.mimi.removed.tooltip").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+      tooltip.add(Component.translatable("block.mimi.broadcaster.tooltip"));
    }
 
    @Override

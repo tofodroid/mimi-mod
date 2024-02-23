@@ -14,9 +14,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
-
-import org.joml.Vector2i;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
@@ -44,17 +43,17 @@ public class GuiInstrument extends BaseGui {
     private static final Integer NOTE_OFFSET_Y = 29;
 
     // GUI
-    private static final Vector2i MIDI_CHANNEL_WIDGET_COORDS = new Vector2i(137,71);
-    private static final Vector2i TRANSMIT_SOURCE_WIDGET_COORDS = new Vector2i(18,105);
-    private static final Vector2i SYS_DEVICE_BUTTON_COORDS = new Vector2i(108,85);
-    private static final Vector2i INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2i(114,62);
-    private static final Vector2i INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2i(67,62);
-    private static final Vector2i KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2i(300,31);
-    private static final Vector2i NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(33,161);
-    private static final Vector2i NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2i(52,161);
-    private static final Vector2i OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2i(14,161);
-    private static final Vector2i OCT_SHIFT_UP_BUTTON_COORDS = new Vector2i(71,161);
-    private static final Vector2i MIDI_EDIT_BUTTON_COORDS = new Vector2i(299,161);
+    private static final Vector2Int MIDI_CHANNEL_WIDGET_COORDS = new Vector2Int(137,71);
+    private static final Vector2Int TRANSMIT_SOURCE_WIDGET_COORDS = new Vector2Int(18,105);
+    private static final Vector2Int SYS_DEVICE_BUTTON_COORDS = new Vector2Int(108,85);
+    private static final Vector2Int INSTRUMENT_VOLUME_UP_BUTTON_COORDS = new Vector2Int(114,62);
+    private static final Vector2Int INSTRUMENT_VOLUME_DOWN_BUTTON_COORDS = new Vector2Int(67,62);
+    private static final Vector2Int KEYBOARD_LAYOUT_BUTTON_COORDS = new Vector2Int(300,31);
+    private static final Vector2Int NOTE_SHIFT_DOWN_BUTTON_COORDS = new Vector2Int(33,161);
+    private static final Vector2Int NOTE_SHIFT_UP_BUTTON_COORDS = new Vector2Int(52,161);
+    private static final Vector2Int OCT_SHIFT_DOWN_BUTTON_COORDS = new Vector2Int(14,161);
+    private static final Vector2Int OCT_SHIFT_UP_BUTTON_COORDS = new Vector2Int(71,161);
+    private static final Vector2Int MIDI_EDIT_BUTTON_COORDS = new Vector2Int(299,161);
 
     // Keyboard
     private static final Integer KEYBOARD_START_NOTE = 21;
@@ -181,8 +180,8 @@ public class GuiInstrument extends BaseGui {
         super.init();
         this.heldNotes = new ConcurrentHashMap<>();
         this.releasedNotes = new ConcurrentHashMap<>();
-        this.midiChannelToggle = new MidiChannelToggleWidget(instrumentStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
-        this.transmitSource = new TransmitterSourceWidget(instrumentStack, player.getUUID(), player.getName().getString(), new Vector2i(START_X, START_Y), TRANSMIT_SOURCE_WIDGET_COORDS);
+        this.midiChannelToggle = new MidiChannelToggleWidget(instrumentStack, new Vector2Int(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
+        this.transmitSource = new TransmitterSourceWidget(instrumentStack, player.getUUID(), player.getName().getString(), new Vector2Int(START_X, START_Y), TRANSMIT_SOURCE_WIDGET_COORDS);
     }
 
     public void syncInstrumentToServer() {
@@ -564,7 +563,7 @@ public class GuiInstrument extends BaseGui {
         if(editMode) {
             // Switchboard Background Panel
             graphics.pushPose();
-            graphics.mulPose(Axis.ZN.rotationDegrees(90.0F));
+            graphics.mulPose(new Quaternion(new Vector3f(0,0,1),-90,true));
             blit(graphics, -(START_Y + 29 + 126),  START_X + 11, 404, 0, 126, 306, TEXTURE_SIZE, TEXTURE_SIZE);
             graphics.popPose();
 

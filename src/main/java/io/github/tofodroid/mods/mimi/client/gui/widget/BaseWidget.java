@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.client.gui.Vector2Int;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -13,18 +13,18 @@ import net.minecraft.resources.ResourceLocation;
 public abstract class BaseWidget {
     protected final ResourceLocation GUI_TEXTURE;
     protected final Integer TEXTURE_SIZE;
-    protected final Vector2i GUI_START;
-    protected final Vector2i WIDGET_START;
-    protected final Vector2i ABSOLUTE_START;
-    protected final Vector2i WIDGET_SIZE;
+    protected final Vector2Int GUI_START;
+    protected final Vector2Int WIDGET_START;
+    protected final Vector2Int ABSOLUTE_START;
+    protected final Vector2Int WIDGET_SIZE;
     
-    public BaseWidget(String textureResource, Integer textureSize, Vector2i size, Vector2i guiStartOffset, Vector2i start) {
+    public BaseWidget(String textureResource, Integer textureSize, Vector2Int size, Vector2Int guiStartOffset, Vector2Int start) {
         this.GUI_TEXTURE = new ResourceLocation(MIMIMod.MODID, textureResource);
         this.TEXTURE_SIZE = textureSize;
         this.GUI_START = guiStartOffset;
         this.WIDGET_START = start;
         this.WIDGET_SIZE = size;
-        this.ABSOLUTE_START = new Vector2i(
+        this.ABSOLUTE_START = new Vector2Int(
             GUI_START.x() + WIDGET_START.x(),
             GUI_START.y() + WIDGET_START.y()
         );
@@ -37,24 +37,24 @@ public abstract class BaseWidget {
     };
 
     public final Boolean mouseClicked(Integer mouseX, Integer mouseY, Integer mouseButton) {
-        return this.mouseClicked(screenToLocalCoords(new Vector2i(mouseX, mouseY)), mouseButton);
+        return this.mouseClicked(screenToLocalCoords(new Vector2Int(mouseX, mouseY)), mouseButton);
     };
 
     // Default no-op methods
     public void renderText(PoseStack graphics, Font font, Integer mouseX, Integer mouseY) { /* No-op */ };
     public Boolean keyPressed(Integer keyCode, Integer scanCode, Integer modifiers) { /* No-op */ return false; };
-    protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) { /* No-op */ return false; };
+    protected Boolean mouseClicked(Vector2Int localMouseCoords, Integer mouseButton) { /* No-op */ return false; };
 
 
-    protected Vector2i screenToLocalCoords(Vector2i screenCoords) {
-        return new Vector2i(
+    protected Vector2Int screenToLocalCoords(Vector2Int screenCoords) {
+        return new Vector2Int(
             screenCoords.x() - ABSOLUTE_START.x(), 
             screenCoords.y() - ABSOLUTE_START.y()
         );
     }
 
-    protected Vector2i localToScreenCoords(Vector2i localCoords) {
-        return new Vector2i(
+    protected Vector2Int localToScreenCoords(Vector2Int localCoords) {
+        return new Vector2Int(
             localCoords.x() + ABSOLUTE_START.x(), 
             localCoords.y() + ABSOLUTE_START.y()
         );

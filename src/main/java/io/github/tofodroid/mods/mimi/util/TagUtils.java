@@ -14,6 +14,12 @@ public abstract class TagUtils {
         return defaultVal;
     }
 
+    public static ItemStack copyWithCount(ItemStack in, Integer count) {
+        ItemStack result = in.copy();
+        result.setCount(count);
+        return result;
+    }
+
     public static Integer getIntOrDefault(ItemStack stack, String tag, Integer defaultVal) {
         try {
             return ((NumericTag)getTagOrExcept(stack, tag)).getAsInt();

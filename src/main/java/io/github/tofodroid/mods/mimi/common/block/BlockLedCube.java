@@ -64,14 +64,14 @@ public class BlockLedCube extends AColoredBlock {
       if(Items.REDSTONE_TORCH.equals(player.getItemInHand(handIn).getItem()) || Items.REDSTONE_BLOCK.equals(player.getItemInHand(handIn).getItem())) {
          if(!worldIn.isClientSide) {
             worldIn.setBlock(pos, state.cycle(INVERTED), 2);
-            worldIn.playSound(null, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS);
+            worldIn.playSound(null, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0f, 1.0f);
          }
          return InteractionResult.SUCCESS;
       } else if(player.getItemInHand(handIn).isEmpty()) {
          if(!worldIn.isClientSide) {
             Integer dyeId = state.getValue(DYE_ID);
             worldIn.setBlock(pos, state.setValue(DYE_ID, dyeId < 15 ? (dyeId + 1) : 0), 2);
-            worldIn.playSound(null, pos, SoundEvents.NOTE_BLOCK_BELL.get(), SoundSource.BLOCKS);
+            worldIn.playSound(null, pos, SoundEvents.NOTE_BLOCK_BELL, SoundSource.BLOCKS, 1.0f, 1.0f);
          }
          return InteractionResult.SUCCESS;
       }

@@ -107,7 +107,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
             }
              return InteractionResult.CONSUME;
         } else if(target instanceof Mob) {
-            if(!user.getLevel().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
+            if(!user.getLevel().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && ((Mob)target).equipItemIfPossible(stack)) {
                 user.setItemInHand(handIn, ItemStack.EMPTY);
                 target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
                 MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.getLevel(), null);

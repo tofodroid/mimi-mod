@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import org.joml.Vector2i;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
@@ -22,12 +20,12 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiReceiver extends BaseGui {
     // GUI
-    private static final Vector2i MIDI_CHANNEL_WIDGET_COORDS = new Vector2i(6,31);
-    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(180,26);
-    private static final Vector2i TRANSMIT_SOURCE_WIDGET_COORDS = new Vector2i(180,59);
-    private static final Vector2i TRIGGER_MODE_WIDGET_COORDS = new Vector2i(6,104);
-    private static final Vector2i HOLD_TICKS_WIDGET_COORDS = new Vector2i(180,104);
-    private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(281,5);
+    private static final Vector2Int MIDI_CHANNEL_WIDGET_COORDS = new Vector2Int(6,31);
+    private static final Vector2Int NOTE_FILTER_WIDGET_COORDS = new Vector2Int(180,26);
+    private static final Vector2Int TRANSMIT_SOURCE_WIDGET_COORDS = new Vector2Int(180,59);
+    private static final Vector2Int TRIGGER_MODE_WIDGET_COORDS = new Vector2Int(6,104);
+    private static final Vector2Int HOLD_TICKS_WIDGET_COORDS = new Vector2Int(180,104);
+    private static final Vector2Int INVERT_POWER_WIDGET_COORDS = new Vector2Int(281,5);
 
     // Widgets
     private MidiChannelToggleWidget midiChannelToggle;
@@ -60,12 +58,12 @@ public class GuiReceiver extends BaseGui {
     @Override
     public void init() {
         super.init();
-        this.midiChannelToggle = new MidiChannelToggleWidget(receiverStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
-        this.noteFilter = new NoteFilterWidget(receiverStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
-        this.transmitSource = new TransmitterSourceWidget(receiverStack, player.getUUID(), player.getName().getString(), new Vector2i(START_X, START_Y), TRANSMIT_SOURCE_WIDGET_COORDS);
-        this.invertSignal = new InvertSignalWidget(receiverStack, new Vector2i(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
-        this.triggerMode = new TriggerModeWidget(receiverStack, new Vector2i(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
-        this.holdTicks = new HoldTicksWidget(receiverStack, new Vector2i(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
+        this.midiChannelToggle = new MidiChannelToggleWidget(receiverStack, new Vector2Int(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
+        this.noteFilter = new NoteFilterWidget(receiverStack, new Vector2Int(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
+        this.transmitSource = new TransmitterSourceWidget(receiverStack, player.getUUID(), player.getName().getString(), new Vector2Int(START_X, START_Y), TRANSMIT_SOURCE_WIDGET_COORDS);
+        this.invertSignal = new InvertSignalWidget(receiverStack, new Vector2Int(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
+        this.triggerMode = new TriggerModeWidget(receiverStack, new Vector2Int(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
+        this.holdTicks = new HoldTicksWidget(receiverStack, new Vector2Int(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
     }
 
     public void syncListenerToServer() {

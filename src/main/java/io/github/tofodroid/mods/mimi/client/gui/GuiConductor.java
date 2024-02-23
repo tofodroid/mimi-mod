@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import org.joml.Vector2i;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -17,9 +15,9 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiConductor extends BaseGui {
     // GUI
-    private static final Vector2i MIDI_CHANNEL_WIDGET_COORDS = new Vector2i(6,26);
-    private static final Vector2i NOTE_LETTER_BUTTON_COORDS = new Vector2i(181,41);
-    private static final Vector2i NOTE_OCTAVE_BUTTON_COORDS = new Vector2i(203,41);
+    private static final Vector2Int MIDI_CHANNEL_WIDGET_COORDS = new Vector2Int(6,26);
+    private static final Vector2Int NOTE_LETTER_BUTTON_COORDS = new Vector2Int(181,41);
+    private static final Vector2Int NOTE_OCTAVE_BUTTON_COORDS = new Vector2Int(203,41);
 
     // Widgets
     private MidiChannelToggleWidget midiChannelToggle;
@@ -49,7 +47,7 @@ public class GuiConductor extends BaseGui {
     public void init() {
         super.init();
         this.broadcastNote = MidiNbtDataUtils.getBroadcastNote(conductorStack);
-        this.midiChannelToggle = new MidiChannelToggleWidget(conductorStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
+        this.midiChannelToggle = new MidiChannelToggleWidget(conductorStack, new Vector2Int(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
     }
 
     public void syncConductorToServer() {

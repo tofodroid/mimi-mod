@@ -2,7 +2,8 @@ package io.github.tofodroid.mods.mimi.common.entity;
 
 import java.util.List;
 
-import org.joml.Vector3d;
+import com.mojang.math.Vector3d;
+
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import net.minecraft.core.BlockPos;

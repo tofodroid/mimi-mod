@@ -1,15 +1,13 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
 import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -18,10 +16,10 @@ import java.util.ArrayList;
 public class ColoredItemRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "coloreditem";
 
-	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<ColoredItemRecipe>(ColoredItemRecipe::new);
+	public static final SimpleRecipeSerializer<?> SERIALIZER = new SimpleRecipeSerializer<ColoredItemRecipe>(ColoredItemRecipe::new);
 
-    public ColoredItemRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
-        super(recipeId, category);
+    public ColoredItemRecipe(ResourceLocation recipeId) {
+        super(recipeId);
     }
 
     @Override
@@ -41,7 +39,7 @@ public class ColoredItemRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack instrument = ItemStack.EMPTY;
         List<DyeItem> dyes = new ArrayList<>();
 

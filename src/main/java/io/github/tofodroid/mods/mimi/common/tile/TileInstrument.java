@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import org.joml.Vector3d;
+import com.mojang.math.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;

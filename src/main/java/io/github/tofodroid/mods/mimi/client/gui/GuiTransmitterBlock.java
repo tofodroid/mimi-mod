@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
-import org.joml.Vector2i;
-
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
@@ -27,21 +25,21 @@ public class GuiTransmitterBlock extends BaseGui {
     protected static final Integer LOADING_ANIMATION_FRAMES = 4;
     
     // Playlist Controls
-    protected static final Vector2i FAVORITE_FILTER_BUTTON = new Vector2i(300,32);
-    protected static final Vector2i FAVORITE_FILTER_SCREEN = new Vector2i(318,33);
-    protected static final Vector2i REFRESH_SONGS_BUTTON = new Vector2i(335,32);
-    protected static final Vector2i OPEN_LOCAL_FOLDER_BUTTON = new Vector2i(10,32);
+    protected static final Vector2Int FAVORITE_FILTER_BUTTON = new Vector2Int(300,32);
+    protected static final Vector2Int FAVORITE_FILTER_SCREEN = new Vector2Int(318,33);
+    protected static final Vector2Int REFRESH_SONGS_BUTTON = new Vector2Int(335,32);
+    protected static final Vector2Int OPEN_LOCAL_FOLDER_BUTTON = new Vector2Int(10,32);
 
     // Song Controls
-    protected static final Vector2i TOGGLE_FAVORITE_BUTTON = new Vector2i(335,149);
-    protected static final Vector2i PREVIOUS_BUTTON = new Vector2i(10,264);
-    protected static final Vector2i STOP_BUTTON = new Vector2i(29,264);
-    protected static final Vector2i PLAY_PAUSE_BUTTON = new Vector2i(48,264);
-    protected static final Vector2i NEXT_BUTTON = new Vector2i(67,264);
-    protected static final Vector2i LOOP_BUTTON = new Vector2i(86,264);
-    protected static final Vector2i LOOP_SCREEN = new Vector2i(104,265);
-    protected static final Vector2i SHUFFLE_BUTTON = new Vector2i(121,264);
-    protected static final Vector2i SHUFFLE_SCREEN = new Vector2i(139,265);
+    protected static final Vector2Int TOGGLE_FAVORITE_BUTTON = new Vector2Int(335,149);
+    protected static final Vector2Int PREVIOUS_BUTTON = new Vector2Int(10,264);
+    protected static final Vector2Int STOP_BUTTON = new Vector2Int(29,264);
+    protected static final Vector2Int PLAY_PAUSE_BUTTON = new Vector2Int(48,264);
+    protected static final Vector2Int NEXT_BUTTON = new Vector2Int(67,264);
+    protected static final Vector2Int LOOP_BUTTON = new Vector2Int(86,264);
+    protected static final Vector2Int LOOP_SCREEN = new Vector2Int(104,265);
+    protected static final Vector2Int SHUFFLE_BUTTON = new Vector2Int(121,264);
+    protected static final Vector2Int SHUFFLE_SCREEN = new Vector2Int(139,265);
 
     // Time Slider
     protected static final Integer SLIDE_Y = 263;

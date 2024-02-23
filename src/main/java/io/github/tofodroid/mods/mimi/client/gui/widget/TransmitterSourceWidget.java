@@ -2,7 +2,7 @@ package io.github.tofodroid.mods.mimi.client.gui.widget;
 
 import java.util.UUID;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.client.gui.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -13,15 +13,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.ItemStack;
 
 public class TransmitterSourceWidget extends BaseWidget {
-    private static final Vector2i SOURCE_SELF_BUTTON_COORDS = new Vector2i(78, 14);
-    private static final Vector2i SOURCE_CLEAR_BUTTON_COORDS = new Vector2i(97, 14);
+    private static final Vector2Int SOURCE_SELF_BUTTON_COORDS = new Vector2Int(78, 14);
+    private static final Vector2Int SOURCE_CLEAR_BUTTON_COORDS = new Vector2Int(97, 14);
 
     private ItemStack midiStack;
     private String playerName;
     private UUID playerId;
 
-    public TransmitterSourceWidget(ItemStack midiStack, UUID playerId, String playerName, Vector2i screenOffset, Vector2i start) {
-        super("textures/gui/widget/transmit_source.png", 116,  new Vector2i(116,45), screenOffset, start);
+    public TransmitterSourceWidget(ItemStack midiStack, UUID playerId, String playerName, Vector2Int screenOffset, Vector2Int start) {
+        super("textures/gui/widget/transmit_source.png", 116,  new Vector2Int(116,45), screenOffset, start);
         this.midiStack = midiStack;
         this.playerId = playerId;
         this.playerName = playerName;
@@ -50,7 +50,7 @@ public class TransmitterSourceWidget extends BaseWidget {
     }
 
     @Override
-    protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
+    protected Boolean mouseClicked(Vector2Int localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), SOURCE_SELF_BUTTON_COORDS)) {
             MidiNbtDataUtils.setMidiSource(midiStack, playerId, playerName);
             return true;

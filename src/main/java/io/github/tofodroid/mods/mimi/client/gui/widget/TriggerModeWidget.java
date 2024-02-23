@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.client.gui.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -11,14 +11,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.ItemStack;
 
 public class TriggerModeWidget extends BaseWidget {
-    private static final Vector2i DOWN_BUTTON_COORDS = new Vector2i(77, 3);
-    private static final Vector2i UP_BUTTON_COORDS = new Vector2i(155, 3);
-    private static final Vector2i VALUE_TEXT_COORDS = new Vector2i(97, 7);
+    private static final Vector2Int DOWN_BUTTON_COORDS = new Vector2Int(77, 3);
+    private static final Vector2Int UP_BUTTON_COORDS = new Vector2Int(155, 3);
+    private static final Vector2Int VALUE_TEXT_COORDS = new Vector2Int(97, 7);
 
     private ItemStack midiStack;
 
-    public TriggerModeWidget(ItemStack midiStack, Vector2i screenOffset, Vector2i start) {
-        super("textures/gui/widget/trigger_mode.png", 173, new Vector2i(173,21), screenOffset, start);
+    public TriggerModeWidget(ItemStack midiStack, Vector2Int screenOffset, Vector2Int start) {
+        super("textures/gui/widget/trigger_mode.png", 173, new Vector2Int(173,21), screenOffset, start);
         this.midiStack = midiStack;
     }
 
@@ -35,7 +35,7 @@ public class TriggerModeWidget extends BaseWidget {
     }
 
     @Override
-    protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
+    protected Boolean mouseClicked(Vector2Int localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), DOWN_BUTTON_COORDS)) {
             MidiNbtDataUtils.setTriggerNoteStart(midiStack, !MidiNbtDataUtils.getTriggerNoteStart(midiStack));
             return true;
