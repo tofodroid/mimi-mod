@@ -15,7 +15,7 @@
         {
             "type": "patchouli:text",
             "title": "Filtering Songs",
-            "text": "When using a Transmitter you can use the buttons in the top-right to filter the playlist of songs by source (your PC, the server, or all) (only for handheld Transmitters) and by favorites (favorited, unfavorited, or all).$(br2)To mark a song as a favorite, use the heart-plus button to the right of the selected song's name. The same button is used to unfavorite the song if it is already favorited."
+            "text": "When using a Transmitter you can use the buttons in the top-right to filter the playlist of songs by source (your PC, the server, all) (only for handheld Transmitters) and by favorites (favorited, not favorited, all).$(br2)To mark a song as a favorite, use the heart-plus button to the right of the selected song's name. The same button is used to unfavorite the song if it is already favorited."
         },
         {
             "type": "patchouli:text",

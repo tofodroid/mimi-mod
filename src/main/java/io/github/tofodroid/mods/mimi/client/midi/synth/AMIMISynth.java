@@ -53,6 +53,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
             this.internalSynth = createSynth(getDeviceOutLine(this.format), this.format, jitterCorrection, false, latency, sounds);
             this.internalSynthReceiver = this.internalSynth.getReceiver();
         } catch(Exception e) {
+            MIMIMod.LOGGER.error("Failed to initialize MIDI Synthesizer: ", e);
             this.internalSynth = null;
             this.internalSynthReceiver = null;
         }
@@ -149,11 +150,13 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void allNotesOff() {
-        for(T channel : this.channelAssignmentMap.keySet()) {
-            channel.allNotesOff();
+        if(internalSynth != null ) {
+            for(T channel : this.channelAssignmentMap.keySet()) {
+                channel.allNotesOff();
 
-            if(this.internalSynth != null && this.internalSynth.isOpen() && this.internalSynth.getMainMixer() != null) {
-                this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
+                if(this.internalSynth != null && this.internalSynth.isOpen() && this.internalSynth.getMainMixer() != null) {
+                    this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
+                }
             }
         }
     }

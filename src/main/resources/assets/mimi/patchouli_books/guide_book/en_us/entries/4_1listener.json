@@ -22,7 +22,7 @@
         },
         {
             "type": "patchouli:text",
-            "text": "$(li)$(l)Trigger Mode$(): Whether the listener should emit redstone the entire time a note is held or just when a note starts."
+            "text": "$(li)$(l)Trigger Mode$(): Whether the listener should emit a Redstone signal the entire time a note is held or just when a note starts."
         }
     ],
     "sortnum": 1
