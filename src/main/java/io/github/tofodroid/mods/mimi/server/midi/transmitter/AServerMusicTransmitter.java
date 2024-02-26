@@ -63,8 +63,8 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
         this.midiHandler.stop();
     }
 
-    public void seek() {
-        // TODO ?
+    public void seek(Integer percent) {
+        this.midiHandler.setPositionPercent(percent);
     }
 
     public void next() {
@@ -172,7 +172,6 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
         this.loading = true;
         this.loadFailed = false;
         this.shouldPlayNextLoad = this.shouldPlayNextLoad || this.midiHandler.isPlaying();
-        this.stop();
         this.midiHandler.unloadSong();
 
         if(info.serverMidi) {
