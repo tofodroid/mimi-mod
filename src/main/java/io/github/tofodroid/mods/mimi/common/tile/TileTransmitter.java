@@ -27,7 +27,7 @@ public class TileTransmitter extends AConfigurableMidiTile {
 
         // Create music player for existing tiles from world save
         if(this.hasLevel() && !this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {
-            ServerMusicTransmitterManager.createTransmitter(this);
+            ServerMusicTransmitterManager.getOrCreateTransmitter(this);
             this.setUnpowered();
         }
     }
@@ -38,7 +38,7 @@ public class TileTransmitter extends AConfigurableMidiTile {
 
         // Create music player for existing tiles from world save
         if(this.hasLevel() && !this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {
-            ServerMusicTransmitterManager.createTransmitter(this);
+            ServerMusicTransmitterManager.getOrCreateTransmitter(this);
             this.setUnpowered();
         }
     }
