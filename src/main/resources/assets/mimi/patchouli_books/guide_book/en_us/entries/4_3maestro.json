@@ -7,7 +7,7 @@
             "type": "patchouli:spotlight",
             "title": "Mechanical Maestro",
             "item": "mimi:mechanicalmaestro",
-            "text": "The Mechanical Maestro is a block that, when powered by redstone and given instruments, will play the instruments it is given when it receives notes from nearby a Transmitter linked to the instruments."
+            "text": "The Mechanical Maestro is a block that, when powered by redstone and given instruments, will play the instruments it is given when it receives notes from a nearby Transmitter linked to the instruments."
         },
         {
             "type": "patchouli:crafting",

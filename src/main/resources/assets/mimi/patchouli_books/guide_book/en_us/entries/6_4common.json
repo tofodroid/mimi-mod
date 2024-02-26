@@ -15,7 +15,7 @@
         {
             "type": "text",
             "title": "Instrument Mobs",
-            "text": "$(l)Param:$() allowedInstrumentMobs$(br)$(l)Type:$() Boolean$(br)$(l)Default:$() minecraft:zombie,minecraft:husk,minecraft:skeleton,minecraft:stray,minecraft:wither_skeleton$(br2)This parameter stores a comma separated list of mobs that should be able to hold instruments."
+            "text": "$(l)Param:$() allowedInstrumentMobs$(br)$(l)Type:$() Comma-Separated List$(br)$(l)Default:$() minecraft:zombie,minecraft:husk,minecraft:skeleton,minecraft:stray,minecraft:wither_skeleton$(br2)This parameter stores a comma separated list of mobs that should be able to hold instruments."
         }
     ],
     "sortnum": 4
