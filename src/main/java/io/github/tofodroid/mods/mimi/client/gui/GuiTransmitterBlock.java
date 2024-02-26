@@ -48,8 +48,8 @@ public class GuiTransmitterBlock extends BaseGui {
     protected static final Integer SLIDE_MAX_X = 335;
     protected static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
     protected static final Integer SLIDE_HEIGHT = SLIDE_MAX_Y - SLIDE_MIN_Y;
-    protected static final Vector2i SLIDE_CLICK_START = new Vector2i(SLIDE_MIN_X-4, SLIDE_MIN_Y);
-    protected static final Vector2i SLIDE_CLICK_SIZE = new Vector2i(SLIDE_WIDTH+8, SLIDE_HEIGHT);
+    protected static final Vector2Int SLIDE_CLICK_START = new Vector2Int(SLIDE_MIN_X-4, SLIDE_MIN_Y);
+    protected static final Vector2Int SLIDE_CLICK_SIZE = new Vector2Int(SLIDE_WIDTH+8, SLIDE_HEIGHT);
 
     // Animation
     protected Integer ticksSinceUpdate = 0;
