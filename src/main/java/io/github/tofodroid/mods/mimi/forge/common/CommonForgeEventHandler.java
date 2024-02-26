@@ -34,6 +34,7 @@ public class CommonForgeEventHandler {
         }
         ServerMidiManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         ServerMusicReceiverManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
+        ServerMusicTransmitterManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
     }
 
     @SubscribeEvent

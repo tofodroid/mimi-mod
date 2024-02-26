@@ -99,7 +99,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
             tileEntity.setSourceStack(newStack);
             
             if(!worldIn.isClientSide) {
-                ServerMusicTransmitterManager.createTransmitter(tileEntity);
+                ServerMusicTransmitterManager.getOrCreateTransmitter(tileEntity);
             }
         }
     }

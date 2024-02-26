@@ -10,7 +10,7 @@
         {
             "type": "patchouli:text",
             "title": "Playing",
-            "text": "You can directly play the instrument that you have opened using the keyboard as shown on the piano keys on the screen, or by just clicking on the piano keys.$(br2)If you hold down Spacebar while playing, notes will hold in the same way as holding the sustain pedal on a piano.$(br2)You can change the piano keyboard layout with the button in the top-right corner."
+            "text": "You can directly play the instrument that you have opened using the keyboard as shown on the piano keys on the screen, or by just clicking on the piano keys.$(br2)If you hold down Space while playing, notes will hold in the same way as holding the sustain pedal on a piano.$(br2)You can change the piano keyboard layout with the button in the top-right corner."
         },
         {
             "type": "patchouli:text",

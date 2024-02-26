@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map.Entry;
 
-import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
-
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
 
@@ -18,14 +16,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 
 public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
-    protected SoftSynthesizer internalSynth;
-    
     public LocalPlayerMIMISynth(Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
        super(jitterCorrection, latency, sounds);
     }
 
     public Boolean tick(Player clientPlayer) {
-        if(!this.channelAssignmentMap.isEmpty()) {
+        if(this.internalSynth != null && !this.channelAssignmentMap.isEmpty()) {
             // Generate player data
             List<MIMIChannel> toRemove = new ArrayList<>();
             TileInstrument instrumentTile = BlockInstrument.getTileInstrumentForEntity(clientPlayer);
@@ -55,7 +51,7 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
 
             return true;
         }
-
+    
         return false;
     }
     

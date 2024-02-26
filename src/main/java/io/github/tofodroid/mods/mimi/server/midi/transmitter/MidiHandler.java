@@ -135,7 +135,9 @@ public class MidiHandler {
             }
 
             if(this.lastTempoBPM == null) {
-                this.lastTempoBPM = getTempoBPM(this.activeSequencer.getSequence());
+                Long tickPos = this.activeSequencer.getTickPosition();
+                tickPos = tickPos != null ? tickPos : 0;
+                this.lastTempoBPM = getTempoBPM(this.activeSequencer.getSequence(), tickPos);
             }
 
             this.activeSequencer.setTempoInBPM(this.lastTempoBPM);
@@ -144,6 +146,19 @@ public class MidiHandler {
         }
         this.pausedTickPosition = null;
         this.pausedMicrosecond = null;
+    }
+    
+    public void setPositionPercent(Integer percent) {
+        if(this.hasSongLoaded()) {
+            this.pause();
+
+            Long newTickPos = Double.valueOf((Double.valueOf(percent)/100.0) * Double.valueOf(this.activeSequencer.getTickLength())).longValue();
+            newTickPos = newTickPos < 0 ? 0 : (newTickPos >= this.activeSequencer.getTickLength() ? this.activeSequencer.getTickLength()-100 : newTickPos);
+            this.pausedTickPosition = newTickPos;
+            this.lastTempoBPM = getTempoBPM(this.activeSequencer.getSequence(), newTickPos);
+
+            this.play();
+        }
     }
 
     public void pause() {
@@ -164,19 +179,30 @@ public class MidiHandler {
         this.lastTempoBPM = null;
 
         if(this.activeSequencer != null) {
-            this.activeSequencer.stop();
-            this.activeSequencer.setTickPosition(0);
-        }
+            try {
+                this.activeSequencer.stop();
+                this.activeSequencer.setTickPosition(0);
+                
+                if(this.activeReceiver != null) {
+                    this.activeReceiver.sendTransmitterAllNotesOffPacket();
+                }
+            } catch (Exception e) {
+                MIMIMod.LOGGER.error("Failed to stop sequencer: ", e);
 
-        if(this.activeReceiver != null) {
-            this.activeReceiver.sendTransmitterAllNotesOffPacket();
+                if(this.activeReceiver != null) {
+                    this.activeReceiver.sendTransmitterAllNotesOffPacket();
+                }
+
+                this.close();
+                this.initializeSequencer();
+            }
         }
     }
     
     public void close() {
         if(this.activeSequencer != null) {
-            this.activeSequencer.stop();
             try {
+                this.activeSequencer.stop();
                 this.activeSequencer.close();
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to stop sequencer: ", e);
@@ -200,7 +226,10 @@ public class MidiHandler {
         this.channelMapping = null;
     }
 
-    private static Integer getTempoBPM(Sequence sequence) {
+    private static Integer getTempoBPM(Sequence sequence, Long tickPos) {
+        // Safe default
+        Integer lastBpm = 120;
+
         for(Track track : sequence.getTracks()) {
             if(track != null && track.size() > 0) {
                 for(int i = 0; i < track.size(); i++) {
@@ -209,15 +238,19 @@ public class MidiHandler {
                         if(message.getType() == 81 && message.getData().length == 3) {
                             byte[] data = message.getData();
                             int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);
-                            return Math.round(60000001f / mspq);
+                            Integer newBpm = Math.round(60000001f / mspq);
+
+                            // If we are at or before target tick or we haven't found any BPM yet cache this one
+                            if(track.get(i).getTick() <= tickPos || lastBpm == null) {
+                                lastBpm = newBpm;
+                            }
                         }
                     }
                 }
             }
         }
 
-        // Safe default
-        return 120;
+        return lastBpm;
     }
 
     protected Boolean initializeSequencer() {

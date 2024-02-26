@@ -1,27 +1,27 @@
 /*
- * Copyright (c) 2003, 2021, Oracle and/or its affiliates. All rights reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
- *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
- *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
- */
+* Copyright (c) 2003, 2019, Oracle and/or its affiliates. All rights reserved.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+*
+* This code is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License version 2 only, as
+* published by the Free Software Foundation.  Oracle designates this
+* particular file as subject to the "Classpath" exception as provided
+* by Oracle in the LICENSE file that accompanied this code.
+*
+* This code is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+* version 2 for more details (a copy is included in the LICENSE file that
+* accompanied this code).
+*
+* You should have received a copy of the GNU General Public License version
+* 2 along with this work; if not, write to the Free Software Foundation,
+* Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+*
+* Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+* or visit www.oracle.com if you need additional information or have any
+* questions.
+*/
 
 package io.github.tofodroid.com.sun.media.sound;
 
@@ -51,26 +51,26 @@ import javax.sound.midi.Transmitter;
 
 /**
  * A Real Time Sequencer
- *
- * @author Florian Bomers
- */
+*
+* @author Florian Bomers
+*/
 
-/* TD:
- * - rename PlayThread to PlayEngine (because isn't a thread)
- */
+/* TODO:
+* - rename PlayThread to PlayEngine (because isn't a thread)
+*/
 final class RealTimeSequencer extends AbstractMidiDevice
         implements Sequencer, AutoConnectSequencer {
 
     /**
      * Event Dispatcher thread. Should be using a shared event
-     * dispatcher instance with a factory in EventDispatcher
-     */
+    * dispatcher instance with a factory in EventDispatcher
+    */
     private static final Map<ThreadGroup, EventDispatcher> dispatchers =
             new WeakHashMap<>();
 
     /**
      * All RealTimeSequencers share this info object.
-     */
+    */
     static final MidiDevice.Info info = new RealTimeSequencerInfo();
 
 
@@ -82,21 +82,21 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * Sequence on which this sequencer is operating.
-     */
+    */
     private Sequence sequence = null;
 
     // caches
 
     /**
      * Same for setTempoInMPQ...
-     * -1 means not set.
-     */
+    * -1 means not set.
+    */
     private double cacheTempoMPQ = -1;
 
     /**
      * cache value for tempo factor until sequence is set
-     * -1 means not set.
-     */
+    * -1 means not set.
+    */
     private float cacheTempoFactor = -1;
 
     /** if a particular track is muted */
@@ -109,22 +109,22 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * True if the sequence is running.
-     */
+    */
     private volatile boolean running;
 
     /**
      * the thread for pushing out the MIDI messages.
-     */
+    */
     private PlayThread playThread;
 
     /**
      * True if we are recording.
-     */
+    */
     private volatile boolean recording;
 
     /**
      * List of tracks to which we're recording.
-     */
+    */
     private final List<RecordingTrack> recordingTracks = new ArrayList<>();
 
     private long loopStart = 0;
@@ -133,27 +133,27 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * Meta event listeners.
-     */
+    */
     private final ArrayList<Object> metaEventListeners = new ArrayList<>();
 
     /**
      * Control change listeners.
-     */
+    */
     private final ArrayList<ControllerListElement> controllerEventListeners = new ArrayList<>();
 
     /**
      * automatic connection support.
-     */
+    */
     private boolean autoConnect = false;
 
     /**
      * if we need to autoconnect at next open.
-     */
+    */
     private boolean doAutoConnectAtNextOpen = false;
 
     /**
      * the receiver that this device is auto-connected to.
-     */
+    */
     Receiver autoConnectedReceiver = null;
 
 
@@ -589,7 +589,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
     }
 
     @Override
-    @SuppressWarnings("null")
     public int[] addControllerEventListener(ControllerEventListener listener, int[] controllers) {
         synchronized(controllerEventListeners) {
 
@@ -618,7 +617,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
     }
 
     @Override
-    @SuppressWarnings("null")
     public int[] removeControllerEventListener(ControllerEventListener listener, int[] controllers) {
         synchronized(controllerEventListeners) {
             ControllerListElement cve = null;
@@ -723,7 +721,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
         Receiver rec = null;
         // first try to connect to the default synthesizer
         // IMPORTANT: this code needs to be synch'ed with
-        //            MidiSystem-getSequencer(boolean), because the same
+        //            MidiSystem.getSequencer(boolean), because the same
         //            algorithm needs to be used!
         try {
             Synthesizer synth = MidiSystem.getSynthesizer();
@@ -748,7 +746,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
             try {
                 rec = MidiSystem.getReceiver();
             } catch (Exception e) {
-                // something went wrong. no-op
+                // something went wrong. Nothing to do then!
             }
         }
         if (rec != null) {
@@ -775,7 +773,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * populate the caches with the current values.
-     */
+    */
     private synchronized void setCaches() {
         cacheTempoFactor = getTempoFactor();
         cacheTempoMPQ = getTempoInMPQ();
@@ -805,7 +803,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /** if this sequencer is set to autoconnect, need to
          * re-establish the connection at next open!
-         */
+        */
         doAutoConnectAtNextOpen = autoConnect;
 
         if (autoConnectedReceiver != null) {
@@ -858,8 +856,8 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * Send midi player events.
-     * must not be synchronized on "this"
-     */
+    * must not be synchronized on "this"
+    */
     void sendMetaEvents(MidiMessage message) {
         if (metaEventListeners.size() == 0) return;
 
@@ -868,7 +866,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * Send midi player events.
-     */
+    */
     void sendControllerEvents(MidiMessage message) {
         int size = controllerEventListeners.size();
         if (size == 0) return;
@@ -897,10 +895,10 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * return the data pump instance, owned by play thread
-     * if playthread is null, return null.
-     * This method is guaranteed to return non-null if
-     * needCaching returns false
-     */
+    * if playthread is null, return null.
+    * This method is guaranteed to return non-null if
+    * needCaching returns false
+    */
     private DataPump getDataPump() {
         if (playThread != null) {
             return playThread.getDataPump();
@@ -956,8 +954,8 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * An own class to distinguish the class name from
-     * the transmitter of other devices.
-     */
+    * the transmitter of other devices.
+    */
     private class SequencerTransmitter extends BasicTransmitter {
         private SequencerTransmitter() {
             super();
@@ -1025,7 +1023,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
         }
     } // class Info
 
-    private static class ControllerListElement {
+    private class ControllerListElement {
 
         // $$jb: using an array for controllers b/c its
         //       easier to deal with than turning all the
@@ -1186,9 +1184,8 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
 
         PlayThread() {
-            // nearly MAX_PRIORITY
-            int priority = Thread.NORM_PRIORITY
-                + ((Thread.MAX_PRIORITY - Thread.NORM_PRIORITY) * 3) / 4;
+            // MAX_PRIORITY
+            int priority = Thread.MAX_PRIORITY;
             thread = JSSecurityManager.createThread(this,
                                                     "Java Sound Sequencer", // name
                                                     false,                  // daemon
@@ -1229,19 +1226,18 @@ final class RealTimeSequencer extends AbstractMidiDevice
         // waits until stopped
         synchronized void stop() {
             playThreadImplStop();
-            long t = System.nanoTime() / 1000000l;
-            while (isPumping) {
+
+            if(isPumping) {
                 synchronized(lock) {
                     try {
-                        lock.wait(2000);
+                        lock.wait(250);
                     } catch (InterruptedException ie) {
-                        // ignore
+                        Printer.err("InterruptedException while waiting stop: " + ie.getMessage());
                     }
                 }
-                // don't wait for more than 2 seconds
-                if ((System.nanoTime()/1000000l) - t > 1900) {
-                    if (Printer.err) Printer.err("Waited more than 2 seconds in RealTimeSequencer.PlayThread.stop()!");
-                    //break;
+
+                if(isPumping) {
+                    Printer.err("Failed to stop play thread after 250ms. Leaving for GC.");
                 }
             }
         }
@@ -1279,10 +1275,10 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /**
          * Main process loop driving the media flow.
-         *
-         * Make sure to NOT synchronize on RealTimeSequencer
-         * anywhere here (even implicit). That is a sure deadlock!
-         */
+        *
+        * Make sure to NOT synchronize on RealTimeSequencer
+        * anywhere here (even implicit). That is a sure deadlock!
+        */
         @Override
         public void run() {
 
@@ -1330,8 +1326,8 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
     /**
      * class that does the actual dispatching of events,
-     * used to be in native in MMAPI.
-     */
+    * used to be in native in MMAPI.
+    */
     private class DataPump {
         private float currTempo;         // MPQ tempo
         private float tempoFactor;       // 1.0 is default
@@ -1458,9 +1454,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
             }
         }
 
-        @SuppressWarnings("unused")
         void notesOff(boolean doControllers) {
-            int done = 0;
             for (int ch=0; ch<16; ch++) {
                 int channelMask = (1<<ch);
                 for (int i=0; i<128; i++) {
@@ -1468,7 +1462,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
                         noteOnCache[i] ^= channelMask;
                         // send note on with velocity 0
                         getTransmitterList().sendMessage((ShortMessage.NOTE_ON | ch) | (i<<8), -1);
-                        done++;
                     }
                 }
                 /* all notes off */
@@ -1478,12 +1471,10 @@ final class RealTimeSequencer extends AbstractMidiDevice
                 if (doControllers) {
                     /* reset all controllers */
                     getTransmitterList().sendMessage((ShortMessage.CONTROL_CHANGE | ch) | (121<<8), -1);
-                    done++;
                 }
             }
         }
 
-        @SuppressWarnings("null")
         private boolean[] makeDisabledArray() {
             if (tracks == null) {
                 return null;
@@ -1521,16 +1512,14 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /**
          * chase all events from beginning of Track
-         * and send note off for those events that are active
-         * in noteOnCache array.
-         * It is possible, of course, to catch notes from other tracks,
-         * but better than more complicated logic to detect
-         * which notes are really from this track
-         */
-        @SuppressWarnings("unused")
+        * and send note off for those events that are active
+        * in noteOnCache array.
+        * It is possible, of course, to catch notes from other tracks,
+        * but better than more complicated logic to detect
+        * which notes are really from this track
+        */
         private void sendNoteOffIfOn(Track track, long endTick) {
             int size = track.size();
-            int done = 0;
             try {
                 for (int i = 0; i < size; i++) {
                     MidiEvent event = track.get(i);
@@ -1560,7 +1549,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
                                 getTransmitterList().sendMessage(status | (note<<8), -1);
                                 // clear the bit
                                 noteOnCache[note] &= (0xFFFF ^ bit);
-                                done++;
                             }
                         }
                     }
@@ -1573,16 +1561,16 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /**
          * Runtime application of mute/solo:
-         * if a track is muted that was previously playing, send
-         *    note off events for all currently playing notes.
-         */
+        * if a track is muted that was previously playing, send
+        *    note off events for all currently playing notes.
+        */
         private void applyDisabledTracks(boolean[] oldDisabled, boolean[] newDisabled) {
             byte[][] tempArray = null;
             synchronized(RealTimeSequencer.this) {
                 for (int i = 0; i < newDisabled.length; i++) {
                     if (((oldDisabled == null)
-                         || (i >= oldDisabled.length)
-                         || !oldDisabled[i])
+                        || (i >= oldDisabled.length)
+                        || !oldDisabled[i])
                         && newDisabled[i]) {
                         // case that a track gets muted: need to
                         // send appropriate note off events to prevent
@@ -1593,9 +1581,9 @@ final class RealTimeSequencer extends AbstractMidiDevice
                         }
                     }
                     else if ((oldDisabled != null)
-                             && (i < oldDisabled.length)
-                             && oldDisabled[i]
-                             && !newDisabled[i]) {
+                            && (i < oldDisabled.length)
+                            && oldDisabled[i]
+                            && !newDisabled[i]) {
                         // case that a track was muted and is now unmuted
                         // need to chase events and re-index this track
                         if (tempArray == null) {
@@ -1609,17 +1597,16 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /** go through all events from startTick to endTick
          * chase the controller state and program change state
-         * and then set the end-states at once.
-         *
-         * needs to be called in synchronized state
-         * @param tempArray an byte[128][16] to hold controller messages
-         */
-        @SuppressWarnings("unused")
+        * and then set the end-states at once.
+        *
+        * needs to be called in synchronized state
+        * @param tempArray an byte[128][16] to hold controller messages
+        */
         private void chaseTrackEvents(int trackNum,
-                                      long startTick,
-                                      long endTick,
-                                      boolean doReindex,
-                                      byte[][] tempArray) {
+                                    long startTick,
+                                    long endTick,
+                                    boolean doReindex,
+                                    byte[][] tempArray) {
             if (startTick > endTick) {
                 // start from the beginning
                 startTick = 0;
@@ -1669,7 +1656,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
                 // this happens when messages are removed
                 // from the track while this method executes
             }
-            int numControllersSent = 0;
+            
             // now send out the aggregated controllers and program changes
             for (int ch = 0; ch < 16; ch++) {
                 for (int co = 0; co < 128; co++) {
@@ -1677,7 +1664,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
                     if (controllerValue >= 0) {
                         int packedMsg = (ShortMessage.CONTROL_CHANGE | ch) | (co<<8) | (controllerValue<<16);
                         getTransmitterList().sendMessage(packedMsg, -1);
-                        numControllersSent++;
                     }
                 }
                 // send program change *after* controllers, to
@@ -1696,7 +1682,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /**
          * chase controllers and program for all tracks.
-         */
+        */
         synchronized void chaseEvents(long startTick, long endTick) {
             byte[][] tempArray = new byte[128][16];
             for (int t = 0; t < tracks.length; t++) {
@@ -1732,7 +1718,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
         private long tick2millis(long tick) {
             if (divisionType != Sequence.PPQ) {
                 double dMillis = ((((double) tick) * 1000) /
-                                  (tempoFactor * ((double) divisionType) * ((double) resolution)));
+                                (tempoFactor * ((double) divisionType) * ((double) resolution)));
                 return (long) dMillis;
             }
             return MidiUtils.ticks2microsec(tick,
@@ -1812,7 +1798,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
 
         /** the main pump method
          * @return true if end of sequence is reached
-         */
+        */
         synchronized boolean pump() {
             long currMillis;
             long targetTick = lastTick;
@@ -1871,7 +1857,7 @@ final class RealTimeSequencer extends AbstractMidiDevice
                         int size = thisTrack.size();
                         // play all events that are due until targetTick
                         while (!changesPending && (readPos < size)
-                               && (currEvent = thisTrack.get(readPos)).getTick() <= targetTick) {
+                            && (currEvent = thisTrack.get(readPos)).getTick() <= targetTick) {
 
                             if ((readPos == size -1) &&  MidiUtils.isMetaEndOfTrack(currEvent.getMessage())) {
                                 // do not send out this message. Finished with this track
@@ -1908,10 +1894,10 @@ final class RealTimeSequencer extends AbstractMidiDevice
                 EOM = (finishedTracks == tracks.length);
                 if (doLoop
                     || ( ((loopCount > 0 && currLoopCounter > 0)
-                          || (loopCount == LOOP_CONTINUOUSLY))
-                         && !changesPending
-                         && (loopEnd == -1)
-                         && EOM)) {
+                        || (loopCount == LOOP_CONTINUOUSLY))
+                        && !changesPending
+                        && (loopEnd == -1)
+                        && EOM)) {
 
                     long oldCheckPointMillis = checkPointMillis;
                     long loopEndTick = loopEnd;
@@ -1927,7 +1913,6 @@ final class RealTimeSequencer extends AbstractMidiDevice
                     // now patch the checkPointMillis so that
                     // it points to the exact beginning of when the loop was finished
 
-                    // $$fb TD: although this is mathematically correct (i.e. the loop position
                     //            is correct, and doesn't drift away with several repetition,
                     //            there is a slight lag when looping back, probably caused
                     //            by the chasing.

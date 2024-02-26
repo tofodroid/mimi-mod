@@ -44,10 +44,14 @@ public class GuiTransmitterBlock extends BaseGui {
     protected static final Vector2i SHUFFLE_SCREEN = new Vector2i(139,265);
 
     // Time Slider
-    protected static final Integer SLIDE_Y = 263;
+    protected static final Integer SLIDE_MIN_Y = 263;
+    protected static final Integer SLIDE_MAX_Y = 280;
     protected static final Integer SLIDE_MIN_X = 166;
     protected static final Integer SLIDE_MAX_X = 335;
     protected static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
+    protected static final Integer SLIDE_HEIGHT = SLIDE_MAX_Y - SLIDE_MIN_Y;
+    protected static final Vector2i SLIDE_CLICK_START = new Vector2i(SLIDE_MIN_X-4, SLIDE_MIN_Y);
+    protected static final Vector2i SLIDE_CLICK_SIZE = new Vector2i(SLIDE_WIDTH+8, SLIDE_HEIGHT);
 
     // Animation
     protected Integer ticksSinceUpdate = 0;
@@ -148,6 +152,11 @@ public class GuiTransmitterBlock extends BaseGui {
             this.sendTransmitterCommand(CONTROL.LOOP_M);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHUFFLE_BUTTON))) {
             this.sendTransmitterCommand(CONTROL.SHUFFLE);
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SLIDE_CLICK_START), SLIDE_CLICK_SIZE)) {
+            Integer percent = Double.valueOf(Math.floor(100.0 * (Double.valueOf((imouseX - 4 - SLIDE_MIN_X - START_X)) / Double.valueOf(SLIDE_WIDTH)))).intValue();
+            // Clamp between 0 and 100
+            percent = percent < 0 ? 0 : ( percent > 100 ? 100 : percent);
+            this.sendTransmitterCommand(CONTROL.SEEK, percent);
         }
         
         return super.mouseClicked(mouseX, mouseY, button);
@@ -206,7 +215,7 @@ public class GuiTransmitterBlock extends BaseGui {
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
-        graphics.blit(guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_Y, 352, 290, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        graphics.blit(guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_MIN_Y, 352, 290, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return graphics;
     }
@@ -302,6 +311,10 @@ public class GuiTransmitterBlock extends BaseGui {
         } else {
             return 4;
         }
+    }
+
+    protected void sendTransmitterCommand(CONTROL control, Integer data) {
+        NetworkProxy.sendToServer(new TransmitterControlPacket(musicPlayerId, control, data));
     }
 
     protected void sendTransmitterCommand(CONTROL control) {
