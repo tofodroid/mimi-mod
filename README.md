@@ -53,8 +53,30 @@ This mod may be included in modpacks. If you choose to redistribute the mod JAR 
 ## Minecraft Versions
 MIMI is a mod that I am developing in my spare time and as such it will only be supporting a limited subset of Minecraft and Forge versions. When a new version is released it may take some time for the mod to be updated. Fabric is not supported and will not be supported by me, but if someone would like to port the mod to Fabric that would be fine! The current versions that this mod officially supports are outlined in the overview above.
 
-## Forking and Contribtuing
-Feel free to fork the mod (note the conditions of the [MIT License](https://opensource.org/licenses/MIT)) and/or provide pull requests back to this repository! I do not spend a great deal of time on working on this mod or monitoring the GitHub page so it is possible that pull requests may sit for some time before I see them but I will do my best to review them as soon as possible!
+## Contribtuing
+Want to help me grow and develop MIMI or have an idea for a cool new feature that you'd like to implement? Here are a few ways that you can contribute to MIMI!
+
+### Non-Developers
+Want to help MIMI but aren't interested in digging into the code itself? There are still lots of ways that you can contribute to MIMI!
+
+- **Content**: I'm pretty comfortable with writing code, but when it comes to producing content about the mod (tutorial/highlight videos, tutorial images, Wiki pages, etc.) I can really struggle (just look at how cheesy some of my trailers are 😵). If you're interested in creating any sort of content about MIMI I'd love any help I can get!
+- **Game Art**: I like to say that the art style of MIMI stays true to Minecraft in that it's "developer art", but if I'm being honest with myself it can be pretty ugly. The oldest open issue in this repository is a request for improved art the fact that I've made very little progress on that I think says it all. If you've got an eye for art and would like to take a stab at improving what I've got, go for it (and please start with the french horn, it's so bad 😅)!
+  - Not sure where to start? On the Issues tab above look for issues with the "Help Wanted: Art" label! There may not always be issues with that label, but sometimes there will be!
+- **Translations**: In it's current state MIMI only supports English, but music is a common language spoken by everyone. I've had several requests for translations that I don't have the skill to create and I'd love for it to be as easy as possible for many different players to try out MIMI! So if you speak a language other than English and would like to submit a translation, even just a partial one, that would be greatly appreciated!
+  -Not sure where to start? On the Issues tab above look for issues with the "Help Wanted: Localization" label! There may not always be issues with that label, but sometimes there will be!
+- **Spelling & Grammar**: I mentioned above that I only speak English, and even that I'm not always super great at. 😄 Over the course of MIMI's development I've found loads of English spelling and grammar issues that I've had to correct so if you've seen any (particularly in the guide book) feel free to submit a correction! You can find the files for the guide book [here](https://github.com/tofodroid/mimi-mod/tree/main/src/main/resources/assets/mimi/patchouli_books/guide_book/en_us/entries).
+- **Make Stuff and Share**: The whole point of building a mod like this is to see what sort of awesome creations the players can come up with and seeing that is a massive motivator to continue working on the mod! So if you've built anything cool with MIMI that you'd like to share drop it in a comment on the CurseForge page or one of the YouTube videos or just send it to me in a message! I'd love to see what you've made and I'm sure others would too!
+- **Anything Else**: Do you have an idea of some way you can help that I didn't mention above? Well then just do it! There are so many unique ways that people can contribute to projects that it's impossible to imagine them all up-front. So if you have an idea of some way you can help and you would like to try it, just go for it! 😊
+
+### Developers (Beginners too!)
+Note: In the next few days I'll be updating this README with instructions for setting up MIMI locally for code development, but for now you can mostly clone this repository and follow the same steps from [here]()
+
+I'm totally open to Pull Requests for bug fixes, improvements, or entirely new features! I don't have a ton of free time to spend monitoring the GitHub page so please give me some time to review your PR after submitting it, but I will do my best to get to it as soon as I can!
+
+New to Java, Minecraft mod development, or just not sure where to start? On the Issues tab above look for issues with the "Beginner Friendly" label!
+
+## Forking
+Feel free to fork the mod (note the conditions of the [MIT License](https://opensource.org/licenses/MIT))!
 
 ## Credits
 
