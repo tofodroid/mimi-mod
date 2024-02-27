@@ -69,7 +69,7 @@ Want to help MIMI but aren't interested in digging into the code itself? There a
 - **Anything Else**: Do you have an idea of some way you can help that I didn't mention above? Well then just do it! There are so many unique ways that people can contribute to projects that it's impossible to imagine them all up-front. So if you have an idea of some way you can help and you would like to try it, just go for it! 😊
 
 ### Developers (Beginners too!)
-Note: In the next few days I'll be updating this README with instructions for setting up MIMI locally for code development, but for now you can mostly clone this repository and follow the same steps from [here]()
+Note: In the next few days I'll be updating this README with instructions for setting up MIMI locally for code development, but for now you can mostly clone this repository and follow the same steps from [here](https://docs.minecraftforge.net/en/latest/gettingstarted/#from-zero-to-modding) but start from Step 3 from within the MIMI repository folder.
 
 I'm totally open to Pull Requests for bug fixes, improvements, or entirely new features! I don't have a ton of free time to spend monitoring the GitHub page so please give me some time to review your PR after submitting it, but I will do my best to get to it as soon as I can!
 
