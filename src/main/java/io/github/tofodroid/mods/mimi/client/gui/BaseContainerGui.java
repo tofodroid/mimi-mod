@@ -38,7 +38,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     @Override
     public void init() {
         START_X = (this.width - GUI_WIDTH) / 2;
-        START_Y = Math.round((this.height - GUI_HEIGHT) / 1.25f);
+        START_Y = (this.height - GUI_HEIGHT) / 2;
         this.leftPos = START_X;
         this.topPos = START_Y;
     }

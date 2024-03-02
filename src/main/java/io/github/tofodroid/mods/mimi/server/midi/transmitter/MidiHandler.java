@@ -148,12 +148,12 @@ public class MidiHandler {
         this.pausedMicrosecond = null;
     }
     
-    public void setPositionPercent(Integer percent) {
+    public void setPositionPercent1000(Integer percent) {
         if(this.hasSongLoaded()) {
             this.pause();
 
-            Long newTickPos = Double.valueOf((Double.valueOf(percent)/100.0) * Double.valueOf(this.activeSequencer.getTickLength())).longValue();
-            newTickPos = newTickPos < 0 ? 0 : (newTickPos >= this.activeSequencer.getTickLength() ? this.activeSequencer.getTickLength()-100 : newTickPos);
+            Long newTickPos = Double.valueOf((Double.valueOf(percent)/1000.0) * Double.valueOf(this.activeSequencer.getTickLength())).longValue();
+            newTickPos = newTickPos < 0 ? 0 : (newTickPos >= this.activeSequencer.getTickLength() ? this.activeSequencer.getTickLength()-1000 : newTickPos);
             this.pausedTickPosition = newTickPos;
             this.lastTempoBPM = getTempoBPM(this.activeSequencer.getSequence(), newTickPos);
 
