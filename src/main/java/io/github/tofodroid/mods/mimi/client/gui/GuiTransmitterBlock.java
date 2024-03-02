@@ -198,9 +198,9 @@ public class GuiTransmitterBlock extends BaseGui {
 
         // Play/Pause Button
         if(!this.musicStatus.isLoading) {
-            blit(graphics, START_X + 49, START_Y + 265, this.musicStatus.isPlaying ? 14 : 1, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(graphics, START_X + 49, START_Y + 232, this.musicStatus.isPlaying ? 14 : 1, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
-            blit(graphics, START_X + 49, START_Y + 265, 1 + this.loadingAnimationFrame*13, 312, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            blit(graphics, START_X + 49, START_Y + 232, 1 + this.loadingAnimationFrame*13, 312, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Server Folder Button
@@ -209,7 +209,7 @@ public class GuiTransmitterBlock extends BaseGui {
         }
 
         // Toggle Favorite Button
-        blit(graphics, START_X + 336, START_Y + 150, this.musicStatus.isFileFavorite ? 40 : 27, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        blit(graphics, START_X + 336, START_Y + 117, this.musicStatus.isFileFavorite ? 40 : 27, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Favorite Filter Screen
         blit(graphics, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.musicStatus.favoriteMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
