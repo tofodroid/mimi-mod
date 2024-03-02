@@ -282,7 +282,6 @@ public class GuiInstrument extends BaseGui {
         
         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
     }
-    
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
@@ -293,6 +292,11 @@ public class GuiInstrument extends BaseGui {
 
         return super.mouseReleased(mouseX, mouseY, button);
     }
+    
+    @Override
+    public boolean doCloseOnInventoryKeyPress() {
+        return false;
+    }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -300,14 +304,19 @@ public class GuiInstrument extends BaseGui {
         
         if(keyCode == GLFW.GLFW_KEY_LEFT) {
             shiftVisibleNotes(false, 1);
+            return true;
         } else if(keyCode == GLFW.GLFW_KEY_RIGHT) {
             shiftVisibleNotes(true, 1);
+            return true;
         } else if(keyCode == GLFW.GLFW_KEY_DOWN) {
             shiftVisibleNotes(false, 7);
+            return true;
         } else if(keyCode == GLFW.GLFW_KEY_UP) {
             shiftVisibleNotes(true, 7);
+            return true;
         } else if(keyCode == GLFW.GLFW_KEY_SPACE) {
             this.toggleHoldPedal(true);
+            return true;
         } else {
             Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
 
@@ -317,10 +326,11 @@ public class GuiInstrument extends BaseGui {
                         this.onGuiNotePress(midiNoteNum, Byte.MAX_VALUE);
                     }
                 }
+                return true;
             }
         }
-        
-        return true;
+
+        return false;
     }
 
     @Override
@@ -329,6 +339,7 @@ public class GuiInstrument extends BaseGui {
 
         if(keyCode == GLFW.GLFW_KEY_SPACE) {
             this.toggleHoldPedal(false);
+            return true;
         } else {
             Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
 
@@ -336,10 +347,11 @@ public class GuiInstrument extends BaseGui {
                 for(Byte midiNoteNum : midiNoteNums) {
                     this.onGuiNoteRelease(midiNoteNum);
                 }
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     private void toggleHoldPedal(Boolean on) {
