@@ -64,7 +64,7 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
     }
 
     public void seek(Integer percent) {
-        this.midiHandler.setPositionPercent(percent);
+        this.midiHandler.setPositionPercent1000(percent);
     }
 
     public void next() {

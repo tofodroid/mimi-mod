@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 
 import org.joml.Vector2i;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -34,6 +35,10 @@ public abstract class BaseGui extends Screen {
         return false;
     }
 
+    public boolean doCloseOnInventoryKeyPress() {
+        return true;
+    }
+
     @Override
     public void init() {
         START_X = (this.width - GUI_WIDTH) / 2;
@@ -44,6 +49,17 @@ public abstract class BaseGui extends Screen {
     public void render(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         graphics = renderGraphics(graphics, mouseX, mouseY, partialTicks);
         graphics = renderText(graphics, mouseX, mouseY, partialTicks);
+    }
+    
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (this.doCloseOnInventoryKeyPress() && this.minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+            this.onClose();
+            return true;
+        }
+        return false;
     }
     
     protected void setAlpha(float alpha) {

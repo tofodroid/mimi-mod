@@ -99,20 +99,40 @@ public abstract class ServerMusicTransmitterManager {
         if(musicPlayer != null) {
             switch(message.control) {
                 case PLAY:
-                    musicPlayer.play();
+                    executeMidiTask(() -> {
+                        musicPlayer.play();
+                    }, (e) -> {
+                        MIMIMod.LOGGER.error("MIMI failed to play transmitter: " + musicPlayer.id.toString(), e);
+                    });
                     break;
                 case PAUSE:
-                    musicPlayer.pause();
+                    executeMidiTask(() -> {
+                        musicPlayer.pause();
+                    }, (e) -> {
+                        MIMIMod.LOGGER.error("MIMI failed to pause transmitter: " + musicPlayer.id.toString(), e);
+                    });
                     break;
                 case STOP:
-                    musicPlayer.stop();
+                    executeMidiTask(() -> {
+                        musicPlayer.stop();
+                    }, (e) -> {
+                        MIMIMod.LOGGER.error("MIMI failed to stop transmitter: " + musicPlayer.id.toString(), e);
+                    });
                     break;
                 case RESTART:
-                    musicPlayer.stop();
-                    musicPlayer.play();
+                    executeMidiTask(() -> {
+                        musicPlayer.stop();
+                        musicPlayer.play();
+                    }, (e) -> {
+                        MIMIMod.LOGGER.error("MIMI failed to restart transmitter: " + musicPlayer.id.toString(), e);
+                    });
                     break;
                 case SEEK:
-                    musicPlayer.seek(message.controlData.get());
+                    executeMidiTask(() -> {
+                        musicPlayer.seek(message.controlData.get());
+                    }, (e) -> {
+                        MIMIMod.LOGGER.error("MIMI failed to seek transmitter: " + musicPlayer.id.toString(), e);
+                    });
                     break;
                 case PREV:
                     musicPlayer.previous();
