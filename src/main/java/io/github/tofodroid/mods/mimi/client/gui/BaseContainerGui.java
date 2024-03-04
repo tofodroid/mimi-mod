@@ -38,7 +38,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     @Override
     public void init() {
         START_X = (this.width - GUI_WIDTH) / 2;
-        START_Y = Math.round((this.height - GUI_HEIGHT) / 1.25f);
+        START_Y = (this.height - GUI_HEIGHT) / 2;
         this.leftPos = START_X;
         this.topPos = START_Y;
     }
@@ -66,14 +66,18 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
         return true;
     }
 
+    public boolean doCloseOnInventoryKeyPress() {
+        return true;
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        InputConstants.Key invKey = InputConstants.getKey(keyCode, scanCode);
-
-        if (!this.minecraft.options.keyInventory.isActiveAndMatches(invKey) && super.keyPressed(keyCode, scanCode, modifiers)) {
-           return true;
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (this.doCloseOnInventoryKeyPress() && this.minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+            this.onClose();
+            return true;
         }
-
         return false;
     }
 
