@@ -42,7 +42,7 @@ public abstract class BaseGui extends Screen {
     @Override
     public void init() {
         START_X = (this.width - GUI_WIDTH) / 2;
-        START_Y = Math.round((this.height - GUI_HEIGHT) / 1.25f);
+        START_Y = (this.height - GUI_HEIGHT) / 2;
     }
     
     @Override
