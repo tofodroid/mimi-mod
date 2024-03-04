@@ -67,15 +67,19 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
         return true;
     }
 
+    public boolean doCloseOnInventoryKeyPress() {
+        return true;
+    }
+
     @Override
     @SuppressWarnings("null")
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        InputConstants.Key invKey = InputConstants.getKey(keyCode, scanCode);
-
-        if (!this.minecraft.options.keyInventory.isActiveAndMatches(invKey) && super.keyPressed(keyCode, scanCode, modifiers)) {
-           return true;
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (this.doCloseOnInventoryKeyPress() && this.minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+            this.onClose();
+            return true;
         }
-
         return false;
     }
 

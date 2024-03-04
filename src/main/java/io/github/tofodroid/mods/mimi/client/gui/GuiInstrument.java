@@ -179,6 +179,8 @@ public class GuiInstrument extends BaseGui {
     @Override
     public void init() {
         super.init();
+        // Override START_Y so this GUI is lower on the screen
+        START_Y = Math.round((this.height - GUI_HEIGHT) / 1.5f);
         this.heldNotes = new ConcurrentHashMap<>();
         this.releasedNotes = new ConcurrentHashMap<>();
         this.midiChannelToggle = new MidiChannelToggleWidget(instrumentStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
