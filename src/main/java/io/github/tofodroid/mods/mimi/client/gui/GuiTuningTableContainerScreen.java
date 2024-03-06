@@ -1,7 +1,5 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import io.github.tofodroid.mods.mimi.common.container.ContainerTuningTable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
@@ -15,11 +13,8 @@ public class GuiTuningTableContainerScreen extends BaseContainerGui<ContainerTun
 
     @Override
     protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return graphics;
     }

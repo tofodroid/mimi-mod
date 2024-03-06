@@ -1,11 +1,10 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
-import io.github.tofodroid.mods.mimi.client.gui.Vector2Int;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +30,7 @@ public class HoldTicksWidget extends BaseWidget {
     public void renderText(PoseStack graphics, Font font, Integer mouseX, Integer mouseY) {
         super.renderText(graphics, font, mouseX, mouseY);
 
-        Screen.drawString(graphics, font, MidiNbtDataUtils.getHoldTicks(midiStack).toString(), ABSOLUTE_START.x() + VALUE_TEXT_COORDS.x, ABSOLUTE_START.y() + VALUE_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getHoldTicks(midiStack).toString(), ABSOLUTE_START.x() + VALUE_TEXT_COORDS.x, ABSOLUTE_START.y() + VALUE_TEXT_COORDS.y, 0xFF00E600);
     }
 
     @Override

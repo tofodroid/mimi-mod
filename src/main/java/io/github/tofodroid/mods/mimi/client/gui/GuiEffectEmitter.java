@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import org.lwjgl.glfw.GLFW;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
@@ -342,11 +342,8 @@ public class GuiEffectEmitter extends BaseGui {
     // Render Functions
     @Override
     protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     
         // Widgets
         this.invertSignalWidget.renderGraphics(graphics, mouseX, mouseY);
@@ -362,16 +359,16 @@ public class GuiEffectEmitter extends BaseGui {
         this.invertSignalWidget.renderText(graphics, font, mouseX, mouseY);
 
         // Counters
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5).toString(), START_X + VOL_TEXT_COORDS.x, START_Y + VOL_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0).toString(), START_X + PITCH_TEXT_COORDS.x, START_Y + PITCH_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0).toString(), START_X + SPREAD_TEXT_COORDS.x, START_Y + SPREAD_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)).substring(0,1), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1).toString(), START_X + COUNT_TEXT_COORDS.x, START_Y + COUNT_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0).toString(), START_X + SPEED_Z_TEXT_COORDS.x, START_Y + SPEED_Z_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0)), START_X + S_LOOP_TEXT_COORDS.x, START_Y + S_LOOP_TEXT_COORDS.y, 0xFF00E600);
-        drawString(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0)), START_X + P_LOOP_TEXT_COORDS.x, START_Y + P_LOOP_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5).toString(), START_X + VOL_TEXT_COORDS.x, START_Y + VOL_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0).toString(), START_X + PITCH_TEXT_COORDS.x, START_Y + PITCH_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0).toString(), START_X + SPREAD_TEXT_COORDS.x, START_Y + SPREAD_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)).substring(0,1), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1).toString(), START_X + COUNT_TEXT_COORDS.x, START_Y + COUNT_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0).toString(), START_X + SPEED_Z_TEXT_COORDS.x, START_Y + SPEED_Z_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0)), START_X + S_LOOP_TEXT_COORDS.x, START_Y + S_LOOP_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0)), START_X + P_LOOP_TEXT_COORDS.x, START_Y + P_LOOP_TEXT_COORDS.y, 0xFF00E600);
 
         return graphics;
     }

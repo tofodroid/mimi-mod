@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
@@ -76,11 +77,8 @@ public class GuiConductor extends BaseGui {
     // Render Functions
     @Override
     protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     
         this.midiChannelToggle.renderGraphics(graphics, mouseX, mouseY);
         
@@ -90,7 +88,7 @@ public class GuiConductor extends BaseGui {
     @Override
     protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // Broadcast note
-        drawString(graphics, font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
 
         this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
 

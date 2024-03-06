@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.client.gui;
+package io.github.tofodroid.mods.mimi.util;
 
 public class Vector2Int {
     public final Integer x;

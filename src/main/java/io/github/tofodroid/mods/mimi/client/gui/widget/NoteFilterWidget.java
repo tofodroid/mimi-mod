@@ -1,10 +1,9 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
-import io.github.tofodroid.mods.mimi.client.gui.Vector2Int;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.ItemStack;
@@ -30,13 +29,13 @@ public class NoteFilterWidget extends BaseWidget {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         if(MidiNbtDataUtils.getInvertNoteOct(midiStack)) {
-            Screen.blit(graphics, ABSOLUTE_START.x() + 104, ABSOLUTE_START.y() + 8, 0, 32, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, GUI_TEXTURE, ABSOLUTE_START.x() + 104, ABSOLUTE_START.y() + 8, 0, 32, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
 
     @Override
     public void renderText(PoseStack graphics, Font font, Integer mouseX, Integer mouseY) {
-        Screen.drawString(graphics, font, MidiNbtDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
     }
 
     @Override

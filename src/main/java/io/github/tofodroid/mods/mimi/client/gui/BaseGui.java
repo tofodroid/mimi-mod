@@ -1,10 +1,11 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
+
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -13,10 +14,11 @@ import net.minecraft.resources.ResourceLocation;
 public abstract class BaseGui extends Screen {
     protected static final Integer STANDARD_BUTTON_SIZE = 15;
 
-    protected ResourceLocation guiTexture;
-    protected Integer TEXTURE_SIZE;
-    protected Integer GUI_WIDTH;
-    protected Integer GUI_HEIGHT;
+    protected final ResourceLocation guiTexture;
+    protected final Integer TEXTURE_SIZE;
+    protected final Integer GUI_WIDTH;
+    protected final Integer GUI_HEIGHT;
+
     protected Integer START_X;
     protected Integer START_Y;
 
@@ -59,10 +61,6 @@ public abstract class BaseGui extends Screen {
         }
         return false;
     }
-    
-    protected void setAlpha(float alpha) {
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
-    }
 
     protected abstract PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks);
     protected abstract PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks);
@@ -81,11 +79,53 @@ public abstract class BaseGui extends Screen {
         );
     }
 
-    protected String truncateString(Font font, String source, Integer maxWidth) {
-        if(source == null || font.width(source) <= maxWidth) {
-            return source;
-        }
-        return font.plainSubstrByWidth("..." + source, maxWidth).substring(3) + "...";
+    // Absolute Position
+    protected void blitAbsolute(PoseStack graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
     }
 
+    protected void blitAbsolute(PoseStack graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void blitAbsolute(PoseStack graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitAbsolute(PoseStack graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringAbsolute(PoseStack graphics, Font font, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
+    }
+
+    protected void drawStringAbsolute(PoseStack graphics, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
+    }
+    
+    // Relative Position
+    protected void blitRelative(PoseStack graphics, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitRelative(PoseStack graphics, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void blitRelative(PoseStack graphics, ResourceLocation texture, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitRelative(PoseStack graphics, ResourceLocation texture, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringRelative(PoseStack graphics, Font font, String string, Integer relativeStartX, Integer relativeStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, START_X + relativeStartX, START_Y + relativeStartY, color);
+    }
+
+    protected void drawStringRelative(PoseStack graphics, String string, Integer relativeStartX, Integer relativeStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, START_X + relativeStartX, START_Y + relativeStartY, color);
+    }
 }

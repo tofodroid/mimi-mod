@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
@@ -101,14 +101,11 @@ public class GuiListener extends BaseGui {
     // Render Functions
     @Override
     protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         if(MidiNbtDataUtils.getInvertInstrument(listenerStack)) {
-            blit(graphics, START_X + 167, START_Y + 34, 0, 86, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 167, START_Y + 34, 0, 86, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
@@ -121,7 +118,7 @@ public class GuiListener extends BaseGui {
 
     @Override
     protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        drawString(graphics, font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.invertSignal.renderText(graphics, font, mouseX, mouseY);
         this.triggerMode.renderText(graphics, font, mouseX, mouseY);

@@ -1,10 +1,10 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
+
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
@@ -169,56 +169,39 @@ public class GuiTransmitterBlock extends BaseGui {
 
     @Override
     protected  PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // Background
-        blit(graphics, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
-
-        // Playlist badges
-        if(!this.songList.infos.isEmpty() && !this.awaitRefresh) {
-            Integer minSong = getMinSong();
-
-            for(int i = 0; i < getVisibleSongs(); i++) {
-                if(this.songList.infos.size() > (minSong + i)) {
-                    BasicMidiInfo info = this.songList.infos.get(minSong + i);
-                    this.renderPlaylistSongBadges(graphics, info, i, minSong);
-                } else {
-                    break;
-                }            
-            }
-        }
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Selected Song Box
         if(!this.songList.infos.isEmpty() && this.musicStatus.fileIndex != null && !this.awaitRefresh) {
             Integer songOffset = getSongBoxOffset();            
             Integer boxY = (getFirstSongY() - 2) + (11 * songOffset);
-            blit(graphics, START_X + 10, START_Y + boxY, 1, 257, 340, 11, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 10, START_Y + boxY, 1, 257, 340, 11, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Play/Pause Button
         if(!this.musicStatus.isLoading) {
-            blit(graphics, START_X + 49, START_Y + 232, this.musicStatus.isPlaying ? 14 : 1, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 49, START_Y + 232, this.musicStatus.isPlaying ? 14 : 1, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
-            blit(graphics, START_X + 49, START_Y + 232, 1 + this.loadingAnimationFrame*13, 312, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 49, START_Y + 232, 1 + this.loadingAnimationFrame*13, 312, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Server Folder Button
         if(this.isSinglePlayerOrLANHost()) {
-            blit(graphics, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Toggle Favorite Button
-        blit(graphics, START_X + 336, START_Y + 117, this.musicStatus.isFileFavorite ? 40 : 27, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + 336, START_Y + 117, this.musicStatus.isFileFavorite ? 40 : 27, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Favorite Filter Screen
-        blit(graphics, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.musicStatus.favoriteMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.musicStatus.favoriteMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Loop Screen
-        blit(graphics, START_X + LOOP_SCREEN.x(), START_Y + LOOP_SCREEN.y(), 1 + (13 * this.musicStatus.loopMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + LOOP_SCREEN.x(), START_Y + LOOP_SCREEN.y(), 1 + (13 * this.musicStatus.loopMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Shuffle Screen    
-        blit(graphics, START_X + SHUFFLE_SCREEN.x(), START_Y + SHUFFLE_SCREEN.y(), 40 + (13 * (this.musicStatus.isShuffled ? 1 : 0)), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + SHUFFLE_SCREEN.x(), START_Y + SHUFFLE_SCREEN.y(), 40 + (13 * (this.musicStatus.isShuffled ? 1 : 0)), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;
@@ -228,8 +211,8 @@ public class GuiTransmitterBlock extends BaseGui {
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
-        blit(graphics, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_MIN_Y, 352, 257, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
-
+        this.blitAbsolute(graphics, guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_MIN_Y, 352, 257, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        
         return graphics;
     }
 
@@ -242,41 +225,42 @@ public class GuiTransmitterBlock extends BaseGui {
             for(int i = 0; i < getVisibleSongs(); i++) {
                 if(this.songList.infos.size() > (minSong + i)) {
                     BasicMidiInfo info = this.songList.infos.get(minSong + i);
-                    drawString(graphics, font, this.truncateString(font, ((minSong + i) < 9 ? "0" : "") + (minSong + i + 1) + "). " + info.fileName, this.maxPlaylistSongTitleWidth()), START_X + 12, START_Y + getFirstSongY() + i * 11, 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, ((minSong + i) < 9 ? "0" : "") + (minSong + i + 1) + "). " + info.fileName, this.maxPlaylistSongTitleWidth()), START_X + 12, START_Y + getFirstSongY() + i * 11, 0xFF00E600);
+                    this.renderPlaylistSongBadges(graphics, info, i, minSong);
                 } else {
                     break;
                 }            
             }
         } else {
-            drawString(graphics, font, this.awaitRefresh ? "Loading..." : "No songs found", START_X + 12, START_Y + getFirstSongY(), 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, this.awaitRefresh ? "Loading..." : "No songs found", START_X + 12, START_Y + getFirstSongY(), 0xFF00E600);
         }
 
         // Current Song
         if(!this.musicStatus.isLoading && this.musicStatus.isLoadFailed) {
-            drawString(graphics, font, "Song failed to load:", START_X + 12, START_Y + 153, 0xFF00E600);
-            drawString(graphics, font, "It may be invalid or may have been deleted. Refresh the", START_X + 12, START_Y + 159, 0xFF00E600);
-            drawString(graphics, font, "list with the button in the top right and select a new song.", START_X + 12, START_Y + 169, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, "Song failed to load:", START_X + 12, START_Y + 153, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, "It may be invalid or may have been deleted. Refresh the", START_X + 12, START_Y + 159, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, "list with the button in the top right and select a new song.", START_X + 12, START_Y + 169, 0xFF00E600);
         } else if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
             BasicMidiInfo info = this.songList.infos.get(this.musicStatus.fileIndex);
-            drawString(graphics, font, this.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 120, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 120, 0xFF00E600);
 
             if(this.musicStatus.isLoading) {
-                drawString(graphics, font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 135, 0xFF00E600);
+                this.drawStringAbsolute(graphics, font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 135, 0xFF00E600);
             } else if(this.musicStatus.channelMapping != null) {
                 Map<Integer, String> instrumentMapping = MidiFileUtils.getInstrumentMapping(this.musicStatus.channelMapping);
-                drawString(graphics, font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 135, 0xFF00E600);
+                this.drawStringAbsolute(graphics, font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 135, 0xFF00E600);
                 
                 Integer index = 0;
                 for(Integer i = 0; i < 16; i+=2) {
                     String name = instrumentMapping.get(i) == null ? "None" : instrumentMapping.get(i);
-                    drawString(graphics, font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 12, START_Y + 149 + 10*index, 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 12, START_Y + 149 + 10*index, 0xFF00E600);
                     index++;
                 }
 
                 index = 0;
                 for(Integer i = 1; i < 16; i+=2) {
                     String name = instrumentMapping.get(i) == null ? "None" : instrumentMapping.get(i);
-                    drawString(graphics, font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 180, START_Y + 149 + 10*index, 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 180, START_Y + 149 + 10*index, 0xFF00E600);
                     index++;
                 }
             }
@@ -292,7 +276,7 @@ public class GuiTransmitterBlock extends BaseGui {
     protected PoseStack renderPlaylistSongBadges(PoseStack graphics, BasicMidiInfo info, Integer songIndex, Integer minSong) {
         // Favorite Badge
         if(this.musicStatus.favoriteMode != FavoriteMode.NOT_FAVORITE && (this.musicStatus.favoriteMode == FavoriteMode.FAVORITE || this.songList.favoriteIndicies.contains(minSong + songIndex))) {
-            blit(graphics, START_X + 339, START_Y + getFirstSongY() - 1 + songIndex * 11, 145, 269, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 339, START_Y + getFirstSongY() - 1 + songIndex * 11, 145, 269, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         return graphics;
     }

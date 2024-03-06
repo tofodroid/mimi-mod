@@ -1,13 +1,12 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
-import io.github.tofodroid.mods.mimi.client.gui.Vector2Int;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class BaseWidget {
@@ -32,8 +31,7 @@ public abstract class BaseWidget {
 
     public void renderGraphics(PoseStack graphics, Integer mouseX, Integer mouseY) {
         // Background
-        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
-        Screen.blit(graphics, ABSOLUTE_START.x(), ABSOLUTE_START.y(), 0, 0, WIDGET_SIZE.x(), WIDGET_SIZE.y(), TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, GUI_TEXTURE, ABSOLUTE_START.x(), ABSOLUTE_START.y(), 0, 0, WIDGET_SIZE.x(), WIDGET_SIZE.y(), TEXTURE_SIZE, TEXTURE_SIZE);
     };
 
     public final Boolean mouseClicked(Integer mouseX, Integer mouseY, Integer mouseButton) {
@@ -60,10 +58,24 @@ public abstract class BaseWidget {
         );
     }
 
-    protected String truncateString(Font font, String source, Integer maxWidth) {
-        if(source == null || font.width(source) <= maxWidth) {
-            return source;
-        }
-        return font.plainSubstrByWidth("..." + source, maxWidth).substring(3) + "...";
+    // Absolute Position
+    protected void blitAbsolute(PoseStack graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.GUI_TEXTURE, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitAbsolute(PoseStack graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.GUI_TEXTURE, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void blitAbsolute(PoseStack graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitAbsolute(PoseStack graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringAbsolute(PoseStack graphics, Font font, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
     }
 }
