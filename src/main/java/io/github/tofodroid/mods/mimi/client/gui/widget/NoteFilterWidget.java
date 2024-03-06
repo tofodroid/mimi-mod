@@ -1,25 +1,24 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.ItemStack;
 
 public class NoteFilterWidget extends BaseWidget {
-    protected static final Vector2i FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector2i(3,14);
-    protected static final Vector2i FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector2i(22,14);
-    protected static final Vector2i FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector2i(98,14);
+    protected static final Vector2Int FILTER_NOTE_LETTER_BUTTON_COORDS = new Vector2Int(3,14);
+    protected static final Vector2Int FILTER_NOTE_OCTAVE_BUTTON_COORDS = new Vector2Int(22,14);
+    protected static final Vector2Int FILTER_NOTE_INVERT_BUTTON_COORDS = new Vector2Int(98,14);
 
     private ItemStack midiStack;
     private Integer filterNoteOctave;
     private Integer filterNoteLetter;
 
-    public NoteFilterWidget(ItemStack midiStack, Vector2i screenOffset, Vector2i start) {
-        super("textures/gui/widget/note_filter.png", 116,  new Vector2i(116,32), screenOffset, start);
+    public NoteFilterWidget(ItemStack midiStack, Vector2Int screenOffset, Vector2Int start) {
+        super("textures/gui/widget/note_filter.png", 116,  new Vector2Int(116,32), screenOffset, start);
         this.midiStack = midiStack;
         this.filterNoteLetter = MidiNbtDataUtils.getFilterNote(midiStack).intValue();
         this.filterNoteOctave = MidiNbtDataUtils.getFilterOct(midiStack).intValue();     
@@ -30,17 +29,17 @@ public class NoteFilterWidget extends BaseWidget {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         if(MidiNbtDataUtils.getInvertNoteOct(midiStack)) {
-            Screen.blit(graphics, ABSOLUTE_START.x() + 104, ABSOLUTE_START.y() + 8, 0, 32, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, GUI_TEXTURE, ABSOLUTE_START.x() + 104, ABSOLUTE_START.y() + 8, 0, 32, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
 
     @Override
     public void renderText(PoseStack graphics, Font font, Integer mouseX, Integer mouseY) {
-        Screen.drawString(graphics, font, MidiNbtDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getFilteredNotesAsString(midiStack), ABSOLUTE_START.x() + 43, ABSOLUTE_START.y() + 18, 0xFF00E600);
     }
 
     @Override
-    protected Boolean mouseClicked(Vector2i localMouseCoords, Integer mouseButton) {
+    protected Boolean mouseClicked(Vector2Int localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), FILTER_NOTE_OCTAVE_BUTTON_COORDS)) {
             this.shiftFilterNoteOctave();
             return true;

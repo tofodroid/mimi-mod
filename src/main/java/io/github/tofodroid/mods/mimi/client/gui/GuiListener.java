@@ -3,9 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.joml.Vector2i;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
@@ -23,13 +21,13 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiListener extends BaseGui {
     // GUI
-    private static final Vector2i NOTE_FILTER_WIDGET_COORDS = new Vector2i(180,26);
-    private static final Vector2i TRIGGER_MODE_WIDGET_COORDS = new Vector2i(6,59);
-    private static final Vector2i HOLD_TICKS_WIDGET_COORDS = new Vector2i(180,59);
-    private static final Vector2i FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2i(9,40);
-    private static final Vector2i FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2i(143,40);
-    private static final Vector2i FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2i(161,40);
-    private static final Vector2i INVERT_POWER_WIDGET_COORDS = new Vector2i(281,5);
+    private static final Vector2Int NOTE_FILTER_WIDGET_COORDS = new Vector2Int(180,26);
+    private static final Vector2Int TRIGGER_MODE_WIDGET_COORDS = new Vector2Int(6,59);
+    private static final Vector2Int HOLD_TICKS_WIDGET_COORDS = new Vector2Int(180,59);
+    private static final Vector2Int FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2Int(9,40);
+    private static final Vector2Int FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2Int(143,40);
+    private static final Vector2Int FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2Int(161,40);
+    private static final Vector2Int INVERT_POWER_WIDGET_COORDS = new Vector2Int(281,5);
 
     // Widgets
     private NoteFilterWidget noteFilter;
@@ -62,10 +60,10 @@ public class GuiListener extends BaseGui {
     public void init() {
         super.init();
         this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(MidiNbtDataUtils.getFilterInstrument(listenerStack));
-        this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2i(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
-        this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2i(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
-        this.triggerMode = new TriggerModeWidget(listenerStack, new Vector2i(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
-        this.holdTicks = new HoldTicksWidget(listenerStack, new Vector2i(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
+        this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2Int(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
+        this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2Int(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
+        this.triggerMode = new TriggerModeWidget(listenerStack, new Vector2Int(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
+        this.holdTicks = new HoldTicksWidget(listenerStack, new Vector2Int(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
     }
 
     public void syncListenerToServer() {
@@ -103,14 +101,11 @@ public class GuiListener extends BaseGui {
     // Render Functions
     @Override
     protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        blit(graphics, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         if(MidiNbtDataUtils.getInvertInstrument(listenerStack)) {
-            blit(graphics, START_X + 167, START_Y + 34, 0, 86, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 167, START_Y + 34, 0, 86, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
@@ -123,7 +118,7 @@ public class GuiListener extends BaseGui {
 
     @Override
     protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
-        drawString(graphics, font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.invertSignal.renderText(graphics, font, mouseX, mouseY);
         this.triggerMode.renderText(graphics, font, mouseX, mouseY);
