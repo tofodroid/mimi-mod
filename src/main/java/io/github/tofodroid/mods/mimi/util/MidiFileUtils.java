@@ -65,7 +65,10 @@ public abstract class MidiFileUtils {
         return Integer.parseInt(Long.valueOf(sequence.getMicrosecondLength()/1000000).toString());
     }
 
-    public static Integer getTempoBPM(Sequence sequence) {
+    public static Integer getTempoBPM(Sequence sequence, Long tickPos) {
+        // Safe default
+        Integer lastBpm = 120;
+
         for(Track track : sequence.getTracks()) {
             if(track != null && track.size() > 0) {
                 for(int i = 0; i < track.size(); i++) {
@@ -74,13 +77,22 @@ public abstract class MidiFileUtils {
                         if(message.getType() == 81 && message.getData().length == 3) {
                             byte[] data = message.getData();
                             int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);
-                            return Math.round(60000001f / mspq);
+                            Integer newBpm = Math.round(60000001f / mspq);
+
+                            // If we are at or before target tick or we haven't found any BPM yet cache this one
+                            if(track.get(i).getTick() <= tickPos || lastBpm == null) {
+                                lastBpm = newBpm;
+                            }
                         }
                     }
                 }
             }
         }
 
-        return 120;        
+        return lastBpm;
+    }
+
+    public static Integer getTempoBPM(Sequence sequence) {
+        return getTempoBPM(sequence, 0l);
     }
 }
