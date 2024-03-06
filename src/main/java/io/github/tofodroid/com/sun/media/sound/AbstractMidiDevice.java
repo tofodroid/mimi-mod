@@ -103,7 +103,7 @@ abstract class AbstractMidiDevice implements MidiDevice, ReferenceCountingDevice
      * this call is a call to close().
      */
     @Override
-    public final void open() throws MidiUnavailableException {
+    public void open() throws MidiUnavailableException {
         synchronized(this) {
             openRefCount = -1;
             doOpen();

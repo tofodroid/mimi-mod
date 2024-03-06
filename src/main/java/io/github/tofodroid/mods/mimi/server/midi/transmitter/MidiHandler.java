@@ -5,12 +5,9 @@ import java.util.UUID;
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-import javax.sound.midi.Track;
-import javax.sound.midi.Transmitter;
 
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
-import io.github.tofodroid.com.sun.media.sound.RealTimeSequencerProvider;
+import io.github.tofodroid.com.sun.media.sound.SimpleThreadSequencer;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
@@ -20,21 +17,15 @@ import net.minecraft.world.entity.player.Player;
 
 public class MidiHandler {
     private final Runnable sequenceEndCallback;
-
-    // Play State
-    private Integer lastTempoBPM;
-    private Long pausedTickPosition;
-    private Long pausedMicrosecond;
     
     // MIDI Sequence
+    private Sequence activeSequence;
     private BasicMidiInfo activeSequenceInfo;
     private Integer songLengthSeconds;
     private byte[] channelMapping;
 
     // Midi System
-    private Sequencer activeSequencer;
-    private AServerMidiInputReceiver activeReceiver;
-    private Transmitter activeTransmitter;
+    private SimpleThreadSequencer<AServerMidiInputReceiver> activeSequencer;
 
     public MidiHandler(TileTransmitter tile, Runnable sequenceEndCallback) {
         this(new TileTransmitterMidiReceiver(tile), sequenceEndCallback);
@@ -45,13 +36,12 @@ public class MidiHandler {
     }
 
     protected MidiHandler(AServerMidiInputReceiver receiver, Runnable sequenceEndCallback) {
-        this.activeReceiver = receiver;
         this.sequenceEndCallback = sequenceEndCallback;
-        initializeSequencer();
+        initializeSequencer(receiver);
     }
 
     public Boolean isPlaying() {
-        return this.hasSongLoaded() ? this.activeSequencer.isRunning() : false;
+        return this.activeSequencer.isOpen() ? this.activeSequencer.isRunning() : false;
     }
 
     public Boolean isInProgress() {
@@ -64,14 +54,13 @@ public class MidiHandler {
     }
 
     public Boolean hasSongLoaded() {
-        return this.activeSequencer != null && this.activeSequenceInfo != null && this.activeSequencer.getSequence() != null;
+        return this.activeSequenceInfo != null && this.activeSequence != null;
     }
 
     public void unloadSong() {
         this.stop();
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
-        this.lastTempoBPM = null;
         this.channelMapping = null;
     }
 
@@ -80,14 +69,8 @@ public class MidiHandler {
     }
     
     public Integer getPositionSeconds() {
-        if(this.activeSequencer != null && this.activeSequencer.isOpen()) {
-            if(this.activeSequencer.isRunning()) {
-                return Long.valueOf(this.activeSequencer.getMicrosecondPosition() / 1000000).intValue();
-            } else if(!this.activeSequencer.isRunning() && this.pausedMicrosecond != null) {
-                return Long.valueOf(this.pausedMicrosecond / 1000000).intValue();
-            } else {
-                return null;
-            }
+        if(this.activeSequencer.isOpen()) {
+            return Long.valueOf(this.activeSequencer.getMicrosecondPosition() / 1000000).intValue();
         } else {
             return null;
         }
@@ -102,50 +85,43 @@ public class MidiHandler {
     }
 
     public void allNotesOff() {
-        if(this.activeReceiver != null) {
-            this.activeReceiver.sendTransmitterAllNotesOffPacket();
+        if(this.activeSequencer.isOpen()) {
+            this.activeSequencer.getAutoConnectedReceiver().sendTransmitterAllNotesOffPacket();
         }
     }
 
     public void load(BasicMidiInfo info, Sequence sequence) {
-        Boolean wasPlaying = this.isPlaying();
-        this.stop();
-
         if(this.activeSequencer != null) {
             try {
                 this.activeSequencer.setSequence(sequence);
-                this.lastTempoBPM = null;
+                this.activeSequencer.setTickPosition(0);
                 this.activeSequenceInfo = info;
+                this.activeSequence = sequence;
                 this.songLengthSeconds = MidiFileUtils.getSongLenghtSeconds(sequence);
                 this.channelMapping = MidiFileUtils.getChannelMapping(sequence);
-
-                if(wasPlaying) {
-                    this.play();
-                }
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to load sequence: " + info.fileName + " - " + e.getMessage());
+                this.close();
             }
         }
     }
 
     public void play() {
         if(this.hasSongLoaded() && !this.activeSequencer.isRunning()) {
-            if(this.pausedTickPosition != null) {
-                this.activeSequencer.setTickPosition(this.pausedTickPosition);
+            if(!this.activeSequencer.isOpen()) {
+                this.activeSequencer.open();
+                try {
+                    this.activeSequencer.setSequence(this.activeSequence);
+                } catch(Exception e) {
+                    MIMIMod.LOGGER.error("Failed to load sequence: " + this.activeSequenceInfo.fileName + " - " + e.getMessage());
+                    this.close();
+                }
             }
 
-            if(this.lastTempoBPM == null) {
-                Long tickPos = this.activeSequencer.getTickPosition();
-                tickPos = tickPos != null ? tickPos : 0;
-                this.lastTempoBPM = getTempoBPM(this.activeSequencer.getSequence(), tickPos);
+            if(this.activeSequencer.isOpen()) {
+                this.activeSequencer.start();
             }
-
-            this.activeSequencer.setTempoInBPM(this.lastTempoBPM);
-
-            this.activeSequencer.start();
         }
-        this.pausedTickPosition = null;
-        this.pausedMicrosecond = null;
     }
     
     public void setPositionPercent1000(Integer percent) {
@@ -154,53 +130,35 @@ public class MidiHandler {
 
             Long newTickPos = Double.valueOf((Double.valueOf(percent)/1000.0) * Double.valueOf(this.activeSequencer.getTickLength())).longValue();
             newTickPos = newTickPos < 0 ? 0 : (newTickPos >= this.activeSequencer.getTickLength() ? this.activeSequencer.getTickLength()-1000 : newTickPos);
-            this.pausedTickPosition = newTickPos;
-            this.lastTempoBPM = getTempoBPM(this.activeSequencer.getSequence(), newTickPos);
+            this.activeSequencer.setTickPosition(newTickPos);
 
             this.play();
         }
     }
 
     public void pause() {
-        if(this.activeSequencer != null && this.activeSequencer.isRunning()) {
-            this.pausedTickPosition = this.activeSequencer.getTickPosition();
-            this.pausedMicrosecond = this.activeSequencer.getMicrosecondPosition();;
-            this.activeSequencer.stop();
-        }
-
-        if(this.activeReceiver != null) {
-            this.activeReceiver.sendTransmitterAllNotesOffPacket();
+        if(this.activeSequencer.isOpen() && this.activeSequencer.isRunning()) {
+            this.activeSequencer.pause();
+            this.allNotesOff();
         }
     }
     
     public void stop() {
-        this.pausedTickPosition = null;
-        this.pausedMicrosecond = null;
-        this.lastTempoBPM = null;
-
-        if(this.activeSequencer != null) {
+        if(this.activeSequencer.isOpen()) {
             try {
                 this.activeSequencer.stop();
-                this.activeSequencer.setTickPosition(0);
-                
-                if(this.activeReceiver != null) {
-                    this.activeReceiver.sendTransmitterAllNotesOffPacket();
-                }
+                this.allNotesOff();
+                this.activeSequencer.close();
             } catch (Exception e) {
                 MIMIMod.LOGGER.error("Failed to stop sequencer: ", e);
-
-                if(this.activeReceiver != null) {
-                    this.activeReceiver.sendTransmitterAllNotesOffPacket();
-                }
-
+                this.allNotesOff();
                 this.close();
-                this.initializeSequencer();
             }
         }
     }
     
     public void close() {
-        if(this.activeSequencer != null) {
+        if(this.activeSequencer.isOpen()) {
             try {
                 this.activeSequencer.stop();
                 this.activeSequencer.close();
@@ -210,71 +168,24 @@ public class MidiHandler {
             this.activeSequencer = null;
         }
 
-        if(this.activeReceiver != null) {
-            this.activeReceiver.sendTransmitterAllNotesOffPacket();
-            this.activeReceiver.close();
-            this.activeReceiver = null;
-        }
-
-        if(this.activeTransmitter != null) {
-            this.activeTransmitter.close();
-            this.activeTransmitter = null;
-        }
-
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
     }
 
-    private static Integer getTempoBPM(Sequence sequence, Long tickPos) {
-        // Safe default
-        Integer lastBpm = 120;
-
-        for(Track track : sequence.getTracks()) {
-            if(track != null && track.size() > 0) {
-                for(int i = 0; i < track.size(); i++) {
-                    if(track.get(i).getMessage() instanceof MetaMessage) {
-                        MetaMessage message = (MetaMessage)track.get(i).getMessage();
-                        if(message.getType() == 81 && message.getData().length == 3) {
-                            byte[] data = message.getData();
-                            int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);
-                            Integer newBpm = Math.round(60000001f / mspq);
-
-                            // If we are at or before target tick or we haven't found any BPM yet cache this one
-                            if(track.get(i).getTick() <= tickPos || lastBpm == null) {
-                                lastBpm = newBpm;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return lastBpm;
-    }
-
-    protected Boolean initializeSequencer() {
+    protected Boolean initializeSequencer(AServerMidiInputReceiver receiver) {
         try { 
             MidiHandler self = this;
-            RealTimeSequencerProvider provider = new RealTimeSequencerProvider();
-            this.activeSequencer = (Sequencer)provider.getDevice(provider.getDeviceInfo()[0]);
-            this.activeSequencer.open();
+            this.activeSequencer = new SimpleThreadSequencer<>(receiver);
             this.activeSequencer.addMetaEventListener(new MetaEventListener(){
                 @Override
                 public void meta(MetaMessage meta) {
                     if(MidiUtils.isMetaEndOfTrack(meta) && !activeSequencer.isRunning()) {
                         self.stop();
                         self.sequenceEndCallback.run();
-                    } else if(MidiUtils.isMetaTempo(meta) | (meta.getType() == 81 && meta.getData().length == 3)) {
-                        byte[] data = meta.getData();
-                        int mspq = ((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8) | (data[2] & 0xff);
-                        lastTempoBPM = Math.round(60000001f / mspq);
-                        activeSequencer.setTempoInBPM(lastTempoBPM);
                     }
                 }
             });
-            this.activeTransmitter = this.activeSequencer.getTransmitter();
-            this.activeTransmitter.setReceiver(this.activeReceiver);
             return true;
         } catch(Exception e) {
             throw new RuntimeException("Failed to create sequencer: ", e);
