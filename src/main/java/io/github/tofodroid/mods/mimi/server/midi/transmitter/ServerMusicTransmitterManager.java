@@ -30,8 +30,8 @@ public abstract class ServerMusicTransmitterManager {
     private static final Set<UUID> PLAYING_LIST = new HashSet<>();
     private static final Map<UUID,AServerMusicTransmitter> PLAYER_MAP = new HashMap<>();
     private static final Map<UUID, Set<UUID>> MIDI_LOAD_CACHE_MAP = new HashMap<>();
-    private static final ExecutorService pool = Executors.newFixedThreadPool(1);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static ExecutorService pool = Executors.newFixedThreadPool(1);
+    private static ExecutorService executor = Executors.newSingleThreadExecutor();
     private static Boolean hasPlaying = false;
 
     public static Boolean isPlaying(UUID id) {
@@ -70,6 +70,34 @@ public abstract class ServerMusicTransmitterManager {
 
     public static void onServerStopping() {
         clearMusicPlayers();
+
+        pool.shutdown();
+        try {
+            pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        } catch(Exception e) {
+            MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI pool. Error: " + e.getMessage());
+            try {
+                pool.shutdownNow();
+                pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
+            } catch(Exception e2) {
+                MIMIMod.LOGGER.error("Failed to force shutdown MIDI pool. Error: " + e.getMessage());
+                pool = null;
+            }
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        } catch(Exception e) {
+            MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI executor. Error: " + e.getMessage());
+            try {
+                executor.shutdownNow();
+                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+            } catch(Exception e2) {
+                MIMIMod.LOGGER.error("Failed to force shutdown MIDI executor. Error: " + e.getMessage());
+                executor = null;
+            }
+        }
     }
     
     public static ServerMusicPlayerSongListPacket createListPacket(UUID musicPlayerId) {
