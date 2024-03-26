@@ -7,7 +7,7 @@ import com.mojang.serialization.MapCodec;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -51,7 +51,7 @@ public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceive
             BlockEntity blockEntity = worldIn.getBlockEntity(pos);
             
             if (blockEntity instanceof TileReceiver) {
-                ServerMusicReceiverManager.removeReceivers(((TileReceiver)blockEntity).getUUID());
+                BroadcastManager.removeOwnedBroadcastConsumers(((TileReceiver)blockEntity).getUUID());
             }
         }
 

@@ -30,7 +30,7 @@ import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
-import net.minecraft.Util;
+import io.github.tofodroid.mods.mimi.util.TimeUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -94,7 +94,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public long getSynthEventTimestamp(Long systemEventMillis) {
-        Long synthOffsetMicros = this.internalSynth.getMicrosecondPosition() - Util.getEpochMillis()*1000;
+        Long synthOffsetMicros = this.internalSynth.getMicrosecondPosition() - TimeUtils.getNowTime()*1000;
         return Math.max(systemEventMillis*1000 + synthOffsetMicros, this.internalSynth.getMicrosecondPosition());
     }
 

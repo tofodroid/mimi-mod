@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
@@ -16,9 +16,9 @@ import net.minecraft.client.gui.GuiGraphics;
 
 public class GuiTransmitter extends GuiTransmitterBlock {
     // Local File Controls
-    protected static final Vector2i SOURCE_FILTER_BUTTON = new Vector2i(265,32);
-    protected static final Vector2i SOURCE_FILTER_SCREEN = new Vector2i(283,33);
-    protected static final Vector2i OPEN_LOCAL_FOLDER_BUTTON = new Vector2i(10,32);
+    protected static final Vector2Int SOURCE_FILTER_BUTTON = new Vector2Int(265,32);
+    protected static final Vector2Int SOURCE_FILTER_SCREEN = new Vector2Int(283,33);
+    protected static final Vector2Int OPEN_LOCAL_FOLDER_BUTTON = new Vector2Int(10,32);
 
     public GuiTransmitter(UUID musicPlayerId) {
         super(musicPlayerId);
@@ -43,13 +43,13 @@ public class GuiTransmitter extends GuiTransmitterBlock {
         super.renderGraphics(graphics, mouseX, mouseY, partialTicks);
 
         // Local Folder Button
-        graphics.blit(guiTexture, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Source Filter Button & Screen Background
-        graphics.blit(guiTexture, START_X + 264, START_Y + 31, 191, 269, 33, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + 264, START_Y + 31, 191, 269, 33, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Source Filter Screen
-        graphics.blit(guiTexture, START_X + 283, START_Y + 33, 105 + (this.musicStatus.sourceMode.ordinal() * 13), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + 283, START_Y + 33, 105 + (this.musicStatus.sourceMode.ordinal() * 13), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return graphics;
     }
@@ -70,7 +70,7 @@ public class GuiTransmitter extends GuiTransmitterBlock {
         super.renderPlaylistSongBadges(graphics, info, songIndex, minSong);
 
         // Source Badge
-        graphics.blit(guiTexture, START_X + 329, START_Y + getFirstSongY() - 1 + songIndex * 11, !info.serverMidi ? 163 : 154, 269, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + 329, START_Y + getFirstSongY() - 1 + songIndex * 11, !info.serverMidi ? 163 : 154, 269, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
 
         return graphics;
     }

@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi.transmitter;
+package io.github.tofodroid.mods.mimi.server.midi.playlist;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 
 public abstract class APlaylistHandler {
@@ -222,6 +223,6 @@ public abstract class APlaylistHandler {
             this.selectedDisplayIndex = null;
             this.selectedSongInfo = null;
         }
-        ServerMusicTransmitterManager.onSelectedSongChange(this.musicPlayerId, this.selectedSongInfo);
+        ServerTransmitterManager.onSelectedSongChange(this.musicPlayerId, this.selectedSongInfo);
     }
 }

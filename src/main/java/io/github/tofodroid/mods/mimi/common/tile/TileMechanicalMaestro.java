@@ -8,8 +8,9 @@ import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManagerConsumerEventHooks;
+import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -21,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileMechanicalMaestro extends AContainerTile {
     public static final String REGISTRY_NAME = "mechanicalmaestro";
-    public static final UUID MECH_SOURCE_ID = new UUID(0,3);
 
     private UUID id;
 
@@ -79,7 +79,7 @@ public class TileMechanicalMaestro extends AContainerTile {
     public void clearContent() {
         this.allNotesOff();
         super.clearContent();
-        ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
     }
 
     @Override
@@ -105,7 +105,7 @@ public class TileMechanicalMaestro extends AContainerTile {
 
         if(!this.getLevel().isClientSide()) {
             this.allNotesOff();
-            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
  
@@ -115,17 +115,17 @@ public class TileMechanicalMaestro extends AContainerTile {
 
         if(!this.getLevel().isClientSide()) {
             this.allNotesOff();
-            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
 
     public void refreshMidiReceivers() {
         if(this.hasLevel() && !this.level.isClientSide) {
             if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
-                ServerMusicReceiverManager.loadMechanicalMaestroInstrumentReceivers(this);
+                BroadcastManagerConsumerEventHooks.reloadMechanicalMaestroInstrumentConsumers(this);
             } else {
                 this.allNotesOff();
-                ServerMusicReceiverManager.removeReceivers(this.getUUID());
+                BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
             }
         }
     }
@@ -148,10 +148,10 @@ public class TileMechanicalMaestro extends AContainerTile {
     
     public void allNotesOff(Byte instrumentId) {
 		if(instrumentId != null && this.getLevel() instanceof ServerLevel) {
-			MidiNotePacketHandler.handlePacketServer(
-                MidiNotePacket.createAllNotesOffPacket(instrumentId, TileMechanicalMaestro.MECH_SOURCE_ID, this.getBlockPos(), null),
-                (ServerLevel)this.getLevel(),
-                null
+			ServerNoteConsumerManager.handlePacket(
+                MidiNotePacket.createAllNotesOffPacket(instrumentId, this.getUUID(), this.getBlockPos(), null),
+                this.getUUID(),
+                (ServerLevel)this.getLevel()
             );
 		}
     }

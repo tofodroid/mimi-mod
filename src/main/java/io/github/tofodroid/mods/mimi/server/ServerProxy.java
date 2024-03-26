@@ -2,11 +2,11 @@ package io.github.tofodroid.mods.mimi.server;
 
 import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
-import net.minecraft.Util;
+import io.github.tofodroid.mods.mimi.util.TimeUtils;
 
 public class ServerProxy implements Proxy {
     private Boolean initialized = false;
-    private final Long serverStartEpoch = Util.getEpochMillis();
+    private final Long serverStartEpoch = TimeUtils.getNowTime();
     private FilesystemMidiFileProvider MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
 
     @Override

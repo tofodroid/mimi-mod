@@ -16,7 +16,7 @@ import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.server.ServerExecutor;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 
 public class ServerMidiUploadManager {
@@ -127,11 +127,11 @@ public class ServerMidiUploadManager {
             UPLOAD_CLIENTS.remove(message.fileId);
 
             if(sequence == null) {
-                ServerMusicTransmitterManager.onSequenceUploadFailed(info);
+                ServerTransmitterManager.onSequenceUploadFailed(info);
                 return;
             }
 
-            ServerMusicTransmitterManager.onFinishUploadSequence(info, sequence);
+            ServerTransmitterManager.onFinishUploadSequence(info, sequence);
         } else {
             UPLOAD_PARTS.put(message.fileId, filePackets);
             TICKS_SINCE_LAST_PART.put(message.fileId, 0);
@@ -155,7 +155,7 @@ public class ServerMidiUploadManager {
         UPLOAD_PARTS.remove(fileId);
         BasicMidiInfo info = UPLOAD_INFOS.remove(fileId);
         UPLOAD_CLIENTS.remove(fileId);
-        ServerMusicTransmitterManager.onSequenceUploadFailed(info);
+        ServerTransmitterManager.onSequenceUploadFailed(info);
     }
 
     public static byte[] merge(List<byte[]> arrays) {
