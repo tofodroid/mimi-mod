@@ -6,7 +6,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '6.+'
 }
 
-version = '1.20.4-4.0.1'
+version = '1.20.4-4.0.2'
 group = 'io.github.tofodroid.mods.mimi'
 archivesBaseName = 'mimimod'
 
@@ -155,8 +155,8 @@ dependencies {
     //implementation fg.deobf("curse.maven:patchouli-306770:4636277")
 
     // Runtime
-    // 
-    //implementation fg.deobf("curse.maven:spark-361579:4738952")
+    // Spark 
+    implementation fg.deobf("curse.maven:spark-361579:4950608")
 }
 
 jar {
