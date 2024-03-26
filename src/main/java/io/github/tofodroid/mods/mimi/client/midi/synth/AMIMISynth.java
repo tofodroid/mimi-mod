@@ -58,17 +58,18 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
             this.internalSynthReceiver = null;
         }
 
+        Builder<T> builder = ImmutableList.builder();
+
         if(internalSynth != null) {
             // Setup channel map
-            Builder<T> builder = ImmutableList.builder();
             for(int i = 0; i < internalSynth.getChannels().length; i++) {
                 builder.add(createChannel(i, this.internalSynth.getChannels()[i]));
             }
             this.midiChannelSet = builder.build();
             this.channelAssignmentMap = HashBiMap.create(midiChannelSet.size());
         } else {
-            this.midiChannelSet = null;
-            this.channelAssignmentMap = null;
+            this.midiChannelSet = builder.build();
+            this.channelAssignmentMap = HashBiMap.create(0);
             this.close();
         }
     }
