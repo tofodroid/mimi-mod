@@ -121,5 +121,6 @@ public class CommonForgeEventHandler {
             event.getServer().registryAccess().registry(Registry.PROCESSOR_LIST_REGISTRY).orElseThrow(),
 		    event.getServer().registryAccess().registry(Registry.TEMPLATE_POOL_REGISTRY).orElseThrow()
         );
+        ServerMusicTransmitterManager.onServerAboutToStart();
     }
 }
