@@ -2,7 +2,9 @@ package io.github.tofodroid.mods.mimi.client.midi.synth;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
@@ -13,11 +15,16 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -36,21 +43,30 @@ import net.minecraft.world.entity.player.Player;
 
 public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable {
     public static final String MC_DEFAULT_DEVICE="Device";
+    private static final Integer IDEAL_CHANNELS[] = {2,1};
+    private static final Integer IDEAL_BIT_RATES[] = {16, 8, 4};
+    private static final Float IDEAL_SAMPLE_RATES[] = {48000.0f,44100.0f,22050.0f,16000.0f,11025.0f,8000.0f};
+
     protected SoftSynthesizer internalSynth;
     protected Receiver internalSynthReceiver;
-    protected AudioFormat format;
     protected Boolean closing = false;
     protected final ImmutableList<T> midiChannelSet;
     protected final BiMap<T, String> channelAssignmentMap;
 
     public AMIMISynth(Boolean jitterCorrection, Integer latency, Soundbank sounds) {
         try {
-            this.format = new AudioFormat(
+            AudioFormat targetFormat = new AudioFormat(
                 ModConfigs.CLIENT.synthSampleRate.get(), 
                 ModConfigs.CLIENT.synthBitRate.get(), 
                 2, true, false
             );
-            this.internalSynth = createSynth(getDeviceOutLine(this.format), this.format, jitterCorrection, false, latency, sounds);
+
+            this.internalSynth = createSynth(targetFormat, jitterCorrection, false, latency, sounds);
+
+            if(internalSynth == null || !internalSynth.isOpen()) {
+                throw new MidiUnavailableException("Synthesizer failed to open but did not produce an error.");
+            }
+
             this.internalSynthReceiver = this.internalSynth.getReceiver();
         } catch(Exception e) {
             MIMIMod.LOGGER.error("Failed to initialize MIDI Synthesizer: ", e);
@@ -175,50 +191,205 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    @SuppressWarnings("resource")
-    public static SourceDataLine getDeviceOutLine(AudioFormat format) {
-        String mcDevice = Minecraft.getInstance().options.soundDevice().get();
+    public static AudioFormat getBestFormatForLine(AudioFormat targetFormat, DataLine.Info lineInfo) {
+        List<AudioFormat> linesFormats = Arrays.asList(lineInfo.getFormats()).stream().filter(format -> format.getEncoding().equals(Encoding.PCM_SIGNED) || format.getEncoding().equals(Encoding.PCM_UNSIGNED)).collect(Collectors.toList());
+        AudioFormat bestFormat = null;
 
-        // Minecraft device name is "<Driver> on <Device>" and we only want device
-        if(mcDevice.toLowerCase().indexOf(" on ") >= 0) {
-            mcDevice = mcDevice.substring(mcDevice.toLowerCase().indexOf(" on ")+4);
+        if(lineInfo.isFormatSupported(targetFormat)) {
+            return targetFormat;
         }
-
-        if(StringUtils.isBlank(mcDevice) || mcDevice.equals(MC_DEFAULT_DEVICE)) {
-            return null;
-        } else {
-            try {
-                for(Mixer.Info info : AudioSystem.getMixerInfo()) {
-                    if(info.getClass().getName().contains("DirectAudioDevice") 
-                        && info.getName().equals(mcDevice)
-                    ) {
-                        return AudioSystem.getSourceDataLine(format, info);
+        
+        // Identify closest supported AudioFormat to target on this line
+        for(AudioFormat format : linesFormats) {
+            for(Integer channels : IDEAL_CHANNELS) {
+                for(Integer bitRate : IDEAL_BIT_RATES) {
+                    for(Float sampleRate : IDEAL_SAMPLE_RATES) {
+                        if(format.getSampleSizeInBits() <= targetFormat.getSampleSizeInBits() && format.getSampleRate() <= targetFormat.getSampleRate())
+                        if(format.getChannels() == channels || format.getChannels() == AudioSystem.NOT_SPECIFIED)
+                        if(format.getSampleSizeInBits() == bitRate || format.getSampleSizeInBits() == AudioSystem.NOT_SPECIFIED)
+                        if(format.getSampleRate() == sampleRate || format.getSampleRate() == AudioSystem.NOT_SPECIFIED)
+                            bestFormat = format;
                     }
                 }
-                MIMIMod.LOGGER.error("Failed to find target AudioOut Device '" + mcDevice + "'. Falling back to default.");
-            } catch(Exception e) {
-                MIMIMod.LOGGER.error("Failed to open target AudioOut Device. Falling back to default. Error: ", e);
             }
         }
+
+        return bestFormat;
+    }
+
+    public static Pair<AudioFormat, DataLine.Info> getBestFormatLine(Mixer outputDevice, AudioFormat targetFormat) {
+        AudioFormat bestFormat = null;
+        DataLine.Info bestLine = null;
+
+        if(outputDevice != null) {
+            List<DataLine.Info> idealLines = Arrays.asList(outputDevice.getSourceLineInfo()).stream().filter(line -> line.getLineClass() == SourceDataLine.class).map(line -> (DataLine.Info)line).collect(Collectors.toList());
+            
+            for(DataLine.Info lineInfo : idealLines) {
+                if(lineInfo.isFormatSupported(targetFormat)) {
+                    return ImmutablePair.of(targetFormat, lineInfo);
+                }
+
+                AudioFormat bestLineFormat = getBestFormatForLine(targetFormat, lineInfo);
+
+                if(bestLineFormat != null) {
+                    if(bestFormat == null) {
+                        bestFormat = bestLineFormat;
+                        bestLine = lineInfo;
+                    } else {
+                        if(bestLineFormat.getChannels() >= bestFormat.getChannels())
+                        if(bestLineFormat.getSampleSizeInBits() >= bestFormat.getSampleSizeInBits())
+                        if(bestLineFormat.getSampleRate() >= bestFormat.getSampleRate()) {
+                            bestFormat = bestLineFormat;
+                            bestLine = lineInfo;
+                        }
+                    }
+                }
+            }
+
+            if(bestLine != null) {
+                return ImmutablePair.of(bestFormat, bestLine);
+            }
+        }
+
+        MIMIMod.LOGGER.warn("Failed to find any supported Audio Output Devices. Attempting fallback to System Default.");
 
         return null;
     }
 
-    /* Code copied from com.sun.media.sound.SoftSynthesizer and customzied */
-    public static SoftSynthesizer createSynth(SourceDataLine outLine, AudioFormat format, Boolean jitterCorrection, Boolean limitChannel10, Integer latency, Soundbank sounds) throws MidiUnavailableException {
+    private static int scanMaxChannels(Line.Info[] lines) {
+        int maxChannels = 0;
+        for (Line.Info line : lines) {
+            if (line instanceof DataLine.Info) {
+                int numChannels = scanMaxChannels(((DataLine.Info) line));
+                if (numChannels > maxChannels) {
+                    maxChannels = numChannels;
+                }
+            }
+        }
+        return maxChannels;
+    }
+
+    private static int scanMaxChannels(DataLine.Info info) {
+        int maxChannels = 0;
+        for (AudioFormat format : info.getFormats()) {
+            int numChannels = format.getChannels();
+            if (numChannels > maxChannels) {
+                maxChannels = numChannels;
+            }
+        }
+        return maxChannels;
+    }
+
+    @SuppressWarnings("resource")
+    public static Mixer getTargetOrDefaultOutputDevice() {
+        String mcDevice = Minecraft.getInstance().options.soundDevice().get();
+
+        // On some versions, Minecraft uses 'Device' as the default instead of a blank string
+        if(mcDevice.trim().equals(MC_DEFAULT_DEVICE)) {
+            mcDevice = "";
+        }
+
+        // Minecraft device name is "<Driver> on <Device>" and we only want device
+        if(mcDevice.toLowerCase().indexOf(" on ") >= 0) {
+            mcDevice = mcDevice.substring(mcDevice.toLowerCase().indexOf(" on ")+4).trim();
+        }
+
+        // If there are multiple devices with the same name, Minecraft appends "#_" to the end (1-indexed)
+        Integer matchNumber = 0;
+        if(mcDevice.toLowerCase().matches(".* #[0-9][0-9]*$")) {
+            matchNumber = Integer.parseInt(mcDevice.substring(mcDevice.lastIndexOf("#")+1))-1;
+            mcDevice = mcDevice.substring(0, mcDevice.lastIndexOf("#")).trim();
+        }
+
+        MIMIMod.LOGGER.info("Searching for Audio Output Device set in Minecraft: '" + mcDevice + " #" + (matchNumber+1) + "'");
+
+        // Identify Valid Output Devices
+        List<Mixer.Info> outputDevices = new ArrayList<>();
+        for(Mixer.Info info : AudioSystem.getMixerInfo()) {
+            Mixer mixer = AudioSystem.getMixer(info);
+
+            if(scanMaxChannels(mixer.getSourceLineInfo()) > 0) {
+                MIMIMod.LOGGER.info("Found Audio Output Device: " + info.toString());
+                outputDevices.add(info);
+            }
+        }
+        // Find target device
+        List<Mixer.Info> matchingDevices = new ArrayList<>();
+        if(mcDevice.isEmpty()) {
+            // System Default
+            if(!outputDevices.isEmpty()) {
+                Mixer.Info info = outputDevices.get(0);
+                MIMIMod.LOGGER.info("Found Matching Device: " + info.getClass().getName() + ": " + info.toString() + " (System Default)");
+                matchingDevices.add(info);
+            }
+        } else {
+            // Search by Name
+            for(Mixer.Info info : outputDevices) {
+                if(info.getName().equals(mcDevice)) {
+                    MIMIMod.LOGGER.info("Found Matching Device: " + info.getClass().getName() + ": " + info.toString() + " (" + matchingDevices.size() + ")");
+                    matchingDevices.add(info);
+                }
+            }
+        }
+
+        // Select Desired Matching Device
+        if(matchingDevices.size() > matchNumber) {
+            Mixer.Info targetInfo = matchingDevices.get(matchNumber);
+            MIMIMod.LOGGER.info("Opened Target Device: " + targetInfo.getName() + " (" + matchNumber + ")");
+            return AudioSystem.getMixer(matchingDevices.get(matchNumber));
+        } else if(!matchingDevices.isEmpty()) {
+            Mixer.Info targetInfo = matchingDevices.get(0);
+            MIMIMod.LOGGER.warn("Expected to find at least " + matchNumber + " devices with name '" + mcDevice + "' but only found " + matchingDevices.size() + ". Using first found device.");
+            MIMIMod.LOGGER.info("Opened Target Device: " + targetInfo.getName() + " (" + matchNumber + ")");
+            return AudioSystem.getMixer(targetInfo);
+        }
+
+        // Fallback to System default
+        MIMIMod.LOGGER.warn("Failed to find MC Audio Deicve '" + mcDevice + "'. Falling back to system default output device.");
+
+        Mixer defaultMixer = null;
+        if(!outputDevices.isEmpty()) {
+            defaultMixer = AudioSystem.getMixer(outputDevices.get(0));
+        }
+
+        if(defaultMixer != null) {
+            Mixer.Info info = defaultMixer.getMixerInfo();
+            MIMIMod.LOGGER.info("Found Matching Device: " + info.getClass().getName() + ": " + info.toString() + " (System Default)");
+        } else {
+            MIMIMod.LOGGER.warn("Failed to find Mixer for System Default Output Device. Falling back to system provided device.");
+            defaultMixer = AudioSystem.getMixer(null);
+        }
+
+        if(defaultMixer != null) {
+            Mixer.Info info = defaultMixer.getMixerInfo();
+            MIMIMod.LOGGER.info("Opened Target Device: " + info.getName() + " (System Default)");
+        }
+
+        return defaultMixer;
+    }
+
+    public static SoftSynthesizer createSynth(AudioFormat targetFormat, Boolean jitterCorrection, Boolean limitChannel10, Integer latency, Soundbank sounds) throws MidiUnavailableException, LineUnavailableException {
         SoftSynthesizer midiSynth = new SoftSynthesizer();
 
         if(midiSynth.getMaxReceivers() != 0) {
             midiSynth.open();
             midiSynth.close();
-
+     
+            Mixer outputDevice = getTargetOrDefaultOutputDevice();
+            Pair<AudioFormat, DataLine.Info> bestLineFormat = getBestFormatLine(outputDevice, targetFormat);
             Map<String, Object> params = new HashMap<>();
             params.put("jitter correction", jitterCorrection);
             params.put("limit channel 10", limitChannel10);
             params.put("latency", latency * 1000);
-            params.put("format", format);
 
-            midiSynth.open(outLine, params);
+            if(bestLineFormat != null) {
+                MIMIMod.LOGGER.info("Identified suitable data line on output device: " + outputDevice.getMixerInfo().toString() + " --> " + bestLineFormat.getLeft().toString());
+                params.put("format", bestLineFormat.getLeft());
+                midiSynth.open((SourceDataLine)outputDevice.getLine(bestLineFormat.getRight()), params);
+            } else {
+                MIMIMod.LOGGER.warn("Failed to identify suitable data line on target output device. Attempting fallback.");
+                midiSynth.open(null, params);
+            }
             
             if(sounds != null) {
                 if(midiSynth.isSoundbankSupported(sounds)) {
@@ -232,5 +403,5 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
 
         throw new MidiUnavailableException("Midi Synth '" + midiSynth.getDeviceInfo().getName() + "' cannot support any receivers.");
-    }
+    } 
 }
