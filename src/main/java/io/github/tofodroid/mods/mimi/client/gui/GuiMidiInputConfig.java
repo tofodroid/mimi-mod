@@ -66,10 +66,12 @@ public class GuiMidiInputConfig extends BaseGui {
         Integer statusX = START_X + 259;
         Integer statusY = START_Y + 33;
 
-        if(this.midiDataManager.inputDeviceManager.isDirtyStatus()) {
-            graphics.blit(guiTexture, statusX, statusY, 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-        } else if(this.midiDataManager.inputDeviceManager.isDeviceSelected()) {
-            graphics.blit(guiTexture, statusX, statusY, this.midiDataManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+        if(this.midiDataManager.inputDeviceManager.isDeviceSelected()) {
+            if(this.midiDataManager.inputDeviceManager.isDeviceAvailable()) {
+                graphics.blit(guiTexture, statusX, statusY, 0, 156, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            } else if(this.midiDataManager.inputDeviceManager.isDeviceError()) {
+                graphics.blit(guiTexture, statusX, statusY, 0, 162, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
         }
         
         return graphics;
@@ -79,7 +81,7 @@ public class GuiMidiInputConfig extends BaseGui {
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Selected Device Name
         if(this.midiDataManager.inputDeviceManager.isDeviceSelected()) {
-            graphics.drawString(font, this.midiDataManager.inputDeviceManager.getSelectedDeviceName(), START_X + 117, START_Y + 40, 0xFF00E600);
+            graphics.drawString(font, this.midiDataManager.inputDeviceManager.getSelectedDeviceName(), START_X + 117, START_Y + 31, 0xFF00E600);
         }
 
         // Available Device Info

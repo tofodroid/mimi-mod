@@ -7,13 +7,14 @@ import java.util.stream.Collectors;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
+import javax.sound.midi.Transmitter;
 
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
-import io.github.tofodroid.mods.mimi.common.midi.AMidiInputSourceManager;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -22,14 +23,23 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class MidiInputDeviceManager extends AMidiInputSourceManager {
+public class MidiInputDeviceManager {
     private List<Pair<InteractionHand, ItemStack>> localInstrumentsToPlay = new ArrayList<>();
+
+    protected Receiver activeReceiver = null;
+    protected Transmitter activeTransmitter = null;
+    protected MidiDevice activeDevice = null;
+
     private String selectedDeviceName;
-    private String midiDeviceError;
-    private Boolean dirty = false;
+    private String midiDeviceError = null;
+
 
     public MidiInputDeviceManager() {
         selectedDeviceName = ModConfigs.CLIENT.selectedMidiDevice.get();
+    }
+
+    public Boolean isDeviceError() {
+        return midiDeviceError != null;
     }
 
     public Boolean isDeviceSelected() {
@@ -38,10 +48,6 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
 
     public Boolean isDeviceAvailable() {
         return this.activeTransmitter != null;
-    }
-
-    public Boolean isDirtyStatus() {
-        return this.dirty;
     }
 
     public String getSelectedDeviceName() {
@@ -54,12 +60,18 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
 
     public void saveDeviceSelection(MidiDevice device) {
         ModConfigs.CLIENT.selectedMidiDevice.set(device.getDeviceInfo().getName());
-        dirty = true;
+        selectedDeviceName = device.getDeviceInfo().getName();
+        midiDeviceError = null;
+
+        if(this.activeTransmitter != null) {
+            this.close();
+        }
+        this.openTransmitter();
     }
 
     public void clearDeviceSelection() {
         ModConfigs.CLIENT.selectedMidiDevice.set("");
-        dirty = true;
+        this.close();
     }
 
     public List<MidiDevice> getAvailableDevices() {
@@ -70,7 +82,6 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
             try {
                 devices.add(MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo()[i]));
             } catch (MidiUnavailableException e) {
-                midiDeviceError = e.getMessage();
                 MIMIMod.LOGGER.warn("Midi Device Error. Device will be skipped. Error: ", e);
             }
         }
@@ -128,21 +139,26 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
     }
 
     protected void openTransmitter() {
-        if(isDeviceSelected()) {
-            try {
-                String oldVal = System.setProperty("javax.sound.midi.Transmitter", "#" + selectedDeviceName);
+        if(isDeviceSelected() && this.activeTransmitter == null) {
+            for(MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
+                if(info.getName().toLowerCase().equals(this.selectedDeviceName.toLowerCase())) {
+                    try {
+                        MidiDevice device = MidiSystem.getMidiDevice(info);
 
-                activeTransmitter = MidiSystem.getTransmitter();
-                activeTransmitter.setReceiver(new MidiDeviceInputReceiver());
+                        if(device != null && device.getMaxTransmitters() != 0) {
+                            activeDevice = device;
+                            activeDevice.open();
+                            activeTransmitter = device.getTransmitter();
+                            activeReceiver = new MidiDeviceInputReceiver();
+                            activeTransmitter.setReceiver(activeReceiver);
+                        }
+                    } catch(Exception e) {
+                        MIMIMod.LOGGER.error("Failed to open MIDI Input Device: '" + this.selectedDeviceName + "'. Error: " + e.getMessage());
+                        midiDeviceError = e.getMessage();
+                        close();
+                    }
 
-                if(oldVal != null) {
-                    System.setProperty("javax.sound.midi.Transmitter", oldVal);
-                } else {
-                    System.clearProperty("javax.sound.midi.Transmitter");
                 }
-            } catch(Exception e) {
-                MIMIMod.LOGGER.error("Midi Device Error: ", e);
-                close();
             }
         }
     }
@@ -151,5 +167,25 @@ public class MidiInputDeviceManager extends AMidiInputSourceManager {
         if(this.activeTransmitter == null) {
             this.openTransmitter();
         }
+    }
+
+    public void close() {
+        if(activeReceiver != null) {
+            activeReceiver.close();
+            activeReceiver = null;
+        }
+
+        if(activeTransmitter != null) {
+            activeTransmitter.setReceiver(null);
+            activeTransmitter.close();
+            activeTransmitter = null;
+        }
+
+        if(activeDevice != null) {
+            activeDevice.close();
+            activeDevice = null;
+        }
+
+        this.selectedDeviceName = null;
     }
 }
