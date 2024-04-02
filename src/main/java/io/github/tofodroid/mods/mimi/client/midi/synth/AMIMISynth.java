@@ -282,12 +282,10 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
     @SuppressWarnings("resource")
     public static Mixer getTargetOrDefaultOutputDevice() {
-        String mcDevice = Minecraft.getInstance().options.soundDevice().get();
+        String mcDevice = Minecraft.getInstance().getSoundManager().soundEngine.library.getCurrentDeviceName();
 
-        // On some versions, Minecraft uses 'Device' as the default instead of a blank string
-        if(mcDevice.trim().equals(MC_DEFAULT_DEVICE)) {
-            mcDevice = "";
-        }
+        MIMIMod.LOGGER.info("Minecraft Audio Output Devices:\n    " + Minecraft.getInstance().getSoundManager().getAvailableSoundDevices().stream().collect(Collectors.joining(",\n    ")));
+        MIMIMod.LOGGER.info("Selected Audio Output Device: '" + mcDevice + "'");
 
         // Minecraft device name is "<Driver> on <Device>" and we only want device
         if(mcDevice.toLowerCase().indexOf(" on ") >= 0) {
@@ -297,11 +295,11 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         // If there are multiple devices with the same name, Minecraft appends "#_" to the end (1-indexed)
         Integer matchNumber = 0;
         if(mcDevice.toLowerCase().matches(".* #[0-9][0-9]*$")) {
-            matchNumber = Integer.parseInt(mcDevice.substring(mcDevice.lastIndexOf("#")+1))-1;
+            matchNumber = Integer.parseInt(mcDevice.substring(mcDevice.lastIndexOf("#")+1).trim())-1;
             mcDevice = mcDevice.substring(0, mcDevice.lastIndexOf("#")).trim();
         }
 
-        MIMIMod.LOGGER.info("Searching for Audio Output Device set in Minecraft: '" + mcDevice + " #" + (matchNumber+1) + "'");
+        MIMIMod.LOGGER.info("Searching for parsed Audio Output Device: '" + mcDevice + " #" + (matchNumber+1) + "'");
 
         // Identify Valid Output Devices
         List<Mixer.Info> outputDevices = new ArrayList<>();
@@ -316,14 +314,19 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         // Find target device
         List<Mixer.Info> matchingDevices = new ArrayList<>();
         if(mcDevice.isEmpty()) {
-            // System Default
+            // Select device based on #
             if(!outputDevices.isEmpty()) {
-                Mixer.Info info = outputDevices.get(0);
-                MIMIMod.LOGGER.info("Found Matching Device: " + info.getClass().getName() + ": " + info.toString() + " (System Default)");
-                matchingDevices.add(info);
+                if(outputDevices.size() > matchNumber) {
+                    Mixer.Info info = outputDevices.get(matchNumber);
+                    MIMIMod.LOGGER.info("Found Matching Device: " + info.getClass().getName() + ": " + info.toString() + " (" + matchNumber + ")");
+                } else {
+                    Mixer.Info info = outputDevices.get(0);
+                    MIMIMod.LOGGER.warn("Expected to find at least " + matchNumber + " devices but only found " + matchingDevices.size() + ". Using first found device: " + info.getClass().getName() + ": " + info.toString() + " (System Default)");
+                    matchingDevices.add(info);
+                }
             }
         } else {
-            // Search by Name
+            // Select device based on name
             for(Mixer.Info info : outputDevices) {
                 if(info.getName().equals(mcDevice)) {
                     MIMIMod.LOGGER.info("Found Matching Device: " + info.getClass().getName() + ": " + info.toString() + " (" + matchingDevices.size() + ")");
