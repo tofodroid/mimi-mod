@@ -66,10 +66,13 @@ public class GuiMidiInputConfig extends BaseGui {
         Integer statusX = START_X + 265;
         Integer statusY = START_Y + 42;
 
-        if(this.midiInputManager.inputDeviceManager.isDirtyStatus()) {
-                graphics.blit(guiTexture, statusX, statusY, 8, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-        } else if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
-            graphics.blit(guiTexture, statusX, statusY, this.midiInputManager.inputDeviceManager.isDeviceAvailable() ? 0 : 4, 159, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+
+        if(this.midiInputManager.inputDeviceManager.isDeviceSelected()) {
+            if(this.midiInputManager.inputDeviceManager.isDeviceAvailable()) {
+                graphics.blit(guiTexture, statusX, statusY, 0, 174, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            } else if(this.midiInputManager.inputDeviceManager.isDeviceError()) {
+                graphics.blit(guiTexture, statusX, statusY, 4, 174, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+            }
         }
         
         return graphics;
