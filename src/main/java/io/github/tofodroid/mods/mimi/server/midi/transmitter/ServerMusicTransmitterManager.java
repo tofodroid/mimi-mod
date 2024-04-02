@@ -30,9 +30,10 @@ public abstract class ServerMusicTransmitterManager {
     private static final Set<UUID> PLAYING_LIST = new HashSet<>();
     private static final Map<UUID,AServerMusicTransmitter> PLAYER_MAP = new HashMap<>();
     private static final Map<UUID, Set<UUID>> MIDI_LOAD_CACHE_MAP = new HashMap<>();
-    private static final ExecutorService pool = Executors.newFixedThreadPool(1);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static ExecutorService pool;
+    private static ExecutorService executor;
     private static Boolean hasPlaying = false;
+    private static Boolean shuttingDown = false;
 
     public static Boolean isPlaying(UUID id) {
         return PLAYING_LIST.contains(id);
@@ -60,6 +61,18 @@ public abstract class ServerMusicTransmitterManager {
         return hasPlaying;
     }
 
+    public static void configureMidiThread() {
+        if(!shuttingDown) {
+            if(pool == null) {
+                pool = Executors.newFixedThreadPool(1);
+            }
+
+            if(executor == null) {
+                executor = Executors.newSingleThreadExecutor();
+            }
+        }
+    }
+
     public static void onPlayerLoggedIn(ServerPlayer player) {
         getOrCreateTransmitter(player);
     }
@@ -68,8 +81,44 @@ public abstract class ServerMusicTransmitterManager {
         removeTransmitter(player.getUUID());
     }
 
+    public static void onServerAboutToStart() {
+        MIMIMod.LOGGER.info("MIMI - SERVER STARTING");
+        shuttingDown = false;
+    }
+
     public static void onServerStopping() {
+        shuttingDown = true;
+        MIMIMod.LOGGER.info("MIMI - SERVER STOPPING");
+
         clearMusicPlayers();
+
+        pool.shutdown();
+        try {
+            pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        } catch(Exception e) {
+            MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI pool. Error: " + e.getMessage());
+            try {
+                pool.shutdownNow();
+                pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
+            } catch(Exception e2) {
+                MIMIMod.LOGGER.error("Failed to force shutdown MIDI pool. Error: " + e.getMessage());
+            }
+        }
+        pool = null;
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        } catch(Exception e) {
+            MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI executor. Error: " + e.getMessage());
+            try {
+                executor.shutdownNow();
+                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+            } catch(Exception e2) {
+                MIMIMod.LOGGER.error("Failed to force shutdown MIDI executor. Error: " + e.getMessage());
+            }
+        }
+        executor = null;
     }
     
     public static ServerMusicPlayerSongListPacket createListPacket(UUID musicPlayerId) {
@@ -170,16 +219,20 @@ public abstract class ServerMusicTransmitterManager {
     }
 
     private static void executeMidiTask(Runnable runnable, Consumer<Exception> onFailed) {
-        pool.execute(() -> {
-            Future<?> future = executor.submit(runnable);
+        configureMidiThread();
 
-            try {
-                future.get(10000, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                onFailed.accept(e);
-            }
-        });
+        if(!shuttingDown && pool != null && executor != null) {
+            pool.execute(() -> {
+                Future<?> future = executor.submit(runnable);
+
+                try {
+                    future.get(10000, TimeUnit.MILLISECONDS);
+                } catch (Exception e) {
+                    future.cancel(true);
+                    onFailed.accept(e);
+                }
+            });
+        }
     }
     
     public static AServerMusicTransmitter getOrCreateTransmitter(ServerPlayer player) {
