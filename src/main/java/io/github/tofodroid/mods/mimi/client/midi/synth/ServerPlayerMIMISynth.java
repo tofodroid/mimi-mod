@@ -20,7 +20,7 @@ public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
     }
 
     public Boolean tick(Player clientPlayer) {
-        if(!this.channelAssignmentMap.isEmpty()) {
+        if(this.channelAssignmentMap != null && !this.channelAssignmentMap.isEmpty()) {
             // Tick channels
             List<PositionalMIMIChannel> toRemove = new ArrayList<>();
             for(PositionalMIMIChannel channel : channelAssignmentMap.keySet()) {

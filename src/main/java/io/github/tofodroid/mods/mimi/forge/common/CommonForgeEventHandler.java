@@ -115,6 +115,7 @@ public class CommonForgeEventHandler {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         BroadcastManager.onServerStopping();
+        ServerTransmitterManager.onServerStopping();
     }
 
     @SubscribeEvent
@@ -123,5 +124,6 @@ public class CommonForgeEventHandler {
             event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow(),
 		    event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow()
         );
+        ServerTransmitterManager.onServerAboutToStart();
     }
 }
