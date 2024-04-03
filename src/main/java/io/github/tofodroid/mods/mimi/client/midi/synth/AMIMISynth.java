@@ -116,7 +116,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void noteOn(MidiNotePacket message, Long timestamp) {
-        if(this.channelAssignmentMap == null || this.channelAssignmentMap.isEmpty() || closing) {
+        if(this.channelAssignmentMap == null || closing) {
             return;
         }
 
@@ -144,7 +144,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void noteOff(MidiNotePacket message, Long timestamp) {
-        if(this.channelAssignmentMap == null || this.channelAssignmentMap.isEmpty() || closing) {
+        if(this.channelAssignmentMap == null || closing) {
             return;
         }
 
