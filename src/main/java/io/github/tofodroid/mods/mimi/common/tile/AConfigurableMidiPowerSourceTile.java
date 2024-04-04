@@ -19,12 +19,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiNoteResponsiveTile {
-    public static final Integer MAX_NOTE_ON_SECONDS = 8;
+    public static final Integer MAX_NOTE_ON_SECONDS = 10;
     
     // Runtime data
     protected Map<Integer, Long> heldNotes = new Int2LongArrayMap();
     protected List<Integer> notesToTurnOff = new ArrayList<>();
-    protected Boolean noteHeld;
+    protected Boolean noteHeld = false;
     protected Integer offCounter = 0;
 
     // Config data
@@ -67,19 +67,14 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         this.setInverted(MidiNbtDataUtils.getInvertSignal(getSourceStack()));
         this.triggerHeld = !MidiNbtDataUtils.getTriggerNoteStart(getSourceStack());
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(getSourceStack());
+        this.noteHeld = false;
         this.clearNotes();
     }
 
     @Override
     public void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {
         if(this.isBlockValid()) {
-            Boolean shouldBePowered = false;
-            
-            if(this.triggerHeld) {
-                this.noteHeld = tickNotes();
-                shouldBePowered = this.noteHeld;
-                this.applyNotesOff();
-            }
+            Boolean shouldBePowered = this.noteHeld;
 
             if(shouldBePowered) {
                 this.setPowered(true);
@@ -92,6 +87,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
                     this.offCounter++;
                 }
             }
+            
+            this.noteHeld = tickNotes();
         }
     }
 
@@ -153,39 +150,34 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         return ((group)*128 + note);
     }
 
-    protected void applyNotesOff() {
-        for(Integer noteOff : this.notesToTurnOff) {
-            this.heldNotes.remove(noteOff);
-        }
-
-        if(this.heldNotes.isEmpty()) {
-            this.noteHeld = false;
-        }
-
-        this.notesToTurnOff.clear();
-    }
-
     protected Boolean tickNotes() {
-        List<Integer> notesToRemove = new ArrayList<>();
-        Long nowTime = Instant.now().toEpochMilli();
+        if(this.triggerHeld) {
+            List<Integer> notesToRemove = new ArrayList<>();
+            Long nowTime = Instant.now().toEpochMilli();
 
-        // Find notes held for longer than MAX_NOTE_ON_SECONDS and time out
-        for(Integer noteId : this.heldNotes.keySet()) {
-            if(nowTime - this.heldNotes.get(noteId) >= MAX_NOTE_ON_SECONDS * 1000) {
-                notesToRemove.add(noteId);
+            // Find notes that were turned off or held for longer than MAX_NOTE_ON_SECONDS and time out
+            for(Integer noteId : this.heldNotes.keySet()) {
+                if(this.notesToTurnOff.contains(noteId) || nowTime - this.heldNotes.get(noteId) >= MAX_NOTE_ON_SECONDS * 1000) {
+                    notesToRemove.add(noteId);
+                }
             }
-        }
 
-        for(Integer noteId : notesToRemove) {
-            this.heldNotes.remove(noteId);
-        }
+            // Remove identified notes
+            for(Integer noteId : notesToRemove) {
+                this.heldNotes.remove(noteId);
+            }
 
-        return !this.heldNotes.isEmpty();
+            this.notesToTurnOff.clear();
+            return !this.heldNotes.isEmpty();
+        } else {
+            this.clearNotes();
+            return false;
+        }
     }
 
     protected void clearNotes() {
-        this.offCounter = 0;
         this.heldNotes.clear();
+        this.notesToTurnOff.clear();
     }
 
     protected Boolean hasNotesOn() {
@@ -193,13 +185,9 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
     
     public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
-        if(this.triggerHeld) {
-            Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
-            this.heldNotes.put(noteId, noteTime);
-            this.noteHeld = true;
-        } else {
-            this.setPowered(true);
-        }
+        Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
+        this.heldNotes.put(noteId, Instant.now().toEpochMilli());
+        this.noteHeld = true;
     }
 
     public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
@@ -210,14 +198,14 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
 
     public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId) {
-        Byte groupKey = getNoteGroupKey(channel, instrumentId);
-
         if(this.triggerHeld) {
+            Byte groupKey = getNoteGroupKey(channel, instrumentId);
+
             if(groupKey == null || (channel != null && channel == BroadcastEvent.ALL_CHANNELS)) {
-                this.heldNotes.clear();
-            } else {
+                this.clearNotes();
+            } else if(groupKey != null) {
                 for(Integer noteId : this.heldNotes.keySet()) {
-                    if(noteId % 128 == channel) {
+                    if((noteId / 128) == groupKey) {
                         this.notesToTurnOff.add(noteId);
                     }
                 }
