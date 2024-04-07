@@ -35,7 +35,7 @@ import javax.sound.midi.Transmitter;
  * @author Kara Kytle
  * @author Florian Bomers
  */
-final class MidiInDevice extends AbstractMidiDevice implements Runnable {
+public final class MidiInDevice extends AbstractMidiDevice implements Runnable {
 
     private volatile Thread midiInThread;
 

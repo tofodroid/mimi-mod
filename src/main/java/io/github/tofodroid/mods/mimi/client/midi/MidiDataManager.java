@@ -13,7 +13,6 @@ public class MidiDataManager {
 
     public MidiDataManager() {
         this.inputDeviceManager = new MidiInputDeviceManager();
-        this.inputDeviceManager.open();
     }
 
     public void setPlayerStatusPakcet(ServerMusicPlayerStatusPacket packet) {
@@ -56,7 +55,7 @@ public class MidiDataManager {
         this.inputDeviceManager.handlePlayerTick(player);
     }
 
-    public void handleLoginLogout() {
+    public void handleLoginLogout(Boolean login) {
         playerTransmitterStatusPacket = null;
         updateTickCount = 0;
     }

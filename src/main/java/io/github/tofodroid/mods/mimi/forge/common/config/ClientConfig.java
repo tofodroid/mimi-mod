@@ -25,7 +25,7 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
 
     // INPUT
-    public ForgeConfigSpec.ConfigValue<String> selectedMidiDevice;
+    public ForgeConfigSpec.BooleanValue printDeDebugMessages;
 
     // SYNTH
     public ForgeConfigSpec.IntValue localBufferms;
@@ -48,9 +48,9 @@ public class ClientConfig {
             .define("playlistFolderPath", "");
         builder.pop();
         builder.push(MIDI_INPUT_CATEGORY_NAME);
-        selectedMidiDevice = builder.comment("What MIDI Input Device should be used (if available)? This can be set from the in-game MIDI Input Device Configuration menu. Changes require a game restart to take affect.")
-            .translation(MIMIMod.MODID + ".config.midi.input.defaultdevice")
-            .define("defaultMidiInputDevice", "");
+        printDeDebugMessages = builder.comment("Should MIMI print debug messages to the log? If you're having a problem with MIMI and want to submit an issue turning this on can be very helpful!")
+            .translation(MIMIMod.MODID + ".config.midi.input.deviceDebug")
+            .define("printDeDebugMessages", false);
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")

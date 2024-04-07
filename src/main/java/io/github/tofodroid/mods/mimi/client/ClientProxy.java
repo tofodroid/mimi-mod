@@ -81,14 +81,14 @@ public class ClientProxy implements Proxy {
 
     public void onLocalPlayerLogout() {
         if(this.isInitialized()) {
-            this.getMidiData().handleLoginLogout();
+            this.getMidiData().handleLoginLogout(false);
             this.getMidiSynth().handleLogout();
         }
     }
 
     public void onLocalPlayerLogin() {
         if(this.isInitialized()) {
-            this.getMidiData().handleLoginLogout();
+            this.getMidiData().handleLoginLogout(true);
             this.getMidiSynth().handleLogin();
         }
     }
