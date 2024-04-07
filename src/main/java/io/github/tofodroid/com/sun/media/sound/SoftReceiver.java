@@ -25,7 +25,7 @@
 
 package io.github.tofodroid.com.sun.media.sound;
 
-import java.util.TreeMap;
+import java.util.Map;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiDeviceReceiver;
@@ -42,7 +42,7 @@ public final class SoftReceiver implements MidiDeviceReceiver {
     boolean open = true;
     private final Object control_mutex;
     private final SoftSynthesizer synth;
-    TreeMap<Long, Object> midimessages;
+    Map<Long, Object> midimessages;
     SoftMainMixer mainmixer;
 
     public SoftReceiver(SoftSynthesizer synth) {

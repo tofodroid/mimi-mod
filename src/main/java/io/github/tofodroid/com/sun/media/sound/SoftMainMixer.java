@@ -27,9 +27,11 @@ package io.github.tofodroid.com.sun.media.sound;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -87,7 +89,7 @@ public final class SoftMainMixer {
     private final SoftAudioProcessor agc;
     private long msec_buffer_len = 0;
     private int buffer_len = 0;
-    TreeMap<Long, Object> midimessages = new TreeMap<>();
+    Map<Long, Object> midimessages = Collections.synchronizedMap(new TreeMap<>());
     private int delay_midievent = 0;
     private int max_delay_midievent = 0;
     double last_volume_left = 1.0;
@@ -425,29 +427,31 @@ public final class SoftMainMixer {
     }
 
     public void clearQueuedChannelEvents(int channel) {
-        Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<Long, Object> entry = iter.next();
-            byte[] data = null;
+        synchronized(midimessages) {
+            Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
+            while (iter.hasNext()) {
+                Entry<Long, Object> entry = iter.next();
+                byte[] data = null;
 
-            if(entry.getValue() instanceof MidiMessage) {
-                data = ((MidiMessage)entry.getValue()).getMessage();
-            } else if(entry.getValue() instanceof byte[]) {
-                data = (byte[])entry.getValue();
-            }
+                if(entry.getValue() instanceof MidiMessage) {
+                    data = ((MidiMessage)entry.getValue()).getMessage();
+                } else if(entry.getValue() instanceof byte[]) {
+                    data = (byte[])entry.getValue();
+                }
 
-            if(data != null) {
-                int status = 0;
-                if (data.length > 0)
-                    status = data[0] & 0xFF;
-                int ch = (status & 0x0F);
+                if(data != null) {
+                    int status = 0;
+                    if (data.length > 0)
+                        status = data[0] & 0xFF;
+                    int ch = (status & 0x0F);
 
-                if(ch == channel) {
-                    try {
-                        iter.remove();
-                    } catch(ConcurrentModificationException e) {
-                        // No-op
-                        MIMIMod.LOGGER.warn("Failed to clear channel event due to concurrent modification.");
+                    if(ch == channel) {
+                        try {
+                            iter.remove();
+                        } catch(ConcurrentModificationException e) {
+                            // No-op
+                            MIMIMod.LOGGER.warn("Failed to clear channel event due to concurrent modification.");
+                        }
                     }
                 }
             }
@@ -455,21 +459,23 @@ public final class SoftMainMixer {
     }
 
     private void processMessages(long timeStamp) {
-        Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<Long, Object> entry = iter.next();
-            if (entry.getKey() >= (timeStamp + msec_buffer_len))
-                return;
-            long msec_delay = entry.getKey() - timeStamp;
-            delay_midievent = (int)(msec_delay * (samplerate / 1000000.0) + 0.5);
-            if(delay_midievent > max_delay_midievent)
-                delay_midievent = max_delay_midievent;
-            if(delay_midievent < 0)
-                delay_midievent = 0;
-            processMessage(entry.getValue());
-            iter.remove();
+        synchronized(midimessages) {
+            Iterator<Entry<Long, Object>> iter = midimessages.entrySet().iterator();
+            while (iter.hasNext()) {
+                Entry<Long, Object> entry = iter.next();
+                if (entry.getKey() >= (timeStamp + msec_buffer_len))
+                    return;
+                long msec_delay = entry.getKey() - timeStamp;
+                delay_midievent = (int)(msec_delay * (samplerate / 1000000.0) + 0.5);
+                if(delay_midievent > max_delay_midievent)
+                    delay_midievent = max_delay_midievent;
+                if(delay_midievent < 0)
+                    delay_midievent = 0;
+                processMessage(entry.getValue());
+                iter.remove();
+            }
+            delay_midievent = 0;
         }
-        delay_midievent = 0;
     }
 
     void processAudioBuffers() {

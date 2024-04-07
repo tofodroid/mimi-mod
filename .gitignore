@@ -17,6 +17,7 @@ bin
 
 # Forge
 run
+runbackup
 logs
 
 # Project Utils
