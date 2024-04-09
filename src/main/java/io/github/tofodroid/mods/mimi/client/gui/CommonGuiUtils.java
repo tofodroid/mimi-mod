@@ -1,5 +1,8 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
@@ -45,6 +48,25 @@ public abstract class CommonGuiUtils {
             return source;
         }
         return font.plainSubstrByWidth("..." + source, maxWidth).substring(3) + "...";
+    }
+    
+    public static List<String> wrapString(Font font, String source, Integer maxWidth, Integer maxLines) {
+        if(source == null || font.width(source) <= maxWidth) {
+            return List.of(source);
+        }
+
+        List<String> lines = new ArrayList<>();
+        String remaining = source;
+
+        do {
+            String part = font.plainSubstrByWidth(remaining, maxWidth);
+            remaining = source.substring(part.length());
+            lines.add(part);
+        } while(font.width(remaining) > maxWidth || lines.size() <= maxLines);
+
+        lines.add(remaining);
+
+        return lines;
     }
 
     public static void blitAbsolute(PoseStack graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {

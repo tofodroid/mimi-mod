@@ -9,6 +9,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 // 1. Default MIDI Input Device
 
 public class ClientConfig {
+    public static final String AUDIO_OUTPUT_CATEGORY_NAME = "Audio Output";
     public static final String INSTRUMENT_GUI_CATEGORY_NAME = "Instrument GUI";
     public static final String MIDI_PLAYER_CATEGORY_NAME = "MIDI Player";
     public static final String MIDI_INPUT_CATEGORY_NAME = "MIDI Input";
@@ -27,6 +28,10 @@ public class ClientConfig {
     // INPUT
     public ForgeConfigSpec.ConfigValue<String> selectedMidiDevice;
 
+    // AUDIO
+    public ForgeConfigSpec.BooleanValue automaticAudioDevice;
+    public ForgeConfigSpec.ConfigValue<String> audioOutputDevice;
+
     // SYNTH
     public ForgeConfigSpec.IntValue localBufferms;
     public ForgeConfigSpec.BooleanValue jitterCorrection;
@@ -37,6 +42,14 @@ public class ClientConfig {
     public ForgeConfigSpec.ConfigValue<String> soundfontPath;
 
     public ClientConfig(ForgeConfigSpec.Builder builder) {
+        builder.push(AUDIO_OUTPUT_CATEGORY_NAME);
+        automaticAudioDevice = builder.comment("Whether or not MIMI should attempt to automatically determine the audio output device to use based on the Minecraft audio device. Works best on Windows.")
+            .translation(MIMIMod.MODID + ".config.audio.automatic")
+            .define("automaticAudioDevice", false);
+        audioOutputDevice = builder.comment("When automatic device determination is set to false, the name of the audio output device that MIMI should attempt to use. If not found MIMI will use the System Default device.")
+            .translation(MIMIMod.MODID + ".config.audio.device")
+            .define("audioOutputDevice", "");
+        builder.pop();
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
             .translation(MIMIMod.MODID + ".config.instrument.keyboard.layout")
