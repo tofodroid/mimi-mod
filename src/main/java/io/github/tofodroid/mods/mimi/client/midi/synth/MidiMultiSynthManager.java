@@ -9,6 +9,12 @@ import io.github.tofodroid.com.sun.media.sound.SF2SoundbankReader;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Soundbank;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.SourceDataLine;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
@@ -32,11 +38,13 @@ public class MidiMultiSynthManager {
     protected Boolean loggingOff = false;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
+    public AudioOutputDeviceManager audioDeviceManager;
     protected LocalPlayerMIMISynth localSynth;
     protected MechanicalMaestroMIMISynth mechSynth;
     protected ServerPlayerMIMISynth playerSynth;
 
     public MidiMultiSynthManager() {
+        this.audioDeviceManager = new AudioOutputDeviceManager();
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
 
         if(this.soundbank != null) {
@@ -83,6 +91,8 @@ public class MidiMultiSynthManager {
             mechSynth.close();
         if(playerSynth != null)
             playerSynth.close();
+
+        Pair<AudioFormat, SourceDataLine> mechOutLine = audioDeviceManager.getOutputFormatLine();
         this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);

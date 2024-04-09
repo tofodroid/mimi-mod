@@ -13,7 +13,7 @@ public abstract class ClientGuiWrapper {
     }
 
     public static void openConfigGui(Level world, Player player) {
-        openGui(world, new GuiMidiInputConfig(player));
+        openGui(world, new GuiDeviceonfig(player));
     }
     
     public static void openGui(Level world, Screen screen) {

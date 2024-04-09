@@ -69,8 +69,10 @@ public class ClientEventHandler {
     
     @SubscribeEvent
     public static void handleSoundReload(SoundEngineLoadEvent event) {
-        MIMIMod.LOGGER.info("EVENT");
-        if(MIMIMod.proxy.isClient() && ((ClientProxy)MIMIMod.proxy).getMidiSynth() != null) ((ClientProxy)MIMIMod.proxy).getMidiSynth().reloadSynths();
+        if(MIMIMod.proxy.isClient() && ((ClientProxy)MIMIMod.proxy).getMidiSynth() != null) {
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().audioDeviceManager.refreshDevice();
+            ((ClientProxy)MIMIMod.proxy).getMidiSynth().reloadSynths();
+        }
     }
 
     protected static void registerItemColors(RegisterColorHandlersEvent.Item event, List<? extends Item> items) {
