@@ -93,9 +93,13 @@ public class MidiMultiSynthManager {
             playerSynth.close();
 
         Pair<AudioFormat, SourceDataLine> mechOutLine = audioDeviceManager.getOutputFormatLine();
-        this.mechSynth = new MechanicalMaestroMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.playerSynth = new ServerPlayerMIMISynth(ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+        this.mechSynth = new MechanicalMaestroMIMISynth(mechOutLine.getLeft(), mechOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+
+        Pair<AudioFormat, SourceDataLine> playerOutLine = audioDeviceManager.getOutputFormatLine();
+        this.playerSynth = new ServerPlayerMIMISynth(playerOutLine.getLeft(), playerOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+
+        Pair<AudioFormat, SourceDataLine> localOutLine = audioDeviceManager.getOutputFormatLine();
+        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
     @SubscribeEvent

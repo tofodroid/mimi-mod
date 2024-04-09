@@ -18,7 +18,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.config.ModConfigs;
 import net.minecraft.client.Minecraft;
 
 public class AudioOutputDeviceManager {
