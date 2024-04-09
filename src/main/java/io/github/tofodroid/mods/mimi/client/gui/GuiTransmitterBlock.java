@@ -21,6 +21,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiTransmitterBlock extends BaseGui {
     protected static final Integer UPDATE_STATUS_EVERY_TICKS = 10;
+    protected static final Integer UPDATE_LIST_EVERY_TICKS = 40;
     protected static final Integer ANIM_FRAME_EVERY_TICKS = 3;
     protected static final Integer LOADING_ANIMATION_FRAMES = 4;
     
@@ -52,7 +53,8 @@ public class GuiTransmitterBlock extends BaseGui {
     protected static final Vector2Int SLIDE_CLICK_SIZE = new Vector2Int(SLIDE_WIDTH+8, SLIDE_HEIGHT);
 
     // Animation
-    protected Integer ticksSinceUpdate = 0;
+    protected Integer ticksSinceUpdateStat = 0;
+    protected Integer ticksSinceUpdateList = 0;
     protected Integer ticksSinceAnimFrame = 0;
     protected Integer loadingAnimationFrame = 0;
 
@@ -60,7 +62,7 @@ public class GuiTransmitterBlock extends BaseGui {
     protected UUID musicPlayerId;
     protected ServerMusicPlayerStatusPacket musicStatus;
     protected ServerMusicPlayerSongListPacket songList;
-    protected Boolean awaitRefresh = false;
+    protected Boolean awaitRefresh = true;
 
     public GuiTransmitterBlock(UUID musicPlayerId) {
         super(360, 255, 360, "textures/gui/container_transmitter.png", "item.MIMIMod.gui_transmitter");
@@ -82,11 +84,18 @@ public class GuiTransmitterBlock extends BaseGui {
 
     @Override
     public void tick() {
-        if(this.ticksSinceUpdate >= UPDATE_STATUS_EVERY_TICKS) {
+        if(this.ticksSinceUpdateStat >= UPDATE_STATUS_EVERY_TICKS) {
             this.startRefreshPlayerStatus();
-            this.ticksSinceUpdate = 0;
+            this.ticksSinceUpdateStat = 0;
         } else {
-            this.ticksSinceUpdate++;
+            this.ticksSinceUpdateStat++;
+        }
+
+        if(this.ticksSinceUpdateList >= UPDATE_LIST_EVERY_TICKS) {
+            this.startRefreshSongList();
+            this.ticksSinceUpdateList = 0;
+        } else {
+            this.ticksSinceUpdateList++;
         }
 
         if(this.ticksSinceAnimFrame >= ANIM_FRAME_EVERY_TICKS) {
@@ -323,6 +332,5 @@ public class GuiTransmitterBlock extends BaseGui {
 
     protected void startRefreshSongList() {
         NetworkProxy.sendToServer(new ServerMusicPlayerSongListPacket(this.musicPlayerId));
-        this.awaitRefresh = true;
     }
 }
