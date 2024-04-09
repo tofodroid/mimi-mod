@@ -90,4 +90,53 @@ public abstract class BaseGui extends Screen {
         return font.plainSubstrByWidth("..." + source, maxWidth).substring(3) + "...";
     }
 
+    // Absolute Position
+    protected void blitAbsolute(GuiGraphics graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitAbsolute(GuiGraphics graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void blitAbsolute(GuiGraphics graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitAbsolute(GuiGraphics graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringAbsolute(GuiGraphics graphics, Font font, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
+    }
+
+    protected void drawStringAbsolute(GuiGraphics graphics, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
+    }
+
+    // Relative Position
+    protected void blitRelative(GuiGraphics graphics, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitRelative(GuiGraphics graphics, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void blitRelative(GuiGraphics graphics, ResourceLocation texture, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    protected void blitRelative(GuiGraphics graphics, ResourceLocation texture, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringRelative(GuiGraphics graphics, Font font, String string, Integer relativeStartX, Integer relativeStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, START_X + relativeStartX, START_Y + relativeStartY, color);
+    }
+
+    protected void drawStringRelative(GuiGraphics graphics, String string, Integer relativeStartX, Integer relativeStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, START_X + relativeStartX, START_Y + relativeStartY, color);
+    }
 }
