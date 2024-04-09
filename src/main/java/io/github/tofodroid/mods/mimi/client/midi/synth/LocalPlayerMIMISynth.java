@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.SourceDataLine;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
@@ -16,8 +18,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 
 public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
-    public LocalPlayerMIMISynth(Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
-       super(jitterCorrection, latency, sounds);
+    public LocalPlayerMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
+       super(format, dataLine, jitterCorrection, latency, sounds);
     }
 
     public Boolean tick(Player clientPlayer) {

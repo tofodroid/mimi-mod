@@ -8,6 +8,8 @@ import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.SourceDataLine;
 
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import net.minecraft.world.entity.player.Player;
@@ -15,8 +17,8 @@ import net.minecraft.world.entity.player.Player;
 public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
     protected SoftSynthesizer internalSynth;
     
-    public ServerPlayerMIMISynth(Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
-       super(jitterCorrection, latency, sounds);
+    public ServerPlayerMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
+       super(format, dataLine, jitterCorrection, latency, sounds);
     }
 
     public Boolean tick(Player clientPlayer) {

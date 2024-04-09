@@ -9,8 +9,13 @@ import io.github.tofodroid.com.sun.media.sound.SF2SoundbankReader;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Soundbank;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.SourceDataLine;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
+import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
@@ -27,10 +32,12 @@ public class MidiMultiSynthManager {
     protected Boolean dead = false;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
+    public AudioOutputDeviceManager audioDeviceManager;
     protected LocalPlayerMIMISynth localSynth;
     protected ServerPlayerMIMISynth networkSynth;
 
     public MidiMultiSynthManager() {
+        this.audioDeviceManager = new AudioOutputDeviceManager();
         this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
 
         if(this.soundbank != null) {
@@ -87,8 +94,11 @@ public class MidiMultiSynthManager {
         if(networkSynth != null)
             networkSynth.close();
 
-        this.networkSynth = new ServerPlayerMIMISynth(false, ModConfigs.CLIENT.latency.get(), this.soundbank);
-        this.localSynth = new LocalPlayerMIMISynth(false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+        Pair<AudioFormat, SourceDataLine> netOutLine = audioDeviceManager.getOutputFormatLine();
+        this.networkSynth = new ServerPlayerMIMISynth(netOutLine.getLeft(), netOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        
+        Pair<AudioFormat, SourceDataLine> localOutLine = audioDeviceManager.getOutputFormatLine();
+        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
     public Long getBufferTime(Long noteServerTime) {
