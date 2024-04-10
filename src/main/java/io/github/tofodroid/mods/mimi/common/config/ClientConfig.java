@@ -25,10 +25,6 @@ public class ClientConfig {
     // PLAYER
     public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
 
-    // INPUT
-    public ForgeConfigSpec.ConfigValue<String> selectedMidiDevice;
-    public ForgeConfigSpec.BooleanValue enableMidiLogs;
-
     // AUDIO
     public ForgeConfigSpec.BooleanValue automaticAudioDevice;
     public ForgeConfigSpec.ConfigValue<String> audioOutputDevice;
@@ -73,12 +69,6 @@ public class ClientConfig {
             .define("playlistFolderPath", "");
         builder.pop();
         builder.push(MIDI_INPUT_CATEGORY_NAME);
-        selectedMidiDevice = builder.comment("What MIDI Input Device should be used (if available)? This can be set from the in-game MIDI Input Device Configuration menu. Changes require a game restart to take affect.")
-            .translation(MIMIMod.MODID + ".config.midi.input.defaultdevice")
-            .define("defaultMidiInputDevice", "");
-            enableMidiLogs = builder.comment("Should MIMI include detailed logs tracking MIDI note input and output?")
-            .translation(MIMIMod.MODID + ".config.midi.synth.enablemidilogs")
-            .define("enableMidiLogs", false);
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         raytraceSound = builder.comment("Should MIDI notes that are played take into account any blocks between you and the source and muffle the sound accordingly? Note that enabling this may impact performance on lower-end systems.")

@@ -32,7 +32,6 @@ public class MidiInputManager {
         this.fileCasterManager = new MidiFileCasterManager();
         MinecraftForge.EVENT_BUS.register(this.fileCasterManager);
         this.fileCasterManager.open();
-        this.inputDeviceManager.open();
     }
 
     @SubscribeEvent
