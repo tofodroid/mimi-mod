@@ -5,9 +5,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import io.netty.handler.codec.DecoderException;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.LoopMode;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.SourceMode;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.FavoriteMode;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.LoopMode;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.SourceMode;
 
 public class ServerMusicPlayerStatusPacket {
     private static final UUID NO_FILE_ID = new UUID(0,0);

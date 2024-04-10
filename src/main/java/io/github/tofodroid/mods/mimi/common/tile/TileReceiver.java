@@ -3,7 +3,8 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManagerConsumerEventHooks;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -26,7 +27,7 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
         super.cacheMidiSettings();
 
         if(this.hasLevel() && !this.getLevel().isClientSide) {
-            ServerMusicReceiverManager.loadReceiverTileReceiver(this);
+            BroadcastManagerConsumerEventHooks.reloadReceiverTileConsumer(this);
         }
     }
     
@@ -35,7 +36,7 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
         super.setRemoved();
 
         if(!this.getLevel().isClientSide()) {
-            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
  
@@ -44,7 +45,7 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile {
         super.onChunkUnloaded();
     
         if(!this.getLevel().isClientSide()) {
-            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
 

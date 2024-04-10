@@ -28,10 +28,8 @@ public class PositionalMIMIChannel extends MIMIChannel{
                 this.channel.controlChange(7, MIMISynthUtils.getVolumeForRelativeNoteDistance(0d));
             }
             return true;
-        } else if(this.lastNoteTime != null) {
-            return false;
         } else {
-            return null;
+            return false;
         }
     }
 }
