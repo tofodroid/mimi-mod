@@ -5,14 +5,16 @@ import java.util.List;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.SourceDataLine;
 
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import net.minecraft.world.entity.player.Player;
 
 public class MechanicalMaestroMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
-    public MechanicalMaestroMIMISynth(Boolean jitterCorrection, Integer latency, Soundbank sounds) {
-        super(jitterCorrection, latency, sounds);
-    }
+    public MechanicalMaestroMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
+        super(format, dataLine, jitterCorrection, latency, sounds);
+     }
 
     @Override
     public Boolean tick(Player clientPlayer) {
