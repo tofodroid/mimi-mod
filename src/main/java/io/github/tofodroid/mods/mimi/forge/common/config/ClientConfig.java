@@ -25,9 +25,6 @@ public class ClientConfig {
     // PLAYER
     public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
 
-    // INPUT
-    public ForgeConfigSpec.ConfigValue<String> selectedMidiDevice;
-
     // AUDIO
     public ForgeConfigSpec.BooleanValue automaticAudioDevice;
     public ForgeConfigSpec.ConfigValue<String> audioOutputDevice;
@@ -61,9 +58,6 @@ public class ClientConfig {
             .define("playlistFolderPath", "");
         builder.pop();
         builder.push(MIDI_INPUT_CATEGORY_NAME);
-        selectedMidiDevice = builder.comment("What MIDI Input Device should be used (if available)? This can be set from the in-game MIDI Input Device Configuration menu. Changes require a game restart to take affect.")
-            .translation(MIMIMod.MODID + ".config.midi.input.defaultdevice")
-            .define("defaultMidiInputDevice", "");
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")

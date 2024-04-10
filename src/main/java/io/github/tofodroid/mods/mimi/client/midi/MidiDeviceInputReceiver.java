@@ -12,13 +12,17 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.util.LogicalSidedProvider;
+import net.minecraftforge.fml.LogicalSide;
 
 public class MidiDeviceInputReceiver implements Receiver {
     private volatile boolean open = true;
 
-    public synchronized void send(MidiMessage msg, long timeStamp) {
+    public void send(MidiMessage msg, long timeStamp) {
         if(open && msg instanceof ShortMessage) {
-            handleMessage((ShortMessage)msg);
+            LogicalSidedProvider.WORKQUEUE.get(LogicalSide.CLIENT).execute(() -> {
+                handleMessage((ShortMessage)msg);
+            });
         }
     }
 
