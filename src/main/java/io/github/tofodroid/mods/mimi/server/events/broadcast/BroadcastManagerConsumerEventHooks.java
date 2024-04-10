@@ -50,7 +50,7 @@ public class BroadcastManagerConsumerEventHooks {
     }
 
     public static void reloadEntityInstrumentConsumers(LivingEntity entity) {
-        if(entity == null || entity.level() == null || !(entity.level() instanceof ServerLevel)) {
+        if(entity == null || entity.getLevel() == null || !(entity.getLevel() instanceof ServerLevel)) {
             return;
         }
 
@@ -65,7 +65,7 @@ public class BroadcastManagerConsumerEventHooks {
             if(instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
                 holder.putConsumer(i, new InstrumentBroadcastConsumer(
                     entity::getOnPos,
-                    () -> entity.level().dimension(),
+                    () -> entity.getLevel().dimension(),
                     entity.getUUID(),
                     instrumentStack,
                     hand
@@ -121,7 +121,7 @@ public class BroadcastManagerConsumerEventHooks {
     }
 
     public static void onPlayerLoggedOut(ServerPlayer player) {
-        if(player.level() instanceof ServerLevel) {
+        if(player.getLevel() instanceof ServerLevel) {
             BroadcastManager.removeOwnedBroadcastConsumers(player.getUUID());
         }
     }
