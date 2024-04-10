@@ -46,18 +46,6 @@ public class MidiDeviceInputReceiver implements Receiver {
 
     @SuppressWarnings("resource")
     protected void handleMessage(ShortMessage message) {
-        if(isNoteOnMessage(message)) {
-            printDebugMessage("Recieved MIDI Input Device Note On - Channel: " + (message.getChannel() + 1) + ", Note: " + message.getMessage()[1] + ", Velocity: " + message.getMessage()[2]);
-        } else if(isNoteOffMessage(message)) {
-            printDebugMessage("Recieved MIDI Input Device Note Off - Channel: " + (message.getChannel() + 1) + ", Note: " + message.getMessage()[1]);
-        } else if(isAllNotesOffMessage(message)) {
-            printDebugMessage("Recieved MIDI Input Device All Notes Off - Channel: " + (message.getChannel() + 1));
-        } else if(isSupportedControlMessage(message)) {
-            printDebugMessage("Recieved MIDI Input Device Control Change - Channel: " + (message.getChannel() + 1) + ", Controller: " + message.getMessage()[1] + ", Value: " + message.getMessage()[2]);
-        } else {
-            printDebugMessage("Recieved Unsupported MIDI Input Device Message - Channel: " + (message.getChannel() + 1) + ", Data: " + message.getMessage().toString());
-        }
-
         Player player = Minecraft.getInstance().player;
 
         if(player != null && MIMIMod.getProxy().isClient()) {
@@ -105,12 +93,6 @@ public class MidiDeviceInputReceiver implements Receiver {
             MidiNotePacket packet =MidiNotePacket.createControlPacket(controller, value, instrument, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
-        }
-    }
-
-    protected void printDebugMessage(String message) {
-        if(ModConfigs.CLIENT.printDeDebugMessages.get()) {
-            MIMIMod.LOGGER.info("Device Debug: " + message);
         }
     }
 
