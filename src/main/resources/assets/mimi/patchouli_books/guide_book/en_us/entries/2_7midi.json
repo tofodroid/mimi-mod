@@ -10,11 +10,11 @@
         {
             "type": "patchouli:crafting",
             "recipe": "mimi:deviceconfig",
-            "text": "The Device Config Screen shows a list of MIDI Input Devices detected by your system at the bottom. Use the arrows to step through the devices and the save button to select one which will be saved and used by default if you restart the game."
+            "text": "The Device Config Screen shows a list of MIDI Input Devices detected by your system at the bottom. Use the arrows to step through the devices and the save button to select the device you'd like to connect to.$(br2)Once a device is selected you'll need to restart the game to select a new device."
         },
         {
             "type": "patchouli:text",
-            "text": "The device that you have selected will appear at the top of the Device Config Screen. The light next to the device name will change colors based on the device's status.$(br)$(li)$(l)Green$() - The device is ready to use.$(br)$(li)$(l)Yellow$() - The game must be restarted to configure this device.$(br)$(li)$(l)Red$() - The device is no longer available or is incompatible."
+            "text": "The device that you have selected will appear at the top of the Device Config Screen along with the status of the device."
         },
         {
             "type": "patchouli:text",
