@@ -42,7 +42,7 @@ public class ClientConfig {
         builder.push(AUDIO_OUTPUT_CATEGORY_NAME);
         automaticAudioDevice = builder.comment("Whether or not MIMI should attempt to automatically determine the audio output device to use based on the Minecraft audio device. Works best on Windows.")
             .translation(MIMIMod.MODID + ".config.audio.automatic")
-            .define("automaticAudioDevice", false);
+            .define("automaticAudioDevice", true);
         audioOutputDevice = builder.comment("When automatic device determination is set to false, the name of the audio output device that MIMI should attempt to use. If not found MIMI will use the System Default device.")
             .translation(MIMIMod.MODID + ".config.audio.device")
             .define("audioOutputDevice", "");
