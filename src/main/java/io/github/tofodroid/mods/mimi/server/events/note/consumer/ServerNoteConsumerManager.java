@@ -95,7 +95,7 @@ public class ServerNoteConsumerManager {
             return;
         }
 
-        if(player.level() instanceof ServerLevel) {
+        if(player.getLevel() instanceof ServerLevel) {
             OWNED_CONSUMERS.put(player.getUUID(), new PlayerNoteConsumer(player));
         } else {
             OWNED_CONSUMERS.remove(player.getUUID());
@@ -119,7 +119,7 @@ public class ServerNoteConsumerManager {
     }
 
     public static void onPlayerLoggedOut(ServerPlayer player) {
-        if(player.level() instanceof ServerLevel) {
+        if(player.getLevel() instanceof ServerLevel) {
             removeConsumers(player.getUUID());
         }
     }

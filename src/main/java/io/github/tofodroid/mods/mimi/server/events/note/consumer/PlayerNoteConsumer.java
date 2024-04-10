@@ -25,7 +25,7 @@ public class PlayerNoteConsumer extends ANoteConsumer {
         super(player.getUUID(), ALL_INSTRUMENTS_ID);
         this.player = player;
         this.cachedPos = this.player.getOnPos();
-        this.cachedDimension = this.player.level().dimension();
+        this.cachedDimension = this.player.getLevel().dimension();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class PlayerNoteConsumer extends ANoteConsumer {
             packetCacheMap.clear();
         }
         cachedPos = this.player.getOnPos();
-        cachedDimension = this.player.level().dimension();
+        cachedDimension = this.player.getLevel().dimension();
     }
 
     private void cachePacket(MidiNotePacket packet) {

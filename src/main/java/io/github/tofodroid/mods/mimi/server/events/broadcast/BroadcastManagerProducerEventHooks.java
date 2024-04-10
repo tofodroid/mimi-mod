@@ -10,7 +10,7 @@ public class BroadcastManagerProducerEventHooks {
     }
 
     public static void onPlayerLoggedOut(ServerPlayer player) {
-        if(player.level() instanceof ServerLevel) {
+        if(player.getLevel() instanceof ServerLevel) {
             BroadcastManager.removeBroadcastProducer(player.getUUID());
         }
     }
