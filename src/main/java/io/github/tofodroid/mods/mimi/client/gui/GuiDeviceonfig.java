@@ -172,7 +172,7 @@ public class GuiDeviceonfig extends BaseGui {
                 if(this.midiDeviceManager.isDeviceAvailable()) {
                     this.drawStringAbsolute(graphics, font, "Connected", START_X + MIDI_DEVICE_STATUS_BOX.x(), START_Y + MIDI_DEVICE_STATUS_BOX.y(), 0xFF00E600);
                 } else if(this.midiDeviceManager.isDeviceError()) {
-                    this.drawStringAbsolute(graphics, font, "Error: " + this.midiDeviceManager.getSelectedDeviceError(), START_X + MIDI_DEVICE_STATUS_BOX.x(), START_Y + MIDI_DEVICE_STATUS_BOX.y(), 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, "Error: " + this.midiDeviceManager.getSelectedDeviceError(), 252), START_X + MIDI_DEVICE_STATUS_BOX.x(), START_Y + MIDI_DEVICE_STATUS_BOX.y(), 0xFF00E600);
                 } else {
                     this.drawStringAbsolute(graphics, font, "Error: Unavailable", START_X + MIDI_DEVICE_STATUS_BOX.x(), START_Y + MIDI_DEVICE_STATUS_BOX.y(), 0xFF00E600);
                 }
