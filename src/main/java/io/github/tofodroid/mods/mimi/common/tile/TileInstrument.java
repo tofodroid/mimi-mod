@@ -7,8 +7,8 @@ import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManagerConsumerEventHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -81,7 +81,7 @@ public class TileInstrument extends AStaticInventoryTile {
             Player currentPlayer = this.getCurrentPlayer();
 
             if(currentPlayer != null) {
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(currentPlayer);
+                BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(currentPlayer);
             }
         }
     }
@@ -94,7 +94,7 @@ public class TileInstrument extends AStaticInventoryTile {
 
         if(currentPlayer != null && !this.getLevel().isClientSide()) {
             this.ejectPlayer();
-            ServerMusicReceiverManager.loadEntityInstrumentReceivers(currentPlayer);
+            BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(currentPlayer);
         }
     }
  
@@ -106,7 +106,7 @@ public class TileInstrument extends AStaticInventoryTile {
 
         if(currentPlayer != null && !this.getLevel().isClientSide()) {
             this.ejectPlayer();
-            ServerMusicReceiverManager.loadEntityInstrumentReceivers(currentPlayer);
+            BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(currentPlayer);
         }
     }
 

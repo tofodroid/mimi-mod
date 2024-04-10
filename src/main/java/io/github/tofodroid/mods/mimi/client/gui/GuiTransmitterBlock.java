@@ -12,8 +12,8 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPac
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket.CONTROL;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.FavoriteMode;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -163,7 +163,6 @@ public class GuiTransmitterBlock extends BaseGui {
             Integer percent = Double.valueOf(Math.floor(1000.0 * (Double.valueOf((imouseX - 4 - SLIDE_MIN_X - START_X)) / Double.valueOf(SLIDE_WIDTH)))).intValue();
             // Clamp between 0 and 1000
             percent = percent < 0 ? 0 : ( percent > 1000 ? 1000 : percent);
-            MIMIMod.LOGGER.info("CLICKED SEEK");
             this.sendTransmitterCommand(CONTROL.SEEK, percent);
         }
         

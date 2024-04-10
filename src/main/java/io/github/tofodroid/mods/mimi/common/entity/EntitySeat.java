@@ -5,7 +5,7 @@ import java.util.List;
 import com.mojang.math.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManagerConsumerEventHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -54,7 +54,7 @@ public class EntitySeat extends Entity {
             this.ejectPassengers();
 
             if(this.rider != null) {
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.rider);
+                BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(this.rider);
             }
 
             this.getLevel().updateNeighbourForOutputSignal(source, this.getLevel().getBlockState(source).getBlock());
@@ -119,7 +119,7 @@ public class EntitySeat extends Entity {
             if(!seatExists(world, newSeat.getX(), newSeat.getY(), newSeat.getZ())) {
                 world.addFreshEntity(newSeat);
                 player.startRiding(newSeat, false);
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(player);
+                BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(player);
                 return newSeat;
             }
         }
