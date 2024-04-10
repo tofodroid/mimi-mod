@@ -3,9 +3,10 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Vector2i;
-
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
+
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -17,11 +18,11 @@ import net.minecraft.sounds.SoundEvents;
 public abstract class CommonGuiUtils {
     public static final Integer STANDARD_BUTTON_SIZE = 15;
     
-    public static final Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2i buttonPos) {
-        return clickedBox(mouseX, mouseY, buttonPos, new Vector2i(STANDARD_BUTTON_SIZE, STANDARD_BUTTON_SIZE));
+    public static final Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2Int buttonPos) {
+        return clickedBox(mouseX, mouseY, buttonPos, new Vector2Int(STANDARD_BUTTON_SIZE, STANDARD_BUTTON_SIZE));
     }
     
-    public static final Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2i buttonPos, Vector2i buttonSize) {
+    public static final Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2Int buttonPos, Vector2Int buttonSize) {
         Integer buttonMinX = buttonPos.x();
         Integer buttonMaxX = buttonMinX + buttonSize.x();
         Integer buttonMinY = buttonPos.y();
@@ -35,15 +36,11 @@ public abstract class CommonGuiUtils {
 
         return result;
     }
-    public static void blitAbsolute(GuiGraphics graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
-        RenderSystem.setShaderTexture(0, texture);
-        graphics.blit(texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    
+    public static void setAlpha(float alpha) {
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
     }
 
-    public static void drawStringAbsolute(GuiGraphics graphics, Font font, String string, Integer renderStartX, Integer renderStartY, Integer color) {
-        graphics.drawString(font, string, renderStartX, renderStartY, color);
-    }
-    
     public static String truncateString(Font font, String source, Integer maxWidth) {
         if(source == null || font.width(source) <= maxWidth) {
             return source;
@@ -68,5 +65,26 @@ public abstract class CommonGuiUtils {
         lines.add(remaining);
 
         return lines;
+    }
+
+    public static void blitAbsolute(GuiGraphics graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        RenderSystem.setShaderTexture(0, texture);
+        graphics.blit(texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
+
+    public static void drawStringAbsolute(GuiGraphics graphics, Font font, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        graphics.drawString(font, string, renderStartX, renderStartY, color);
+    }
+
+    public static void pushLayer(GuiGraphics graphics) {
+        graphics.pose().pushPose();
+    }
+
+    public static void rotateLayer(GuiGraphics graphics, Float degrees) {
+        graphics.pose().mulPose(Axis.ZN.rotationDegrees(degrees));
+    }
+
+    public static void popLayer(GuiGraphics graphics) {
+        graphics.pose().popPose();
     }
 }

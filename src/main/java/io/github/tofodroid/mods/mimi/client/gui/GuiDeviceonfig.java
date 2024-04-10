@@ -6,7 +6,7 @@ import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.sampled.Mixer;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
@@ -18,19 +18,19 @@ import net.minecraft.world.entity.player.Player;
 
 public class GuiDeviceonfig extends BaseGui {    
     // Button Boxes
-    private static final Vector2i AUDIO_DEVICE_BUTTON = new Vector2i(7, 25);
-    private static final Vector2i MIDI_DEVICE_BUTTON = new Vector2i(211, 25);
+    private static final Vector2Int AUDIO_DEVICE_BUTTON = new Vector2Int(7, 25);
+    private static final Vector2Int MIDI_DEVICE_BUTTON = new Vector2Int(211, 25);
 
-    private static final Vector2i REFRESH_DEVICES_BUTTON = new Vector2i(266,114);
-    private static final Vector2i SHIFT_DEVICE_DOWN_BUTTON = new Vector2i(8,114);
-    private static final Vector2i SHIFT_DEVICE_UP_BUTTON = new Vector2i(247,114);
-    private static final Vector2i SAVE_DEVICE_BUTTON = new Vector2i(266,164);
+    private static final Vector2Int REFRESH_DEVICES_BUTTON = new Vector2Int(266,114);
+    private static final Vector2Int SHIFT_DEVICE_DOWN_BUTTON = new Vector2Int(8,114);
+    private static final Vector2Int SHIFT_DEVICE_UP_BUTTON = new Vector2Int(247,114);
+    private static final Vector2Int SAVE_DEVICE_BUTTON = new Vector2Int(266,164);
 
     // Text Boxes
-    private static final Vector2i MIDI_DEVICE_NAME_BOX = new Vector2i(51, 51);
-    private static final Vector2i MIDI_DEVICE_STATUS_BOX = new Vector2i(51, 66);
-    private static final Vector2i AUDIO_DEVICE_NAME_BOX = new Vector2i(51, 46);
-    private static final Vector2i AUDIO_DEVICE_STATUS_BOX = new Vector2i(51, 69);
+    private static final Vector2Int MIDI_DEVICE_NAME_BOX = new Vector2Int(51, 51);
+    private static final Vector2Int MIDI_DEVICE_STATUS_BOX = new Vector2Int(51, 66);
+    private static final Vector2Int AUDIO_DEVICE_NAME_BOX = new Vector2Int(51, 46);
+    private static final Vector2Int AUDIO_DEVICE_STATUS_BOX = new Vector2Int(51, 69);
 
     // Data
     private Boolean audioMode = true;
@@ -63,10 +63,10 @@ public class GuiDeviceonfig extends BaseGui {
         int imouseX = (int)Math.round(mouseX);
         int imouseY = (int)Math.round(mouseY);
 
-        if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(AUDIO_DEVICE_BUTTON), new Vector2i(87, 14))) {
+        if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(AUDIO_DEVICE_BUTTON), new Vector2Int(87, 14))) {
             audioMode = true;
             visibleDeviceId = 0;
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(MIDI_DEVICE_BUTTON), new Vector2i(70, 14))) {
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(MIDI_DEVICE_BUTTON), new Vector2Int(70, 14))) {
             audioMode = false;
             visibleDeviceId = 0;
         } else if(audioMode) {

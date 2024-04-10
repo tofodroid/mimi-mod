@@ -1,12 +1,10 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
@@ -28,21 +26,21 @@ public class GuiTransmitterBlock extends BaseGui {
     protected static final Integer LOADING_ANIMATION_FRAMES = 4;
     
     // Playlist Controls
-    protected static final Vector2i FAVORITE_FILTER_BUTTON = new Vector2i(300,32);
-    protected static final Vector2i FAVORITE_FILTER_SCREEN = new Vector2i(318,33);
-    protected static final Vector2i REFRESH_SONGS_BUTTON = new Vector2i(335,32);
-    protected static final Vector2i OPEN_LOCAL_FOLDER_BUTTON = new Vector2i(10,32);
+    protected static final Vector2Int FAVORITE_FILTER_BUTTON = new Vector2Int(300,32);
+    protected static final Vector2Int FAVORITE_FILTER_SCREEN = new Vector2Int(318,33);
+    protected static final Vector2Int REFRESH_SONGS_BUTTON = new Vector2Int(335,32);
+    protected static final Vector2Int OPEN_LOCAL_FOLDER_BUTTON = new Vector2Int(10,32);
 
     // Song Controls
-    protected static final Vector2i TOGGLE_FAVORITE_BUTTON = new Vector2i(335,118);
-    protected static final Vector2i PREVIOUS_BUTTON = new Vector2i(10,231);
-    protected static final Vector2i STOP_BUTTON = new Vector2i(29,231);
-    protected static final Vector2i PLAY_PAUSE_BUTTON = new Vector2i(48,231);
-    protected static final Vector2i NEXT_BUTTON = new Vector2i(67,231);
-    protected static final Vector2i LOOP_BUTTON = new Vector2i(86,231);
-    protected static final Vector2i LOOP_SCREEN = new Vector2i(104,232);
-    protected static final Vector2i SHUFFLE_BUTTON = new Vector2i(121,231);
-    protected static final Vector2i SHUFFLE_SCREEN = new Vector2i(139,232);
+    protected static final Vector2Int TOGGLE_FAVORITE_BUTTON = new Vector2Int(335,118);
+    protected static final Vector2Int PREVIOUS_BUTTON = new Vector2Int(10,231);
+    protected static final Vector2Int STOP_BUTTON = new Vector2Int(29,231);
+    protected static final Vector2Int PLAY_PAUSE_BUTTON = new Vector2Int(48,231);
+    protected static final Vector2Int NEXT_BUTTON = new Vector2Int(67,231);
+    protected static final Vector2Int LOOP_BUTTON = new Vector2Int(86,231);
+    protected static final Vector2Int LOOP_SCREEN = new Vector2Int(104,232);
+    protected static final Vector2Int SHUFFLE_BUTTON = new Vector2Int(121,231);
+    protected static final Vector2Int SHUFFLE_SCREEN = new Vector2Int(139,232);
 
     // Time Slider
     protected static final Integer SLIDE_MIN_Y = 230;
@@ -51,8 +49,8 @@ public class GuiTransmitterBlock extends BaseGui {
     protected static final Integer SLIDE_MAX_X = 335;
     protected static final Integer SLIDE_WIDTH = SLIDE_MAX_X - SLIDE_MIN_X;
     protected static final Integer SLIDE_HEIGHT = SLIDE_MAX_Y - SLIDE_MIN_Y;
-    protected static final Vector2i SLIDE_CLICK_START = new Vector2i(SLIDE_MIN_X-4, SLIDE_MIN_Y);
-    protected static final Vector2i SLIDE_CLICK_SIZE = new Vector2i(SLIDE_WIDTH+8, SLIDE_HEIGHT);
+    protected static final Vector2Int SLIDE_CLICK_START = new Vector2Int(SLIDE_MIN_X-4, SLIDE_MIN_Y);
+    protected static final Vector2Int SLIDE_CLICK_SIZE = new Vector2Int(SLIDE_WIDTH+8, SLIDE_HEIGHT);
 
     // Animation
     protected Integer ticksSinceUpdateStat = 0;
@@ -180,42 +178,39 @@ public class GuiTransmitterBlock extends BaseGui {
 
     @Override
     protected  GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // Background
-        graphics.blit(guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Selected Song Box
         if(!this.songList.infos.isEmpty() && this.musicStatus.fileIndex != null && !this.awaitRefresh) {
             Integer songOffset = getSongBoxOffset();            
             Integer boxY = (getFirstSongY() - 2) + (11 * songOffset);
-            graphics.blit(guiTexture, START_X + 10, START_Y + boxY, 1, 257, 340, 11, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 10, START_Y + boxY, 1, 257, 340, 11, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Play/Pause Button
         if(!this.musicStatus.isLoading) {
-            graphics.blit(guiTexture, START_X + 49, START_Y + 232, this.musicStatus.isPlaying ? 14 : 1, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 49, START_Y + 232, this.musicStatus.isPlaying ? 14 : 1, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
-            graphics.blit(guiTexture, START_X + 49, START_Y + 232, 1 + this.loadingAnimationFrame*13, 312, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 49, START_Y + 232, 1 + this.loadingAnimationFrame*13, 312, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         
         // Server Folder Button
         if(this.isSinglePlayerOrLANHost()) {
-            graphics.blit(guiTexture, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         // Toggle Favorite Button
-        graphics.blit(guiTexture, START_X + 336, START_Y + 117, this.musicStatus.isFileFavorite ? 40 : 27, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + 336, START_Y + 117, this.musicStatus.isFileFavorite ? 40 : 27, 283, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Favorite Filter Screen
-        graphics.blit(guiTexture, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.musicStatus.favoriteMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + FAVORITE_FILTER_SCREEN.x(), START_Y + FAVORITE_FILTER_SCREEN.y(), 66 + (13 * this.musicStatus.favoriteMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Loop Screen
-        graphics.blit(guiTexture, START_X + LOOP_SCREEN.x(), START_Y + LOOP_SCREEN.y(), 1 + (13 * this.musicStatus.loopMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + LOOP_SCREEN.x(), START_Y + LOOP_SCREEN.y(), 1 + (13 * this.musicStatus.loopMode.ordinal()), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Shuffle Screen    
-        graphics.blit(guiTexture, START_X + SHUFFLE_SCREEN.x(), START_Y + SHUFFLE_SCREEN.y(), 40 + (13 * (this.musicStatus.isShuffled ? 1 : 0)), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + SHUFFLE_SCREEN.x(), START_Y + SHUFFLE_SCREEN.y(), 40 + (13 * (this.musicStatus.isShuffled ? 1 : 0)), 269, 13, 13, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Time Slider
         Integer slideOffset = 0;
@@ -225,7 +220,7 @@ public class GuiTransmitterBlock extends BaseGui {
             Double slidePercentage =  Double.valueOf(slideProgress) / Double.valueOf(slideLength);
             slideOffset = Double.valueOf(Math.floor(slidePercentage * SLIDE_WIDTH)).intValue();
         }
-        graphics.blit(guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_MIN_Y, 352, 257, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X + SLIDE_MIN_X + slideOffset, START_Y + SLIDE_MIN_Y, 352, 257, 7, 17, TEXTURE_SIZE, TEXTURE_SIZE);
         
         return graphics;
     }
@@ -239,42 +234,42 @@ public class GuiTransmitterBlock extends BaseGui {
             for(int i = 0; i < getVisibleSongs(); i++) {
                 if(this.songList.infos.size() > (minSong + i)) {
                     BasicMidiInfo info = this.songList.infos.get(minSong + i);
-                    graphics.drawString(font, this.truncateString(font, ((minSong + i) < 9 ? "0" : "") + (minSong + i + 1) + "). " + info.fileName, this.maxPlaylistSongTitleWidth()), START_X + 12, START_Y + getFirstSongY() + i * 11, 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, ((minSong + i) < 9 ? "0" : "") + (minSong + i + 1) + "). " + info.fileName, this.maxPlaylistSongTitleWidth()), START_X + 12, START_Y + getFirstSongY() + i * 11, 0xFF00E600);
                     this.renderPlaylistSongBadges(graphics, info, i, minSong);
                 } else {
                     break;
                 }            
             }
         } else {
-            graphics.drawString(font, this.awaitRefresh ? "Loading..." : "No songs found", START_X + 12, START_Y + getFirstSongY(), 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, this.awaitRefresh ? "Loading..." : "No songs found", START_X + 12, START_Y + getFirstSongY(), 0xFF00E600);
         }
 
         // Current Song
         if(!this.musicStatus.isLoading && this.musicStatus.isLoadFailed) {
-            graphics.drawString(font, "Song failed to load:", START_X + 12, START_Y + 153, 0xFF00E600);
-            graphics.drawString(font, "It may be invalid or may have been deleted. Refresh the", START_X + 12, START_Y + 159, 0xFF00E600);
-            graphics.drawString(font, "list with the button in the top right and select a new song.", START_X + 12, START_Y + 169, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, "Song failed to load:", START_X + 12, START_Y + 153, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, "It may be invalid or may have been deleted. Refresh the", START_X + 12, START_Y + 159, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, "list with the button in the top right and select a new song.", START_X + 12, START_Y + 169, 0xFF00E600);
         } else if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
             BasicMidiInfo info = this.songList.infos.get(this.musicStatus.fileIndex);
-            graphics.drawString(font, this.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 120, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 120, 0xFF00E600);
 
             if(this.musicStatus.isLoading) {
-                graphics.drawString(font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 135, 0xFF00E600);
+                this.drawStringAbsolute(graphics, font, "Channel Instrument Assignments: Loading...", START_X + 12, START_Y + 135, 0xFF00E600);
             } else if(this.musicStatus.channelMapping != null) {
                 Map<Integer, String> instrumentMapping = MidiFileUtils.getInstrumentMapping(this.musicStatus.channelMapping);
-                graphics.drawString(font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 135, 0xFF00E600);
+                this.drawStringAbsolute(graphics, font, "Channel Instrument Assignments: ", START_X + 12, START_Y + 135, 0xFF00E600);
                 
                 Integer index = 0;
                 for(Integer i = 0; i < 16; i+=2) {
                     String name = instrumentMapping.get(i) == null ? "None" : instrumentMapping.get(i);
-                    graphics.drawString(font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 12, START_Y + 149 + 10*index, 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 12, START_Y + 149 + 10*index, 0xFF00E600);
                     index++;
                 }
 
                 index = 0;
                 for(Integer i = 1; i < 16; i+=2) {
                     String name = instrumentMapping.get(i) == null ? "None" : instrumentMapping.get(i);
-                    graphics.drawString(font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 180, START_Y + 149 + 10*index, 0xFF00E600);
+                    this.drawStringAbsolute(graphics, font, (i < 9 ? "0" : "") + (i+1) + ": " + name, START_X + 180, START_Y + 149 + 10*index, 0xFF00E600);
                     index++;
                 }
             }
@@ -290,7 +285,7 @@ public class GuiTransmitterBlock extends BaseGui {
     protected GuiGraphics renderPlaylistSongBadges(GuiGraphics graphics, BasicMidiInfo info, Integer songIndex, Integer minSong) {
         // Favorite Badge
         if(this.musicStatus.favoriteMode != FavoriteMode.NOT_FAVORITE && (this.musicStatus.favoriteMode == FavoriteMode.FAVORITE || this.songList.favoriteIndicies.contains(minSong + songIndex))) {
-            graphics.blit(guiTexture, START_X + 339, START_Y + getFirstSongY() - 1 + songIndex * 11, 145, 269, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
+            this.blitAbsolute(graphics, guiTexture, START_X + 339, START_Y + getFirstSongY() - 1 + songIndex * 11, 145, 269, 9, 9, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         return graphics;
     }
