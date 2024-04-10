@@ -2,8 +2,6 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.util.Set;
 
-import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -25,17 +23,17 @@ public class TileConductor extends AConfigurableMidiTile {
             Set<Byte> channels = MidiNbtDataUtils.getEnabledChannelsSet(sourceStack);
 
             if(channels.size() > 0) {
-                Byte note = MidiNbtDataUtils.getBroadcastNote(sourceStack);
-                Byte velocity = stop ? -1 : Byte.MAX_VALUE;
+                // Byte note = MidiNbtDataUtils.getBroadcastNote(sourceStack);
+                // Byte velocity = stop ? -1 : Byte.MAX_VALUE;
                 
-                for(Byte channel : channels) {
-                    ServerMusicReceiverManager.handlePacket(
-                        TransmitterNoteEvent.createNoteEvent(channel, note, velocity), 
-                        getUUID(),
-                        getBlockPos(), 
-                        (ServerLevel)level
-                    );
-                }
+                // for(Byte channel : channels) {
+                //     ServerMusicReceiverManager.handlePacket(
+                //         TransmitterNoteEvent.createNoteEvent(channel, note, velocity), 
+                //         getUUID(),
+                //         getBlockPos(), 
+                //         (ServerLevel)level
+                //     );
+                // }
             }
         }        
     }

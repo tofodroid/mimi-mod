@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.midi.transmitter;
+package io.github.tofodroid.mods.mimi.server.midi.playlist;
 
 import java.util.ArrayList;
 import java.util.Random;

@@ -1,12 +1,12 @@
-package io.github.tofodroid.mods.mimi.server.midi.transmitter;
+package io.github.tofodroid.mods.mimi.server.midi.playlist;
 
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.FavoriteMode;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.LoopMode;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.APlaylistHandler.SourceMode;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.FavoriteMode;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.LoopMode;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.SourceMode;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.saveddata.SavedData;
 

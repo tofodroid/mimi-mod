@@ -14,6 +14,8 @@ import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
@@ -85,6 +87,7 @@ public class NetworkManager {
         registerMessage(7, TransmitterControlPacket.class, TransmitterControlPacket::encodePacket, TransmitterControlPacket::decodePacket, createHandler(TransmitterControlPacketHandler::handlePacketClient, TransmitterControlPacketHandler::handlePacketServer));
         registerMessage(8, ServerMidiUploadPacket.class, ServerMidiUploadPacket::encodePacket, ServerMidiUploadPacket::decodePacket, createHandler(ServerMidiUploadPacketHandler::handlePacketClient, ServerMidiUploadPacketHandler::handlePacketServer));
         registerMessage(9, EffectEmitterUpdatePacket.class, EffectEmitterUpdatePacket::encodePacket, EffectEmitterUpdatePacket::decodePacket, createHandler(EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer));
+        registerMessage(10, MultiMidiNotePacket.class, MultiMidiNotePacket::encodePacket, MultiMidiNotePacket::decodePacket, createHandler(MultiMidiNotePacketHandler::handlePacketClient, MultiMidiNotePacketHandler::handlePacketServer));
     }
 
     public static <T> void registerMessage(Integer index, Class<T> messageClass, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<NetworkEvent.Context>> handler) {

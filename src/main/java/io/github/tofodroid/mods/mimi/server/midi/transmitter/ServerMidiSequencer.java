@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.server.midi.transmitter;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
@@ -9,13 +10,11 @@ import javax.sound.midi.Sequence;
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.com.sun.media.sound.SimpleThreadSequencer;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.midi.BasicMidiEvent;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
-import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
-import io.github.tofodroid.mods.mimi.server.midi.AServerMidiInputReceiver;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
-import net.minecraft.world.entity.player.Player;
 
-public class MidiHandler {
+public class ServerMidiSequencer {
     private final Runnable sequenceEndCallback;
     
     // MIDI Sequence
@@ -24,20 +23,15 @@ public class MidiHandler {
     private Integer songLengthSeconds;
     private byte[] channelMapping;
 
+    // Runtime
+    private Long startPlayMicros = null;
+
     // Midi System
-    private SimpleThreadSequencer<AServerMidiInputReceiver> activeSequencer;
+    private SimpleThreadSequencer<ServerMidiInputReceiver> activeSequencer;
 
-    public MidiHandler(TileTransmitter tile, Runnable sequenceEndCallback) {
-        this(new TileTransmitterMidiReceiver(tile), sequenceEndCallback);
-    }
-
-    public MidiHandler(Player player, Runnable sequenceEndCallback) {
-        this(new PlayerTransmitterMidiReceiver(player), sequenceEndCallback);
-    }
-
-    protected MidiHandler(AServerMidiInputReceiver receiver, Runnable sequenceEndCallback) {
+    public ServerMidiSequencer(Consumer<BasicMidiEvent> eventHandler, Runnable sequenceEndCallback) {
+        initializeSequencer(new ServerMidiInputReceiver(eventHandler));
         this.sequenceEndCallback = sequenceEndCallback;
-        initializeSequencer(receiver);
     }
 
     public Boolean isPlaying() {
@@ -84,12 +78,6 @@ public class MidiHandler {
         return this.channelMapping;
     }
 
-    public void allNotesOff() {
-        if(this.activeSequencer.isOpen()) {
-            this.activeSequencer.getAutoConnectedReceiver().sendTransmitterAllNotesOffPacket();
-        }
-    }
-
     public void load(BasicMidiInfo info, Sequence sequence) {
         if(this.activeSequencer != null) {
             try {
@@ -119,6 +107,10 @@ public class MidiHandler {
             }
 
             if(this.activeSequencer.isOpen()) {
+                if(this.startPlayMicros != null) {
+                    this.activeSequencer.setMicrosecondPosition(this.startPlayMicros);
+                    this.startPlayMicros = null;
+                }
                 this.activeSequencer.start();
             }
         }
@@ -126,20 +118,25 @@ public class MidiHandler {
     
     public void setPositionPercent1000(Integer percent) {
         if(this.hasSongLoaded()) {
-            this.pause();
+            Boolean wasPlaying = this.isPlaying();
 
-            Long newTickPos = Double.valueOf((Double.valueOf(percent)/1000.0) * Double.valueOf(this.activeSequencer.getTickLength())).longValue();
-            newTickPos = newTickPos < 0 ? 0 : (newTickPos >= this.activeSequencer.getTickLength() ? this.activeSequencer.getTickLength()-1000 : newTickPos);
-            this.activeSequencer.setTickPosition(newTickPos);
+            if(wasPlaying) {
+                this.pause();
+            }
 
-            this.play();
+            Long newMicroPos = Double.valueOf((Double.valueOf(percent)/1000.0) * Double.valueOf(this.activeSequence.getMicrosecondLength())).longValue();
+            newMicroPos = newMicroPos < 0 ? 0 : (newMicroPos >= this.activeSequence.getMicrosecondLength() ? this.activeSequence.getMicrosecondLength()-100 : newMicroPos);
+            this.startPlayMicros = newMicroPos;
+
+            if(wasPlaying) {
+                this.play();
+            }
         }
     }
 
     public void pause() {
         if(this.activeSequencer.isOpen() && this.activeSequencer.isRunning()) {
             this.activeSequencer.pause();
-            this.allNotesOff();
         }
     }
     
@@ -147,11 +144,9 @@ public class MidiHandler {
         if(this.activeSequencer.isOpen()) {
             try {
                 this.activeSequencer.stop();
-                this.allNotesOff();
                 this.activeSequencer.close();
             } catch (Exception e) {
                 MIMIMod.LOGGER.error("Failed to stop sequencer: ", e);
-                this.allNotesOff();
                 this.close();
             }
         }
@@ -173,9 +168,9 @@ public class MidiHandler {
         this.channelMapping = null;
     }
 
-    protected Boolean initializeSequencer(AServerMidiInputReceiver receiver) {
+    protected Boolean initializeSequencer(ServerMidiInputReceiver receiver) {
         try { 
-            MidiHandler self = this;
+            ServerMidiSequencer self = this;
             this.activeSequencer = new SimpleThreadSequencer<>(receiver);
             this.activeSequencer.addMetaEventListener(new MetaEventListener(){
                 @Override
