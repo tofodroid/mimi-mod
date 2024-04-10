@@ -1,8 +1,9 @@
-package io.github.tofodroid.mods.mimi.server.midi.transmitter;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.producer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.sound.midi.Sequence;
 
@@ -10,17 +11,23 @@ import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
+import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler;
+import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMidiSequencer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
-public abstract class AServerMusicTransmitter implements AutoCloseable {
-    protected UUID id;
+public abstract class ATransmitterBroadcastProducer extends ABroadcastProducer {
     protected Boolean loading = false;
     protected Boolean loadFailed = false;
     protected Boolean shouldPlayNextLoad = false;
-    protected MidiHandler midiHandler;
+    private ServerMidiSequencer midiHandler;
     protected APlaylistHandler playlistHandler;
 
-    public AServerMusicTransmitter(UUID id) {
-        this.id = id;
+    public ATransmitterBroadcastProducer(UUID id, APlaylistHandler playlistHandler, Supplier<BlockPos> blockPos, Supplier<ResourceKey<Level>> dimension) {
+        super(id, blockPos, dimension);
+        this.playlistHandler = playlistHandler;
+        this.midiHandler = new ServerMidiSequencer(this::broadcast, this::onSongEnd);
     }
 
     public void onLoad() {
@@ -37,7 +44,7 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
 
     public void refreshSongs() {
         // If refresh can't find current song and currently playing set load failed
-        Boolean wasPlaying = ServerMusicTransmitterManager.isPlaying(this.id);
+        Boolean wasPlaying = this.midiHandler.isPlaying();
 
         if(!this.playlistHandler.refreshFilteredSongs()) {
             if(wasPlaying) {
@@ -49,18 +56,17 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
     }
 
     public void play() {
-        ServerMusicTransmitterManager.addPlaying(this.id);
         this.midiHandler.play();
     }
 
     public void pause() {
-        ServerMusicTransmitterManager.removePlaying(this.id);
         this.midiHandler.pause();
+        this.allNotesOff();
     }
 
     public void stop() {
-        ServerMusicTransmitterManager.removePlaying(this.id);
         this.midiHandler.stop();
+        this.allNotesOff();
     }
 
     public void seek(Integer percent) {
@@ -140,18 +146,22 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
     @Override
     public void close() {
         this.midiHandler.stop();
+        this.allNotesOff();
         this.midiHandler.close();
     }
 
-    public void allNotesOff() {
-        this.midiHandler.allNotesOff();
+    @Override
+    public void tick() {
+        if(this.midiHandler.isPlaying() && !this.isTransmitterStillValid()) {
+            this.stop();
+        }
     }
 
     public ServerMusicPlayerStatusPacket getStatus() {
         UUID currentId = this.midiHandler.getSequenceId();
 
         return new ServerMusicPlayerStatusPacket(
-            this.id,
+            this.ownerId,
             currentId,
             this.playlistHandler.getSelectedDisplayIndex(),
             (currentId != null ? this.playlistHandler.getFavoriteSongs().contains(currentId) : false),
@@ -172,6 +182,7 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
         this.loading = true;
         this.loadFailed = false;
         this.shouldPlayNextLoad = this.shouldPlayNextLoad || this.midiHandler.isPlaying();
+        this.stop();
         this.midiHandler.unloadSong();
 
         if(info.serverMidi) {
@@ -190,7 +201,7 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
             // Failure if it gets here
             this.onSequenceLoadFailed(info);
         } else {
-            ServerMusicTransmitterManager.startLoadSequence(this.id, this.playlistHandler.getClientSourceId(), info);
+            ServerTransmitterManager.startLoadSequence(this.ownerId, this.playlistHandler.getClientSourceId(), info);
         }
     }
 
@@ -213,4 +224,6 @@ public abstract class AServerMusicTransmitter implements AutoCloseable {
             }
         }
     }
+
+    protected abstract Boolean isTransmitterStillValid();
 }

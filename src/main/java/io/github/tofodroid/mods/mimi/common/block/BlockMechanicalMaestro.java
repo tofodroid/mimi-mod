@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -104,7 +104,7 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
             TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
             
             if (tile != null) {
-                ServerMusicReceiverManager.removeReceivers(tile.getUUID());
+                BroadcastManager.removeOwnedBroadcastConsumers(tile.getUUID());
                 tile.allNotesOff();
             }
         }
