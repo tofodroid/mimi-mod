@@ -19,23 +19,22 @@ import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
-import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import net.minecraft.Util;
+import io.github.tofodroid.mods.mimi.util.TimeUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public class MidiMultiSynthManager {
     private static final Integer MIDI_TICK_FREQUENCY = 2;
     protected Boolean loggingOff = false;
+    protected Boolean paused = false;
     protected Boolean dead = false;
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     public AudioOutputDeviceManager audioDeviceManager;
     protected LocalPlayerMIMISynth localSynth;
-    protected MechanicalMaestroMIMISynth mechSynth;
-    protected ServerPlayerMIMISynth playerSynth;
+    protected ServerPlayerMIMISynth networkSynth;
 
     public MidiMultiSynthManager() {
         this.audioDeviceManager = new AudioOutputDeviceManager();
@@ -55,20 +54,24 @@ public class MidiMultiSynthManager {
     public void handleClientTick() {
         midiTickCounter++;
 
+        // Pause Synths on Game Paused
+        Boolean gamePaused = Minecraft.getInstance().isPaused();
+        if(!paused && gamePaused) {
+            this.allNotesOff();
+            paused = true;
+        } else if(paused && !gamePaused) {
+            paused = false;
+        }
+
         // Tick synths every N tickets
         if(midiTickCounter >= MIDI_TICK_FREQUENCY) {
             if(Minecraft.getInstance().player != null) {
                 // Local
                 localSynth.tick(Minecraft.getInstance().player);
-    
-                // Mechanical Maestros
-                mechSynth.tick(Minecraft.getInstance().player);
-        
+            
                 // Players
-                playerSynth.tick(Minecraft.getInstance().player);
+                networkSynth.tick(Minecraft.getInstance().player);
             }
-
-           
         }
     }
 
@@ -88,20 +91,14 @@ public class MidiMultiSynthManager {
     public void reloadSynths() {
         if(localSynth != null)
             localSynth.close();
-        if(mechSynth != null)
-            mechSynth.close();
-        if(playerSynth != null)
-            playerSynth.close();
+        if(networkSynth != null)
+            networkSynth.close();
 
+        Pair<AudioFormat, SourceDataLine> netOutLine = audioDeviceManager.getOutputFormatLine();
+        this.networkSynth = new ServerPlayerMIMISynth(netOutLine.getLeft(), netOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
         
-        Pair<AudioFormat, SourceDataLine> mechOutLine = audioDeviceManager.getOutputFormatLine();    
-        this.mechSynth = new MechanicalMaestroMIMISynth(mechOutLine.getLeft(), mechOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-        
-        Pair<AudioFormat, SourceDataLine> playerOutLine = audioDeviceManager.getOutputFormatLine();    
-        this.playerSynth = new ServerPlayerMIMISynth(playerOutLine.getLeft(), playerOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
-        
-        Pair<AudioFormat, SourceDataLine> localOutLine = audioDeviceManager.getOutputFormatLine(); 
-        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), false, ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+        Pair<AudioFormat, SourceDataLine> localOutLine = audioDeviceManager.getOutputFormatLine();
+        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.localLatency.get(), this.soundbank);
     }
 
     public Long getBufferTime(Long noteServerTime) {
@@ -114,14 +111,9 @@ public class MidiMultiSynthManager {
             localSynth.close();
         }
 
-        if(mechSynth != null) {
-            mechSynth.allNotesOff();
-            mechSynth.close();
-        }
-
-        if(playerSynth != null) {
-            playerSynth.allNotesOff();
-            playerSynth.close();
+        if(networkSynth != null) {
+            networkSynth.allNotesOff();
+            networkSynth.close();
         }
     }
 
@@ -142,21 +134,23 @@ public class MidiMultiSynthManager {
         }
     }
 
+    @SuppressWarnings("resource")
     public void handlePacket(MidiNotePacket message) {
-        if(loggingOff) return;
+        if(loggingOff || Minecraft.getInstance().player == null)
+            return;
 
-        AMIMISynth<?> targetSynth = getSynthForMessage(message);
-
-        if(targetSynth != null) {
+        if(networkSynth != null) {
             if(!message.isControlPacket()) {
-                if(message.velocity > 0) {
-                    targetSynth.noteOn(message, getBufferTime(message.noteServerTime));
+                if(message.velocity > 0 && !Minecraft.getInstance().isPaused()) {
+                    //MIMIMod.LOGGER.info("Note On: " + message.note + " | " + message.instrumentId + " | " + message.noteServerTime);
+                    networkSynth.noteOn(message, getBufferTime(message.noteServerTime));
                 } else if(message.velocity <= 0) {
-                    targetSynth.noteOff(message, getBufferTime(message.noteServerTime));
+                    //MIMIMod.LOGGER.info("Note Off: " + message.note + " | " + message.instrumentId + " | " + message.noteServerTime);
+                    networkSynth.noteOff(message, getBufferTime(message.noteServerTime));
                 }
                 this.sendToGui(message);
-            } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
-                targetSynth.controlChange(message, getBufferTime(message.noteServerTime));
+            } else if(message.isControlPacket() && !message.isAllNotesOffPacket() && !Minecraft.getInstance().isPaused()) {
+                networkSynth.controlChange(message, getBufferTime(message.noteServerTime));
             }
         }
     }
@@ -167,12 +161,12 @@ public class MidiMultiSynthManager {
         if(localSynth != null) {
             if(!message.isControlPacket()) {
                 if(message.velocity > 0) {
-                    localSynth.noteOn(message, Util.getEpochMillis());
+                    localSynth.noteOn(message, TimeUtils.getNowTime());
                 } else if(message.velocity <= 0) {
-                    localSynth.noteOff(message, Util.getEpochMillis());
+                    localSynth.noteOff(message, TimeUtils.getNowTime());
                 }
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
-                localSynth.controlChange(message, Util.getEpochMillis());
+                localSynth.controlChange(message, TimeUtils.getNowTime());
             }
         }
     }
@@ -191,18 +185,8 @@ public class MidiMultiSynthManager {
     public void allNotesOff() {
         if(localSynth != null)
             localSynth.allNotesOff();
-        if(mechSynth != null)
-            mechSynth.allNotesOff();
-        if(playerSynth != null)
-            playerSynth.allNotesOff();
-    }
-
-    protected AMIMISynth<?> getSynthForMessage(MidiNotePacket message) {
-        if(message.player.equals(TileMechanicalMaestro.MECH_SOURCE_ID)) {
-            return mechSynth;
-        } else {
-            return playerSynth;
-        }
+        if(networkSynth != null)
+            networkSynth.allNotesOff();
     }
     
     protected Soundbank openSoundbank(String resourcePath) {

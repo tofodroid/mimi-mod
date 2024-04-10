@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
-import io.github.tofodroid.mods.mimi.common.midi.TransmitterNoteEvent;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import net.minecraft.core.BlockPos;
@@ -201,7 +201,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         if(this.triggerHeld) {
             Byte groupKey = getNoteGroupKey(channel, instrumentId);
 
-            if(groupKey == null || (channel != null && channel == TransmitterNoteEvent.ALL_CHANNELS)) {
+            if(groupKey == null || (channel != null && channel == BroadcastEvent.ALL_CHANNELS)) {
                 this.clearNotes();
             } else if(groupKey != null) {
                 for(Integer noteId : this.heldNotes.keySet()) {

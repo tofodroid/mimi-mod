@@ -28,7 +28,7 @@ import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
@@ -103,14 +103,14 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
                 MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
                 user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
-                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.getLevel(), null);
+                ServerNoteConsumerManager.handlePacket(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), null, (ServerLevel)user.getLevel());
             }
              return InteractionResult.CONSUME;
         } else if(target instanceof Mob) {
             if(!user.getLevel().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
                 user.setItemInHand(handIn, ItemStack.EMPTY);
                 target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
-                MidiNotePacketHandler.handlePacketServer(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), (ServerLevel)user.getLevel(), null);
+                ServerNoteConsumerManager.handlePacket(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), null, (ServerLevel)user.getLevel());
             }
             return InteractionResult.CONSUME;
         }

@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.common;
 
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
-import net.minecraft.Util;
+import io.github.tofodroid.mods.mimi.util.TimeUtils;
 
 public interface Proxy {
     public Boolean isInitialized();
@@ -12,10 +12,10 @@ public interface Proxy {
     public void init();
 
     default public Long getBaselineBufferMs() {
-        return 30l;
+        return 75l;
     }
 
     default public Long getCurrentServerMillis() {
-        return Util.getEpochMillis() - getServerStartEpoch();
+        return TimeUtils.getNowTime() - getServerStartEpoch();
     }
 }

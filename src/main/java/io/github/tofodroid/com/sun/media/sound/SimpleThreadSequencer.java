@@ -1460,37 +1460,55 @@ public final class SimpleThreadSequencer<R extends Receiver> extends AbstractMid
                 sendMetaEvents(message);
 
             } else {
-                // not meta, send to device
-                getTransmitterList().sendMessage(message, -1);
+                // not meta, send to device if...
 
                 switch (msgStatus & 0xF0) {
-                case ShortMessage.NOTE_OFF: {
-                    // note off - clear the bit in the noteOnCache array
-                    int note = ((ShortMessage) message).getData1() & 0x7F;
-                    noteOnCache[note] &= (0xFFFF ^ (1<<(msgStatus & 0x0F)));
-                    break;
-                }
-
-                case ShortMessage.NOTE_ON: {
-                    // note on
-                    ShortMessage smsg = (ShortMessage) message;
-                    int note = smsg.getData1() & 0x7F;
-                    int vel = smsg.getData2() & 0x7F;
-                    if (vel > 0) {
-                        // if velocity > 0 set the bit in the noteOnCache array
-                        noteOnCache[note] |= 1<<(msgStatus & 0x0F);
-                    } else {
-                        // if velocity = 0 clear the bit in the noteOnCache array
-                        noteOnCache[note] &= (0xFFFF ^ (1<<(msgStatus & 0x0F)));
+                    case ShortMessage.NOTE_OFF: {
+                        // note off - if note is on then send to device and clear the bit in the noteOnCache array
+                        int note = ((ShortMessage) message).getData1() & 0x7F;
+                        int bit = 1<<(msgStatus & 0x0F);
+                    
+                        if ((noteOnCache[note] & bit) != 0) {
+                            getTransmitterList().sendMessage(message, -1);
+                            noteOnCache[note] &= (0xFFFF ^ (bit));
+                        }
+                        break;
                     }
-                    break;
-                }
 
-                case ShortMessage.CONTROL_CHANGE:
-                    // if controller message, send controller listeners
-                    sendControllerEvents(message);
-                    break;
+                    case ShortMessage.NOTE_ON: {
+                        // note on
 
+                        ShortMessage smsg = (ShortMessage) message;
+                        int note = smsg.getData1() & 0x7F;
+                        int vel = smsg.getData2() & 0x7F;
+                        int bit = 1<<(msgStatus & 0x0F);
+
+                        if (vel > 0) {
+                            // if velocity > 0 send to device and set the bit in the noteOnCache array
+                            getTransmitterList().sendMessage(message, -1);
+                            noteOnCache[note] |= bit;
+                        } else {
+                            // if velocity = 0 and note is on then send to device and clear the bit in the noteOnCache array
+                            if ((noteOnCache[note] & bit) != 0) {
+                                getTransmitterList().sendMessage(message, -1);
+                                noteOnCache[note] &= (0xFFFF ^ (bit));
+                            }
+                        }
+                        break;
+                    }
+
+                    case ShortMessage.CONTROL_CHANGE: {
+                        // if controller message, send to device and controller listeners
+                        getTransmitterList().sendMessage(message, -1);
+                        sendControllerEvents(message);
+                        break;
+                    }
+
+                    
+                    default: {
+                        // Send message to device
+                        getTransmitterList().sendMessage(message, -1);
+                    }
                 }
             }
             return changesPending;

@@ -84,6 +84,10 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
         return this.enabledChannels;
     }
 
+    public Byte getFilteredInstrument() {
+        return this.filteredInstrument;
+    }
+
     protected void cacheMidiSettings() {
         if(this.getSourceStack() == null) return;
 

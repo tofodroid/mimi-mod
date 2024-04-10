@@ -10,7 +10,8 @@ import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -76,7 +77,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
         TileTransmitter tileEntity = getTileForBlock(worldIn, pos);
 
         if(!worldIn.isClientSide && tileEntity != null) {
-            ServerMusicTransmitterManager.removeTransmitter(tileEntity.getUUID());
+            BroadcastManager.removeBroadcastProducer(tileEntity.getUUID());
         }
         
         super.onRemove(state, worldIn, pos, newState, isMoving);
@@ -91,7 +92,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
             tileEntity.setSourceStack(newStack);
             
             if(!worldIn.isClientSide) {
-                ServerMusicTransmitterManager.getOrCreateTransmitter(tileEntity);
+                ServerTransmitterManager.createTransmitter(tileEntity);
             }
         }
     }
