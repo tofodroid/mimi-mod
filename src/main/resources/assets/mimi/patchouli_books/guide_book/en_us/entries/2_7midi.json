@@ -14,7 +14,7 @@
         },
         {
             "type": "patchouli:text",
-            "text": "The device that you have selected will appear at the top of the Device Config Screen. The light next to the device name will change colors based on the device's status and the device status box will tell you the status of the device."
+            "text": "The device that you have selected will appear at the top of the Device Config Screen along with the status of the device."
         },
         {
             "type": "patchouli:text",

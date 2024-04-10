@@ -25,9 +25,6 @@ public class ClientConfig {
     // PLAYER
     public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
 
-    // INPUT
-    public ForgeConfigSpec.BooleanValue printDeDebugMessages;
-
     // AUDIO
     public ForgeConfigSpec.BooleanValue automaticAudioDevice;
     public ForgeConfigSpec.ConfigValue<String> audioOutputDevice;
@@ -61,9 +58,6 @@ public class ClientConfig {
             .define("playlistFolderPath", "");
         builder.pop();
         builder.push(MIDI_INPUT_CATEGORY_NAME);
-        printDeDebugMessages = builder.comment("Should MIMI print debug messages to the log? If you're having a problem with MIMI and want to submit an issue turning this on can be very helpful!")
-            .translation(MIMIMod.MODID + ".config.midi.input.deviceDebug")
-            .define("printDeDebugMessages", false);
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
