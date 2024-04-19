@@ -6,6 +6,7 @@ import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.SortedArraySet;
+import java.util.List;
 import net.minecraft.world.item.ItemStack;
 
 public class MidiChannelToggleWidget extends BaseWidget {
