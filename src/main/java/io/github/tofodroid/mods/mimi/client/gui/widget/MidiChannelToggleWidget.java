@@ -5,8 +5,9 @@ import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
 public class MidiChannelToggleWidget extends BaseWidget {
@@ -26,7 +27,7 @@ public class MidiChannelToggleWidget extends BaseWidget {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         // Channel Output Status Lights
-        SortedArraySet<Byte> acceptedChannels = MidiNbtDataUtils.getEnabledChannelsSet(this.midiStack);
+        List<Byte> acceptedChannels = MidiNbtDataUtils.getEnabledChannelsList(this.midiStack);
 
         if(acceptedChannels != null && !acceptedChannels.isEmpty()) {
             for(Byte channelId : acceptedChannels) {

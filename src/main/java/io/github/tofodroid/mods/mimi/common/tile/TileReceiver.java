@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -19,6 +20,7 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile implements IB
     public static final String REGISTRY_NAME = "receiver";
 
     protected UUID linkedId;
+    protected List<Byte> enabledChannelsList;
 
     public TileReceiver(BlockPos pos, BlockState state) {
         super(ModTiles.RECEIVER, pos, state);
@@ -39,6 +41,7 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile implements IB
         }
 
         this.linkedId = MidiNbtDataUtils.getMidiSource(this.getSourceStack());
+        this.enabledChannelsList = MidiNbtDataUtils.getEnabledChannelsList(getSourceStack());
 
         if(this.hasLevel() && !this.getLevel().isClientSide) {
             BroadcastConsumerInventoryHolder holder = new BroadcastConsumerInventoryHolder(this.getUUID());
@@ -91,6 +94,11 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile implements IB
     @Override
     public ResourceKey<Level> getDimension() {
         return this.getLevel().dimension();
+    }
+
+    @Override
+    public List<Byte> getEnabledChannelsList() {
+        return this.enabledChannelsList;
     }
 
     @Override

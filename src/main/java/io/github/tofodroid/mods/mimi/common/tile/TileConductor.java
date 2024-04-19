@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import java.util.Set;
+import java.util.List;
 
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
@@ -20,7 +20,7 @@ public class TileConductor extends AConfigurableMidiTile {
         Level level = getLevel();
         if(level instanceof ServerLevel) {
             ItemStack sourceStack = getSourceStack();
-            Set<Byte> channels = MidiNbtDataUtils.getEnabledChannelsSet(sourceStack);
+            List<Byte> channels = MidiNbtDataUtils.getEnabledChannelsList(sourceStack);
 
             if(channels.size() > 0) {
                 // Byte note = MidiNbtDataUtils.getBroadcastNote(sourceStack);
