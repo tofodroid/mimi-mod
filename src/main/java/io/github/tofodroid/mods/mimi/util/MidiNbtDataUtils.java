@@ -12,7 +12,6 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.item.ItemStack;
 
 public abstract class MidiNbtDataUtils {
@@ -169,8 +168,8 @@ public abstract class MidiNbtDataUtils {
         return result.isEmpty() ? result : result.substring(0, result.length()-1);
     }
     
-    public static SortedArraySet<Byte> getEnabledChannelsSet(ItemStack switchStack) {
-        SortedArraySet<Byte> result = SortedArraySet.create(16);
+    public static List<Byte> getEnabledChannelsList(ItemStack switchStack) {
+        List<Byte> result = new ArrayList<>();
         Integer enabledChannels = getEnabledChannelsInt(switchStack);
 
         for(byte i = 0; i < 16; i++) {

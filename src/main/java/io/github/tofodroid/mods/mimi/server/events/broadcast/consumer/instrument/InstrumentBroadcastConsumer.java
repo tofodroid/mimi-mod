@@ -1,6 +1,5 @@
 package io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -21,7 +20,7 @@ public class InstrumentBroadcastConsumer extends ABroadcastConsumer {
     protected InteractionHand handIn;
 
     public InstrumentBroadcastConsumer(Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dimension, UUID notePlayerId, ItemStack instrumentStack, InteractionHand handIn) {
-        super(notePlayerId, MidiNbtDataUtils.getMidiSource(instrumentStack), MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack), new ArrayList<>(MidiNbtDataUtils.getEnabledChannelsSet(instrumentStack)), pos, dimension);
+        super(notePlayerId, MidiNbtDataUtils.getMidiSource(instrumentStack), MidiNbtDataUtils.getEnabledChannelsInt(instrumentStack), MidiNbtDataUtils.getEnabledChannelsList(instrumentStack), pos, dimension);
         this.instrumentId = MidiNbtDataUtils.getInstrumentId(instrumentStack);
         this.volume = MidiNbtDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;

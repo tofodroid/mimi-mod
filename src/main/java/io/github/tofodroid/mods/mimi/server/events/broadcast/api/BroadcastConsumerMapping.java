@@ -28,8 +28,10 @@ public class BroadcastConsumerMapping {
             CHANNEL_CONSUMERS[i].clear();
         }
         for(IBroadcastConsumer consumer : LINKED_CONSUMERS) {
-            for(Byte enabledChannel : consumer.getEnabledChannelsList()) {
-                CHANNEL_CONSUMERS[enabledChannel].add(consumer);
+            if(consumer.getEnabledChannelsList() != null) {
+                for(Byte enabledChannel : consumer.getEnabledChannelsList()) {
+                    CHANNEL_CONSUMERS[enabledChannel].add(consumer);
+                }
             }
         }
     }
