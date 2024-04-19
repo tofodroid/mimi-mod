@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.consumer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.api;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public abstract class ABroadcastConsumer {
+public abstract class ABroadcastProducerConsumer implements IBroadcastProducer, IBroadcastConsumer {
     public static final Byte ALL_CHANNELS_ID = Byte.MAX_VALUE;
     
     protected UUID ownerId;
@@ -18,8 +18,9 @@ public abstract class ABroadcastConsumer {
     protected Supplier<ResourceKey<Level>> dimension;
     protected Integer enabledChannels;
     protected List<Byte> enabledChannelsList;
+    protected BroadcastConsumerMapping consumerCache;
 
-    public ABroadcastConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dimension) {
+    public ABroadcastProducerConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dimension) {
         this.ownerId = ownerId;
         this.linkedId = linkedId;
         this.blockPos = pos;
@@ -28,7 +29,7 @@ public abstract class ABroadcastConsumer {
         this.enabledChannelsList = enabledChannelsList;
     }
 
-    public ABroadcastConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, BlockPos pos, ResourceKey<Level> dimension) {
+    public ABroadcastProducerConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, BlockPos pos, ResourceKey<Level> dimension) {
         this(ownerId, linkedId, enabledChannels, enabledChannelsList, () -> pos, () -> dimension);
     }
 
@@ -44,16 +45,16 @@ public abstract class ABroadcastConsumer {
         return this.dimension.get();
     }
 
+    public BlockPos getBlockPos() {
+        return this.blockPos.get();
+    }
+
     public List<Byte> getEnabledChannelsList() {
         return this.enabledChannelsList;
     }
 
-    public List<ABroadcastConsumer> getConsumers() {
-        return List.of(this);
-    }
-
-    protected Boolean isPacketInRange(BroadcastEvent packet) {
-        return Math.abs(Math.sqrt(packet.pos.distSqr(blockPos.get()))) <= (packet.isNoteOffEvent() ? 32 : 32) && packet.dimension.equals(this.dimension.get());
+    public BroadcastConsumerMapping getConsumers() {
+        return this.consumerCache;
     }
 
     public void consumeNoteOn(BroadcastEvent message) {
@@ -73,14 +74,13 @@ public abstract class ABroadcastConsumer {
             this.doHandleAllNotesOff(message);
         }
     }
-    
-    public void tick() {/* Default no-op */}
 
-    public abstract void onRemoved();
-    protected abstract Boolean willHandleNoteOn(BroadcastEvent message);
-    protected abstract void doHandleNoteOn(BroadcastEvent message);
-    protected abstract Boolean willHandleNoteOff(BroadcastEvent message);
-    protected abstract void doHandleNoteOff(BroadcastEvent message);
-    protected abstract Boolean willHandleAllNotesOff(BroadcastEvent message);
-    protected abstract void doHandleAllNotesOff(BroadcastEvent message);
+    public void linkConsumers(List<IBroadcastConsumer> consumers) {
+        this.consumerCache = new BroadcastConsumerMapping(this.ownerId, consumers);
+    }
+
+
+    public void tickProducer() {/*Default no-op*/}
+    public void tickConsumer() {/*Default no-op*/}
+    public void close() throws Exception {this.onProducerRemoved(); this.onConsumerRemoved();}
 }

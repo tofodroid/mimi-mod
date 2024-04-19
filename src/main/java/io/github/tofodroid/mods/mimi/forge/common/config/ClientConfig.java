@@ -22,12 +22,13 @@ public class ClientConfig {
     }
     public ForgeConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
 
-    // PLAYER
-    public ForgeConfigSpec.ConfigValue<String> playlistFolderPath;
+    // MIDI INPUT
+    public ForgeConfigSpec.IntValue midiDeviceVelocity;
 
     // AUDIO
     public ForgeConfigSpec.BooleanValue automaticAudioDevice;
     public ForgeConfigSpec.ConfigValue<String> audioOutputDevice;
+    public ForgeConfigSpec.IntValue audioDeviceVolume;
 
     // SYNTH
     public ForgeConfigSpec.IntValue localBufferms;
@@ -46,18 +47,19 @@ public class ClientConfig {
         audioOutputDevice = builder.comment("When automatic device determination is set to false, the name of the audio output device that MIMI should attempt to use. If not found MIMI will use the System Default device.")
             .translation(MIMIMod.MODID + ".config.audio.device")
             .define("audioOutputDevice", "");
+        audioDeviceVolume = builder.comment("A multipler used to increase or decrease the base volume of all notes played by MIMI instruments.","Allowed values: 0-10")
+            .translation(MIMIMod.MODID + ".config.audio.volume")
+            .defineInRange("audioDeviceVolume",5, 0, 10);
         builder.pop();
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
             .translation(MIMIMod.MODID + ".config.instrument.keyboard.layout")
             .defineEnum("instrumentKeyboardLayout", KEYBOARD_LAYOUTS.MIMI);
         builder.pop();
-        builder.push(MIDI_PLAYER_CATEGORY_NAME);
-        playlistFolderPath = builder.comment("Optional full path to a folder containing MIDI files to be used by the MIDI Player. See guide book for more information.")
-            .translation(MIMIMod.MODID + ".config.midi.player.playlist.path")
-            .define("playlistFolderPath", "");
-        builder.pop();
         builder.push(MIDI_INPUT_CATEGORY_NAME);
+        midiDeviceVelocity = builder.comment("A value to add to the velocity of notes recieved from the MIDI input device (to increase or decrease volume).","Allowed values: - (-)127-(+)127")
+            .translation(MIMIMod.MODID + ".config.midi.input.volume")
+            .defineInRange("midiDeviceVelocity",0, -127, 127);
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")

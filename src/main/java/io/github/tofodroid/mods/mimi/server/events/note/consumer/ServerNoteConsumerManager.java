@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileListener;
 import io.github.tofodroid.mods.mimi.server.events.note.NoteEvent;
+import io.github.tofodroid.mods.mimi.server.events.note.api.ANoteConsumer;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceKey;
@@ -137,7 +138,7 @@ public class ServerNoteConsumerManager {
         CONSUMER_LOOKUP.clear();
         OWNED_CONSUMERS.values().stream().forEach(consumer -> {
             consumer.tick();
-            List<ANoteConsumer> consumerList = CONSUMER_LOOKUP.computeIfAbsent(consumer.instrumentId, (iid) -> new ArrayList<>());
+            List<ANoteConsumer> consumerList = CONSUMER_LOOKUP.computeIfAbsent(consumer.getInstrumentId(), (iid) -> new ArrayList<>());
             consumerList.add(consumer);
         });
     }

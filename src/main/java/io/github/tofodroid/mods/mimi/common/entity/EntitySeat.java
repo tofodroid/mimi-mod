@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.joml.Vector3d;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManagerConsumerEventHooks;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -53,7 +53,7 @@ public class EntitySeat extends Entity {
             this.ejectPassengers();
 
             if(this.rider != null) {
-                BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(this.rider);
+                EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(this.rider);
             }
 
             this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());
@@ -118,7 +118,7 @@ public class EntitySeat extends Entity {
             if(!seatExists(world, newSeat.getX(), newSeat.getY(), newSeat.getZ())) {
                 world.addFreshEntity(newSeat);
                 player.startRiding(newSeat, false);
-                BroadcastManagerConsumerEventHooks.reloadEntityInstrumentConsumers(player);
+                EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(player);
                 return newSeat;
             }
         }

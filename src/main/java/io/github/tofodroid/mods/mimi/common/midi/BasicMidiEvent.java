@@ -44,6 +44,14 @@ public class BasicMidiEvent {
             this.type = MidiEventType.OTHER;
         }
     }
+
+    public static BasicMidiEvent allNotesOff(Byte channel, Long eventTime) {
+        return new BasicMidiEvent(MidiEventType.ALL_NOTES_OFF, channel, BasicMidiEvent.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), eventTime);
+    }
+
+    public static BasicMidiEvent allNotesOff(Long eventTime) {
+        return new BasicMidiEvent(MidiEventType.ALL_NOTES_OFF, BasicMidiEvent.ALL_CHANNELS, BasicMidiEvent.ALL_NOTES_OFF, Integer.valueOf(0).byteValue(), eventTime);
+    }
     
     protected Boolean isNoteOnMessage(ShortMessage msg) {
         return msg.getData1() >= 0 && ShortMessage.NOTE_ON == msg.getCommand() && msg.getData2() > 0;

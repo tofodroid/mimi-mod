@@ -455,7 +455,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         if(this.instrumentId != null) {
-            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, MidiNbtDataUtils.applyVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos(), handIn);
+            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos(), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);

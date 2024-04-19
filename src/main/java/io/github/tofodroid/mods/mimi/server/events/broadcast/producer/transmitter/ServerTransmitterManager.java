@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.producer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +20,7 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacke
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastProducer;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -31,8 +32,8 @@ public abstract class ServerTransmitterManager {
     private static ExecutorService executor;
     private static Boolean shuttingDown = false;
 
-    private static ATransmitterBroadcastProducer getTransmitter(UUID id) {
-        ABroadcastProducer producer = BroadcastManager.getBroadcastProducer(id);
+    public static ATransmitterBroadcastProducer getTransmitter(UUID id) {
+        IBroadcastProducer producer = BroadcastManager.getBroadcastProducer(id);
 
         if(producer instanceof ATransmitterBroadcastProducer) {
             return (ATransmitterBroadcastProducer)producer;
@@ -40,12 +41,12 @@ public abstract class ServerTransmitterManager {
         return null;
     }
 
-    public static void createTransmitter(ServerPlayer player) {
-        BroadcastManager.registerProducer(new PlayerBroadcastProducer(player));
+    public static PlayerTransmitterBroadcastProducer createTransmitter(ServerPlayer player) {
+        return BroadcastManager.registerProducer( new PlayerTransmitterBroadcastProducer(player));
     }
 
-    public static void createTransmitter(TileTransmitter tile) {
-        BroadcastManager.registerProducer(new TileTransmitterBroadcastProducer(tile));
+    public static TileTransmitterBroadcastProducer createTransmitter(TileTransmitter tile) {
+        return BroadcastManager.registerProducer(new TileTransmitterBroadcastProducer(tile));
     }
 
     public static void executeTaskOnMidiThread(Runnable runnable, Consumer<Exception> onFailed) {
@@ -143,21 +144,21 @@ public abstract class ServerTransmitterManager {
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.play();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to play transmitter: " + musicPlayer.ownerId.toString(), e);
+                        MIMIMod.LOGGER.error("MIMI failed to play transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case PAUSE:
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.pause();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to pause transmitter: " + musicPlayer.ownerId.toString(), e);
+                        MIMIMod.LOGGER.error("MIMI failed to pause transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case STOP:
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.stop();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to stop transmitter: " + musicPlayer.ownerId.toString(), e);
+                        MIMIMod.LOGGER.error("MIMI failed to stop transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case RESTART:
@@ -165,14 +166,14 @@ public abstract class ServerTransmitterManager {
                         musicPlayer.stop();
                         musicPlayer.play();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to restart transmitter: " + musicPlayer.ownerId.toString(), e);
+                        MIMIMod.LOGGER.error("MIMI failed to restart transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case SEEK:
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.seek(message.controlData.get());
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to seek transmitter: " + musicPlayer.ownerId.toString(), e);
+                        MIMIMod.LOGGER.error("MIMI failed to seek transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case PREV:
