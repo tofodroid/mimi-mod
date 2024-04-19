@@ -4,7 +4,7 @@ import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.ItemStack;
 
 public class BroadcastRangeWidget extends BaseWidget {
@@ -18,7 +18,7 @@ public class BroadcastRangeWidget extends BaseWidget {
     }
 
     @Override
-    public void renderGraphics(GuiGraphics graphics, Integer mouseX, Integer mouseY) {
+    public void renderGraphics(PoseStack graphics, Integer mouseX, Integer mouseY) {
         super.renderGraphics(graphics, mouseX, mouseY);
 
         // Broadcast Range

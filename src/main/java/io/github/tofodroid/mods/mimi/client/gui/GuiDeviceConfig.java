@@ -14,7 +14,7 @@ import io.github.tofodroid.mods.mimi.client.midi.MidiInputDeviceManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.player.Player;
 
 public class GuiDeviceConfig extends BaseGui {    
@@ -123,7 +123,7 @@ public class GuiDeviceConfig extends BaseGui {
     }
 
     @Override
-    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // Background
         this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
@@ -136,7 +136,7 @@ public class GuiDeviceConfig extends BaseGui {
     }
 
     @Override
-    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         if(this.audioMode) {
             // Volume
             this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ModConfigs.CLIENT.audioDeviceVolume.get(), 2, false), START_X + VOLUME_BOX.x(), START_Y + VOLUME_BOX.y(), 0xFF00E600);

@@ -2,8 +2,6 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import java.util.List;
 
-import com.mojang.serialization.MapCodec;
-
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
@@ -33,12 +31,6 @@ import net.minecraft.world.phys.BlockHitResult;
 public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final String REGISTRY_NAME = "relay";
-    public static final MapCodec<BlockRelay> CODEC = simpleCodec(BlockRelay::new);
- 
-    @Override
-    public MapCodec<BlockRelay> codec() {
-       return CODEC;
-    }
 
     public BlockRelay(Properties props) {
         super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.METAL).isRedstoneConductor((a,b,c) -> false));
