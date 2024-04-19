@@ -32,7 +32,7 @@ public class MidiInputDeviceManager {
     protected Receiver activeReceiver = null;
     protected Transmitter activeTransmitter = null;
     protected MidiDevice activeDevice = null;
-
+    private Boolean transmitMidiInput = false;
     private String selectedDeviceName = "";
     private String midiDeviceError = null;
 
@@ -86,6 +86,18 @@ public class MidiInputDeviceManager {
 
     public String getSelectedDeviceError() {
         return midiDeviceError;
+    }
+
+    public Boolean getTransmitMidiInput() {
+        return transmitMidiInput;
+    }
+
+    public void toggleTransmitMidiInput() {
+        this.transmitMidiInput = !this.transmitMidiInput;
+    }
+
+    public void setTransmitMidiInput(Boolean transmitMidiInput) {
+        this.transmitMidiInput = transmitMidiInput;
     }
 
     public void saveDeviceSelection(MidiDevice device) {

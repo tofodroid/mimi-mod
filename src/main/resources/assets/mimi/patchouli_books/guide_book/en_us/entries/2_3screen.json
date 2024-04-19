@@ -29,7 +29,7 @@
         },
         {
             "type": "patchouli:text",
-            "text": "$(li)$(l)System MIDI Device$() - Whether or not this instrument should play notes from a MIDI Input Device attached to your PC.$(br)$(li)$(l)Volume$() - How loud notes from this instrument should be played.$(br)$(li)$(l)Transmission Source$() - What transmitter this instrument is linked to (will play notes from). You can link to yourself or unlink with the \"ME\" and \"X\" buttons."
+            "text": "$(li)$(l)System MIDI Device$() - Whether or not this instrument should play notes from a MIDI Input Device attached to your PC.$(br)$(li)$(l)Volume$() - How loud notes from this instrument should be played.$(br)$(li)$(l)Transmission Source$() - What Transmitter or Relay this instrument is linked to (will play notes from). You can link to yourself or unlink with the \"ME\" and \"X\" buttons."
         },
         {
             "type": "patchouli:text",

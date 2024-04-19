@@ -32,10 +32,15 @@ public abstract class MidiNbtDataUtils {
     public static final String INVERT_SIGNAL_TAG = "invert_signal";
     public static final String NOTE_START_TRIGGER_TAG = "note_start";
     public static final String HOLD_TICKS_TAG = "hold_ticks";
+    public static final String BROADCAST_RANGE_TAG = "broadcast_range";
     public static final String TRANSMITTER_SOURCE_PREFIX = ";T;";
+    public static final String RELAY_SOURCE_PREFIX = ";R;";
+    public static final String CHANNEL_MAP_BASE_TAG = "channel_map_";
     public static final Byte INSTRUMENT_ALL = -1;
     public static final Byte MAX_TRIGGER_MODE = 3;
     public static final Byte MAX_HOLD_TICKS = 20;
+    public static final Byte MIN_BROADCAST_RANGE = 1;
+    public static final Byte MAX_BROADCAST_RANGE = 4;
     public static final Byte MAX_INSTRUMENT_VOLUME = 10;
     public static final Integer PERCUSSION_BANK = 120;
     public static final Byte DEFAULT_INSTRUMENT_VOLUME = 5;
@@ -67,6 +72,10 @@ public abstract class MidiNbtDataUtils {
         return INSTRUMENT_NAME_MAP;
     }
 
+    public static void setMidiSourceFromRelay(ItemStack stack,UUID sourceId, String sourceName) {
+        setMidiSource(stack, sourceId, RELAY_SOURCE_PREFIX + sourceName);
+    }
+
     public static void setMidiSourceFromTransmitter(ItemStack stack,UUID sourceId, String sourceName) {
         setMidiSource(stack, sourceId, TRANSMITTER_SOURCE_PREFIX + sourceName);
     }
@@ -93,6 +102,11 @@ public abstract class MidiNbtDataUtils {
         return TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "").startsWith(TRANSMITTER_SOURCE_PREFIX);
     }
 
+    public static Boolean getMidiSourceIsRelay(ItemStack stack) {
+        return TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "").startsWith(RELAY_SOURCE_PREFIX);
+    }
+
+
     public static String getMidiSourceName(ItemStack stack, Boolean forDisplay) {
         UUID sourceId = getMidiSource(stack);
 
@@ -101,7 +115,7 @@ public abstract class MidiNbtDataUtils {
         }
 
         String name = TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "Unknown");
-        return forDisplay ? name.replaceFirst(TRANSMITTER_SOURCE_PREFIX, "") : name;
+        return forDisplay ? name.replaceFirst(TRANSMITTER_SOURCE_PREFIX, "").replaceFirst(RELAY_SOURCE_PREFIX, "") : name;
     }
 
     public static void setEnabledChannelsInt(ItemStack stack, Integer enabledChannels) {
@@ -297,6 +311,21 @@ public abstract class MidiNbtDataUtils {
         return ticks < 1 ? 1 : ticks;
     }
 
+    public static void setBroadcastRange(ItemStack stack, Byte broadcastRange) {
+        if(broadcastRange > MAX_BROADCAST_RANGE) {
+            broadcastRange = MAX_BROADCAST_RANGE;
+        } else if(broadcastRange < MIN_BROADCAST_RANGE) {
+            broadcastRange = MIN_BROADCAST_RANGE;
+        }
+
+        stack.getOrCreateTag().putByte(BROADCAST_RANGE_TAG, broadcastRange);
+    }
+
+    public static Byte getBroadcastRange(ItemStack stack) {
+        Byte range = TagUtils.getByteOrDefault(stack, BROADCAST_RANGE_TAG, 1);
+        return range < MIN_BROADCAST_RANGE ? MIN_BROADCAST_RANGE : range;
+    }
+
     public static void setInstrumentVolume(ItemStack stack, Byte volume) {
         if(volume > MAX_INSTRUMENT_VOLUME) {
             volume = MAX_INSTRUMENT_VOLUME;
@@ -311,7 +340,7 @@ public abstract class MidiNbtDataUtils {
         return TagUtils.getByteOrDefault(stack, VOLUME_TAG, DEFAULT_INSTRUMENT_VOLUME);
     }
 
-    public static Byte applyVolume(ItemStack stack, Byte sourceVelocity) {
+    public static Byte applyInstrumentVolume(ItemStack stack, Byte sourceVelocity) {
         return applyVolume(getInstrumentVolume(stack), sourceVelocity);
     }
 
@@ -321,6 +350,28 @@ public abstract class MidiNbtDataUtils {
 
     public static String getInstrumentName(Byte instrumentId) {
         return INSTRUMENT_NAME_MAP().get(instrumentId);
+    }
+
+    public static Byte[] getChannelMap(ItemStack stack) {
+        Byte[] result = new Byte[16];
+        for(byte i = 0; i < 16; i++) {
+            result[i] = TagUtils.getByteOrDefault(stack, CHANNEL_MAP_BASE_TAG + i, i);
+        }
+        return result;
+    }
+
+    public static Byte getChannelMap(ItemStack stack, Byte index) {
+        return TagUtils.getByteOrDefault(stack, CHANNEL_MAP_BASE_TAG + index, index);
+    }
+
+    public static void setChannelMap(ItemStack stack, Byte[] map) {
+        for(byte i = 0; i < 16; i++) {
+            setChannelMap(stack, i, map[i]);
+        }
+    }
+
+    public static void setChannelMap(ItemStack stack, Byte index, Byte value) {
+        TagUtils.setOrRemoveByte(stack, CHANNEL_MAP_BASE_TAG + index, value == index.byteValue() ? null : (value < 0 ? 0 : (value > 15 ? 15 : value)));
     }
 
     public static List<Byte> getFilterNotes(Byte note, Byte oct) {
@@ -487,7 +538,9 @@ public abstract class MidiNbtDataUtils {
 
         // Note Source
         if(getMidiSource(stack) != null) {
-            tooltip.add(Component.literal("  Play Notes From: " + (getMidiSourceIsTransmitter(stack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+            Boolean isTransmitter = getMidiSourceIsTransmitter(stack);
+            Boolean isRelay = getMidiSourceIsRelay(stack);
+            tooltip.add(Component.literal("  Play Notes From: " + (isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"))).withStyle(ChatFormatting.GREEN));
             tooltip.add(Component.literal("  " + getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("  Play Notes From: None").withStyle(ChatFormatting.GREEN));

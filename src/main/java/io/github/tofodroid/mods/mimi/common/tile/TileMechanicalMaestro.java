@@ -9,8 +9,10 @@ import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManagerConsumerEventHooks;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.InstrumentBroadcastConsumer;
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -119,17 +121,6 @@ public class TileMechanicalMaestro extends AContainerTile {
         }
     }
 
-    public void refreshMidiReceivers() {
-        if(this.hasLevel() && !this.level.isClientSide) {
-            if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
-                BroadcastManagerConsumerEventHooks.reloadMechanicalMaestroInstrumentConsumers(this);
-            } else {
-                this.allNotesOff();
-                BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
-            }
-        }
-    }
-
     public List<ItemStack> getInstrumentStacks() {
         return this.getItems().stream().filter(stack -> stack.getItem() instanceof IInstrumentItem).collect(Collectors.toList());
     }
@@ -154,5 +145,31 @@ public class TileMechanicalMaestro extends AContainerTile {
                 (ServerLevel)this.getLevel()
             );
 		}
+    }
+
+    public void refreshMidiReceivers() {
+        if(this.hasLevel() && !this.level.isClientSide) {            
+            if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
+                BroadcastConsumerInventoryHolder holder = new BroadcastConsumerInventoryHolder(this.getUUID());
+        
+                for(int i = 0; i < this.getInstrumentStacks().size(); i++) {
+                    ItemStack instrumentStack = this.getInstrumentStacks().get(i);
+                    if(instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
+                        holder.putConsumer(i, new InstrumentBroadcastConsumer(
+                            this.getBlockPos(),
+                            this.getLevel().dimension(),
+                            this.getUUID(),
+                            instrumentStack,
+                            null
+                        ));
+                    }
+                }
+                BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
+                BroadcastManager.registerConsumers(holder);
+            } else {
+                this.allNotesOff();
+                BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.util.Vector2Int;
-
+import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
@@ -15,6 +15,10 @@ import net.minecraft.Util;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiTransmitter extends GuiTransmitterBlock {
+    // System MIDI Input Control
+    protected static final Vector2Int SYSTEM_MIDI_DEVICE_BUTTON = new Vector2Int(330,7);
+    protected static final Vector2Int SYSTEM_MIDI_DEVICE_LIGHT = new Vector2Int(349,13);
+
     // Local File Controls
     protected static final Vector2Int SOURCE_FILTER_BUTTON = new Vector2Int(265,32);
     protected static final Vector2Int SOURCE_FILTER_SCREEN = new Vector2Int(283,33);
@@ -33,6 +37,8 @@ public class GuiTransmitter extends GuiTransmitterBlock {
             this.sendTransmitterCommand(CONTROL.SOURCE_M);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OPEN_LOCAL_FOLDER_BUTTON))) {
             Util.getPlatform().openUri(Path.of(MIMIMod.getProxy().clientMidiFiles().getCurrentFolderPath()).toUri());
+        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SYSTEM_MIDI_DEVICE_BUTTON))) {
+            ((ClientProxy)MIMIMod.getProxy()).getMidiData().inputDeviceManager.toggleTransmitMidiInput();
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -42,6 +48,13 @@ public class GuiTransmitter extends GuiTransmitterBlock {
     protected  PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         super.renderGraphics(graphics, mouseX, mouseY, partialTicks);
 
+        // System MIDI Input Device Background and Light
+        this.blitAbsolute(graphics, guiTexture, START_X + 240, START_Y + 4, 1, 327, 116, 21, TEXTURE_SIZE, TEXTURE_SIZE);
+
+        if(((ClientProxy)MIMIMod.getProxy()).getMidiData().inputDeviceManager.getTransmitMidiInput()) {
+            this.blitAbsolute(graphics, guiTexture, START_X + SYSTEM_MIDI_DEVICE_LIGHT.x(), START_Y + SYSTEM_MIDI_DEVICE_LIGHT.y(), 1, 349, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
+        }
+        
         // Local Folder Button
         this.blitAbsolute(graphics, guiTexture, START_X + 9, START_Y + 31, 173, 269, 17, 17, TEXTURE_SIZE, TEXTURE_SIZE);
 

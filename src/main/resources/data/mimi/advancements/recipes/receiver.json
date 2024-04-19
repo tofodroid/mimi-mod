@@ -11,7 +11,7 @@
         "conditions": {
           "items": [
             {
-              "item": "mimi:transmitter"
+              "item": "minecraft:note_block"
             }
           ]
         }
