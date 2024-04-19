@@ -34,11 +34,12 @@ public class TransmitterSourceWidget extends BaseWidget {
         } else {
             String sourceName = MidiNbtDataUtils.getMidiSourceName(this.midiStack, true);
             Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(this.midiStack);
+            Boolean isRelay = MidiNbtDataUtils.getMidiSourceIsRelay(this.midiStack);
 
-            this.drawStringAbsolute(graphics, font, isTransmitter ? "Transmitter:" : "Player:", ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"), ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 15, 0xFF00E600);
 
             
-            if(isTransmitter) {
+            if(isTransmitter || isRelay) {
                 this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, sourceName.substring(0, sourceName.indexOf("@")), 68), ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 24, 0xFF00E600);
                 this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, sourceName.substring(sourceName.indexOf("(") + 1, sourceName.indexOf(")")), 106), ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 34, 0xFF00E600);
             } else {

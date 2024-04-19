@@ -11,7 +11,7 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -49,7 +49,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
         if(tile != null) {
             ItemStack handStack = player.getItemInHand(hand);
 
-            if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER))) {
+            if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER) || handStack.getItem().equals(ModItems.RELAY))) {
                 if(!worldIn.isClientSide) {
                     String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
                     MidiNbtDataUtils.setMidiSourceFromTransmitter(handStack, tile.getUUID(), transmitterName);

@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 
 public class TransmitterControlPacketHandler {    

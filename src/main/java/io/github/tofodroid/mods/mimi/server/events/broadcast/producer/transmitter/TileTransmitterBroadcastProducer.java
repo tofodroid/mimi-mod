@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.producer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.TileTransmitterPlaylistHandler;
@@ -32,5 +32,15 @@ public class TileTransmitterBroadcastProducer extends ATransmitterBroadcastProdu
     @Override
     protected Boolean isTransmitterStillValid() {
         return true;
+    }
+
+    @Override
+    public void onProducerRemoved() {
+        // No-op
+    }
+
+    @Override
+    public Integer getBroadcastRange() {
+        return 16;
     }
 }

@@ -27,12 +27,17 @@
         },
         {
             "type": "patchouli:text",
+            "title": "Velocity Modifier",
+            "text": "You can also use the Velocity arrows to set a velocity modifier that should be applied to all notes recieved from the selected MIDI Input Device. This can be used to increase or decrease the volume of notes played by the device."
+        },
+        {
+            "type": "patchouli:text",
             "title": "Troubleshooting",
             "text": "Sometimes MIDI and Minecraft don't get along very well so here are some things to try if it just won't work.$(br2)$(l)Device Doesn't Show$()$(br2)1. Plug it in and ensure it's detected by your PC before starting Minecraft.$(br2)2. Restart it and/or unplug it and plug it back in. Seriously, this fixes most problems for me like 70% of the time!"
         },
         {
             "type": "patchouli:text",
-            "text": "$(l)Device Is Red$()$(br2)1. The same things from \"Device Doesn't Show\".$(br2)2. Ensure the device is not already being used by another program on your PC. Most MIDI Input Devices can only be used by one program at a time."
+            "text": "$(l)Device Status Error$()$(br2)1. The same things from \"Device Doesn't Show\".$(br2)2. Ensure the device is not already being used by another program on your PC. Most MIDI Input Devices can only be used by one program at a time."
         }
     ],
     "sortnum": 7

@@ -1,10 +1,10 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-public class BroadcastManagerProducerEventHooks {
+public class PlayerTransmitterProducerEventHandler {
     public static void onPlayerLoggedIn(ServerPlayer player) {
         ServerTransmitterManager.createTransmitter(player);
     }

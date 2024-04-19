@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.producer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import javax.sound.midi.Sequence;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.ABroadcastProducer;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMidiSequencer;
@@ -151,7 +152,7 @@ public abstract class ATransmitterBroadcastProducer extends ABroadcastProducer {
     }
 
     @Override
-    public void tick() {
+    public void tickProducer() {
         if(this.midiHandler.isPlaying() && !this.isTransmitterStillValid()) {
             this.stop();
         }

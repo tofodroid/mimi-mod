@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AStaticInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
+public abstract class AStaticInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
     protected final Integer INVENTORY_SIZE;
     protected NonNullList<ItemStack> items;
 

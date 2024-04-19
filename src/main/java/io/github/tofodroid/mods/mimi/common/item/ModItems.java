@@ -22,6 +22,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.BlockListener;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.block.BlockReceiver;
+import io.github.tofodroid.mods.mimi.common.block.BlockRelay;
 import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.common.block.BlockTuningTable;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
@@ -54,6 +55,7 @@ public final class ModItems {
     public static BlockItem MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().stacksTo(64)));
     public static BlockItem CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().stacksTo(64)));
     public static BlockItem EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockItem(ModBlocks.EFFECTEMITTER, new Item.Properties().stacksTo(64)));
+    public static BlockItem RELAY = create(BlockRelay.REGISTRY_NAME, new BlockItem(ModBlocks.RELAY, new Item.Properties().stacksTo(64)));
     
     // Blocks - LED Cubes
     public static BlockItem LEDCUBE_A = create(BlockLedCube.REGISTRY_NAME_A, new BlockItem(ModBlocks.LEDCUBE_A, new Item.Properties().stacksTo(64)));
@@ -84,6 +86,7 @@ public final class ModItems {
                 RECEIVER,
                 MECHANICALMAESTRO,
                 EFFECTEMITTER,
+                RELAY,
                 TRANSMITTERBLOCK,
                 TUNINGTABLE,
                 LEDCUBE_A,

@@ -12,7 +12,7 @@ import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
 
 public abstract class ServerMidiManager {
