@@ -3,8 +3,8 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ServerTransmitterManager;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;

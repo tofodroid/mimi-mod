@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.midi.synth;
 
+import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
@@ -28,6 +29,11 @@ public abstract class MIMISynthUtils {
 
         // 2. Adjust for game volume
         if(applyGameVolume) {
+            // Audio Volume is from 0-10
+            Double mimiVolume = Double.valueOf(ModConfigs.CLIENT.audioDeviceVolume.get()) / 10.0d;
+            volume *= mimiVolume;
+
+            // Minecraft Settings Volumes
             Float catVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.RECORDS);
             catVolume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
             volume *= catVolume.doubleValue();

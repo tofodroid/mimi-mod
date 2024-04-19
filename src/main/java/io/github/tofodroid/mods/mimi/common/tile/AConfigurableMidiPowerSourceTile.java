@@ -14,7 +14,6 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -39,10 +38,6 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         super(type, pos, state, inventorySize);
     }
 
-    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
-        self.tick(world, pos, state);
-    }
-    
     @Override
     public void setRemoved() {
         super.setRemoved();
@@ -190,14 +185,14 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         this.noteHeld = true;
     }
 
-    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
+    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
         if(this.triggerHeld && this.noteHeld) {
             Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
             this.notesToTurnOff.add(noteId);
         }
     }
 
-    public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId) {
+    public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime) {
         if(this.triggerHeld) {
             Byte groupKey = getNoteGroupKey(channel, instrumentId);
 

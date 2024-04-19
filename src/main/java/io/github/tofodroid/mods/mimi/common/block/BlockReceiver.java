@@ -81,7 +81,9 @@ public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceive
 
         // Note Source
         if(MidiNbtDataUtils.getMidiSource(blockItemStack) != null) {
-            tooltip.add(Component.literal("  Recieve Notes From: " + (MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+            Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack);
+            Boolean isRelay = MidiNbtDataUtils.getMidiSourceIsRelay(blockItemStack);
+            tooltip.add(Component.literal("  Recieve Notes From: " + (isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"))).withStyle(ChatFormatting.GREEN));
             tooltip.add(Component.literal("  " + MidiNbtDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("  Recieve Notes From: None").withStyle(ChatFormatting.GREEN));

@@ -1,14 +1,14 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.producer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
 import io.github.tofodroid.mods.mimi.server.ServerExecutor;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.PlayerPlaylistHandler;
 import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import net.minecraft.server.level.ServerPlayer;
 
-public class PlayerBroadcastProducer extends ATransmitterBroadcastProducer {
+public class PlayerTransmitterBroadcastProducer extends ATransmitterBroadcastProducer {
     protected ServerPlayer player;
 
-    public PlayerBroadcastProducer(ServerPlayer player) {
+    public PlayerTransmitterBroadcastProducer(ServerPlayer player) {
         super(player.getUUID(), new PlayerPlaylistHandler(player), player::getOnPos, () -> player.level().dimension());
         this.player = player;
     }
@@ -24,5 +24,15 @@ public class PlayerBroadcastProducer extends ATransmitterBroadcastProducer {
         }
 
         return false;
+    }
+
+    @Override
+    public void onProducerRemoved() {
+        // No-op
+    }
+
+    @Override
+    public Integer getBroadcastRange() {
+        return 16;
     }
 }

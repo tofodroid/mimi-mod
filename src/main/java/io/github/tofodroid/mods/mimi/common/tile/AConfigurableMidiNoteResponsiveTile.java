@@ -27,6 +27,10 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     protected Boolean invertFilterNoteOct;
     protected Boolean invertFilterInstrument;
 
+    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiNoteResponsiveTile self) {
+        self.tick(world, pos, state);
+    }
+    
     public AConfigurableMidiNoteResponsiveTile(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 1);
     }
@@ -40,6 +44,7 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
             this.execServerTick((ServerLevel)world, pos, state);
 
             if(firstTick) {
+                this.onFirstTick((ServerLevel)world, pos, state);
                 this.cacheMidiSettings();
                 this.firstTick = false;
             }
@@ -103,10 +108,11 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     }
 
     protected void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {/* Default: No-op */};
+    protected void onFirstTick(ServerLevel world, BlockPos pos, BlockState state) {/* Default: No-op */};
     
     public abstract void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime);
-    public abstract void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
-    public abstract void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId);
+    public abstract void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime);
+    public abstract void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime);
     public abstract Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
     public abstract Boolean shouldTriggerFromNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
     public abstract Boolean shouldTriggerFromAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId);

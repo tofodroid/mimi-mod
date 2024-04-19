@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.consumer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.ABroadcastConsumer;
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
@@ -35,17 +36,17 @@ public class InstrumentBroadcastConsumer extends ABroadcastConsumer {
     }
 
     @Override
-    protected Boolean willHandleNoteOn(BroadcastEvent message) {
+    public Boolean willHandleNoteOn(BroadcastEvent message) {
         return true;
     }
 
     @Override
-    protected Boolean willHandleNoteOff(BroadcastEvent message) {
+    public Boolean willHandleNoteOff(BroadcastEvent message) {
         return true;
     }
 
     @Override
-    protected Boolean willHandleAllNotesOff(BroadcastEvent message) {
+    public Boolean willHandleAllNotesOff(BroadcastEvent message) {
         return true;
     }
 
@@ -64,22 +65,22 @@ public class InstrumentBroadcastConsumer extends ABroadcastConsumer {
     }
 
     @Override
-    protected void doHandleNoteOn(BroadcastEvent message) {
+    public void doHandleNoteOn(BroadcastEvent message) {
         ServerNoteConsumerManager.handleBroadcastPacket(MidiNotePacket.createNotePacket(message.note, MidiNbtDataUtils.applyVolume(this.volume, message.velocity), instrumentId, this.ownerId, blockPos.get(), message.eventTime, handIn), this.getDimension());
     }
 
     @Override
-    protected void doHandleNoteOff(BroadcastEvent message) {
+    public void doHandleNoteOff(BroadcastEvent message) {
         ServerNoteConsumerManager.handleBroadcastPacket(MidiNotePacket.createNotePacket(message.note, Integer.valueOf(0).byteValue(), instrumentId, this.ownerId, blockPos.get(), message.eventTime, handIn), this.getDimension());
     }
 
     @Override
-    protected void doHandleAllNotesOff(BroadcastEvent message) {
+    public void doHandleAllNotesOff(BroadcastEvent message) {
         this.sendAllNotesOff();
     }
 
     @Override
-    public void onRemoved() {
+    public void onConsumerRemoved() {
         this.sendAllNotesOff();
     }
 }

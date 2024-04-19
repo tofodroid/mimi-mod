@@ -5,33 +5,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.ABroadcastConsumer;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.BroadcastConsumerHolder;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.ABroadcastProducer;
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastProducer;
 
 public class BroadcastManager {
     // Producers
-    protected static final HashMap<UUID, ABroadcastProducer> OWNED_PRODUCERS = new HashMap<>();
+    protected static final HashMap<UUID, IBroadcastProducer> OWNED_PRODUCERS = new HashMap<>();
     
     // Consumers
-    protected static final HashMap<UUID, BroadcastConsumerHolder> OWNED_CONSUMERS = new HashMap<>();
+    protected static final HashMap<UUID, BroadcastConsumerInventoryHolder> OWNED_CONSUMERS = new HashMap<>();
 
     // Producer --> Consumers
-    protected static final HashMap<UUID, List<ABroadcastConsumer>> LINKED_CONSUMERS = new HashMap<>();
+    protected static final HashMap<UUID, List<IBroadcastConsumer>> LINKED_CONSUMERS = new HashMap<>();
 
     // Producer
-    public static void registerProducer(ABroadcastProducer producer) {
+    public static <T extends IBroadcastProducer> T registerProducer(T producer) {
         OWNED_PRODUCERS.computeIfAbsent(producer.getOwnerId(), (id) -> producer).linkConsumers(
             LINKED_CONSUMERS.computeIfAbsent(producer.getOwnerId(), (id) -> new ArrayList<>())
         );
+        return producer;
     }
 
-    public static ABroadcastProducer getBroadcastProducer(UUID producerId) {
+    public static IBroadcastProducer getBroadcastProducer(UUID producerId) {
         return OWNED_PRODUCERS.get(producerId);
     }
 
     public static void removeBroadcastProducer(UUID producerId) {
-        ABroadcastProducer producer = OWNED_PRODUCERS.remove(producerId);
+        IBroadcastProducer producer = OWNED_PRODUCERS.remove(producerId);
 
         if(producer != null) {
             try {   
@@ -41,9 +43,9 @@ public class BroadcastManager {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends ABroadcastProducer> List<T> getBroadcastProducersByType(Class<T> clazz) {
+    public static <T extends IBroadcastProducer> List<T> getBroadcastProducersByType(Class<T> clazz) {
         List<T> result = new ArrayList<>();
-        for(ABroadcastProducer producer : OWNED_PRODUCERS.values()) {
+        for(IBroadcastProducer producer : OWNED_PRODUCERS.values()) {
             if(producer.getClass().equals(clazz)) {
                 result.add((T)producer);
             }
@@ -52,7 +54,7 @@ public class BroadcastManager {
     }
 
     private static void clearProducers() {
-        for(ABroadcastProducer producer : OWNED_PRODUCERS.values()) {
+        for(IBroadcastProducer producer : OWNED_PRODUCERS.values()) {
             try {
                 producer.close();
             } catch(Exception e) {}
@@ -61,15 +63,20 @@ public class BroadcastManager {
     }
 
     // Consumer
-    protected static void registerConsumers(BroadcastConsumerHolder holder) {
-        removeOwnedBroadcastConsumers(holder.getOwnerId());
+    public static void registerConsumers(BroadcastConsumerInventoryHolder holder) {
+        BroadcastConsumerInventoryHolder existing = OWNED_CONSUMERS.get(holder.getOwnerId());
+
+        if(existing != null && !existing.isEmpty()) {
+            MIMIMod.LOGGER.warn("Attempted to register new consumers for owner ID that already has non-closed consumers: " + holder.getOwnerId());
+            return;
+        }
 
         if(!holder.isEmpty()) {
             OWNED_CONSUMERS.put(holder.getOwnerId(), holder);
-            for(ABroadcastConsumer consumer : holder.getConsumers()) {
+            for(IBroadcastConsumer consumer : holder.getConsumers()) {
                 LINKED_CONSUMERS.computeIfAbsent(consumer.getLinkedId(), (id) -> new ArrayList<>()).add(consumer);
                 
-                ABroadcastProducer linkedProducer = OWNED_PRODUCERS.get(consumer.getLinkedId());
+                IBroadcastProducer linkedProducer = OWNED_PRODUCERS.get(consumer.getLinkedId());
     
                 if(linkedProducer != null) {
                     linkedProducer.reindex();
@@ -78,35 +85,35 @@ public class BroadcastManager {
         }
     }
 
-    public static BroadcastConsumerHolder getOwnedBroadcastConsumers(UUID ownerId) {
+    public static BroadcastConsumerInventoryHolder getOwnedBroadcastConsumers(UUID ownerId) {
         return OWNED_CONSUMERS.get(ownerId);
     }
 
     public static void removeOwnedBroadcastConsumers(UUID ownerId) {
-        BroadcastConsumerHolder removedConsumers = OWNED_CONSUMERS.remove(ownerId);
+        BroadcastConsumerInventoryHolder removedConsumers = OWNED_CONSUMERS.remove(ownerId);
 
         if(removedConsumers != null) {
-            for(ABroadcastConsumer consumer : removedConsumers.getConsumers()) {  
+            for(IBroadcastConsumer consumer : removedConsumers.getConsumers()) {  
                 if(consumer.getLinkedId() != null) {
-                    List<ABroadcastConsumer> linkedConsumerList = LINKED_CONSUMERS.get(consumer.getLinkedId());
+                    List<IBroadcastConsumer> linkedConsumerList = LINKED_CONSUMERS.get(consumer.getLinkedId());
                     if(linkedConsumerList != null) {
                         linkedConsumerList.remove(consumer);
                     }
                     
-                    ABroadcastProducer linkedProducer = OWNED_PRODUCERS.get(consumer.getLinkedId());
+                    IBroadcastProducer linkedProducer = OWNED_PRODUCERS.get(consumer.getLinkedId());
                     if(linkedProducer != null) {
                         linkedProducer.reindex();
                     }
                 }
-                consumer.onRemoved();
+                consumer.onConsumerRemoved();
             }
         }
     }
 
     private static void clearConsumers() {
-        for(BroadcastConsumerHolder holder : OWNED_CONSUMERS.values()) {
-            for(ABroadcastConsumer consumer : holder.getConsumers()) {
-                consumer.onRemoved();
+        for(BroadcastConsumerInventoryHolder holder : OWNED_CONSUMERS.values()) {
+            for(IBroadcastConsumer consumer : holder.getConsumers()) {
+                consumer.onConsumerRemoved();
             }
         }
         OWNED_CONSUMERS.clear();
@@ -114,13 +121,13 @@ public class BroadcastManager {
 
     // Events
     public static void onServerTick() {
-        for(ABroadcastProducer producer : OWNED_PRODUCERS.values()) {
-            producer.tick();
+        for(IBroadcastProducer producer : OWNED_PRODUCERS.values()) {
+            producer.tickProducer();
         }
 
-        for(BroadcastConsumerHolder holder : OWNED_CONSUMERS.values()) {
-            for(ABroadcastConsumer consumer : holder.getConsumers()) {
-                consumer.tick();
+        for(BroadcastConsumerInventoryHolder holder : OWNED_CONSUMERS.values()) {
+            for(IBroadcastConsumer consumer : holder.getConsumers()) {
+                consumer.tickConsumer();
             }
         }
     }

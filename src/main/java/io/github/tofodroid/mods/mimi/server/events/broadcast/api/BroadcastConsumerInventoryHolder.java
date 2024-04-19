@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.consumer;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,11 +7,11 @@ import java.util.UUID;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
-public class BroadcastConsumerHolder {
+public class BroadcastConsumerInventoryHolder {
     private final UUID ownerId;
-    private final Map<Integer, ABroadcastConsumer> holderMap = new Int2ObjectArrayMap<>();
+    private final Map<Integer, IBroadcastConsumer> holderMap = new Int2ObjectArrayMap<>();
 
-    public BroadcastConsumerHolder(UUID ownerId) {
+    public BroadcastConsumerInventoryHolder(UUID ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -19,19 +19,19 @@ public class BroadcastConsumerHolder {
         return holderMap.isEmpty();
     }
 
-    public void putConsumer(Integer slot, ABroadcastConsumer consumer) {
+    public void putConsumer(Integer slot, IBroadcastConsumer consumer) {
         this.holderMap.put(slot, consumer);
     }
 
-    public ABroadcastConsumer removeConsumer(Integer slot) {
+    public IBroadcastConsumer removeConsumer(Integer slot) {
         return this.holderMap.remove(slot);
     }
 
-    public ABroadcastConsumer getConsumer(Integer slot) {
+    public IBroadcastConsumer getConsumer(Integer slot) {
         return holderMap.get(slot);
     }
 
-    public List<ABroadcastConsumer> getConsumers() {
+    public List<IBroadcastConsumer> getConsumers() {
         if(holderMap.isEmpty()) {
             return new ArrayList<>(0);
         }

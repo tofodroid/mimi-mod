@@ -9,6 +9,7 @@ import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
+import io.github.tofodroid.mods.mimi.util.MathUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -146,25 +147,25 @@ public class GuiEffectEmitter extends BaseGui {
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOL_DOWN_BUTTON_COORDS))) {
             Byte volume = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5);
             addAmount = mouseModifier ? 2 : addAmount;
-            volume = this.addClamped(volume, -addAmount, 0, 10);
+            volume = MathUtils.addClamped(volume, -addAmount, 0, 10);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.VOLUME_TAG, volume);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOL_UP_BUTTON_COORDS))) {
             Byte volume = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5);
             addAmount = mouseModifier ? 2 : addAmount;
-            volume = this.addClamped(volume, addAmount, 0, 10);
+            volume = MathUtils.addClamped(volume, addAmount, 0, 10);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.VOLUME_TAG, volume);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PITCH_DOWN_BUTTON_COORDS))) {
             Byte pitch = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            pitch = this.addClamped(pitch, -addAmount, -2, 2);
+            pitch = MathUtils.addClamped(pitch, -addAmount, -2, 2);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PITCH_TAG, pitch);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PITCH_UP_BUTTON_COORDS))) {
             Byte pitch = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            pitch = this.addClamped(pitch, addAmount, -2, 2);
+            pitch = MathUtils.addClamped(pitch, addAmount, -2, 2);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PITCH_TAG, pitch);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_PARTICLE_BUTTON_COORDS))) {
@@ -172,118 +173,102 @@ public class GuiEffectEmitter extends BaseGui {
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SIDE_DOWN_BUTTON_COORDS))) {
             Byte side = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            side = this.addClamped(side, -addAmount, 0, 5);
+            side = MathUtils.addClamped(side, -addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SIDE_TAG, side);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SIDE_UP_BUTTON_COORDS))) {
             Byte side = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            side = this.addClamped(side, addAmount, 0, 5);
+            side = MathUtils.addClamped(side, addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SIDE_TAG, side);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPREAD_DOWN_BUTTON_COORDS))) {
             Byte spread = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            spread = this.addClamped(spread, -addAmount, 0, 5);
+            spread = MathUtils.addClamped(spread, -addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPREAD_TAG, spread);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPREAD_UP_BUTTON_COORDS))) {
             Byte spread = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            spread = this.addClamped(spread, addAmount, 0, 5);
+            spread = MathUtils.addClamped(spread, addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPREAD_TAG, spread);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(COUNT_DOWN_BUTTON_COORDS))) {
             Byte count = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1);
             addAmount = mouseModifier ? 5 : addAmount;
-            count = this.addClamped(count, -addAmount, 1, 20);
+            count = MathUtils.addClamped(count, -addAmount, 1, 20);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.COUNT_TAG, count);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(COUNT_UP_BUTTON_COORDS))) {
             Byte count = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1);
             addAmount = mouseModifier ? 5 : addAmount;
-            count = this.addClamped(count, addAmount, 1, 20);
+            count = MathUtils.addClamped(count, addAmount, 1, 20);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.COUNT_TAG, count);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_X_DOWN_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, -addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, -addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_X_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_X_UP_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_X_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Y_DOWN_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, -addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, -addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Y_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Y_UP_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Y_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Z_DOWN_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, -addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, -addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Z_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Z_UP_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Z_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(S_LOOP_DOWN_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, -addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, -addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(S_LOOP_UP_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_DOWN_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, -addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, -addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_UP_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         }
 
         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
-    }
-
-    public Byte addClamped(Byte value, Integer add, Integer min, Integer max) {
-        return addClamped(value.intValue(), add, min, max).byteValue();
-    }
-
-    public Integer addClamped(Integer value, Integer add, Integer min, Integer max) {
-        Integer result = value + add;
-
-        if(result < min) {
-            result = min;
-        } else if(result > max) {
-            result = max;
-        }
-
-        return result;
     }
 
     public void syncEffectEmitterToServer() {
