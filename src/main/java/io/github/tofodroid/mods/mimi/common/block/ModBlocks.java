@@ -24,10 +24,10 @@ public class ModBlocks {
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro(Properties.of(Material.METAL)));
     public static final BlockConductor CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockConductor(Properties.of(Material.METAL)));
     public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter(Properties.of(Material.METAL)));
+    public static final BlockRelay RELAY = create(BlockRelay.REGISTRY_NAME, new BlockRelay(Properties.of(Material.METAL)));
 
     // Legacy Compat
     public static final BlockBroadcaster BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockBroadcaster(Properties.of(Material.METAL)));
-
 
     // Village Blocks
     public static final BlockTuningTable TUNINGTABLE = create(BlockTuningTable.REGISTRY_NAME, new BlockTuningTable(Properties.of(Material.METAL)));

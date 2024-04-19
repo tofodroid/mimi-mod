@@ -76,6 +76,7 @@
   "block.mimi.receiver": "Receiver",
   "block.mimi.mechanicalmaestro": "Mechanical Maestro",
   "block.mimi.effectemitter": "Effect Emitter",
+  "block.mimi.relay": "Relay",
   "block.mimi.conductor.wip": "Coming Soon!",
   "block.mimi.conductor": "Conductor - Coming Soon",
   "block.mimi.piano": "Piano (Grand)",

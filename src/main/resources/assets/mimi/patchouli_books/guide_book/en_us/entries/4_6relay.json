@@ -1,0 +1,25 @@
+{
+    "name": "Relay",
+    "icon": "mimi:relay",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "Relay",
+            "item": "mimi:relay",
+            "text": "The Relay is a block that can be linked to a Transmitter (or another Relay) and then can rebroadcast any notes that are broadcast to it with a much greater range.$(br2)Using the Relay's settings, notes can be re-mapped to different channels."
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "Recipe",
+            "recipe": "mimi:relay",
+            "text": "Settings can be copied from one Relay to another by placing two directly next to eachother in a crafting grid. The settings from the one on the left will be coped to the one on the right."
+        },
+        {
+            "type": "patchouli:text",
+            "title": "Settings",
+            "text": "$(li)$(l)Channel Map$(): Which channels the Relay should recieve notes from and which channels it should broadcast those notes out to.$(br)$(li)$(l)Transmission Source$(): The Transmitter or Relay this Relay is linked to. Link by setting to yourself from the Receiver Screen or right-clicking a player / Server Transmitter block with the Receiver."
+        }
+    ],
+    "sortnum": 5
+}

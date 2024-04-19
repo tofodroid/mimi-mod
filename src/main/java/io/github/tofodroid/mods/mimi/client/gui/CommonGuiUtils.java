@@ -42,6 +42,16 @@ public abstract class CommonGuiUtils {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
     }
 
+    public static String formatNumberAsString(Integer value, Integer minDigits, Boolean includePlus) {
+        String numberString = value.toString();
+
+        if(value < 0) {
+            numberString = numberString.substring(1);
+        }
+    
+        return (value < 0 ? "-" : (includePlus ? "+" : "")) + (numberString.length() < minDigits ? "0".repeat(minDigits-numberString.length()) + numberString : numberString);
+    }
+
     public static String truncateString(Font font, String source, Integer maxWidth) {
         if(source == null || font.width(source) <= maxWidth) {
             return source;

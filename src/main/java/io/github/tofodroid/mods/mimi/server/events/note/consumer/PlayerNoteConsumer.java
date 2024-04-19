@@ -3,12 +3,12 @@ package io.github.tofodroid.mods.mimi.server.events.note.consumer;
 import java.util.ArrayList;
 import java.util.Map;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetMidiEvent;
 import io.github.tofodroid.mods.mimi.forge.common.NetworkManager;
 import io.github.tofodroid.mods.mimi.server.events.note.NoteEvent;
+import io.github.tofodroid.mods.mimi.server.events.note.api.ANoteConsumer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -31,7 +31,6 @@ public class PlayerNoteConsumer extends ANoteConsumer {
     @Override
     protected Boolean willHandleNoteOn(NoteEvent message) {
         if(message.senderId != null) {
-            MIMIMod.LOGGER.info("Event has sender: " + message.senderId);
             return !this.player.getUUID().equals(message.senderId);
         }
         return true;

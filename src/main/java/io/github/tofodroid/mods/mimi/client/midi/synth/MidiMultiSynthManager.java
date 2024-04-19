@@ -165,6 +165,7 @@ public class MidiMultiSynthManager {
                 } else if(message.velocity <= 0) {
                     localSynth.noteOff(message, TimeUtils.getNowTime());
                 }
+                this.sendToGui(message);
             } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
                 localSynth.controlChange(message, TimeUtils.getNowTime());
             }

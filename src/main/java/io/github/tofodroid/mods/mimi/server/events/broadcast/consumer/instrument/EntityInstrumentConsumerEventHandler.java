@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast;
+package io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,12 +7,9 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
-import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.ABroadcastConsumer;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.BroadcastConsumerHolder;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.InstrumentBroadcastConsumer;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.ReceiverBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastConsumer;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,40 +18,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
-public class BroadcastManagerConsumerEventHooks {
+public class EntityInstrumentConsumerEventHandler {
     private static final List<InteractionHand> ENTITY_INSTRUMENT_ITER = Collections.unmodifiableList(
         Arrays.asList(InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND, null)
     );
 
-    public static void reloadMechanicalMaestroInstrumentConsumers(TileMechanicalMaestro tile) {
-        if(tile == null || tile.getLevel() == null || !(tile.getLevel() instanceof ServerLevel)) {
-            return;
-        }
-
-        BroadcastConsumerHolder holder = new BroadcastConsumerHolder(tile.getUUID());
-
-        for(int i = 0; i < tile.getInstrumentStacks().size(); i++) {
-            ItemStack instrumentStack = tile.getInstrumentStacks().get(i);
-            if(instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
-                holder.putConsumer(i, new InstrumentBroadcastConsumer(
-                    tile.getBlockPos(),
-                    tile.getLevel().dimension(),
-                    tile.getUUID(),
-                    instrumentStack,
-                    null
-                ));
-            }
-        }
-
-        BroadcastManager.registerConsumers(holder);
-    }
-
+    @SuppressWarnings("resource")
     public static void reloadEntityInstrumentConsumers(LivingEntity entity) {
         if(entity == null || entity.getLevel() == null || !(entity.getLevel() instanceof ServerLevel)) {
             return;
         }
 
-        BroadcastConsumerHolder holder = new BroadcastConsumerHolder(entity.getUUID());
+        BroadcastConsumerInventoryHolder holder = new BroadcastConsumerInventoryHolder(entity.getUUID());
 
         for(int i = 0; i < ENTITY_INSTRUMENT_ITER.size(); i++) {
             InteractionHand hand = ENTITY_INSTRUMENT_ITER.get(i);
@@ -73,20 +48,7 @@ public class BroadcastManagerConsumerEventHooks {
             }
         }
 
-        BroadcastManager.registerConsumers(holder);
-    }
-
-    public static void reloadReceiverTileConsumer(TileReceiver tile) { 
-        if(tile == null || tile.getLevel() == null || !(tile.getLevel() instanceof ServerLevel)) {
-            return;
-        }
-
-        BroadcastConsumerHolder holder = new BroadcastConsumerHolder(tile.getUUID());
-
-        if(MidiNbtDataUtils.getMidiSource(tile.getSourceStack()) != null) {
-            holder.putConsumer(0, new ReceiverBroadcastConsumer(tile));
-        }
-    
+        BroadcastManager.removeOwnedBroadcastConsumers(holder.getOwnerId());
         BroadcastManager.registerConsumers(holder);
     }
 
@@ -127,10 +89,10 @@ public class BroadcastManagerConsumerEventHooks {
     }
 
     private static void allInstrumentConsumerNotesOff(UUID ownerId) {
-        BroadcastConsumerHolder holder = BroadcastManager.getOwnedBroadcastConsumers(ownerId);
+        BroadcastConsumerInventoryHolder holder = BroadcastManager.getOwnedBroadcastConsumers(ownerId);
 
         if(holder != null) {
-            for(ABroadcastConsumer consumer : holder.getConsumers()) {
+            for(IBroadcastConsumer consumer : holder.getConsumers()) {
                 if(consumer instanceof InstrumentBroadcastConsumer) {
                     ((InstrumentBroadcastConsumer)consumer).sendAllNotesOff();
                 }

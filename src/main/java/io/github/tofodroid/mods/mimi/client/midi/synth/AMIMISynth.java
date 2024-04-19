@@ -109,11 +109,18 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
                 channelAssignmentMap.put(channel, createChannelId(message));
             }
         }
-
         if(channel != null) {
             try {
                 channel.noteOn(message.pos);
-                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_ON, channel.getChannelNumber(), message.note, message.velocity), getSynthEventTimestamp(timestamp));
+                this.internalSynthReceiver.send(
+                    new ShortMessage(
+                        ShortMessage.NOTE_ON,
+                        channel.getChannelNumber(),
+                        message.note,
+                        message.velocity
+                    ),
+                    getSynthEventTimestamp(timestamp)
+                );
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle note on: ", e);
             }

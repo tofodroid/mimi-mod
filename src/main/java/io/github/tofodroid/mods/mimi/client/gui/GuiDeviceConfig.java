@@ -13,13 +13,18 @@ import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputDeviceManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
 
-public class GuiDeviceonfig extends BaseGui {    
+public class GuiDeviceConfig extends BaseGui {    
     // Button Boxes
     private static final Vector2Int AUDIO_DEVICE_BUTTON = new Vector2Int(7, 25);
+    private static final Vector2Int VOLUME_DOWN_BUTTON = new Vector2Int(152, 26);
+    private static final Vector2Int VOLUME_UP_BUTTON = new Vector2Int(186, 26);
     private static final Vector2Int MIDI_DEVICE_BUTTON = new Vector2Int(211, 25);
+    private static final Vector2Int VELO_DOWN_BUTTON = new Vector2Int(137, 26);
+    private static final Vector2Int VELO_UP_BUTTON = new Vector2Int(186, 26);
 
     private static final Vector2Int REFRESH_DEVICES_BUTTON = new Vector2Int(266,114);
     private static final Vector2Int SHIFT_DEVICE_DOWN_BUTTON = new Vector2Int(8,114);
@@ -27,6 +32,8 @@ public class GuiDeviceonfig extends BaseGui {
     private static final Vector2Int SAVE_DEVICE_BUTTON = new Vector2Int(266,164);
 
     // Text Boxes
+    private static final Vector2Int VOLUME_BOX = new Vector2Int(171, 30);
+    private static final Vector2Int VELO_BOX = new Vector2Int(156, 30);
     private static final Vector2Int MIDI_DEVICE_NAME_BOX = new Vector2Int(51, 51);
     private static final Vector2Int MIDI_DEVICE_STATUS_BOX = new Vector2Int(51, 66);
     private static final Vector2Int AUDIO_DEVICE_NAME_BOX = new Vector2Int(51, 46);
@@ -45,7 +52,7 @@ public class GuiDeviceonfig extends BaseGui {
     private List<Mixer> availableAudioDevices;
     private List<String> availableAudioDeviceDisplayNames;
 
-    public GuiDeviceonfig(Player player) {
+    public GuiDeviceConfig(Player player) {
         super(288, 187, 288, "textures/gui/gui_midi_config.png",  "item.MIMIMod.gui_midi_input_config");
         
         // MIDI
@@ -86,6 +93,12 @@ public class GuiDeviceonfig extends BaseGui {
                 visibleDeviceId = visibleDeviceId < (this.availableAudioDevices.size() - 1) ? visibleDeviceId + 1 : visibleDeviceId;
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_DOWN_BUTTON))) {
                 visibleDeviceId = visibleDeviceId > -1 ? visibleDeviceId - 1 : visibleDeviceId;
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOLUME_UP_BUTTON))) {
+                Integer volume = ModConfigs.CLIENT.audioDeviceVolume.get();
+                ModConfigs.CLIENT.audioDeviceVolume.set(volume < 10 ? volume + 1 : volume);
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOLUME_DOWN_BUTTON))) {
+                Integer volume = ModConfigs.CLIENT.audioDeviceVolume.get();
+                ModConfigs.CLIENT.audioDeviceVolume.set(volume > 0 ? volume - 1 : volume);
             }
         } else if(!audioMode) {
             if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_DEVICES_BUTTON))) {
@@ -97,6 +110,12 @@ public class GuiDeviceonfig extends BaseGui {
                 visibleDeviceId = visibleDeviceId < (this.availableMidiDevices.size() - 1) ? visibleDeviceId + 1 : visibleDeviceId;
             } else if(this.availableMidiDevices != null  && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_DOWN_BUTTON))) {
                 visibleDeviceId = visibleDeviceId > 0 ? visibleDeviceId - 1 : visibleDeviceId;
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VELO_UP_BUTTON))) {
+                Integer velocity = ModConfigs.CLIENT.midiDeviceVelocity.get();
+                ModConfigs.CLIENT.midiDeviceVelocity.set(velocity < 127 ? velocity + 1 : velocity);
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VELO_DOWN_BUTTON))) {
+                Integer velocity = ModConfigs.CLIENT.midiDeviceVelocity.get();
+                ModConfigs.CLIENT.midiDeviceVelocity.set(velocity > -127 ? velocity - 1 : velocity);
             }
         }
         
@@ -104,7 +123,7 @@ public class GuiDeviceonfig extends BaseGui {
     }
 
     @Override
-    protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
+    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Background
         this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, GUI_WIDTH, GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
@@ -117,8 +136,11 @@ public class GuiDeviceonfig extends BaseGui {
     }
 
     @Override
-    protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
+    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if(this.audioMode) {
+            // Volume
+            this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ModConfigs.CLIENT.audioDeviceVolume.get(), 2, false), START_X + VOLUME_BOX.x(), START_Y + VOLUME_BOX.y(), 0xFF00E600);
+
             // Selected Device Name / Status
             List<String> nameLines = CommonGuiUtils.wrapString(font, this.synthManager.audioDeviceManager.getCurrentDeviceName(), 228, 2);
             if(!nameLines.isEmpty()) {
@@ -165,6 +187,15 @@ public class GuiDeviceonfig extends BaseGui {
                 }
             }
         } else {
+            // Velocity
+            Integer velo = ModConfigs.CLIENT.midiDeviceVelocity.get();
+
+            if(velo == 0) {
+                this.drawStringAbsolute(graphics, "Input", START_X + VELO_BOX.x(), START_Y + VELO_BOX.y(), 0xFF00E600);
+            } else {
+                this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ModConfigs.CLIENT.midiDeviceVelocity.get(), 3, true), START_X + VELO_BOX.x(), START_Y + VELO_BOX.y(), 0xFF00E600);
+            }
+
             // Selected Device Name / Status
             if(this.midiDeviceManager.isDeviceSelected()) {
                 this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, this.midiDeviceManager.getSelectedDeviceName(), 228), START_X + MIDI_DEVICE_NAME_BOX.x(), START_Y + MIDI_DEVICE_NAME_BOX.y(), 0xFF00E600);
