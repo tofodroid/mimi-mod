@@ -18,8 +18,8 @@
         {
             "type": "patchouli:text",
             "title": "Settings",
-            "text": "$(li)$(l)Channel Map$(): Which channels the Relay should recieve notes from and which channels it should broadcast those notes out to.$(br)$(li)$(l)Transmission Source$(): The Transmitter or Relay this Relay is linked to. Link by setting to yourself from the Receiver Screen or right-clicking a player / Server Transmitter block with the Receiver."
+            "text": "$(li)$(l)Channel Map$(): Which channels the Relay should recieve notes from and which channels it should broadcast those notes out to.$(br)$(li)$(l)Transmission Source$(): The Transmitter or Relay this Relay is linked to. Link by setting to yourself from the Receiver Screen or right-clicking a player / block with the Receiver."
         }
     ],
-    "sortnum": 5
+    "sortnum": 6
 }
