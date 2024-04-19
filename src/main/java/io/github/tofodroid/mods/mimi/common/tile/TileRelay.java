@@ -22,6 +22,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     public static final String REGISTRY_NAME = "relay";
 
     protected UUID linkedId;
+    protected List<Byte> enabledChannelsList;
     protected Byte broadcastRange;
     protected Byte[] channelMap;
 
@@ -40,16 +41,15 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     public void cacheMidiSettings() {
         super.cacheMidiSettings();
 
-        // Stop all notes
-        this.allNotesOff();
-
         // Remove old consumers before changing linked ID
         if(this.hasLevel() && !this.getLevel().isClientSide) {
-
+            // Stop all notes
+            this.allNotesOff();
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
 
         this.linkedId = MidiNbtDataUtils.getMidiSource(this.getSourceStack());
+        this.enabledChannelsList = MidiNbtDataUtils.getEnabledChannelsList(getSourceStack());
         this.broadcastRange = MidiNbtDataUtils.getBroadcastRange(this.getSourceStack());
         this.channelMap = MidiNbtDataUtils.getChannelMap(this.getSourceStack());
 
@@ -125,6 +125,11 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     @Override
     public UUID getOwnerId() {
         return this.getUUID();
+    }
+
+    @Override
+    public List<Byte> getEnabledChannelsList() {
+        return this.enabledChannelsList;
     }
 
     @Override
