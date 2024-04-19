@@ -2,8 +2,6 @@ package io.github.tofodroid.mods.mimi.common.block;
 
 import java.util.List;
 
-import com.mojang.serialization.MapCodec;
-
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
