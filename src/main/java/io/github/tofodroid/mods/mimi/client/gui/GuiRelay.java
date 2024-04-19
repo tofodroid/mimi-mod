@@ -8,7 +8,7 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -137,7 +137,7 @@ public class GuiRelay extends BaseGui {
 
     // Render Functions
     @Override
-    protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // GUI Background
         this.blitRelative(graphics, 0, 0, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT);
     
@@ -163,7 +163,7 @@ public class GuiRelay extends BaseGui {
     }
 
     @Override
-    protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         this.transmitSource.renderText(graphics, font, mouseX, mouseY);
         this.broadcastRange.renderText(graphics, font, mouseX, mouseY);
 
