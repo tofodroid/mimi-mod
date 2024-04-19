@@ -5,9 +5,8 @@ import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.SortedArraySet;
-import java.util.List;
 import net.minecraft.world.item.ItemStack;
+import java.util.List;
 
 public class MidiChannelToggleWidget extends BaseWidget {
     private static final Vector2Int ALL_MIDI_BUTTON_COORDS = new Vector2Int(3, 17);
