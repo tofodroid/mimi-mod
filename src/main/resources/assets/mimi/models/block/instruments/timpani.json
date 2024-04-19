@@ -175,6 +175,7 @@
 			"rotation": [0, 180, 0]
 		},
 		"fixed": {
+			"translation": [0, 1, 0],
 			"rotation": [0, 180, 0]
 		}
 	}
