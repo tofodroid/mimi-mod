@@ -72,7 +72,7 @@ public class BlockLedCube extends AColoredBlock {
          if(!worldIn.isClientSide) {
             Integer dyeId = state.getValue(DYE_ID);
             worldIn.setBlock(pos, state.setValue(DYE_ID, dyeId < 15 ? (dyeId + 1) : 0), 2);
-            worldIn.playSound(null, pos, SoundEvents.NOTE_BLOCK_BELL.get(), SoundSource.BLOCKS);
+            worldIn.playSound(null, pos, SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.BLOCKS);
          }
          return InteractionResult.SUCCESS;
       }

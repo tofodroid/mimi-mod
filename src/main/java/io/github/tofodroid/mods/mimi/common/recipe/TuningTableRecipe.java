@@ -70,8 +70,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
 
     public static class Serializer implements RecipeSerializer<TuningTableRecipe> {
         public static final String REGISTRY_NAME = "tuning";
-        
-        @SuppressWarnings("deprecation")
+
         public static final Codec<ItemStack> ITEM_STACK_ITEM_CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(ItemStack::getItem)
             ).apply(instance, ItemStack::new)

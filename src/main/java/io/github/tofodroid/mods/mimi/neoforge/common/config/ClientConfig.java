@@ -1,10 +1,10 @@
-package io.github.tofodroid.mods.mimi.forge.common.config;
+package io.github.tofodroid.mods.mimi.neoforge.common.config;
 
 import java.util.Arrays;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-
-import net.minecraftforge.common.ForgeConfigSpec;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy.KEYBOARD_LAYOUTS;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 // 1. Default MIDI Input Device
 
@@ -14,32 +14,27 @@ public class ClientConfig {
     public static final String MIDI_PLAYER_CATEGORY_NAME = "MIDI Player";
     public static final String MIDI_INPUT_CATEGORY_NAME = "MIDI Input";
     public static final String MIDI_SYNTH_CATEGORY_NAME = "MIDI Synth";
-
-    // INSTRUMENT GUI
-    public static enum KEYBOARD_LAYOUTS {
-        MIMI,
-        VPiano
-    }
-    public ForgeConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
+    
+    public ModConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
 
     // MIDI INPUT
-    public ForgeConfigSpec.IntValue midiDeviceVelocity;
+    public ModConfigSpec.IntValue midiDeviceVelocity;
 
     // AUDIO
-    public ForgeConfigSpec.BooleanValue automaticAudioDevice;
-    public ForgeConfigSpec.ConfigValue<String> audioOutputDevice;
-    public ForgeConfigSpec.IntValue audioDeviceVolume;
+    public ModConfigSpec.BooleanValue automaticAudioDevice;
+    public ModConfigSpec.ConfigValue<String> audioOutputDevice;
+    public ModConfigSpec.IntValue audioDeviceVolume;
 
     // SYNTH
-    public ForgeConfigSpec.IntValue localBufferms;
-    public ForgeConfigSpec.BooleanValue jitterCorrection;
-    public ForgeConfigSpec.IntValue latency;
-    public ForgeConfigSpec.IntValue localLatency;
-    public ForgeConfigSpec.ConfigValue<Integer> synthSampleRate;
-    public ForgeConfigSpec.ConfigValue<Integer> synthBitRate;
-    public ForgeConfigSpec.ConfigValue<String> soundfontPath;
+    public ModConfigSpec.IntValue localBufferms;
+    public ModConfigSpec.BooleanValue jitterCorrection;
+    public ModConfigSpec.IntValue latency;
+    public ModConfigSpec.IntValue localLatency;
+    public ModConfigSpec.ConfigValue<Integer> synthSampleRate;
+    public ModConfigSpec.ConfigValue<Integer> synthBitRate;
+    public ModConfigSpec.ConfigValue<String> soundfontPath;
 
-    public ClientConfig(ForgeConfigSpec.Builder builder) {
+    public ClientConfig(ModConfigSpec.Builder builder) {
         builder.push(AUDIO_OUTPUT_CATEGORY_NAME);
         automaticAudioDevice = builder.comment("Whether or not MIMI should attempt to automatically determine the audio output device to use based on the Minecraft audio device. Works best on Windows.")
             .translation(MIMIMod.MODID + ".config.audio.automatic")

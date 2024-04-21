@@ -1,22 +1,22 @@
-package io.github.tofodroid.mods.mimi.forge.common.loot;
+package io.github.tofodroid.mods.mimi.neoforge.common.loot;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
-import net.minecraftforge.common.loot.LootModifier;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.common.loot.LootModifier;
 
 public class GenericAddDropLootModifier extends LootModifier {
     public static final Codec<GenericAddDropLootModifier> CODEC = RecordCodecBuilder.create(
         inst -> LootModifier.codecStart(inst)
         .and(
-                ForgeRegistries.ITEMS.getCodec().fieldOf("item").forGetter(m -> m.item)
+            BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(m -> m.item)
         )
         .apply(inst, GenericAddDropLootModifier::new)
     );

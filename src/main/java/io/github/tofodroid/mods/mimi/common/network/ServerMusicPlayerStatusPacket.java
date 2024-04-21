@@ -2,6 +2,8 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.UUID;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import io.netty.handler.codec.DecoderException;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -9,7 +11,8 @@ import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.Favor
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.LoopMode;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.SourceMode;
 
-public class ServerMusicPlayerStatusPacket {
+public class ServerMusicPlayerStatusPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerStatusPacket.class.getSimpleName().toLowerCase());
     private static final UUID NO_FILE_ID = new UUID(0,0);
 
     public final UUID musicPlayerId;
@@ -59,6 +62,16 @@ public class ServerMusicPlayerStatusPacket {
         this.loopMode = loopMode;
         this.favoriteMode = favoriteMode;
         this.sourceMode = sourceMode;
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ServerMusicPlayerStatusPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        ServerMusicPlayerStatusPacket.encodePacket(this, buf);
     }
     
     public static ServerMusicPlayerStatusPacket decodePacket(FriendlyByteBuf buf) {

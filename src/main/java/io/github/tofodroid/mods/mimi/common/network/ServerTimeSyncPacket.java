@@ -2,8 +2,11 @@ package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public class ServerTimeSyncPacket {
+public class ServerTimeSyncPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerTimeSyncPacket.class.getSimpleName().toLowerCase());
     public final long currentServerMilli;
     public final Boolean firstRequest;
 
@@ -14,6 +17,16 @@ public class ServerTimeSyncPacket {
     public ServerTimeSyncPacket(long currentServerMilli, Boolean firstRequest) {
         this.currentServerMilli = currentServerMilli;
         this.firstRequest = firstRequest;
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ServerTimeSyncPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        ServerTimeSyncPacket.encodePacket(this, buf);
     }
 
     public static ServerTimeSyncPacket decodePacket(FriendlyByteBuf buf) {

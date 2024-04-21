@@ -1,7 +1,7 @@
-package io.github.tofodroid.mods.mimi.forge.server;
+package io.github.tofodroid.mods.mimi.neoforge.server;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public abstract class ServerAccessor {
     public static MinecraftServer getCurrentServer() {

@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.common;
 
-import io.github.tofodroid.mods.mimi.forge.common.CommonEventHooks;
+import io.github.tofodroid.mods.mimi.neoforge.common.CommonEventHooks;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

@@ -29,7 +29,7 @@ public abstract class APlaylistHandler {
     
     protected BasicMidiInfo selectedSongInfo = null;
     protected Integer selectedDisplayIndex = -1;
-    protected ArrayList<BasicMidiInfo> filteredSongs = null;
+    protected ArrayList<BasicMidiInfo> filteredSongs = new ArrayList<>();
     protected final UUID musicPlayerId;
 
     public abstract ArrayList<UUID> getFavoriteSongs();

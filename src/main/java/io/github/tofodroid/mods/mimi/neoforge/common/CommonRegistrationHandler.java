@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.forge.common;
+package io.github.tofodroid.mods.mimi.neoforge.common;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
@@ -9,10 +9,12 @@ import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import net.minecraft.core.registries.Registries;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public abstract class CommonRegistrationHandler {    
@@ -48,5 +50,11 @@ public abstract class CommonRegistrationHandler {
     @SubscribeEvent
     public static void postRegistrySetup(final FMLCommonSetupEvent event) {
         MIMIMod.postRegister();
+    }
+
+    @SubscribeEvent
+    public static void register(final RegisterPayloadHandlerEvent event) {
+        final IPayloadRegistrar registrar = event.registrar(MIMIMod.MODID);
+        NetworkManager.registerPackets(registrar);
     }
 }

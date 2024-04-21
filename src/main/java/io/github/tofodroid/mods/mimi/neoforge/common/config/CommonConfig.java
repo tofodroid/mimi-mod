@@ -1,7 +1,7 @@
-package io.github.tofodroid.mods.mimi.forge.common.config;
+package io.github.tofodroid.mods.mimi.neoforge.common.config;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 // 1. Default MIDI Input Device
 
@@ -10,10 +10,10 @@ public class CommonConfig {
     public static final String MOB_CATEGORY_NAME = "Mobs";
     public static final String MUSIC_PLAYER_CATEGORY_NAME = "Server Music";
 
-    public ForgeConfigSpec.BooleanValue enableInstrumentalistShop;
-    public ForgeConfigSpec.ConfigValue<String> allowedInstrumentMobs;
+    public ModConfigSpec.BooleanValue enableInstrumentalistShop;
+    public ModConfigSpec.ConfigValue<String> allowedInstrumentMobs;
 
-    public CommonConfig(ForgeConfigSpec.Builder builder) {
+    public CommonConfig(ModConfigSpec.Builder builder) {
         builder.push(WORLD_CATEGORY_NAME);
         enableInstrumentalistShop = builder.comment("Toggles whether Instrumentalist shops should generate in villages.")
             .translation(MIMIMod.MODID + ".config.server.world.village.instrumentalist")

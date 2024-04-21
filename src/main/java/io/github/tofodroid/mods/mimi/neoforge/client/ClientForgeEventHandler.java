@@ -1,19 +1,19 @@
-package io.github.tofodroid.mods.mimi.forge.client;
+package io.github.tofodroid.mods.mimi.neoforge.client;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
-import net.minecraftforge.client.event.InputEvent.Key;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut;
+import net.neoforged.neoforge.client.event.InputEvent.Key;
+import net.neoforged.neoforge.event.TickEvent.ClientTickEvent;
+import net.neoforged.neoforge.event.TickEvent.Phase;
+import net.neoforged.neoforge.event.TickEvent.PlayerTickEvent;
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
