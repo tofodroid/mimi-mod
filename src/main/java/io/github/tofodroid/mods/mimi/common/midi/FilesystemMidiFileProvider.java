@@ -186,7 +186,7 @@ public class FilesystemMidiFileProvider {
         List<LocalMidiInfo> allFiles = new ArrayList<>();
         try {
             for(File file : midiFiles) {
-                LocalMidiInfo info = LocalMidiInfo.fromFile(file);
+                LocalMidiInfo info = LocalMidiInfo.fromFile(file, isServer);
                 if(info != null) {
                     allFiles.add(info);
                 }

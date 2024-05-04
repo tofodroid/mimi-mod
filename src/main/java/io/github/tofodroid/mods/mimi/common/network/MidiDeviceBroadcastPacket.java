@@ -7,8 +7,11 @@ import javax.annotation.Nonnull;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public class MidiDeviceBroadcastPacket {
+public class MidiDeviceBroadcastPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MidiDeviceBroadcastPacket.class.getSimpleName().toLowerCase());
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 
     public final @Nonnull Byte channel;
@@ -49,6 +52,16 @@ public class MidiDeviceBroadcastPacket {
         this.player = player;
         this.pos = pos;
         this.noteServerTime = noteServerTime;
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return MidiDeviceBroadcastPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        MidiDeviceBroadcastPacket.encodePacket(this, buf);
     }
 
     public static MidiDeviceBroadcastPacket decodePacket(FriendlyByteBuf buf) {
