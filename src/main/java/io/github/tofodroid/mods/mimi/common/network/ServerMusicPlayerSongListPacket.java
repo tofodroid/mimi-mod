@@ -7,8 +7,11 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public class ServerMusicPlayerSongListPacket {
+public class ServerMusicPlayerSongListPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerSongListPacket.class.getSimpleName().toLowerCase());
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
 
     public final UUID musicPlayerId;
@@ -31,6 +34,16 @@ public class ServerMusicPlayerSongListPacket {
         } else {
             this.infos = infos;
         }
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ServerMusicPlayerSongListPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        ServerMusicPlayerSongListPacket.encodePacket(this, buf);
     }
 
     public static ServerMusicPlayerSongListPacket decodePacket(FriendlyByteBuf buf) {
