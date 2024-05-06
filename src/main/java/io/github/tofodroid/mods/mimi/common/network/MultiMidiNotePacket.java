@@ -9,19 +9,41 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
-public class MultiMidiNotePacket {
+public class MultiMidiNotePacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MultiMidiNotePacket.class.getSimpleName().toLowerCase());
+
     private final Map<Long, ArrayList<NetMidiEvent>> sourceMap;
     public final TreeMap<Long, List<MidiNotePacket>> resultPackets;
 
     public MultiMidiNotePacket(Map<Long, ArrayList<NetMidiEvent>> sourceMap) {
         this.sourceMap = sourceMap;
         this.resultPackets = new TreeMap<>();
+        
+        for(Map.Entry<Long, ArrayList<NetMidiEvent>> sourceEntry : sourceMap.entrySet()) {
+            List<MidiNotePacket> packets = new ArrayList<>();
+
+            for(NetMidiEvent event : sourceEntry.getValue()) {
+                packets.add(MidiNotePacket.fromNetMidiEvent(event, sourceEntry.getKey()));
+            }
+            resultPackets.put(sourceEntry.getKey(), packets);
+        }
     }
 
     public MultiMidiNotePacket(TreeMap<Long, List<MidiNotePacket>> packets) {
         this.resultPackets = packets;
         this.sourceMap = Map.of();
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return MultiMidiNotePacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        MultiMidiNotePacket.encodePacket(this, buf);
     }
 
     public static MultiMidiNotePacket decodePacket(FriendlyByteBuf buf) {

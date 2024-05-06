@@ -248,7 +248,7 @@ public class GuiTransmitterBlock extends BaseGui {
             this.drawStringAbsolute(graphics, font, "Song failed to load:", START_X + 12, START_Y + 153, 0xFF00E600);
             this.drawStringAbsolute(graphics, font, "It may be invalid or may have been deleted. Refresh the", START_X + 12, START_Y + 159, 0xFF00E600);
             this.drawStringAbsolute(graphics, font, "list with the button in the top right and select a new song.", START_X + 12, START_Y + 169, 0xFF00E600);
-        } else if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex < this.songList.infos.size()) {
+        } else if(this.musicStatus.fileIndex != null && this.musicStatus.fileIndex >= 0 && this.musicStatus.fileIndex < this.songList.infos.size()) {
             BasicMidiInfo info = this.songList.infos.get(this.musicStatus.fileIndex);
             this.drawStringAbsolute(graphics, font, CommonGuiUtils.truncateString(font, info.fileName, 264), START_X + 66, START_Y + 120, 0xFF00E600);
 

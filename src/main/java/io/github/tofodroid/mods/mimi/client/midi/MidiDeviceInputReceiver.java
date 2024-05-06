@@ -6,18 +6,16 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
-import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.util.MathUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.fml.LogicalSide;
 
 public class MidiDeviceInputReceiver implements Receiver {
     public static final Integer MAX_MIDI_DEVICE_VOLUME = 10;
@@ -26,9 +24,7 @@ public class MidiDeviceInputReceiver implements Receiver {
 
     public void send(MidiMessage msg, long timeStamp) {
         if(open && msg instanceof ShortMessage) {
-            LogicalSidedProvider.WORKQUEUE.get(LogicalSide.CLIENT).execute(() -> {
-                handleMessage((ShortMessage)msg);
-            });
+            handleMessage((ShortMessage)msg);
         }
     }
 
@@ -84,7 +80,7 @@ public class MidiDeviceInputReceiver implements Receiver {
     public void handleMidiNoteOn(Boolean transmit, Byte channel, ItemStack instrument, Byte midiNote, Byte velocity, Player player, InteractionHand handIn) {
         if(MIMIMod.getProxy().isClient()) {
             // Apply MIDI Input Device Config Velocity Adjuster
-            velocity = MathUtils.addClamped(velocity, ModConfigs.CLIENT.midiDeviceVelocity.get(), 0, 127);
+            velocity = MathUtils.addClamped(velocity, ConfigProxy.getMidiDeviceVelocity(), 0, 127);
 
             if(transmit) {
                 MidiDeviceBroadcastPacket packet = MidiDeviceBroadcastPacket.createNotePacket(channel, midiNote, velocity, player.getUUID(), player.getOnPos());

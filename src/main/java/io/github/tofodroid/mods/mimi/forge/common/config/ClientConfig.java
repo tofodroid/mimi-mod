@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.forge.common.config;
 import java.util.Arrays;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy.KEYBOARD_LAYOUTS;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -16,10 +17,6 @@ public class ClientConfig {
     public static final String MIDI_SYNTH_CATEGORY_NAME = "MIDI Synth";
 
     // INSTRUMENT GUI
-    public static enum KEYBOARD_LAYOUTS {
-        MIMI,
-        VPiano
-    }
     public ForgeConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
 
     // MIDI INPUT

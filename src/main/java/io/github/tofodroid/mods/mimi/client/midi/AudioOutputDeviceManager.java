@@ -18,7 +18,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import net.minecraft.client.Minecraft;
 
 public class AudioOutputDeviceManager {
@@ -56,8 +56,8 @@ public class AudioOutputDeviceManager {
 
         if(currentDevice != null) {
             AudioFormat targetFormat = new AudioFormat(
-                ModConfigs.CLIENT.synthSampleRate.get(), 
-                ModConfigs.CLIENT.synthBitRate.get(), 
+                ConfigProxy.getSynthSampleRate(), 
+                ConfigProxy.getSynthBitRate(), 
                 2, true, false
             );
 
@@ -71,27 +71,27 @@ public class AudioOutputDeviceManager {
     }
 
     public void setAutomaticDevice() {
-        ModConfigs.CLIENT.automaticAudioDevice.set(true);
-        ModConfigs.CLIENT.audioOutputDevice.set("");
+        ConfigProxy.setAutomaticAudioDevice(true);
+        ConfigProxy.setAudioOutputDevice("");
         refreshDevice();
     }
 
     public void setDevice(String deviceName) {
-        ModConfigs.CLIENT.automaticAudioDevice.set(false);
-        ModConfigs.CLIENT.audioOutputDevice.set(deviceName.trim());
+        ConfigProxy.setAutomaticAudioDevice(false);
+        ConfigProxy.setAudioOutputDevice(deviceName.trim());
         refreshDevice();
     }
 
     public String getCurrentDeviceName() {
-        if(ModConfigs.CLIENT.automaticAudioDevice.get()) {
+        if(ConfigProxy.getAutomaticAudioDevice()) {
             return "Auto: " + (this.targetDeviceId.getLeft().isBlank() ? "Default" : this.targetDeviceId.getLeft() + (this.targetDeviceId.getRight() > 0 ? " #" + (this.targetDeviceId.getRight()+1) : ""));
         } else {
-            return "Set: " + ModConfigs.CLIENT.audioOutputDevice.get();
+            return "Set: " + ConfigProxy.getAudioOutputDevice();
         }
     }
 
     public String getCurrentDeviceStatus() {
-        if(ModConfigs.CLIENT.automaticAudioDevice.get()) {
+        if(ConfigProxy.getAutomaticAudioDevice()) {
             if(currentDevice != null) {
                 if(currentLine == null) {
                     return "Device encountered an error. Outputting to system-provided device.";
@@ -128,7 +128,7 @@ public class AudioOutputDeviceManager {
         String targetDeviceName = null;
         Integer targetDeviceMatchNumber = 0;
 
-        if(ModConfigs.CLIENT.automaticAudioDevice.get()) {
+        if(ConfigProxy.getAutomaticAudioDevice()) {
             targetDeviceName = getMinecraftOutputDeviceName();
             
             // If there are multiple devices with the same name Minecraft appends a 1-indexed number to the end
@@ -136,8 +136,8 @@ public class AudioOutputDeviceManager {
                 targetDeviceMatchNumber = Integer.parseInt(targetDeviceName.substring(targetDeviceName.lastIndexOf("#")+1).trim())-1;
                 targetDeviceName = targetDeviceName.substring(0, targetDeviceName.lastIndexOf("#")).trim();
             }
-        } else if(!ModConfigs.CLIENT.audioOutputDevice.get().isBlank()) {
-            targetDeviceName = ModConfigs.CLIENT.audioOutputDevice.get().trim();
+        } else if(!ConfigProxy.getAudioOutputDevice().isBlank()) {
+            targetDeviceName = ConfigProxy.getAudioOutputDevice().trim();
             
             // If there are multiple devices with the same name MIMI appends a 1-indexed number to the end too :)
             if(targetDeviceName.toLowerCase().matches(".* #[0-9][0-9]*$")) {
