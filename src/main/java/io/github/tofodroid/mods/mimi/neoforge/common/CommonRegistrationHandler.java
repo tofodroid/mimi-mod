@@ -7,11 +7,19 @@ import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
+import io.github.tofodroid.mods.mimi.common.tile.AContainerTile;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
 import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import net.neoforged.neoforge.registries.RegisterEvent;
@@ -50,6 +58,18 @@ public abstract class CommonRegistrationHandler {
     @SubscribeEvent
     public static void postRegistrySetup(final FMLCommonSetupEvent event) {
         MIMIMod.postRegister();
+    }
+
+    @SubscribeEvent
+    public static void register(final RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModTiles.MECHANICALMAESTRO, CommonRegistrationHandler::genericInventoryTileHnalder);
+    }
+    
+    public static IItemHandler genericInventoryTileHnalder(BlockEntity blockEntity, Direction side) {
+        if (blockEntity instanceof AContainerTile container) {
+            return side != null ? new SidedInvWrapper(container, side) : new InvWrapper(container);
+        }
+        return null;
     }
 
     @SubscribeEvent
