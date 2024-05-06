@@ -19,10 +19,9 @@ import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.TransmitterSourceWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.SyncInstrumentPacket;
-import io.github.tofodroid.mods.mimi.forge.common.config.ClientConfig;
-import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
@@ -225,10 +224,10 @@ public class GuiInstrument extends BaseGui {
             // Keyboard Layout Hover Box
             if(imouseX >= (START_X + 222) && imouseY >= (START_Y + 28) && imouseX < (START_X + this.GUI_WIDTH) && imouseY < (START_Y + 50)) {
                 if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(KEYBOARD_LAYOUT_BUTTON_COORDS))) {
-                    if(ModConfigs.CLIENT.keyboardLayout.get().ordinal() < ClientConfig.KEYBOARD_LAYOUTS.values().length - 1) {
-                        ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[ModConfigs.CLIENT.keyboardLayout.get().ordinal()+1]);
+                    if(ConfigProxy.getKeyboardLayout().ordinal() < ConfigProxy.KEYBOARD_LAYOUTS.values().length - 1) {
+                        ConfigProxy.setKeyboardLayout(ConfigProxy.KEYBOARD_LAYOUTS.values()[ConfigProxy.getKeyboardLayout().ordinal()+1]);
                     } else {
-                        ModConfigs.CLIENT.keyboardLayout.set(ClientConfig.KEYBOARD_LAYOUTS.values()[0]);
+                        ConfigProxy.setKeyboardLayout(ConfigProxy.KEYBOARD_LAYOUTS.values()[0]);
                     }
                     this.releaseHeldNotes();
                 }
@@ -477,7 +476,7 @@ public class GuiInstrument extends BaseGui {
 
     // Keyboard Input Functions
     private Set<Byte> getMidiNoteFromScanCode(Integer scanCode, Boolean modifier, Boolean ignoreModifier) {
-        switch(ModConfigs.CLIENT.keyboardLayout.get()) {
+        switch(ConfigProxy.getKeyboardLayout()) {
             case MIMI:
                 return Arrays.asList(getMidiNoteFromScanCode_MIMI(scanCode))
                     .stream().filter(b -> b != null).collect(Collectors.toSet());
@@ -532,7 +531,7 @@ public class GuiInstrument extends BaseGui {
         this.blitAbsolute(graphics, guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y - 1, keyboardTextureShift, 276, 308, 128, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Note Labels
-        if(ClientConfig.KEYBOARD_LAYOUTS.MIMI.equals(ModConfigs.CLIENT.keyboardLayout.get())) {
+        if(ConfigProxy.KEYBOARD_LAYOUTS.MIMI.equals(ConfigProxy.getKeyboardLayout())) {
             this.blitAbsolute(graphics, guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
         } else {
             if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
@@ -653,9 +652,9 @@ public class GuiInstrument extends BaseGui {
 
         // Keyboard Layout
         if(editMode) {
-            this.drawStringAbsolute(graphics, font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF003600);
+            this.drawStringAbsolute(graphics, font, ConfigProxy.getKeyboardLayout().toString(), START_X + 264, START_Y + 35, 0xFF003600);
         } else { 
-            this.drawStringAbsolute(graphics, font, ModConfigs.CLIENT.keyboardLayout.get().toString(), START_X + 264, START_Y + 35, 0xFF00E600);
+            this.drawStringAbsolute(graphics, font, ConfigProxy.getKeyboardLayout().toString(), START_X + 264, START_Y + 35, 0xFF00E600);
         }
 
         return graphics;

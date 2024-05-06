@@ -6,8 +6,11 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
-public class TransmitterControlPacket {
+public class TransmitterControlPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, TransmitterControlPacket.class.getSimpleName().toLowerCase());
+
     public enum CONTROL {
         PLAY,
         PAUSE,
@@ -69,6 +72,16 @@ public class TransmitterControlPacket {
         this.control = control != null ? control : CONTROL.UNKNOWN;
         this.controlData = Optional.empty();
         this.songId = Optional.empty();
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return TransmitterControlPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        TransmitterControlPacket.encodePacket(this, buf);
     }
     
     public static TransmitterControlPacket decodePacket(FriendlyByteBuf buf) {

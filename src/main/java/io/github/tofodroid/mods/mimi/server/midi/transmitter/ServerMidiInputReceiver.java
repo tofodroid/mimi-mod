@@ -7,7 +7,7 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiEvent;
-import io.github.tofodroid.mods.mimi.server.ServerExecutor;
+import io.github.tofodroid.mods.mimi.server.ServerExecutorProxy;
 
 
 public class ServerMidiInputReceiver implements Receiver {
@@ -21,7 +21,7 @@ public class ServerMidiInputReceiver implements Receiver {
     public synchronized void send(MidiMessage msg, long timeStamp) {
         if(open && msg instanceof ShortMessage) {
             BasicMidiEvent event = new BasicMidiEvent((ShortMessage)msg);
-            ServerExecutor.executeOnServerThread(() -> {
+            ServerExecutorProxy.executeOnServerThread(() -> {
                 handler.accept(event);
             });
         }
