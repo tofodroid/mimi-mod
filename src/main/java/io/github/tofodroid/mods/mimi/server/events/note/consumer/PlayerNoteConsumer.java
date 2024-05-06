@@ -6,7 +6,7 @@ import java.util.Map;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetMidiEvent;
-import io.github.tofodroid.mods.mimi.forge.common.NetworkManager;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.server.events.note.NoteEvent;
 import io.github.tofodroid.mods.mimi.server.events.note.api.ANoteConsumer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -82,7 +82,7 @@ public class PlayerNoteConsumer extends ANoteConsumer {
     @Override
     public void tick() {
         if(!packetCacheMap.isEmpty() && this.playerIsAlive()) {
-            NetworkManager.sendToPlayer(new MultiMidiNotePacket(packetCacheMap), this.player);
+            NetworkProxy.sendToPlayer(new MultiMidiNotePacket(packetCacheMap), this.player);
             packetCacheMap.clear();
         }
         cachedPos = this.player.getOnPos();

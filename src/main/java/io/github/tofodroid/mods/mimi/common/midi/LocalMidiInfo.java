@@ -10,8 +10,15 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 
 public class LocalMidiInfo {
-    public File file;
-    public UUID fileId;
+    public final Boolean serverFile;
+    public final File file;
+    public final UUID fileId;
+
+    private LocalMidiInfo(File file, UUID fileId, Boolean serverFile) {
+        this.serverFile = serverFile;
+        this.file = file;
+        this.fileId = fileId;
+    }
 
     public UUID getFileId() {
         return this.fileId;
@@ -27,7 +34,7 @@ public class LocalMidiInfo {
     }
 
     public BasicMidiInfo getBasicMidiInfo() {
-        return new BasicMidiInfo(file.getName(), fileId);
+        return new BasicMidiInfo(file.getName(), fileId, serverFile);
     }
 
     @Override
@@ -38,13 +45,10 @@ public class LocalMidiInfo {
         return ((LocalMidiInfo)other).getFileId().equals(this.getFileId());
     }
 
-    public static LocalMidiInfo fromFile(File file) {
+    public static LocalMidiInfo fromFile(File file, Boolean isServer) {
         if(file.exists()) {
             try {
-                LocalMidiInfo result = new LocalMidiInfo();
-                result.file = file;
-                result.fileId = LocalMidiInfo.createFileId(file);
-                return result;
+                return new LocalMidiInfo(file, LocalMidiInfo.createFileId(file), isServer);
             } catch(Exception e) {
                 MIMIMod.LOGGER.warn("Invalid MIDI file: " + file.getAbsolutePath());
             }

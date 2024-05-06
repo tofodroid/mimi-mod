@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
-import io.github.tofodroid.mods.mimi.server.ServerExecutor;
+import io.github.tofodroid.mods.mimi.server.ServerExecutorProxy;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.PlayerPlaylistHandler;
 import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,7 +16,7 @@ public class PlayerTransmitterBroadcastProducer extends ATransmitterBroadcastPro
     @Override
     protected Boolean isTransmitterStillValid() {
         if(this.player.isDeadOrDying()) {
-            this.player = ServerExecutor.getServerPlayerById(this.player.getUUID());
+            this.player = ServerExecutorProxy.getServerPlayerById(this.player.getUUID());
         }
 
         if(this.player != null && this.player.isAddedToWorld() && !this.player.isDeadOrDying()) {

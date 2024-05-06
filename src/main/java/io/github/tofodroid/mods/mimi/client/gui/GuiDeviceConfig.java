@@ -13,8 +13,8 @@ import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.client.midi.MidiInputDeviceManager;
 import io.github.tofodroid.mods.mimi.client.midi.synth.MidiMultiSynthManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import net.minecraft.world.entity.player.Player;
 
 public class GuiDeviceConfig extends BaseGui {    
@@ -94,11 +94,11 @@ public class GuiDeviceConfig extends BaseGui {
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_DOWN_BUTTON))) {
                 visibleDeviceId = visibleDeviceId > -1 ? visibleDeviceId - 1 : visibleDeviceId;
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOLUME_UP_BUTTON))) {
-                Integer volume = ModConfigs.CLIENT.audioDeviceVolume.get();
-                ModConfigs.CLIENT.audioDeviceVolume.set(volume < 10 ? volume + 1 : volume);
+                Integer volume = ConfigProxy.getAudioDeviceVolume();
+                ConfigProxy.setAudioDeviceVolume(volume < 10 ? volume + 1 : volume);
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOLUME_DOWN_BUTTON))) {
-                Integer volume = ModConfigs.CLIENT.audioDeviceVolume.get();
-                ModConfigs.CLIENT.audioDeviceVolume.set(volume > 0 ? volume - 1 : volume);
+                Integer volume = ConfigProxy.getAudioDeviceVolume();
+                ConfigProxy.setAudioDeviceVolume(volume > 0 ? volume - 1 : volume);
             }
         } else if(!audioMode) {
             if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_DEVICES_BUTTON))) {
@@ -111,11 +111,11 @@ public class GuiDeviceConfig extends BaseGui {
             } else if(this.availableMidiDevices != null  && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SHIFT_DEVICE_DOWN_BUTTON))) {
                 visibleDeviceId = visibleDeviceId > 0 ? visibleDeviceId - 1 : visibleDeviceId;
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VELO_UP_BUTTON))) {
-                Integer velocity = ModConfigs.CLIENT.midiDeviceVelocity.get();
-                ModConfigs.CLIENT.midiDeviceVelocity.set(velocity < 127 ? velocity + 1 : velocity);
+                Integer velocity = ConfigProxy.getMidiDeviceVelocity();
+                ConfigProxy.setMidiDeviceVelocity(velocity < 127 ? velocity + 1 : velocity);
             } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VELO_DOWN_BUTTON))) {
-                Integer velocity = ModConfigs.CLIENT.midiDeviceVelocity.get();
-                ModConfigs.CLIENT.midiDeviceVelocity.set(velocity > -127 ? velocity - 1 : velocity);
+                Integer velocity = ConfigProxy.getMidiDeviceVelocity();
+                ConfigProxy.setMidiDeviceVelocity(velocity > -127 ? velocity - 1 : velocity);
             }
         }
         
@@ -139,7 +139,7 @@ public class GuiDeviceConfig extends BaseGui {
     protected PoseStack renderText(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         if(this.audioMode) {
             // Volume
-            this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ModConfigs.CLIENT.audioDeviceVolume.get(), 2, false), START_X + VOLUME_BOX.x(), START_Y + VOLUME_BOX.y(), 0xFF00E600);
+            this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ConfigProxy.getAudioDeviceVolume(), 2, false), START_X + VOLUME_BOX.x(), START_Y + VOLUME_BOX.y(), 0xFF00E600);
 
             // Selected Device Name / Status
             List<String> nameLines = CommonGuiUtils.wrapString(font, this.synthManager.audioDeviceManager.getCurrentDeviceName(), 228, 2);
@@ -188,12 +188,12 @@ public class GuiDeviceConfig extends BaseGui {
             }
         } else {
             // Velocity
-            Integer velo = ModConfigs.CLIENT.midiDeviceVelocity.get();
+            Integer velo = ConfigProxy.getMidiDeviceVelocity();
 
             if(velo == 0) {
                 this.drawStringAbsolute(graphics, "Input", START_X + VELO_BOX.x(), START_Y + VELO_BOX.y(), 0xFF00E600);
             } else {
-                this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ModConfigs.CLIENT.midiDeviceVelocity.get(), 3, true), START_X + VELO_BOX.x(), START_Y + VELO_BOX.y(), 0xFF00E600);
+                this.drawStringAbsolute(graphics, CommonGuiUtils.formatNumberAsString(ConfigProxy.getMidiDeviceVelocity(), 3, true), START_X + VELO_BOX.x(), START_Y + VELO_BOX.y(), 0xFF00E600);
             }
 
             // Selected Device Name / Status

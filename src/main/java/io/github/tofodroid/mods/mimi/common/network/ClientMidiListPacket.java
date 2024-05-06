@@ -6,8 +6,10 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
-public class ClientMidiListPacket {
+public class ClientMidiListPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ClientMidiListPacket.class.getSimpleName().toLowerCase());
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
     public final List<BasicMidiInfo> infos;
 
@@ -22,6 +24,16 @@ public class ClientMidiListPacket {
         } else {
             this.infos = new ArrayList<BasicMidiInfo>(infos);
         }
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ClientMidiListPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        ClientMidiListPacket.encodePacket(this, buf);
     }
 
     public static ClientMidiListPacket decodePacket(FriendlyByteBuf buf) {

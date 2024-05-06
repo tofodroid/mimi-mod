@@ -1,24 +1,37 @@
 modLoader="javafml"
-license="MIT License"
-loaderVersion="[39,)"
-issueTrackerURL=""
-logoFile="logo.png"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
 
+# A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]]
-modId="mimi"
-displayName="MIMI"
-version="${file.jarVersion}"
-authors="tofodroid"
-description='''
-MIMI - Musical Instrument Minecraft Interface
-'''
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+logoFile="logo.png"
+issueTrackerURL="https://github.com/tofodroid/mimi-mod/issues"
+displayURL="https://github.com/tofodroid/mimi-mod"
+authors="${mod_authors}"
+description='''${mod_description}'''
 
-[[dependencies.mimi]]
-    modId="forge"
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
+# The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
+#[[mixins]]
+#config="${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+    modId="${engine_name}"
+    type="required"
     mandatory=true
-    versionRange="[43.0.0,)"
-[[dependencies.mimi]]
+    versionRange="${engine_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
     modId="minecraft"
+    type="required"
     mandatory=true
-    versionRange="[1.19.0, 1.19.3)"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
     side="BOTH"

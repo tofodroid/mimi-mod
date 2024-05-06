@@ -6,9 +6,12 @@ import io.github.tofodroid.mods.mimi.util.TagUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public class EffectEmitterUpdatePacket {
+public class EffectEmitterUpdatePacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, EffectEmitterUpdatePacket.class.getSimpleName().toLowerCase());
+
     public final BlockPos tilePos;
     public final String sound;
     public final String particle;
@@ -58,6 +61,16 @@ public class EffectEmitterUpdatePacket {
         this.sound_loop = sound_loop != null ? sound_loop : 0;
         this.particle_loop = particle_loop != null ? particle_loop : 0;
         this.invertSignal = invertSignal != null ? invertSignal : false;
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return EffectEmitterUpdatePacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        EffectEmitterUpdatePacket.encodePacket(this, buf);
     }
 
     public static EffectEmitterUpdatePacket decodePacket(FriendlyByteBuf buf) {
