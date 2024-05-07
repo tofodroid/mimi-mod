@@ -14,10 +14,10 @@ import net.minecraft.world.entity.player.Player;
 public class ClientProxy implements Proxy {
     private MidiMultiSynthManager MIDI_SYNTH;
     private MidiDataManager MIDI_DATA;
-    private FilesystemMidiFileProvider CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false, 0);
+    private FilesystemMidiFileProvider CLIENT_MIDI_FILES;
     
     // In singleplayer this proxy is used on server side, so we need both providers
-    private FilesystemMidiFileProvider SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
+    private FilesystemMidiFileProvider SERVER_MIDI_FILES;
     private Long startSyncEpoch = null;
     private Long serverStartEpoch = 0l;
     private Boolean initialized = false;
@@ -26,7 +26,11 @@ public class ClientProxy implements Proxy {
     public void init() {
         MIDI_SYNTH = new MidiMultiSynthManager();        
         MIDI_DATA = new MidiDataManager();
+    
+        CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false, 0);
         CLIENT_MIDI_FILES.refresh(true);
+
+        SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
         SERVER_MIDI_FILES.refresh(true);
         this.initialized = true;
     }
