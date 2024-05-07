@@ -17,9 +17,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
-import io.github.tofodroid.mods.mimi.forge.common.config.ModConfigs;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.TimeUtils;
 import net.minecraft.client.Minecraft;
@@ -38,7 +38,7 @@ public class MidiMultiSynthManager {
 
     public MidiMultiSynthManager() {
         this.audioDeviceManager = new AudioOutputDeviceManager();
-        this.soundbank = openSoundbank(ModConfigs.CLIENT.soundfontPath.get());
+        this.soundbank = openSoundbank(ConfigProxy.getSoundfontPath());
 
         if(this.soundbank != null) {
             MIMIMod.LOGGER.debug("Loaded Soundbank:\n\n" +
@@ -95,14 +95,14 @@ public class MidiMultiSynthManager {
             networkSynth.close();
 
         Pair<AudioFormat, SourceDataLine> netOutLine = audioDeviceManager.getOutputFormatLine();
-        this.networkSynth = new ServerPlayerMIMISynth(netOutLine.getLeft(), netOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.latency.get(), this.soundbank);
+        this.networkSynth = new ServerPlayerMIMISynth(netOutLine.getLeft(), netOutLine.getRight(), ConfigProxy.getJitterCorrection(), ConfigProxy.getLatency(), this.soundbank);
         
         Pair<AudioFormat, SourceDataLine> localOutLine = audioDeviceManager.getOutputFormatLine();
-        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), ModConfigs.CLIENT.jitterCorrection.get(), ModConfigs.CLIENT.localLatency.get(), this.soundbank);
+        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), ConfigProxy.getJitterCorrection(), ConfigProxy.getLocalLatency(), this.soundbank);
     }
 
     public Long getBufferTime(Long noteServerTime) {
-        return (MIMIMod.getProxy().getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ModConfigs.CLIENT.localBufferms.get() : 0)) + (MIMIMod.getProxy().getServerStartEpoch() + noteServerTime);
+        return (MIMIMod.getProxy().getBaselineBufferMs() + (Minecraft.getInstance().getCurrentServer() != null ? ConfigProxy.getLocalBufferms() : 0)) + (MIMIMod.getProxy().getServerStartEpoch() + noteServerTime);
     }
 
     public void close() {

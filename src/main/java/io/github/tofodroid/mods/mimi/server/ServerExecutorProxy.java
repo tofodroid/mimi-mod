@@ -5,7 +5,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.forge.server.ServerAccessor;
 import net.minecraft.server.level.ServerPlayer;
 
-public abstract class ServerExecutor {
+public abstract class ServerExecutorProxy {
     public static void executeOnServerThread(Runnable toRun) {
         ServerAccessor.getCurrentServer().execute(toRun);
     }

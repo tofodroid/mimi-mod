@@ -14,7 +14,7 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPac
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class GuiTransmitter extends GuiTransmitterBlock {
+public class GuiTransmitterItem extends GuiTransmitterBlock {
     // System MIDI Input Control
     protected static final Vector2Int SYSTEM_MIDI_DEVICE_BUTTON = new Vector2Int(330,7);
     protected static final Vector2Int SYSTEM_MIDI_DEVICE_LIGHT = new Vector2Int(349,13);
@@ -24,7 +24,7 @@ public class GuiTransmitter extends GuiTransmitterBlock {
     protected static final Vector2Int SOURCE_FILTER_SCREEN = new Vector2Int(283,33);
     protected static final Vector2Int OPEN_LOCAL_FOLDER_BUTTON = new Vector2Int(10,32);
 
-    public GuiTransmitter(UUID musicPlayerId) {
+    public GuiTransmitterItem(UUID musicPlayerId) {
         super(musicPlayerId);
     }
     

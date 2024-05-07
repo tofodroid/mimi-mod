@@ -7,9 +7,13 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public class ConfigurableMidiTileSyncPacket {
+public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ConfigurableMidiTileSyncPacket.class.getSimpleName().toLowerCase());
+
     public final BlockPos tilePos;
     public final UUID midiSource;
     public final String midiSourceName;
@@ -57,6 +61,16 @@ public class ConfigurableMidiTileSyncPacket {
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(sourceStack);
         this.broadcastRange = MidiNbtDataUtils.getBroadcastRange(sourceStack);
         this.channelMap = MidiNbtDataUtils.getChannelMap(sourceStack);
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ConfigurableMidiTileSyncPacket.ID;
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        ConfigurableMidiTileSyncPacket.encodePacket(this, buf);
     }
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
