@@ -21,6 +21,7 @@ public class ClientConfig {
 
     // MIDI INPUT
     public ForgeConfigSpec.IntValue midiDeviceVelocity;
+    public ForgeConfigSpec.ConfigValue<String> transmitterMidiPath;
 
     // AUDIO
     public ForgeConfigSpec.BooleanValue automaticAudioDevice;
@@ -57,6 +58,9 @@ public class ClientConfig {
         midiDeviceVelocity = builder.comment("A value to add to the velocity of notes recieved from the MIDI input device (to increase or decrease volume).","Allowed values: - (-)127-(+)127")
             .translation(MIMIMod.MODID + ".config.midi.input.volume")
             .defineInRange("midiDeviceVelocity",0, -127, 127);
+        transmitterMidiPath = builder.comment("Optional full path to the folder on your system that the Transmitter should MIDI songs from.")
+            .translation(MIMIMod.MODID + ".config.midi.input.transmitter.path")
+            .define("transmitterMidiPath", "");
         builder.pop();
         builder.push(MIDI_SYNTH_CATEGORY_NAME);
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")

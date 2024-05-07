@@ -19,9 +19,9 @@ public class ClientMidiListPacket implements CustomPacketPayload {
     }
 
     public ClientMidiListPacket(List<BasicMidiInfo> infos) {
-        if(infos.size() > 50) {
-            MIMIMod.LOGGER.warn("ClientMidiListPacket can only accept up to 50 files. Trimming list ot 50.");
-            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 50);
+        if(infos.size() > 1000) {
+            MIMIMod.LOGGER.warn("ClientMidiListPacket can only accept up to 1000 files. Trimming list to 1000.");
+            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 1000);
         } else {
             this.infos = new ArrayList<BasicMidiInfo>(infos);
         }
