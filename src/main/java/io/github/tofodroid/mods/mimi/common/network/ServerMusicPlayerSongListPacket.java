@@ -28,9 +28,9 @@ public class ServerMusicPlayerSongListPacket implements CustomPacketPayload {
         this.musicPlayerId = musicPlayerId;
         this.favoriteIndicies = favoriteIndicies;
 
-        if(infos.size() > 100) {
-            MIMIMod.LOGGER.warn("ServerMusicPlayerSongListPacket can only accept up to 100 files. Trimming list ot 100.");
-            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 50);
+        if(infos.size() > 1000) {
+            MIMIMod.LOGGER.warn("ServerMusicPlayerSongListPacket can only accept up to 1000 files. Trimming list ot 1000.");
+            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 1000);
         } else {
             this.infos = infos;
         }

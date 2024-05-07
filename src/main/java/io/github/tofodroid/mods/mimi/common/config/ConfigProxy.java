@@ -62,6 +62,14 @@ public class ConfigProxy {
         ModConfigs.CLIENT.audioDeviceVolume.set(vol);
     }
 
+    public static String getTransmitterMidiPath() {
+        return ModConfigs.CLIENT.transmitterMidiPath.get();
+    }
+
+    public static void setTransmitterMidiPath(String path) {
+        ModConfigs.CLIENT.transmitterMidiPath.set(path);
+    }
+
     // SYNTH
 
     // Read-Only

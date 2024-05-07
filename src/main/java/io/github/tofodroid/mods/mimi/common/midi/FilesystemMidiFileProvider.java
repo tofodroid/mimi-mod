@@ -20,7 +20,7 @@ import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 
 public class FilesystemMidiFileProvider {
     public static final String MIMI_CONFIG_DIR = "mimi";
-    public static final String CLIENT_MIDI_DIR = "midi_files";
+    public static final String DEFAULT_CLIENT_MIDI_DIR = "midi_files";
     public static final String SERVER_MIDI_DIR = "server_midi_files";
     public static final FilenameFilter MIDI_FILTER = (dir, name) -> name.endsWith(".mid") || name.endsWith(".midi");
     protected final Integer updateAfterSeconds;
@@ -36,7 +36,7 @@ public class FilesystemMidiFileProvider {
         this.updateAfterSeconds = updateAfterSeconds;
         this.songMap = new HashMap<>();
         this.orderedSongList = new ArrayList<>();
-        this.initFromConfigFolder();
+        this.init();
     }
 
     protected void clear() {
@@ -47,7 +47,11 @@ public class FilesystemMidiFileProvider {
     public List<UUID> getSortedSongIds() {
         return this.orderedSongList;
     }
-    
+
+    public void setDirectory(String newDirectory) {
+        this.initFromDirectory(new File(newDirectory));
+    }
+
     public void refresh(Boolean forceFromDisk) {
         this.loadSongs(forceFromDisk);
     }
@@ -159,22 +163,31 @@ public class FilesystemMidiFileProvider {
         if(directory != null && directory.exists() && directory.isDirectory()) {
             selectedFolder = directory;
             this.loadSongs(true);
+        } else {
+            MIMIMod.LOGGER.error("Failed to open MIDI directory: " + directory.getAbsolutePath());
         }
     }
 
-    public FilesystemMidiFileProvider initFromConfigFolder() {
+    public FilesystemMidiFileProvider init() {
         try {
+            // Create Default Folders
             File mimiFolder = new File(ConfigProxy.getConfigPath().toString(), MIMI_CONFIG_DIR);
             if (!mimiFolder.exists() && !mimiFolder.mkdirs() && !mimiFolder.isDirectory()) {
                 throw new IOException("Could not create MIMI config directory!");
             }
             
-            File midiFolder = new File(mimiFolder.getAbsolutePath(), isServer ? SERVER_MIDI_DIR : CLIENT_MIDI_DIR);
-            if (!midiFolder.exists() && !midiFolder.mkdirs() && !midiFolder.isDirectory()) {
+            File defaultMidiFolder = new File(mimiFolder.getAbsolutePath(), isServer ? SERVER_MIDI_DIR : DEFAULT_CLIENT_MIDI_DIR);
+            if (!defaultMidiFolder.exists() && !defaultMidiFolder.mkdirs() && !defaultMidiFolder.isDirectory()) {
                 throw new IOException("Could not create MIMI MIDI directory!");
             }
 
-            this.initFromDirectory(midiFolder);
+            // Load Folder
+            if(isServer || ConfigProxy.getTransmitterMidiPath() == null || ConfigProxy.getTransmitterMidiPath().isBlank()) {
+                this.initFromDirectory(defaultMidiFolder);
+            } else {
+                File userMidiFolder = new File(ConfigProxy.getTransmitterMidiPath());
+                this.initFromDirectory(userMidiFolder);
+            }
         } catch(Exception e) {
             this.clear();
             MIMIMod.LOGGER.error("Failed to configure MIDI file manager.", e);
