@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
@@ -14,6 +16,7 @@ import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -119,6 +122,11 @@ public class TileMechanicalMaestro extends AContainerTile {
             this.allNotesOff();
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
+    }
+    
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+        return stack.getItem() instanceof IInstrumentItem;
     }
 
     public List<ItemStack> getInstrumentStacks() {
