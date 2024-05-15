@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class TransmitterControlPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, TransmitterControlPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<TransmitterControlPacket> TYPE = new Type<>(ID);
 
     public enum CONTROL {
         PLAY,
@@ -74,15 +75,18 @@ public class TransmitterControlPacket implements CustomPacketPayload {
         this.controlData = Optional.empty();
         this.songId = Optional.empty();
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return TransmitterControlPacket.ID;
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        TransmitterControlPacket.encodePacket(this, buf);
+    public static UUID readUUID(FriendlyByteBuf buf) {
+        return FriendlyByteBuf.readUUID(buf);
+    }
+
+    public static void writeUUID(FriendlyByteBuf buf, UUID id) {
+        FriendlyByteBuf.writeUUID(buf, id);
     }
     
     public static TransmitterControlPacket decodePacket(FriendlyByteBuf buf) {
@@ -90,7 +94,7 @@ public class TransmitterControlPacket implements CustomPacketPayload {
             UUID transmitterId = buf.readUUID();
             byte control = buf.readByte();
             Optional<Integer> controlData = buf.readOptional(FriendlyByteBuf::readInt);
-            Optional<UUID> songId = buf.readOptional(FriendlyByteBuf::readUUID);
+            Optional<UUID> songId = buf.readOptional(TransmitterControlPacket::readUUID);
             return new TransmitterControlPacket(transmitterId, CONTROL.fromByte(control), controlData, songId);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("TransmitterControlPacket did not contain enough bytes. Exception: " + e);
@@ -105,6 +109,6 @@ public class TransmitterControlPacket implements CustomPacketPayload {
         buf.writeUUID(pkt.transmitterId);
         buf.writeByte(Integer.valueOf(pkt.control.ordinal()).byteValue());
         buf.writeOptional(pkt.controlData, FriendlyByteBuf::writeInt);
-        buf.writeOptional(pkt.songId, FriendlyByteBuf::writeUUID);
+        buf.writeOptional(pkt.songId, TransmitterControlPacket::writeUUID);
     }
 }

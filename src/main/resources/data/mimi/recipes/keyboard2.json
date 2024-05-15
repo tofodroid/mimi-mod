@@ -7,6 +7,6 @@
         "item": "minecraft:chorus_fruit"
     },
     "result": {
-        "item": "mimi:keyboard2"
+        "id": "mimi:keyboard2"
     }
 }

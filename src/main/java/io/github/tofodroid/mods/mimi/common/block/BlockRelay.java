@@ -15,7 +15,6 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -62,23 +61,25 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
     public BlockEntityType<TileRelay> getTileType() {
         return ModTiles.RELAY;
     }
-    
+
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         TileRelay tile = getTileForBlock(worldIn, pos);
         
         if(tile != null) {
-            ItemStack handStack = player.getItemInHand(hand);
+            ItemStack handStack = player.getItemInHand(player.getUsedItemHand());
 
             if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER) || handStack.getItem().equals(ModItems.RELAY))) {
                 if(!worldIn.isClientSide) {
                     String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
                     MidiNbtDataUtils.setMidiSourceFromRelay(handStack, tile.getUUID(), transmitterName);
-                    player.setItemInHand(hand, handStack);
+                    player.setItemInHand(player.getUsedItemHand(), handStack);
                     player.displayClientMessage(Component.literal("Linked to Relay"), true);
+                    return InteractionResult.CONSUME;
                 }
             } else if(worldIn.isClientSide) {
                 ClientGuiWrapper.openRelayGui(worldIn, player, tile.getBlockPos(), tile.getSourceStack());
+                return InteractionResult.CONSUME;
             }
         }
 

@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ClientMidiListPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ClientMidiListPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ClientMidiListPacket> TYPE = new Type<>(ID);
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
     public final List<BasicMidiInfo> infos;
 
@@ -26,15 +27,10 @@ public class ClientMidiListPacket implements CustomPacketPayload {
             this.infos = new ArrayList<BasicMidiInfo>(infos);
         }
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return ClientMidiListPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        ClientMidiListPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static ClientMidiListPacket decodePacket(FriendlyByteBuf buf) {

@@ -7,6 +7,6 @@
         "tag": "minecraft:planks"
     },
     "result": {
-        "item": "mimi:drums2"
+        "id": "mimi:drums2"
     }
 }

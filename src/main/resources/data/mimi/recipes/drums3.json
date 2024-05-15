@@ -7,6 +7,6 @@
         "item": "minecraft:cobblestone"
     },
     "result": {
-        "item": "mimi:drums3"
+        "id": "mimi:drums3"
     }
 }

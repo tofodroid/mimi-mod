@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
-import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,8 +49,7 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
     
     @Override
     public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note)) && 
-            (instrumentId == null || MidiNbtDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId));
+        return true;
     }
 
     @Override

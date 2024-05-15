@@ -7,6 +7,6 @@
         "item": "minecraft:copper_ingot"
     },
     "result": {
-        "item": "mimi:prophet3"
+        "id": "mimi:prophet3"
     }
 }

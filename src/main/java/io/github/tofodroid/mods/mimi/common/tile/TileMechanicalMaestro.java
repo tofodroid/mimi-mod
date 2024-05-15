@@ -17,6 +17,7 @@ import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsu
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -93,8 +94,8 @@ public class TileMechanicalMaestro extends AContainerTile {
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
         this.refreshMidiReceivers();
     }
 

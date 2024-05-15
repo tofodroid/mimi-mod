@@ -7,6 +7,6 @@
         "item": "minecraft:flint"
     },
     "result": {
-        "item": "mimi:synlead2"
+        "id": "mimi:synlead2"
     }
 }

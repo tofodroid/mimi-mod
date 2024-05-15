@@ -8,6 +8,7 @@ import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
+import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -18,6 +19,8 @@ import net.minecraftforge.registries.RegisterEvent;
 public abstract class CommonRegistrationHandler {    
     @SubscribeEvent
     public static void register(final RegisterEvent event) {
+        TagUtils.init();
+
         // Blocks
         event.register(Registries.BLOCK, (reg) -> ModBlocks.BLOCKS.forEach(reg::register));
 

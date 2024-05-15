@@ -14,6 +14,7 @@ import net.minecraft.world.InteractionHand;
 
 public class MidiNotePacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MidiNotePacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<MidiNotePacket> TYPE = new Type<>(ID);
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 
     public final @Nonnull Byte note;
@@ -61,15 +62,10 @@ public class MidiNotePacket implements CustomPacketPayload {
         this.noteServerTime = noteServerTime;
         this.instrumentHand = instrumentHand;
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return MidiNotePacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        MidiNotePacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static MidiNotePacket decodePacket(FriendlyByteBuf buf) {

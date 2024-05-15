@@ -7,6 +7,6 @@
         "item": "minecraft:blaze_powder"
     },
     "result": {
-        "item": "mimi:elecguitar5"
+        "id": "mimi:elecguitar5"
     }
 }

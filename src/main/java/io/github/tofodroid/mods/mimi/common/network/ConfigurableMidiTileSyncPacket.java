@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ConfigurableMidiTileSyncPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ConfigurableMidiTileSyncPacket> TYPE = new Type<>(ID);
 
     public final BlockPos tilePos;
     public final UUID midiSource;
@@ -22,14 +23,13 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     public final Boolean invertNoteOct;
     public final Byte instrumentId;
     public final Integer enabledChannelsInt;
-    public final Boolean invertInstrument;
     public final Boolean invertSignal;
     public final Boolean triggerNoteStart;
     public final Byte holdTicks;
     public final Byte broadcastRange;
     public final Byte[] channelMap;
 
-    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertInstrument, Boolean invertSignal, Boolean triggerNoteStart, Byte holdTicks, Byte broadcastRange, Byte channelMap[]) {
+    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertSignal, Boolean triggerNoteStart, Byte holdTicks, Byte broadcastRange, Byte channelMap[]) {
         this.tilePos = tilePos;
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
@@ -38,7 +38,6 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         this.invertNoteOct = invertNoteOct;
         this.enabledChannelsInt = enabledChannelsInt;
         this.instrumentId = instrumentId;
-        this.invertInstrument = invertInstrument;
         this.invertSignal = invertSignal;
         this.triggerNoteStart = triggerNoteStart;
         this.holdTicks = holdTicks;
@@ -55,22 +54,16 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         this.invertNoteOct = MidiNbtDataUtils.getInvertNoteOct(sourceStack);
         this.enabledChannelsInt = MidiNbtDataUtils.getEnabledChannelsInt(sourceStack);
         this.instrumentId = MidiNbtDataUtils.getFilterInstrument(sourceStack);
-        this.invertInstrument = MidiNbtDataUtils.getInvertInstrument(sourceStack);
         this.invertSignal = MidiNbtDataUtils.getInvertSignal(sourceStack);
         this.triggerNoteStart = MidiNbtDataUtils.getTriggerNoteStart(sourceStack);
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(sourceStack);
         this.broadcastRange = MidiNbtDataUtils.getBroadcastRange(sourceStack);
         this.channelMap = MidiNbtDataUtils.getChannelMap(sourceStack);
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return ConfigurableMidiTileSyncPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        ConfigurableMidiTileSyncPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
@@ -92,7 +85,6 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
             Boolean invertNoteOct = buf.readBoolean();
             Integer enabledChannelsInt = buf.readInt();
             Byte instrumentId = buf.readByte();
-            Boolean invertInstrument = buf.readBoolean();
             Boolean invertSignal = buf.readBoolean();
             Boolean triggerNoteStart = buf.readBoolean();
             Byte holdTicks = buf.readByte();
@@ -103,7 +95,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
                 channelMap[i] = buf.readByte();
             }
 
-            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertInstrument, invertSignal, triggerNoteStart, holdTicks, broadcastRange, channelMap);
+            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertSignal, triggerNoteStart, holdTicks, broadcastRange, channelMap);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ConfigurableMidiTileSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -135,7 +127,6 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         buf.writeBoolean(pkt.invertNoteOct);
         buf.writeInt(pkt.enabledChannelsInt);
         buf.writeByte(pkt.instrumentId);
-        buf.writeBoolean(pkt.invertInstrument);
         buf.writeBoolean(pkt.invertSignal);
         buf.writeBoolean(pkt.triggerNoteStart);
         buf.writeByte(pkt.holdTicks);

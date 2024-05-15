@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class MidiDeviceBroadcastPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MidiDeviceBroadcastPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<MidiDeviceBroadcastPacket> TYPE = new Type<>(ID);
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 
     public final @Nonnull Byte channel;
@@ -53,15 +54,10 @@ public class MidiDeviceBroadcastPacket implements CustomPacketPayload {
         this.pos = pos;
         this.noteServerTime = noteServerTime;
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return MidiDeviceBroadcastPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        MidiDeviceBroadcastPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static MidiDeviceBroadcastPacket decodePacket(FriendlyByteBuf buf) {

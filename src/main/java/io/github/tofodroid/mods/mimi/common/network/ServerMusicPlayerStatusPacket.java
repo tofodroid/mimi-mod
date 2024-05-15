@@ -13,6 +13,7 @@ import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.Sourc
 
 public class ServerMusicPlayerStatusPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerStatusPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ServerMusicPlayerStatusPacket> TYPE = new Type<>(ID);
     private static final UUID NO_FILE_ID = new UUID(0,0);
 
     public final UUID musicPlayerId;
@@ -63,15 +64,10 @@ public class ServerMusicPlayerStatusPacket implements CustomPacketPayload {
         this.favoriteMode = favoriteMode;
         this.sourceMode = sourceMode;
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return ServerMusicPlayerStatusPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        ServerMusicPlayerStatusPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
     
     public static ServerMusicPlayerStatusPacket decodePacket(FriendlyByteBuf buf) {

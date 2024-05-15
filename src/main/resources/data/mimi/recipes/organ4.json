@@ -7,6 +7,6 @@
         "item": "minecraft:granite"
     },
     "result": {
-        "item": "mimi:organ4"
+        "id": "mimi:organ4"
     }
 }

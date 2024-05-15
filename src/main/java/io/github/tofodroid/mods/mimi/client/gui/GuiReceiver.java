@@ -52,7 +52,7 @@ public class GuiReceiver extends BaseGui {
             return;
         }
         this.receiverStack = new ItemStack(receiverStack.getItem(), receiverStack.getCount());
-        this.receiverStack.setTag(receiverStack.getOrCreateTag().copy());
+        this.receiverStack.applyComponents(receiverStack.getComponents());
     }
 
     @Override

@@ -7,6 +7,6 @@
         "item": "minecraft:stick"
     },
     "result": {
-        "item": "mimi:drums"
+        "id": "mimi:drums"
     }
 }

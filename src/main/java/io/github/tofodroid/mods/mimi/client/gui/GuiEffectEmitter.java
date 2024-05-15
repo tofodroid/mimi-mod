@@ -92,7 +92,7 @@ public class GuiEffectEmitter extends BaseGui {
             return;
         }
         this.emitterStack = new ItemStack(emitterStack.getItem(), emitterStack.getCount());
-        this.emitterStack.setTag(emitterStack.getOrCreateTag().copy());
+        this.emitterStack.applyComponents(emitterStack.getComponents());
     }
 
     @Override

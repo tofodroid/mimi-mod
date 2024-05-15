@@ -1,10 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -29,7 +30,7 @@ public class ColoredItemRecipe extends CustomRecipe {
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stackI = inv.getItem(i);
-            if (IColorableItem.isDyeableInstrument(stackI) && instrument.isEmpty()) {
+            if (stackI.is(ItemTags.DYEABLE) && instrument.isEmpty()) {
                 instrument = stackI;
             } else if (!stackI.isEmpty() && !(stackI.getItem() instanceof DyeItem))  {
                 return false;
@@ -40,14 +41,14 @@ public class ColoredItemRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
         ItemStack instrument = ItemStack.EMPTY;
         List<DyeItem> dyes = new ArrayList<>();
 
         for (int i = 0; i < inv.getContainerSize(); ++i) {
             ItemStack stackI = inv.getItem(i);
             if (!stackI.isEmpty()) {
-                if (IColorableItem.isDyeableInstrument(stackI) && instrument.isEmpty()) {
+                if (stackI.is(ItemTags.DYEABLE) && instrument.isEmpty()) {
                     instrument = stackI;
                 } else if (stackI.getItem() instanceof DyeItem)  {
                     dyes.add((DyeItem)stackI.getItem());
@@ -55,7 +56,7 @@ public class ColoredItemRecipe extends CustomRecipe {
             }
         }
 
-        return !instrument.isEmpty() && !dyes.isEmpty() ? IColorableItem.dyeItem(instrument, dyes) : ItemStack.EMPTY;
+        return !instrument.isEmpty() && !dyes.isEmpty() ? DyedItemColor.applyDyes(instrument, dyes) : ItemStack.EMPTY;
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ServerMusicPlayerSongListPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerSongListPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ServerMusicPlayerSongListPacket> TYPE = new Type<>(ID);
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
 
     public final UUID musicPlayerId;
@@ -35,15 +36,10 @@ public class ServerMusicPlayerSongListPacket implements CustomPacketPayload {
             this.infos = infos;
         }
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return ServerMusicPlayerSongListPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        ServerMusicPlayerSongListPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static ServerMusicPlayerSongListPacket decodePacket(FriendlyByteBuf buf) {

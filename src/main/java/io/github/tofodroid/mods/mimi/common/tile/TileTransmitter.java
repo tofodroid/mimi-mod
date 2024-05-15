@@ -6,6 +6,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockTransmitter;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -18,13 +19,8 @@ public class TileTransmitter extends AConfigurableMidiTile {
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
-    }
-
-    @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
 
         // Create music player for existing tiles from world save
         if(this.hasLevel() && !this.getLevel().isClientSide && !this.getSourceStack().isEmpty()) {

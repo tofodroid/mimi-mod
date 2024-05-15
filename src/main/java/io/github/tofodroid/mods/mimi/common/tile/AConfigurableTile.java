@@ -36,29 +36,19 @@ public abstract class AConfigurableTile extends AStaticInventoryTile {
             return items.get(SOURCE_STACK_SLOT);
         }
     }
-
+    
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
-        
-        // Fallback for missing stack data
+    public void onItemsLoaded() {
+        // Fallback for missing stack
         if(this.items.get(0).isEmpty()) {
-            MIMIMod.LOGGER.warn("ConfigurableTile had no saved source stack! Re-initializing.");
-            this.setSourceStack(this.initializeSourceStack(null));
-        } else {
-            this.setSourceStack(this.items.get(0));
+            MIMIMod.LOGGER.warn(this.getClass().getSimpleName() + " is missing stack! Re-initializing.");
+            this.initializeSourceStack(null);
         }
     }
 
+
     protected ItemStack initializeSourceStack(CompoundTag stackTag) {
         ItemStack sourceStack = new ItemStack(this.getBlockState().getBlock().asItem(), 1);
-
-        if(stackTag != null) {
-            sourceStack.setTag(stackTag);
-        } else {
-            sourceStack.setTag(new CompoundTag());
-        }
-
         return sourceStack;
     }
 }

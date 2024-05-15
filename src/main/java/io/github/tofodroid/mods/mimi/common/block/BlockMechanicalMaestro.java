@@ -8,9 +8,6 @@ import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestro> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -35,19 +31,6 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
     public BlockMechanicalMaestro(Properties props) {
         super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, Boolean.valueOf(false)));
-    }
-        
-    @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(!worldIn.isClientSide) {
-            TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
-
-            if(tile != null) {
-                // TODO link anything?
-            }
-        }
-
-        return super.use(state, worldIn, pos, player, hand, hit);
     }
     
     @Override

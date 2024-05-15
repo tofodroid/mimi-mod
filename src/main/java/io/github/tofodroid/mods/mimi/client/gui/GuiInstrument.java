@@ -167,7 +167,7 @@ public class GuiInstrument extends BaseGui {
         this.player = player;
         this.handIn = handIn;
         this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount());
-        this.instrumentStack.setTag(instrumentStack.getOrCreateTag().copy());
+        this.instrumentStack.applyComponents(instrumentStack.getComponents());
         this.instrumentId = MidiNbtDataUtils.getInstrumentId(this.instrumentStack);
         this.instrumentNameString = MidiNbtDataUtils.getInstrumentName(this.instrumentId);
     }

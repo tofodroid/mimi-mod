@@ -7,6 +7,6 @@
         "item": "minecraft:iron_nugget"
     },
     "result": {
-        "item": "mimi:keyboard3"
+        "id": "mimi:keyboard3"
     }
 }

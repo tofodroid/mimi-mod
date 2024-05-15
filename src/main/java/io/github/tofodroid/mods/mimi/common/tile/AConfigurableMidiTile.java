@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
@@ -27,7 +28,7 @@ public abstract class AConfigurableMidiTile extends AConfigurableTile {
     }
 
     @Override
-    public void loadItems(CompoundTag compound) {
+    public void loadItems(CompoundTag compound, HolderLookup.Provider pRegistries) {
         // START TEMPORARY LEGACY COMPATIBILITY CODE
         // Filter out switchboard items so that we can convert them
         ListTag listtag = compound.getList("Items", 10);
@@ -42,7 +43,7 @@ public abstract class AConfigurableMidiTile extends AConfigurableTile {
             }
         }
 
-        ContainerHelper.loadAllItems(compound, items);
+        ContainerHelper.loadAllItems(compound, items, pRegistries);
 
         if(convertStack != null) {  
             this.setSourceStack(convertStack);

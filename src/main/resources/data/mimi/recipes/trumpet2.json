@@ -7,6 +7,6 @@
         "item": "minecraft:clay_ball"
     },
     "result": {
-        "item": "mimi:trumpet2"
+        "id": "mimi:trumpet2"
     }
 }
