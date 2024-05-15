@@ -7,6 +7,6 @@
         "item": "minecraft:kelp"
     },
     "result": {
-        "item": "mimi:elecguitar3"
+        "id": "mimi:elecguitar3"
     }
 }

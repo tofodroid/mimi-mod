@@ -46,4 +46,10 @@ public class BroadcastConsumerMapping {
         }
         return CHANNEL_CONSUMERS[channel];
     }
+
+    public void allNotesOff(BroadcastEvent event) {
+        for(IBroadcastConsumer consumer : LINKED_CONSUMERS) {
+            consumer.consumeAllNotesOff(event);
+        }
+    }
 }

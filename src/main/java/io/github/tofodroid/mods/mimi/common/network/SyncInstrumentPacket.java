@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class SyncInstrumentPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, SyncInstrumentPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<SyncInstrumentPacket> TYPE = new Type<>(ID);
 
     public final UUID midiSource;
     public final String midiSourceName;
@@ -38,15 +39,10 @@ public class SyncInstrumentPacket implements CustomPacketPayload {
         this.volume = MidiNbtDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return SyncInstrumentPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        SyncInstrumentPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static Byte getInstrumentLocationByte(InteractionHand handIn) {

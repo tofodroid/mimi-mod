@@ -7,6 +7,6 @@
         "item": "minecraft:feather"
     },
     "result": {
-        "item": "mimi:drums5"
+        "id": "mimi:drums5"
     }
 }

@@ -7,6 +7,6 @@
         "item": "minecraft:bone"
     },
     "result": {
-        "item": "mimi:organ3"
+        "id": "mimi:organ3"
     }
 }

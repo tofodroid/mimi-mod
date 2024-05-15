@@ -3,7 +3,6 @@ package io.github.tofodroid.mods.mimi.common.item.legacycompat;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.ChatFormatting;
@@ -25,15 +24,11 @@ public class ItemFileCaster extends Item {
     }
     
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
         tooltip.add(Component.literal(""));
         tooltip.add(Component.translatableWithFallback("item.mimi.removed.tooltip", "REMOVED").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
-
-        // Client-side only
-        if(worldIn != null && worldIn.isClientSide) {
-            tooltip.add(Component.translatableWithFallback("item.mimi.filecaster.tooltip", "Right-click to convert me!"));
-        }
+        tooltip.add(Component.translatableWithFallback("item.mimi.filecaster.tooltip", "Right-click to convert me!"));
     }
 
     @Override

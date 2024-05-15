@@ -1,13 +1,12 @@
 package io.github.tofodroid.mods.mimi.common.recipe;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -71,44 +70,40 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     public static class Serializer implements RecipeSerializer<TuningTableRecipe> {
         public static final String REGISTRY_NAME = "tuning";
 
-        public static final Codec<ItemStack> ITEM_STACK_ITEM_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(ItemStack::getItem)
-            ).apply(instance, ItemStack::new)
-        );
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, TuningTableRecipe> streamCodec() {
+            return StreamCodec.of(
+                TuningTableRecipe.Serializer::toNetwork, TuningTableRecipe.Serializer::fromNetwork
+            );
+        }
         
         @Override
-        public Codec<TuningTableRecipe> codec() {
-            return RecordCodecBuilder.create(instance -> instance.group(
+        public MapCodec<TuningTableRecipe> codec() {
+            return RecordCodecBuilder.mapCodec(instance -> instance.group(
 						Ingredient.CODEC.fieldOf("instrument").forGetter(o -> o.instrument),
 						Ingredient.CODEC.fieldOf("addition").forGetter(o -> o.addition),
-						ITEM_STACK_ITEM_CODEC.fieldOf("result").forGetter(o -> o.result)
+						ItemStack.CODEC.fieldOf("result").forGetter(o -> o.result)
             ).apply(instance, TuningTableRecipe::new));
         }
 
-        @Override
-        public TuningTableRecipe fromNetwork(FriendlyByteBuf buffer) {
-            Ingredient ingredient = Ingredient.fromNetwork(buffer);
-            Ingredient ingredient1 = Ingredient.fromNetwork(buffer);
-            ItemStack itemstack = buffer.readItem();
+        public static TuningTableRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
+            Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
+            Ingredient ingredient1 = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
+            ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buffer);
             return new TuningTableRecipe(ingredient, ingredient1, itemstack);
         }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, TuningTableRecipe recipe) {
-            recipe.instrument.toNetwork(buffer);
-            recipe.addition.toNetwork(buffer);
-            buffer.writeItem(recipe.result);
+        
+        public static void toNetwork(RegistryFriendlyByteBuf buffer, TuningTableRecipe recipe) {
+            Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.instrument);
+            Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.addition);
+            ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
         }
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
         ItemStack itemstack = this.result.copy();
-        CompoundTag compoundnbt = inv.getItem(0).getTag();
-        if (compoundnbt != null) {
-            itemstack.setTag(compoundnbt.copy());
-        }
-
+        itemstack.applyComponents(inv.getItem(0).getComponents());
         return itemstack;
     }
 
@@ -118,7 +113,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess r) {
+    public ItemStack getResultItem(HolderLookup.Provider r) {
         return this.result;
     }
 }

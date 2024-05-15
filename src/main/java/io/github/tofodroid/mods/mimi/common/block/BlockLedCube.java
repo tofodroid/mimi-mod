@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -55,33 +55,31 @@ public class BlockLedCube extends AColoredBlock {
    }
 
    @Override
-   @SuppressWarnings("deprecation")
    public float getShadeBrightness(BlockState state, BlockGetter p_153690_, BlockPos p_153691_) {
       return state.getValue(BlockLedCube.POWERED) ? 1.0f : super.getShadeBrightness(state, p_153690_, p_153691_);
    }
 
    @Override
-   public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+   public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
       if(Items.REDSTONE_TORCH.equals(player.getItemInHand(handIn).getItem()) || Items.REDSTONE_BLOCK.equals(player.getItemInHand(handIn).getItem())) {
          if(!worldIn.isClientSide) {
             worldIn.setBlock(pos, state.cycle(INVERTED), 2);
             worldIn.playSound(null, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS);
          }
-         return InteractionResult.SUCCESS;
+         return ItemInteractionResult.CONSUME;
       } else if(player.getItemInHand(handIn).isEmpty()) {
          if(!worldIn.isClientSide) {
             Integer dyeId = state.getValue(DYE_ID);
             worldIn.setBlock(pos, state.setValue(DYE_ID, dyeId < 15 ? (dyeId + 1) : 0), 2);
             worldIn.playSound(null, pos, SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.BLOCKS);
          }
-         return InteractionResult.SUCCESS;
+         return ItemInteractionResult.CONSUME;
       }
    
-      return InteractionResult.PASS;
+      return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
    }
 
    @Override
-   @SuppressWarnings("deprecation")
    public int getLightBlock(BlockState state, BlockGetter p_60586_, BlockPos p_60587_) {
       return BlockLedCube.isLit(state) ? BlockStateProperties.MAX_LEVEL_15 : super.getLightBlock(state, p_60586_, p_60587_);
    }
@@ -104,7 +102,7 @@ public class BlockLedCube extends AColoredBlock {
    @Override
    public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
       ItemStack itemstack = super.getCloneItemStack(reader, pos, state);
-      itemstack.getOrCreateTag().putBoolean(INVERTED.getName(), state.getOptionalValue(INVERTED).orElse(false));
+      itemstack.set(TagUtils.getBoolComponent(INVERTED.getName()), state.getOptionalValue(INVERTED).orElse(false));
       return itemstack;
    }
 

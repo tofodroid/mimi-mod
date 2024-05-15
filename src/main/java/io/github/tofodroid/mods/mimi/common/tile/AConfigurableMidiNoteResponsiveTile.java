@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -46,8 +47,8 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     }
     
 	@Override
-	public void load(CompoundTag nbt) {
-        super.load(nbt);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
         this.cacheMidiSettings();
     }
 

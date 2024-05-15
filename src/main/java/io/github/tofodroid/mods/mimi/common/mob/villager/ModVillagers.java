@@ -11,6 +11,8 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
@@ -55,10 +57,11 @@ public class ModVillagers {
         return profession;
     }
 
+    @SuppressWarnings("deprecation")
     public static void registerTrades(VillagerProfession profession, Int2ObjectMap<List<ItemListing>> trades) {
         // Instrumentalist
         if(profession == INSTRUMENTALIST) {
-            GiveGiftToHero.GIFTS.put(INSTRUMENTALIST, new ResourceLocation(MIMIMod.MODID, "gameplay/hero_of_the_village/instrumentalist_gift"));
+            GiveGiftToHero.GIFTS.put(INSTRUMENTALIST, ResourceKey.create(Registries.LOOT_TABLE,  new ResourceLocation(MIMIMod.MODID, "gameplay/hero_of_the_village/instrumentalist_gift")));
             trades.get(1).addAll(Arrays.asList(
                 new ItemsForItemsTrade(Arrays.asList(Items.MUSIC_DISC_CAT,Items.MUSIC_DISC_13), 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
                 new ItemsForItemsTrade(Arrays.asList(Items.NOTE_BLOCK), 1, Arrays.asList(Items.PAPER, Items.REDSTONE), 8, 16, 20)

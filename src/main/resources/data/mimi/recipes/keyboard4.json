@@ -7,6 +7,6 @@
         "item": "minecraft:ghast_tear"
     },
     "result": {
-        "item": "mimi:keyboard4"
+        "id": "mimi:keyboard4"
     }
 }

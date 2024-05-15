@@ -52,7 +52,7 @@ public class GuiListener extends BaseGui {
         }
         this.tilePos = tilePos;
         this.listenerStack = new ItemStack(listenerStack.getItem(), listenerStack.getCount());
-        this.listenerStack.setTag(listenerStack.getOrCreateTag().copy());
+        this.listenerStack.applyComponents(listenerStack.getComponents());
     }
 
     @Override

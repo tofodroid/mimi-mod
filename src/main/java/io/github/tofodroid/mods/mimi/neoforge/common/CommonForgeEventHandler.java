@@ -13,11 +13,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.event.TickEvent.Phase;
-import net.neoforged.neoforge.event.TickEvent.PlayerTickEvent;
-import net.neoforged.neoforge.event.TickEvent.ServerTickEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -26,7 +24,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = MIMIMod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class CommonForgeEventHandler {
     
     @SubscribeEvent
@@ -61,8 +59,8 @@ public class CommonForgeEventHandler {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.SERVER || !(event.player instanceof ServerPlayer)) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) {
             return;
         }  
     }
@@ -103,10 +101,7 @@ public class CommonForgeEventHandler {
     }
     
     @SubscribeEvent
-    public static void onServerTick(ServerTickEvent event) {
-        if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
-            return;
-        }
+    public static void onServerTick(ServerTickEvent.Post event) {
         BroadcastManager.onServerTick();
         ServerNoteConsumerManager.onServerTick();
         ServerMidiUploadManager.onServerTick();

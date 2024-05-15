@@ -58,7 +58,7 @@ public class GuiRelay extends BaseGui {
             return;
         }
         this.relayStack = new ItemStack(relayStack.getItem(), relayStack.getCount());
-        this.relayStack.setTag(relayStack.getOrCreateTag().copy());
+        this.relayStack.applyComponents(relayStack.getComponents());
     }
 
     @Override

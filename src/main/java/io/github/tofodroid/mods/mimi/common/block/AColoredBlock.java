@@ -3,8 +3,6 @@ package io.github.tofodroid.mods.mimi.common.block;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -12,13 +10,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 
@@ -57,8 +55,8 @@ public abstract class AColoredBlock extends Block {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter blockGetter, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, blockGetter, tooltip, flag);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
         this.appendSettingsTooltip(stack, tooltip);
     }
    
@@ -66,7 +64,7 @@ public abstract class AColoredBlock extends Block {
     @SuppressWarnings("deprecation")
     public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
         ItemStack itemstack = super.getCloneItemStack(reader, pos, state);
-        itemstack.getOrCreateTag().putInt(DYE_ID.getName(), state.getOptionalValue(DYE_ID).orElse(0));
+        TagUtils.setOrRemoveInt(itemstack, DYE_ID.getName(), state.getOptionalValue(DYE_ID).orElse(0));
         return itemstack;
     }
 

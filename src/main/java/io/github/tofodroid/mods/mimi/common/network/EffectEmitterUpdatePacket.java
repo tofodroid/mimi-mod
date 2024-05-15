@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class EffectEmitterUpdatePacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, EffectEmitterUpdatePacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<EffectEmitterUpdatePacket> TYPE = new Type<>(ID);
 
     public final BlockPos tilePos;
     public final String sound;
@@ -65,13 +66,8 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
     }
 
     @Override
-    public ResourceLocation id() {
-        return EffectEmitterUpdatePacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        EffectEmitterUpdatePacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static EffectEmitterUpdatePacket decodePacket(FriendlyByteBuf buf) {

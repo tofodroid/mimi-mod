@@ -7,6 +7,6 @@
         "item": "minecraft:iron_bars"
     },
     "result": {
-        "item": "mimi:organ2"
+        "id": "mimi:organ2"
     }
 }

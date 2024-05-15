@@ -2,17 +2,16 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 
 import java.util.Optional;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.tofodroid.mods.mimi.common.block.AColoredBlock;
 import io.github.tofodroid.mods.mimi.common.block.BlockLedCube;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -27,8 +26,8 @@ public class ChangeLedCubeRecipe extends ShapedRecipe {
     final ShapedRecipePattern shapedPattern;
 
     public ChangeLedCubeRecipe(ShapedRecipe shaped) {
-        super(shaped.getGroup(), shaped.category(), new ShapedRecipePattern(shaped.getRecipeWidth(), shaped.getRecipeHeight(), shaped.getIngredients(), Optional.empty()), shaped.getResultItem(null), shaped.showNotification());
-        shapedPattern = new ShapedRecipePattern(shaped.getRecipeWidth(), shaped.getRecipeHeight(), shaped.getIngredients(), Optional.empty());
+        super(shaped.getGroup(), shaped.category(), new ShapedRecipePattern(shaped.getWidth(), shaped.getHeight(), shaped.getIngredients(), Optional.empty()), shaped.getResultItem(null), shaped.showNotification());
+        shapedPattern = new ShapedRecipePattern(shaped.getWidth(), shaped.getHeight(), shaped.getIngredients(), Optional.empty());
     }
 
     public ChangeLedCubeRecipe(String p_250221_, CraftingBookCategory p_250716_, ShapedRecipePattern p_312200_, ItemStack p_248581_, boolean p_310619_) {
@@ -42,7 +41,7 @@ public class ChangeLedCubeRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess reg) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
         ItemStack source = ItemStack.EMPTY;
         Integer sourceDye = null;
 
@@ -67,8 +66,8 @@ public class ChangeLedCubeRecipe extends ShapedRecipe {
         }
         
         // At this point, valid
-        ItemStack result = this.getResultItem(reg).copy();
-        result.setTag(source.getOrCreateTag());
+        ItemStack result = this.getResultItem(null).copy();
+        result.applyComponents(source.getComponents());
         return result;
     }
 
@@ -80,31 +79,35 @@ public class ChangeLedCubeRecipe extends ShapedRecipe {
     public static class ChangeLedSerializer implements RecipeSerializer<ChangeLedCubeRecipe> {
         public static final String REGISTRY_NAME = "changeledcube";
     
+        public static final StreamCodec<RegistryFriendlyByteBuf, ChangeLedCubeRecipe> STREAM_CODEC = StreamCodec.of(
+            ChangeLedCubeRecipe.ChangeLedSerializer::toNetwork, ChangeLedCubeRecipe.ChangeLedSerializer::fromNetwork
+        );
+
         @Override
-        public Codec<ChangeLedCubeRecipe> codec() {
-            return RecordCodecBuilder.create((p_309256_) -> {
-                return p_309256_.group(ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter((p_309251_) -> {
-                    return p_309251_.getGroup();
-                }), CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter((p_309253_) -> {
-                    return p_309253_.category();
-                }), ShapedRecipePattern.MAP_CODEC.forGetter((p_309254_) -> {
-                    return p_309254_.shapedPattern;
-                }), ItemStack.ITEM_WITH_COUNT_CODEC.fieldOf("result").forGetter((p_309252_) -> {
-                    return p_309252_.getResultItem(null);
-                }), ExtraCodecs.strictOptionalField(Codec.BOOL, "show_notification", true).forGetter((p_309255_) -> {
-                    return p_309255_.showNotification();
-                })).apply(p_309256_, ChangeLedCubeRecipe::new);
-            });
+        public MapCodec<ChangeLedCubeRecipe> codec() {
+            return RecordCodecBuilder.mapCodec(
+                p_327208_ -> p_327208_.group(
+                    Codec.STRING.optionalFieldOf("group", "").forGetter(p_309251_ -> p_309251_.getGroup()),
+                    CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(p_309253_ -> p_309253_.category()),
+                    ShapedRecipePattern.MAP_CODEC.forGetter(p_309254_ -> p_309254_.shapedPattern),
+                    ItemStack.STRICT_CODEC.fieldOf("result").forGetter(p_309252_ -> p_309252_.getResultItem(null)),
+                    Codec.BOOL.optionalFieldOf("show_notification", Boolean.valueOf(true)).forGetter(p_309255_ -> p_309255_.showNotification())
+                )
+                .apply(p_327208_, ChangeLedCubeRecipe::new)
+            );
         }
 
         @Override
-        public @Nullable ChangeLedCubeRecipe fromNetwork(FriendlyByteBuf p_44106_) {
-            return new ChangeLedCubeRecipe(RecipeSerializer.SHAPED_RECIPE.fromNetwork(p_44106_));
+        public StreamCodec<RegistryFriendlyByteBuf, ChangeLedCubeRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
 
-        @Override
-        public void toNetwork(FriendlyByteBuf p_44101_, ChangeLedCubeRecipe p_44102_) {
-            RecipeSerializer.SHAPED_RECIPE.toNetwork(p_44101_, p_44102_);
+        private static ChangeLedCubeRecipe fromNetwork(RegistryFriendlyByteBuf p_335571_) {
+            return new ChangeLedCubeRecipe(ShapedRecipe.Serializer.STREAM_CODEC.decode(p_335571_));
+        }
+
+        private static void toNetwork(RegistryFriendlyByteBuf p_336365_, ShapedRecipe p_330934_) {
+            ShapedRecipe.Serializer.STREAM_CODEC.encode(p_336365_, p_330934_);
         }
     }
 }

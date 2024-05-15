@@ -2,8 +2,6 @@ package io.github.tofodroid.mods.mimi.common.item;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.network.chat.Component;
@@ -12,10 +10,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
 
 public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     protected final String REGISTRY_NAME;
@@ -28,23 +25,14 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
-
-        // Client-side only
-        if(worldIn != null && worldIn.isClientSide) {
-            MidiNbtDataUtils.appendSettingsTooltip(stack, tooltip);
-        }
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
+        MidiNbtDataUtils.appendSettingsTooltip(stack, tooltip);
     }
 
     @Override
     public Byte getInstrumentId() {
         return this.instrumentBlock.getInstrumentId();
-    }
-
-    @Override
-    public Boolean isColorable() {
-        return this.instrumentBlock.isColorable();
     }
 
     @Override
@@ -55,14 +43,6 @@ public class ItemInstrumentBlock extends BlockItem implements IInstrumentItem {
     @Override
     public Integer getDefaultChannels() {
         return this.instrumentBlock.getDefaultChannels();
-    }
-    
-    @Override
-    public InteractionResult useOn(UseOnContext context) {
-        if(washItem(context)) {
-            return InteractionResult.SUCCESS;
-        }
-        return super.useOn(context);
     }
 
     @Override

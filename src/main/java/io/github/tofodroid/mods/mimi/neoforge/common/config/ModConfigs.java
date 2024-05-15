@@ -26,8 +26,8 @@ public class ModConfigs {
     }
 
     public static void registerConfigs() { 
-        ModLoadingContext.get().registerConfig(Type.CLIENT, ModConfigs.CLIENTSPEC);
-        ModLoadingContext.get().registerConfig(Type.COMMON, ModConfigs.COMMONSPEC);
+        ModLoadingContext.get().getActiveContainer().registerConfig(Type.CLIENT, ModConfigs.CLIENTSPEC);
+        ModLoadingContext.get().getActiveContainer().registerConfig(Type.COMMON, ModConfigs.COMMONSPEC);
     }
 
     public static Path getConfigPath() {

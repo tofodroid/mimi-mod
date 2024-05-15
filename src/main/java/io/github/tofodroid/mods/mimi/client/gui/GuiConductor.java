@@ -40,7 +40,7 @@ public class GuiConductor extends BaseGui {
             return;
         }
         this.conductorStack = new ItemStack(conductorStack.getItem(), conductorStack.getCount());
-        this.conductorStack.setTag(conductorStack.getOrCreateTag().copy());
+        this.conductorStack.applyComponents(conductorStack.getComponents());
     }
 
     @Override

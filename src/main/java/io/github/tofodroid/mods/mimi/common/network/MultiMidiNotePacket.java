@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,12 +15,13 @@ import net.minecraft.resources.ResourceLocation;
 
 public class MultiMidiNotePacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MultiMidiNotePacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<MultiMidiNotePacket> TYPE = new Type<>(ID);
 
     private final Map<Long, ArrayList<NetMidiEvent>> sourceMap;
     public final TreeMap<Long, List<MidiNotePacket>> resultPackets;
 
     public MultiMidiNotePacket(Map<Long, ArrayList<NetMidiEvent>> sourceMap) {
-        this.sourceMap = sourceMap;
+        this.sourceMap = new HashMap<>(sourceMap);
         this.resultPackets = new TreeMap<>();
         
         for(Map.Entry<Long, ArrayList<NetMidiEvent>> sourceEntry : sourceMap.entrySet()) {
@@ -36,15 +38,10 @@ public class MultiMidiNotePacket implements CustomPacketPayload {
         this.resultPackets = packets;
         this.sourceMap = Map.of();
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return MultiMidiNotePacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        MultiMidiNotePacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static MultiMidiNotePacket decodePacket(FriendlyByteBuf buf) {

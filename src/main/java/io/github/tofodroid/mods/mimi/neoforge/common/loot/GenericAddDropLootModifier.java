@@ -1,6 +1,6 @@
 package io.github.tofodroid.mods.mimi.neoforge.common.loot;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 
 public class GenericAddDropLootModifier extends LootModifier {
-    public static final Codec<GenericAddDropLootModifier> CODEC = RecordCodecBuilder.create(
+    public static final MapCodec<GenericAddDropLootModifier> CODEC = RecordCodecBuilder.mapCodec(
         inst -> LootModifier.codecStart(inst)
         .and(
             BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(m -> m.item)
@@ -35,8 +35,8 @@ public class GenericAddDropLootModifier extends LootModifier {
     }
 
     @Override
-    public Codec<? extends IGlobalLootModifier> codec() {
-        return ModLootModifiers.GENERIC_ADD_DROP.get();
+    public MapCodec<? extends IGlobalLootModifier> codec() {
+        return CODEC;
     }
 }
 

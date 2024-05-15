@@ -18,7 +18,6 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -51,21 +50,23 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         TileTransmitter tile = getTileForBlock(worldIn, pos);
         
         if(tile != null) {
-            ItemStack handStack = player.getItemInHand(hand);
+            ItemStack handStack = player.getItemInHand(player.getUsedItemHand());
 
             if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER) || handStack.getItem().equals(ModItems.RELAY))) {
                 if(!worldIn.isClientSide) {
                     String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
                     MidiNbtDataUtils.setMidiSourceFromTransmitter(handStack, tile.getUUID(), transmitterName);
-                    player.setItemInHand(hand, handStack);
+                    player.setItemInHand(player.getUsedItemHand(), handStack);
                     player.displayClientMessage(Component.literal("Linked to Transmitter"), true);
+                    return InteractionResult.CONSUME;
                 }
             } else if(worldIn.isClientSide) {
                 ClientGuiWrapper.openTransmitterBlockGui(worldIn, tile.getUUID());
+                return InteractionResult.CONSUME;
             }
         }
 
@@ -96,7 +97,7 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
         TileTransmitter tileEntity = getTileForBlock(worldIn, pos);
         if (tileEntity != null) {
             ItemStack newStack = new ItemStack(stack.getItem(), 1);
-            newStack.setTag(stack.getOrCreateTag().copy());
+            newStack.applyComponents(stack.getComponents());
             tileEntity.setSourceStack(newStack);
             
             if(!worldIn.isClientSide) {

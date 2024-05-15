@@ -3,8 +3,8 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -58,7 +58,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
         ItemStack source = ItemStack.EMPTY;
         ItemStack target = ItemStack.EMPTY;
 

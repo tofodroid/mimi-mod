@@ -4,11 +4,11 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.command.ModCommands;
 import io.github.tofodroid.mods.mimi.common.mob.villager.ModVillagers;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 
-@Mod.EventBusSubscriber(modid = MIMIMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = MIMIMod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class CommonForgeRegistrationHandler {
     
     @SubscribeEvent

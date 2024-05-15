@@ -86,14 +86,14 @@ public class TileTransmitterPlaylistHandler extends APlaylistHandler {
     @SuppressWarnings("null")
     protected void saveData() {
         ItemStack sourceStack = tile.getSourceStack();
-        PlaylistData.writeToTag(data, sourceStack.getOrCreateTag());
+        PlaylistData.writeToComponents(data, sourceStack);
         tile.setSourceStack(sourceStack);
         tile.getLevel().sendBlockUpdated(tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 2);
         this.refreshData();
     }
     
     protected void refreshData() {
-        this.data = PlaylistData.loadFromTag(tile.getSourceStack().getOrCreateTag());
+        this.data = PlaylistData.loadFromComponents(tile.getSourceStack());
     }
 
     @Override

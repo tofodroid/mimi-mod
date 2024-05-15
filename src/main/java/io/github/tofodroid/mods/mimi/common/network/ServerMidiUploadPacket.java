@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ServerMidiUploadPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMidiUploadPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ServerMidiUploadPacket> TYPE = new Type<>(ID);
     public static final int MAX_DATA_SIZE = 30000;
     public static final Byte UPLOAD_SUCCESS = Integer.valueOf(0).byteValue();
     public static final Byte UPLOAD_RESEND = Integer.valueOf(1).byteValue();
@@ -54,15 +55,10 @@ public class ServerMidiUploadPacket implements CustomPacketPayload {
             this.data = data;
         }
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return ServerMidiUploadPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        ServerMidiUploadPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
     
     public static ServerMidiUploadPacket decodePacket(FriendlyByteBuf buf) {

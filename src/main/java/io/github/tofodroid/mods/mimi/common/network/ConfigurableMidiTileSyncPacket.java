@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ConfigurableMidiTileSyncPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ConfigurableMidiTileSyncPacket> TYPE = new Type<>(ID);
 
     public final BlockPos tilePos;
     public final UUID midiSource;
@@ -59,15 +60,10 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         this.broadcastRange = MidiNbtDataUtils.getBroadcastRange(sourceStack);
         this.channelMap = MidiNbtDataUtils.getChannelMap(sourceStack);
     }
-
+    
     @Override
-    public ResourceLocation id() {
-        return ConfigurableMidiTileSyncPacket.ID;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        ConfigurableMidiTileSyncPacket.encodePacket(this, buf);
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
