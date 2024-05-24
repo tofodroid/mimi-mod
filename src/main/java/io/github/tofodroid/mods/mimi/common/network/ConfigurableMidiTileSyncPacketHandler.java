@@ -21,7 +21,6 @@ public class ConfigurableMidiTileSyncPacketHandler {
             MidiNbtDataUtils.setFilterInstrument(midiStack, message.instrumentId);
             MidiNbtDataUtils.setFilterNote(midiStack, message.filterNote);
             MidiNbtDataUtils.setFilterOct(midiStack, message.filterOct);
-            MidiNbtDataUtils.setInvertInstrument(midiStack, message.invertInstrument);
             MidiNbtDataUtils.setInvertNoteOct(midiStack, message.invertNoteOct);
             MidiNbtDataUtils.setInvertSignal(midiStack, message.invertSignal);
             MidiNbtDataUtils.setTriggerNoteStart(midiStack, message.triggerNoteStart);

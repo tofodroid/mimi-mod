@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class CloneMidiSettingsRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "clonemidi";
-    public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER);
+    public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER, ModItems.RELAY);
 	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
 
     public CloneMidiSettingsRecipe(ResourceLocation recipeId, CraftingBookCategory category) {
@@ -85,7 +85,6 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
                 MidiNbtDataUtils.setFilterNote(result, MidiNbtDataUtils.getFilterNote(source));
                 MidiNbtDataUtils.setInvertNoteOct(result, MidiNbtDataUtils.getInvertNoteOct(source));
                 MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
-                MidiNbtDataUtils.setInvertInstrument(result, MidiNbtDataUtils.getInvertInstrument(source));
                 MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
                 MidiNbtDataUtils.setTriggerNoteStart(result, MidiNbtDataUtils.getTriggerNoteStart(source));
                 MidiNbtDataUtils.setHoldTicks(result, MidiNbtDataUtils.getHoldTicks(source));

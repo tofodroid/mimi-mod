@@ -25,8 +25,7 @@ public class GuiListener extends BaseGui {
     private static final Vector2Int TRIGGER_MODE_WIDGET_COORDS = new Vector2Int(6,59);
     private static final Vector2Int HOLD_TICKS_WIDGET_COORDS = new Vector2Int(180,59);
     private static final Vector2Int FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2Int(9,40);
-    private static final Vector2Int FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2Int(143,40);
-    private static final Vector2Int FILTER_INSTRUMENT_INVERT_BUTTON_COORDS = new Vector2Int(161,40);
+    private static final Vector2Int FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2Int(161,40);
     private static final Vector2Int INVERT_POWER_WIDGET_COORDS = new Vector2Int(281,5);
 
     // Widgets
@@ -82,9 +81,6 @@ public class GuiListener extends BaseGui {
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(FILTER_INSTRUMENT_NEXT_BUTTON_COORDS))) {
             this.shiftInstrumentId(true);
             this.syncListenerToServer();
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(FILTER_INSTRUMENT_INVERT_BUTTON_COORDS))) {
-            MidiNbtDataUtils.setInvertInstrument(listenerStack, !MidiNbtDataUtils.getInvertInstrument(listenerStack));
-            this.syncListenerToServer();
         } else if(noteFilter.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
         } else if(invertSignal.mouseClicked(imouseX, imouseY, mouseButton)) {
@@ -103,10 +99,6 @@ public class GuiListener extends BaseGui {
     protected PoseStack renderGraphics(PoseStack graphics, int mouseX, int mouseY, float partialTicks) {
         // GUI Background
         this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
-
-        if(MidiNbtDataUtils.getInvertInstrument(listenerStack)) {
-            this.blitAbsolute(graphics, guiTexture, START_X + 167, START_Y + 34, 0, 86, 3, 3, TEXTURE_SIZE, TEXTURE_SIZE);
-        }
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
         this.invertSignal.renderGraphics(graphics, mouseX, mouseY);
