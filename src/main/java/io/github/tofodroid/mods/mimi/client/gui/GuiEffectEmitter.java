@@ -1,8 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import org.joml.Vector2i;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import org.lwjgl.glfw.GLFW;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
@@ -10,6 +9,7 @@ import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
+import io.github.tofodroid.mods.mimi.util.MathUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,45 +27,45 @@ public class GuiEffectEmitter extends BaseGui {
     private static final Integer DEFAULT_TEXT_FIELD_COLOR = 14737632;
 
     // GUI
-    private static final Vector2i INVERT_SIGNAL_WIDGET_COORDS = new Vector2i(281,5);
+    private static final Vector2Int INVERT_SIGNAL_WIDGET_COORDS = new Vector2Int(281,5);
 
-    private static final Vector2i SOUND_BOX_COORDS = new Vector2i(46,32);
-    private static final Vector2i PLAY_SOUND_BUTTON_COORDS = new Vector2i(278,29);
+    private static final Vector2Int SOUND_BOX_COORDS = new Vector2Int(46,32);
+    private static final Vector2Int PLAY_SOUND_BUTTON_COORDS = new Vector2Int(278,29);
 
-    private static final Vector2i VOL_DOWN_BUTTON_COORDS = new Vector2i(30,51);
-    private static final Vector2i VOL_UP_BUTTON_COORDS = new Vector2i(66,51);
-    private static final Vector2i VOL_TEXT_COORDS = new Vector2i(50,55);
-    private static final Vector2i PITCH_DOWN_BUTTON_COORDS = new Vector2i(116,51);
-    private static final Vector2i PITCH_UP_BUTTON_COORDS = new Vector2i(152,51);
-    private static final Vector2i PITCH_TEXT_COORDS = new Vector2i(136,55);
-    private static final Vector2i S_LOOP_DOWN_BUTTON_COORDS = new Vector2i(230, 51);
-    private static final Vector2i S_LOOP_UP_BUTTON_COORDS = new Vector2i(278, 51);
-    private static final Vector2i S_LOOP_TEXT_COORDS = new Vector2i(250, 55);
+    private static final Vector2Int VOL_DOWN_BUTTON_COORDS = new Vector2Int(30,51);
+    private static final Vector2Int VOL_UP_BUTTON_COORDS = new Vector2Int(66,51);
+    private static final Vector2Int VOL_TEXT_COORDS = new Vector2Int(50,55);
+    private static final Vector2Int PITCH_DOWN_BUTTON_COORDS = new Vector2Int(116,51);
+    private static final Vector2Int PITCH_UP_BUTTON_COORDS = new Vector2Int(152,51);
+    private static final Vector2Int PITCH_TEXT_COORDS = new Vector2Int(136,55);
+    private static final Vector2Int S_LOOP_DOWN_BUTTON_COORDS = new Vector2Int(230, 51);
+    private static final Vector2Int S_LOOP_UP_BUTTON_COORDS = new Vector2Int(278, 51);
+    private static final Vector2Int S_LOOP_TEXT_COORDS = new Vector2Int(250, 55);
 
-    private static final Vector2i PARTICLE_BOX_COORDS = new Vector2i(51,81);
-    private static final Vector2i PLAY_PARTICLE_BUTTON_COORDS = new Vector2i(278,78);
+    private static final Vector2Int PARTICLE_BOX_COORDS = new Vector2Int(51,81);
+    private static final Vector2Int PLAY_PARTICLE_BUTTON_COORDS = new Vector2Int(278,78);
     
-    private static final Vector2i SIDE_DOWN_BUTTON_COORDS = new Vector2i(32,100);
-    private static final Vector2i SIDE_UP_BUTTON_COORDS = new Vector2i(62,100);
-    private static final Vector2i SIDE_TEXT_COORDS = new Vector2i(52,104);
-    private static final Vector2i SPEED_X_DOWN_BUTTON_COORDS = new Vector2i(116,100);
-    private static final Vector2i SPEED_X_UP_BUTTON_COORDS = new Vector2i(158,100);
-    private static final Vector2i SPEED_X_TEXT_COORDS = new Vector2i(136,107);
-    private static final Vector2i SPEED_Y_DOWN_BUTTON_COORDS = new Vector2i(176,100);
-    private static final Vector2i SPEED_Y_UP_BUTTON_COORDS = new Vector2i(218,100);
-    private static final Vector2i SPEED_Y_TEXT_COORDS = new Vector2i(196,107);
-    private static final Vector2i SPEED_Z_DOWN_BUTTON_COORDS = new Vector2i(236,100);
-    private static final Vector2i SPEED_Z_UP_BUTTON_COORDS = new Vector2i(278,100);
-    private static final Vector2i SPEED_Z_TEXT_COORDS = new Vector2i(256,107);
-    private static final Vector2i SPREAD_DOWN_BUTTON_COORDS = new Vector2i(36,122);
-    private static final Vector2i SPREAD_UP_BUTTON_COORDS = new Vector2i(66,122);
-    private static final Vector2i SPREAD_TEXT_COORDS = new Vector2i(56,126);
-    private static final Vector2i COUNT_DOWN_BUTTON_COORDS = new Vector2i(116,122);
-    private static final Vector2i COUNT_UP_BUTTON_COORDS = new Vector2i(152,122);
-    private static final Vector2i COUNT_TEXT_COORDS = new Vector2i(136,126);
-    private static final Vector2i P_LOOP_DOWN_BUTTON_COORDS = new Vector2i(230, 122);
-    private static final Vector2i P_LOOP_UP_BUTTON_COORDS = new Vector2i(278, 122);
-    private static final Vector2i P_LOOP_TEXT_COORDS = new Vector2i(250, 126);
+    private static final Vector2Int SIDE_DOWN_BUTTON_COORDS = new Vector2Int(32,100);
+    private static final Vector2Int SIDE_UP_BUTTON_COORDS = new Vector2Int(62,100);
+    private static final Vector2Int SIDE_TEXT_COORDS = new Vector2Int(52,104);
+    private static final Vector2Int SPEED_X_DOWN_BUTTON_COORDS = new Vector2Int(116,100);
+    private static final Vector2Int SPEED_X_UP_BUTTON_COORDS = new Vector2Int(158,100);
+    private static final Vector2Int SPEED_X_TEXT_COORDS = new Vector2Int(136,107);
+    private static final Vector2Int SPEED_Y_DOWN_BUTTON_COORDS = new Vector2Int(176,100);
+    private static final Vector2Int SPEED_Y_UP_BUTTON_COORDS = new Vector2Int(218,100);
+    private static final Vector2Int SPEED_Y_TEXT_COORDS = new Vector2Int(196,107);
+    private static final Vector2Int SPEED_Z_DOWN_BUTTON_COORDS = new Vector2Int(236,100);
+    private static final Vector2Int SPEED_Z_UP_BUTTON_COORDS = new Vector2Int(278,100);
+    private static final Vector2Int SPEED_Z_TEXT_COORDS = new Vector2Int(256,107);
+    private static final Vector2Int SPREAD_DOWN_BUTTON_COORDS = new Vector2Int(36,122);
+    private static final Vector2Int SPREAD_UP_BUTTON_COORDS = new Vector2Int(66,122);
+    private static final Vector2Int SPREAD_TEXT_COORDS = new Vector2Int(56,126);
+    private static final Vector2Int COUNT_DOWN_BUTTON_COORDS = new Vector2Int(116,122);
+    private static final Vector2Int COUNT_UP_BUTTON_COORDS = new Vector2Int(152,122);
+    private static final Vector2Int COUNT_TEXT_COORDS = new Vector2Int(136,126);
+    private static final Vector2Int P_LOOP_DOWN_BUTTON_COORDS = new Vector2Int(230, 122);
+    private static final Vector2Int P_LOOP_UP_BUTTON_COORDS = new Vector2Int(278, 122);
+    private static final Vector2Int P_LOOP_TEXT_COORDS = new Vector2Int(250, 126);
 
     // Widgets
     private InvertSignalWidget invertSignalWidget;
@@ -92,13 +92,13 @@ public class GuiEffectEmitter extends BaseGui {
             return;
         }
         this.emitterStack = new ItemStack(emitterStack.getItem(), emitterStack.getCount());
-        this.emitterStack.setTag(emitterStack.getOrCreateTag().copy());
+        this.emitterStack.applyComponents(emitterStack.getComponents());
     }
 
     @Override
     public void init() {
         super.init();
-        this.invertSignalWidget = new InvertSignalWidget(emitterStack, new Vector2i(START_X, START_Y), INVERT_SIGNAL_WIDGET_COORDS);
+        this.invertSignalWidget = new InvertSignalWidget(emitterStack, new Vector2Int(START_X, START_Y), INVERT_SIGNAL_WIDGET_COORDS);
         this.soundBox = this.addWidget(new EditBox(this.font, this.START_X + SOUND_BOX_COORDS.x, this.START_Y + SOUND_BOX_COORDS.y, 229, 10, CommonComponents.EMPTY));
             soundBox.setMaxLength(512);    
             soundBox.setValue(TagUtils.getStringOrDefault(emitterStack, TileEffectEmitter.SOUND_ID_TAG, ""));
@@ -147,25 +147,25 @@ public class GuiEffectEmitter extends BaseGui {
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOL_DOWN_BUTTON_COORDS))) {
             Byte volume = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5);
             addAmount = mouseModifier ? 2 : addAmount;
-            volume = this.addClamped(volume, -addAmount, 0, 10);
+            volume = MathUtils.addClamped(volume, -addAmount, 0, 10);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.VOLUME_TAG, volume);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOL_UP_BUTTON_COORDS))) {
             Byte volume = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5);
             addAmount = mouseModifier ? 2 : addAmount;
-            volume = this.addClamped(volume, addAmount, 0, 10);
+            volume = MathUtils.addClamped(volume, addAmount, 0, 10);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.VOLUME_TAG, volume);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PITCH_DOWN_BUTTON_COORDS))) {
             Byte pitch = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            pitch = this.addClamped(pitch, -addAmount, -2, 2);
+            pitch = MathUtils.addClamped(pitch, -addAmount, -2, 2);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PITCH_TAG, pitch);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PITCH_UP_BUTTON_COORDS))) {
             Byte pitch = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            pitch = this.addClamped(pitch, addAmount, -2, 2);
+            pitch = MathUtils.addClamped(pitch, addAmount, -2, 2);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PITCH_TAG, pitch);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_PARTICLE_BUTTON_COORDS))) {
@@ -173,118 +173,102 @@ public class GuiEffectEmitter extends BaseGui {
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SIDE_DOWN_BUTTON_COORDS))) {
             Byte side = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            side = this.addClamped(side, -addAmount, 0, 5);
+            side = MathUtils.addClamped(side, -addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SIDE_TAG, side);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SIDE_UP_BUTTON_COORDS))) {
             Byte side = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            side = this.addClamped(side, addAmount, 0, 5);
+            side = MathUtils.addClamped(side, addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SIDE_TAG, side);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPREAD_DOWN_BUTTON_COORDS))) {
             Byte spread = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            spread = this.addClamped(spread, -addAmount, 0, 5);
+            spread = MathUtils.addClamped(spread, -addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPREAD_TAG, spread);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPREAD_UP_BUTTON_COORDS))) {
             Byte spread = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0);
             addAmount = mouseModifier ? 2 : addAmount;
-            spread = this.addClamped(spread, addAmount, 0, 5);
+            spread = MathUtils.addClamped(spread, addAmount, 0, 5);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPREAD_TAG, spread);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(COUNT_DOWN_BUTTON_COORDS))) {
             Byte count = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1);
             addAmount = mouseModifier ? 5 : addAmount;
-            count = this.addClamped(count, -addAmount, 1, 20);
+            count = MathUtils.addClamped(count, -addAmount, 1, 20);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.COUNT_TAG, count);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(COUNT_UP_BUTTON_COORDS))) {
             Byte count = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1);
             addAmount = mouseModifier ? 5 : addAmount;
-            count = this.addClamped(count, addAmount, 1, 20);
+            count = MathUtils.addClamped(count, addAmount, 1, 20);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.COUNT_TAG, count);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_X_DOWN_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, -addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, -addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_X_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_X_UP_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_X_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Y_DOWN_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, -addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, -addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Y_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Y_UP_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Y_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Z_DOWN_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, -addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, -addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Z_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SPEED_Z_UP_BUTTON_COORDS))) {
             Byte speed = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0);
             addAmount = mouseModifier ? 5 : addAmount;
-            speed = this.addClamped(speed, addAmount, -50, 50);
+            speed = MathUtils.addClamped(speed, addAmount, -50, 50);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Z_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(S_LOOP_DOWN_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, -addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, -addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(S_LOOP_UP_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_DOWN_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, -addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, -addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_UP_BUTTON_COORDS))) {
             Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
-            loop = this.addClamped(loop, addAmount, 0, 999);
+            loop = MathUtils.addClamped(loop, addAmount, 0, 999);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         }
 
         return super.mouseClicked(dmouseX, dmouseY, mouseButton);
-    }
-
-    public Byte addClamped(Byte value, Integer add, Integer min, Integer max) {
-        return addClamped(value.intValue(), add, min, max).byteValue();
-    }
-
-    public Integer addClamped(Integer value, Integer add, Integer min, Integer max) {
-        Integer result = value + add;
-
-        if(result < min) {
-            result = min;
-        } else if(result > max) {
-            result = max;
-        }
-
-        return result;
     }
 
     public void syncEffectEmitterToServer() {
@@ -343,11 +327,8 @@ public class GuiEffectEmitter extends BaseGui {
     // Render Functions
     @Override
     protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     
         // Widgets
         this.invertSignalWidget.renderGraphics(graphics, mouseX, mouseY);
@@ -363,16 +344,16 @@ public class GuiEffectEmitter extends BaseGui {
         this.invertSignalWidget.renderText(graphics, font, mouseX, mouseY);
 
         // Counters
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5).toString(), START_X + VOL_TEXT_COORDS.x, START_Y + VOL_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0).toString(), START_X + PITCH_TEXT_COORDS.x, START_Y + PITCH_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0).toString(), START_X + SPREAD_TEXT_COORDS.x, START_Y + SPREAD_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)).substring(0,1), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1).toString(), START_X + COUNT_TEXT_COORDS.x, START_Y + COUNT_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0).toString(), START_X + SPEED_Z_TEXT_COORDS.x, START_Y + SPEED_Z_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0)), START_X + S_LOOP_TEXT_COORDS.x, START_Y + S_LOOP_TEXT_COORDS.y, 0xFF00E600);
-        graphics.drawString(font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0)), START_X + P_LOOP_TEXT_COORDS.x, START_Y + P_LOOP_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5).toString(), START_X + VOL_TEXT_COORDS.x, START_Y + VOL_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PITCH_TAG, 0).toString(), START_X + PITCH_TEXT_COORDS.x, START_Y + PITCH_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPREAD_TAG, 0).toString(), START_X + SPREAD_TEXT_COORDS.x, START_Y + SPREAD_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, BlockEffectEmitter.getSideFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0)).substring(0,1), START_X + SIDE_TEXT_COORDS.x, START_Y + SIDE_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.COUNT_TAG, 1).toString(), START_X + COUNT_TEXT_COORDS.x, START_Y + COUNT_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0).toString(), START_X + SPEED_Z_TEXT_COORDS.x, START_Y + SPEED_Z_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0)), START_X + S_LOOP_TEXT_COORDS.x, START_Y + S_LOOP_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0)), START_X + P_LOOP_TEXT_COORDS.x, START_Y + P_LOOP_TEXT_COORDS.y, 0xFF00E600);
 
         return graphics;
     }

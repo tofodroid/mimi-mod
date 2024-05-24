@@ -3,12 +3,12 @@ package io.github.tofodroid.mods.mimi.common.network;
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.client.gui.GuiTransmitterBlock;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 public class ServerMusicPlayerStatusPacketHandler {
     public static void handlePacketServer(ServerMusicPlayerStatusPacket request, ServerPlayer sender) {
-        ServerMusicPlayerStatusPacket response = ServerMusicTransmitterManager.createStatusPacket(request.musicPlayerId);
+        ServerMusicPlayerStatusPacket response = ServerTransmitterManager.createStatusPacket(request.musicPlayerId);
         
         if(response != null) {
             NetworkProxy.sendToPlayer(sender, response);

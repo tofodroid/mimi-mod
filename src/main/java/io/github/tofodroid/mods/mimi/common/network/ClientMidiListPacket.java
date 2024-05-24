@@ -6,8 +6,12 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public class ClientMidiListPacket {
+public class ClientMidiListPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ClientMidiListPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ClientMidiListPacket> TYPE = new Type<>(ID);
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
     public final List<BasicMidiInfo> infos;
 
@@ -16,12 +20,17 @@ public class ClientMidiListPacket {
     }
 
     public ClientMidiListPacket(List<BasicMidiInfo> infos) {
-        if(infos.size() > 50) {
-            MIMIMod.LOGGER.warn("ClientMidiListPacket can only accept up to 50 files. Trimming list ot 50.");
-            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 50);
+        if(infos.size() > 1000) {
+            MIMIMod.LOGGER.warn("ClientMidiListPacket can only accept up to 1000 files. Trimming list to 1000.");
+            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 1000);
         } else {
             this.infos = new ArrayList<BasicMidiInfo>(infos);
         }
+    }
+    
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static ClientMidiListPacket decodePacket(FriendlyByteBuf buf) {

@@ -13,7 +13,6 @@ public class MidiDataManager {
 
     public MidiDataManager() {
         this.inputDeviceManager = new MidiInputDeviceManager();
-        this.inputDeviceManager.open();
     }
 
     public void setPlayerStatusPakcet(ServerMusicPlayerStatusPacket packet) {

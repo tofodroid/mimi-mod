@@ -4,13 +4,20 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.InstrumentBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
+import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileMechanicalMaestro extends AContainerTile {
     public static final String REGISTRY_NAME = "mechanicalmaestro";
-    public static final UUID MECH_SOURCE_ID = new UUID(0,3);
 
     private UUID id;
 
@@ -79,7 +85,7 @@ public class TileMechanicalMaestro extends AContainerTile {
     public void clearContent() {
         this.allNotesOff();
         super.clearContent();
-        ServerMusicReceiverManager.removeReceivers(this.getUUID());
+        BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
     }
 
     @Override
@@ -88,8 +94,8 @@ public class TileMechanicalMaestro extends AContainerTile {
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
         this.refreshMidiReceivers();
     }
 
@@ -105,7 +111,7 @@ public class TileMechanicalMaestro extends AContainerTile {
 
         if(!this.getLevel().isClientSide()) {
             this.allNotesOff();
-            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
  
@@ -115,19 +121,13 @@ public class TileMechanicalMaestro extends AContainerTile {
 
         if(!this.getLevel().isClientSide()) {
             this.allNotesOff();
-            ServerMusicReceiverManager.removeReceivers(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
-
-    public void refreshMidiReceivers() {
-        if(this.hasLevel() && !this.level.isClientSide) {
-            if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
-                ServerMusicReceiverManager.loadMechanicalMaestroInstrumentReceivers(this);
-            } else {
-                this.allNotesOff();
-                ServerMusicReceiverManager.removeReceivers(this.getUUID());
-            }
-        }
+    
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+        return stack.getItem() instanceof IInstrumentItem;
     }
 
     public List<ItemStack> getInstrumentStacks() {
@@ -148,11 +148,37 @@ public class TileMechanicalMaestro extends AContainerTile {
     
     public void allNotesOff(Byte instrumentId) {
 		if(instrumentId != null && this.getLevel() instanceof ServerLevel) {
-			MidiNotePacketHandler.handlePacketServer(
-                MidiNotePacket.createAllNotesOffPacket(instrumentId, TileMechanicalMaestro.MECH_SOURCE_ID, this.getBlockPos(), null),
-                (ServerLevel)this.getLevel(),
-                null
+			ServerNoteConsumerManager.handlePacket(
+                MidiNotePacket.createAllNotesOffPacket(instrumentId, this.getUUID(), this.getBlockPos(), null),
+                this.getUUID(),
+                (ServerLevel)this.getLevel()
             );
 		}
+    }
+
+    public void refreshMidiReceivers() {
+        if(this.hasLevel() && !this.level.isClientSide) {            
+            if(this.hasAnInstrument() && this.getBlockState().getValue(BlockMechanicalMaestro.POWERED)) {
+                BroadcastConsumerInventoryHolder holder = new BroadcastConsumerInventoryHolder(this.getUUID());
+        
+                for(int i = 0; i < this.getInstrumentStacks().size(); i++) {
+                    ItemStack instrumentStack = this.getInstrumentStacks().get(i);
+                    if(instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
+                        holder.putConsumer(i, new InstrumentBroadcastConsumer(
+                            this.getBlockPos(),
+                            this.getLevel().dimension(),
+                            this.getUUID(),
+                            instrumentStack,
+                            null
+                        ));
+                    }
+                }
+                BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
+                BroadcastManager.registerConsumers(holder);
+            } else {
+                this.allNotesOff();
+                BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
+            }
+        }
     }
 }

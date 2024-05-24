@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AStaticInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
+public abstract class AStaticInventoryTile extends BlockEntity implements WorldlyContainer, StackedContentsCompatible {
     protected final Integer INVENTORY_SIZE;
     protected NonNullList<ItemStack> items;
 
@@ -35,20 +35,25 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
     }
 
     @Override
-	protected void saveAdditional(CompoundTag compound) {
-		super.saveAdditional(compound);
-        ContainerHelper.saveAllItems(compound, this.items);
+	protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+		super.saveAdditional(nbt, pRegistries);
+        ContainerHelper.saveAllItems(nbt, this.items, pRegistries);
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-        super.load(nbt);
-        this.loadItems(nbt);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
+        this.loadItems(nbt, pRegistries);
 	}
 
-    public void loadItems(CompoundTag nbt) {
+    public void loadItems(CompoundTag nbt, HolderLookup.Provider pRegistries) {
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(nbt, this.items);
+        ContainerHelper.loadAllItems(nbt, this.items, pRegistries);
+        this.onItemsLoaded();
+    }
+
+    public void onItemsLoaded() {
+
     }
     
     @Override
@@ -112,18 +117,13 @@ public class AStaticInventoryTile extends BlockEntity implements WorldlyContaine
     }
     
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
+        return this.saveCustomOnly(pRegistries);
     }
 
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        this.load(pkt.getTag());
     }
 
     protected NonNullList<ItemStack> getItems() {

@@ -7,7 +7,7 @@ import com.mojang.serialization.MapCodec;
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileReceiver;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -51,7 +51,7 @@ public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceive
             BlockEntity blockEntity = worldIn.getBlockEntity(pos);
             
             if (blockEntity instanceof TileReceiver) {
-                ServerMusicReceiverManager.removeReceivers(((TileReceiver)blockEntity).getUUID());
+                BroadcastManager.removeOwnedBroadcastConsumers(((TileReceiver)blockEntity).getUUID());
             }
         }
 
@@ -81,7 +81,9 @@ public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceive
 
         // Note Source
         if(MidiNbtDataUtils.getMidiSource(blockItemStack) != null) {
-            tooltip.add(Component.literal("  Recieve Notes From: " + (MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack) ? "Transmitter" : "Player")).withStyle(ChatFormatting.GREEN));
+            Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack);
+            Boolean isRelay = MidiNbtDataUtils.getMidiSourceIsRelay(blockItemStack);
+            tooltip.add(Component.literal("  Recieve Notes From: " + (isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"))).withStyle(ChatFormatting.GREEN));
             tooltip.add(Component.literal("  " + MidiNbtDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("  Recieve Notes From: None").withStyle(ChatFormatting.GREEN));

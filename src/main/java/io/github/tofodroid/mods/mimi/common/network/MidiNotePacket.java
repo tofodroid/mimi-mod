@@ -8,9 +8,13 @@ import javax.annotation.Nullable;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 
-public class MidiNotePacket {
+public class MidiNotePacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MidiNotePacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<MidiNotePacket> TYPE = new Type<>(ID);
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 
     public final @Nonnull Byte note;
@@ -45,6 +49,10 @@ public class MidiNotePacket {
         return new MidiNotePacket(note, velocity, instrumentId, player, pos, noteServerTime, instrumentHand);
     }
 
+    public static MidiNotePacket fromNetMidiEvent(NetMidiEvent event, Long eventTime) {
+        return new MidiNotePacket(event.note, event.velocity, event.instrumentId, event.playerId, event.pos, eventTime, null);
+    }
+
     protected MidiNotePacket(Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
         this.note = note;
         this.velocity = velocity;
@@ -53,6 +61,11 @@ public class MidiNotePacket {
         this.pos = pos;
         this.noteServerTime = noteServerTime;
         this.instrumentHand = instrumentHand;
+    }
+    
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static MidiNotePacket decodePacket(FriendlyByteBuf buf) {

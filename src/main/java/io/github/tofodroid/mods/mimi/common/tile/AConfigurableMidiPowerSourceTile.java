@@ -2,31 +2,28 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidiNoteResponsiveTile {
-    public static final Integer MAX_NOTE_ON_SECONDS = 8;
+    public static final Integer MAX_NOTE_ON_SECONDS = 10;
     
     // Runtime data
-    protected Map<Byte, Map<Byte, Long>> heldNotes = new LinkedHashMap<>();
-    protected List<Pair<Byte, Byte>> notesToTurnOff = Collections.synchronizedList(new ArrayList<>());
-    protected Boolean noteHeld;
+    protected Map<Integer, Long> heldNotes = new Int2LongArrayMap();
+    protected List<Integer> notesToTurnOff = new ArrayList<>();
+    protected Boolean noteHeld = false;
     protected Integer offCounter = 0;
 
     // Config data
@@ -41,10 +38,6 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         super(type, pos, state, inventorySize);
     }
 
-    public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiPowerSourceTile self) {
-        self.tick(world, pos, state);
-    }
-    
     @Override
     public void setRemoved() {
         super.setRemoved();
@@ -69,19 +62,14 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         this.setInverted(MidiNbtDataUtils.getInvertSignal(getSourceStack()));
         this.triggerHeld = !MidiNbtDataUtils.getTriggerNoteStart(getSourceStack());
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(getSourceStack());
+        this.noteHeld = false;
         this.clearNotes();
     }
 
     @Override
     public void execServerTick(ServerLevel world, BlockPos pos, BlockState state) {
         if(this.isBlockValid()) {
-            Boolean shouldBePowered = false;
-            
-            if(this.triggerHeld) {
-                this.noteHeld = tickNotes();
-                shouldBePowered = this.noteHeld;
-                this.applyNotesOff();
-            }
+            Boolean shouldBePowered = this.noteHeld;
 
             if(shouldBePowered) {
                 this.setPowered(true);
@@ -94,6 +82,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
                     this.offCounter++;
                 }
             }
+            
+            this.noteHeld = tickNotes();
         }
     }
 
@@ -151,58 +141,38 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         }
     }
 
-    protected void applyNotesOff() {
-        for(Pair<Byte,Byte> noteOff : this.notesToTurnOff) {
-            Map<Byte, Long> groupMap = this.heldNotes.get(noteOff.getLeft());
-
-            if(groupMap != null && !groupMap.isEmpty()) {
-                if(groupMap.remove(noteOff.getRight()) != null && groupMap.isEmpty()) {
-                    this.heldNotes.remove(noteOff.getLeft());
-                }
-            }
-        }
-
-        if(this.heldNotes.isEmpty()) {
-            this.noteHeld = false;
-        }
-
-        this.notesToTurnOff.clear();
+    protected Integer getUniqueNoteInt(Byte group, Byte note) {
+        return ((group)*128 + note);
     }
 
     protected Boolean tickNotes() {
-        List<Byte> groupsToRemove = new ArrayList<>();
-        Long nowTime = Instant.now().toEpochMilli();
+        if(this.triggerHeld) {
+            List<Integer> notesToRemove = new ArrayList<>();
+            Long nowTime = Instant.now().toEpochMilli();
 
-        // Find notes held for longer than MAX_NOTE_ON_SECONDS and time out
-        for(Byte groupId : this.heldNotes.keySet()) {
-            Map<Byte, Long> group = this.heldNotes.get(groupId);
-            List<Byte> notesToRemove = new ArrayList<>();
-        
-            for(Map.Entry<Byte, Long> note : group.entrySet()) {
-                if(nowTime - note.getValue() >= MAX_NOTE_ON_SECONDS * 1000) {
-                    notesToRemove.add(note.getKey());
+            // Find notes that were turned off or held for longer than MAX_NOTE_ON_SECONDS and time out
+            for(Integer noteId : this.heldNotes.keySet()) {
+                if(this.notesToTurnOff.contains(noteId) || nowTime - this.heldNotes.get(noteId) >= MAX_NOTE_ON_SECONDS * 1000) {
+                    notesToRemove.add(noteId);
                 }
             }
 
-            for(Byte note : notesToRemove) {
-                group.remove(note);
+            // Remove identified notes
+            for(Integer noteId : notesToRemove) {
+                this.heldNotes.remove(noteId);
             }
 
-            if(group.isEmpty()) {
-                groupsToRemove.add(groupId);
-            }
+            this.notesToTurnOff.clear();
+            return !this.heldNotes.isEmpty();
+        } else {
+            this.clearNotes();
+            return false;
         }
-
-        for(Byte groupId : groupsToRemove) {
-            this.heldNotes.remove(groupId);
-        }
-
-        return !this.heldNotes.isEmpty();
     }
 
     protected void clearNotes() {
-        this.offCounter = 0;
         this.heldNotes.clear();
+        this.notesToTurnOff.clear();
     }
 
     protected Boolean hasNotesOn() {
@@ -210,31 +180,30 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     }
     
     public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
-        Byte groupKey = getNoteGroupKey(channel, instrumentId);
-
-        if(this.triggerHeld) {
-            this.heldNotes.computeIfAbsent(groupKey, (key) -> new LinkedHashMap<>()).put(note, noteTime);
-            this.noteHeld = true;
-        } else {
-            this.setPowered(true);
-        }
+        Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
+        this.heldNotes.put(noteId, Instant.now().toEpochMilli());
+        this.noteHeld = true;
     }
 
-    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {    
+    public void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
         if(this.triggerHeld && this.noteHeld) {
-            Byte groupKey = getNoteGroupKey(channel, instrumentId);
-            notesToTurnOff.add(Pair.of(groupKey, note));
+            Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
+            this.notesToTurnOff.add(noteId);
         }
     }
 
-    public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId) {
-        Byte groupKey = getNoteGroupKey(channel, instrumentId);
-
+    public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime) {
         if(this.triggerHeld) {
-            if(groupKey == null) {
-                this.heldNotes.clear();
-            } else {
-                this.heldNotes.remove(groupKey);
+            Byte groupKey = getNoteGroupKey(channel, instrumentId);
+
+            if(groupKey == null || (channel != null && channel == BroadcastEvent.ALL_CHANNELS)) {
+                this.clearNotes();
+            } else if(groupKey != null) {
+                for(Integer noteId : this.heldNotes.keySet()) {
+                    if((noteId / 128) == groupKey) {
+                        this.notesToTurnOff.add(noteId);
+                    }
+                }
             }
         }
     }

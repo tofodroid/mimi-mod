@@ -1,8 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
-import org.joml.Vector2i;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.tofodroid.mods.mimi.util.Vector2Int;
 
 import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -17,9 +15,9 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiConductor extends BaseGui {
     // GUI
-    private static final Vector2i MIDI_CHANNEL_WIDGET_COORDS = new Vector2i(6,26);
-    private static final Vector2i NOTE_LETTER_BUTTON_COORDS = new Vector2i(181,41);
-    private static final Vector2i NOTE_OCTAVE_BUTTON_COORDS = new Vector2i(203,41);
+    private static final Vector2Int MIDI_CHANNEL_WIDGET_COORDS = new Vector2Int(6,26);
+    private static final Vector2Int NOTE_LETTER_BUTTON_COORDS = new Vector2Int(181,41);
+    private static final Vector2Int NOTE_OCTAVE_BUTTON_COORDS = new Vector2Int(203,41);
 
     // Widgets
     private MidiChannelToggleWidget midiChannelToggle;
@@ -42,14 +40,14 @@ public class GuiConductor extends BaseGui {
             return;
         }
         this.conductorStack = new ItemStack(conductorStack.getItem(), conductorStack.getCount());
-        this.conductorStack.setTag(conductorStack.getOrCreateTag().copy());
+        this.conductorStack.applyComponents(conductorStack.getComponents());
     }
 
     @Override
     public void init() {
         super.init();
         this.broadcastNote = MidiNbtDataUtils.getBroadcastNote(conductorStack);
-        this.midiChannelToggle = new MidiChannelToggleWidget(conductorStack, new Vector2i(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
+        this.midiChannelToggle = new MidiChannelToggleWidget(conductorStack, new Vector2Int(START_X, START_Y), MIDI_CHANNEL_WIDGET_COORDS);
     }
 
     public void syncConductorToServer() {
@@ -78,11 +76,8 @@ public class GuiConductor extends BaseGui {
     // Render Functions
     @Override
     protected GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        // Set Texture
-        RenderSystem.setShaderTexture(0, guiTexture);
-
         // GUI Background
-        graphics.blit(guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        this.blitAbsolute(graphics, guiTexture, START_X, START_Y, 0, 0, this.GUI_WIDTH, this.GUI_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     
         this.midiChannelToggle.renderGraphics(graphics, mouseX, mouseY);
         
@@ -92,7 +87,7 @@ public class GuiConductor extends BaseGui {
     @Override
     protected GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         // Broadcast note
-        graphics.drawString(font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
+        this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getMidiNoteAsString(broadcastNote), START_X + 224, START_Y + 45,0xFF00E600);
 
         this.midiChannelToggle.renderText(graphics, font, mouseX, mouseY);
 

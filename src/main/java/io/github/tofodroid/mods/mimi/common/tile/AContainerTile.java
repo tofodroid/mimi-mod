@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
@@ -36,16 +36,16 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
     }
 
     @Override
-	protected void saveAdditional(CompoundTag compound) {
-		super.saveAdditional(compound);
-        ContainerHelper.saveAllItems(compound, this.items);
+	protected void saveAdditional(CompoundTag compound, HolderLookup.Provider pRegistries) {
+		super.saveAdditional(compound, pRegistries);
+        ContainerHelper.saveAllItems(compound, this.items, pRegistries);
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-        super.load(nbt);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(nbt, this.items);
+        ContainerHelper.loadAllItems(nbt, this.items, pRegistries);
         this.onLoadItemsComplete();
 	}
 
@@ -90,7 +90,6 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
     }
 
     @Override
-    @SuppressWarnings("null")
     public boolean stillValid(Player playerEntity) {
         if (this.level != null && this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
@@ -132,18 +131,8 @@ public abstract class AContainerTile extends BaseContainerBlockEntity implements
     }
     
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
-    }
-
-    @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        this.load(pkt.getTag());
     }
 
     protected NonNullList<ItemStack> getItems() {

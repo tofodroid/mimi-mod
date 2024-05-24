@@ -22,7 +22,6 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -61,7 +60,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected final Byte instrumentId;
     protected final Integer defaultChannels;
     protected final Integer defaultColor;
-    protected final Boolean colorable;
     protected final String REGISTRY_NAME;
  
     @Override
@@ -76,8 +74,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         this.REGISTRY_NAME = spec.registryName;
         this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
         this.instrumentId = instrumentId;
-        this.colorable = spec.isColorable();
-        this.defaultColor = this.colorable ? spec.defaultColor() : null;
+        this.defaultColor = spec.defaultColor();
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
     }
 
@@ -87,8 +84,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         this.REGISTRY_NAME = spec.registryName;
         this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
         this.instrumentId = spec.instrumentId;
-        this.colorable = spec.isColorable();
-        this.defaultColor = this.colorable ? spec.defaultColor() : null;
+        this.defaultColor = spec.defaultColor();
         this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
     }
 
@@ -106,16 +102,18 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
     
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         TileInstrument tileInstrument = getTileForBlock(worldIn, pos);
         
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
                 if(player.getVehicle() == null) {
                     tileInstrument.attemptSit(player);
+                    return InteractionResult.CONSUME;
                 }
             } else if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
                 ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
+                return InteractionResult.CONSUME;
             }
         }
 
@@ -167,7 +165,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
        return SHAPES.get(state.getValue(DIRECTION));
     }
 
-    @SuppressWarnings("deprecation")
     public FluidState getFluidState(BlockState p_51581_) {
         return p_51581_.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(p_51581_);
     }
@@ -196,7 +193,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         BlockEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof TileInstrument) {
             ItemStack newStack = new ItemStack(stack.getItem(), stack.getCount());
-            newStack.setTag(stack.getOrCreateTag().copy());
+            newStack.applyComponents(stack.getComponents());
             ((TileInstrument)tileEntity).setInstrumentStack(newStack);
         }
     }
@@ -208,10 +205,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 
     public String getRegistryName() {
         return this.REGISTRY_NAME;
-    }
-
-    public Boolean isColorable() {
-        return this.colorable;
     }
 
     public Integer getDefaultColor() {

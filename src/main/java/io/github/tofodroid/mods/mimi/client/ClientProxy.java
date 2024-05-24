@@ -6,7 +6,7 @@ import io.github.tofodroid.mods.mimi.common.Proxy;
 import io.github.tofodroid.mods.mimi.common.midi.FilesystemMidiFileProvider;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
-import net.minecraft.Util;
+import io.github.tofodroid.mods.mimi.util.TimeUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.world.entity.player.Player;
@@ -14,10 +14,10 @@ import net.minecraft.world.entity.player.Player;
 public class ClientProxy implements Proxy {
     private MidiMultiSynthManager MIDI_SYNTH;
     private MidiDataManager MIDI_DATA;
-    private FilesystemMidiFileProvider CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false, 0);
+    private FilesystemMidiFileProvider CLIENT_MIDI_FILES;
     
     // In singleplayer this proxy is used on server side, so we need both providers
-    private FilesystemMidiFileProvider SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
+    private FilesystemMidiFileProvider SERVER_MIDI_FILES;
     private Long startSyncEpoch = null;
     private Long serverStartEpoch = 0l;
     private Boolean initialized = false;
@@ -26,7 +26,11 @@ public class ClientProxy implements Proxy {
     public void init() {
         MIDI_SYNTH = new MidiMultiSynthManager();        
         MIDI_DATA = new MidiDataManager();
+    
+        CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false, 0);
         CLIENT_MIDI_FILES.refresh(true);
+
+        SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
         SERVER_MIDI_FILES.refresh(true);
         this.initialized = true;
     }
@@ -65,10 +69,10 @@ public class ClientProxy implements Proxy {
         if(currentServer != null) {
             // Ignore the first response and do it again because initial login to server adds a lot of latency
             if(this.startSyncEpoch == null) {
-                this.startSyncEpoch = Util.getEpochMillis();
+                this.startSyncEpoch = TimeUtils.getNowTime();
                 NetworkProxy.sendToServer(new ServerTimeSyncPacket(0l, false));
             } else {
-                this.serverStartEpoch = Util.getEpochMillis() - message.currentServerMilli - ((Util.getEpochMillis() - this.startSyncEpoch)/2);
+                this.serverStartEpoch = TimeUtils.getNowTime() - message.currentServerMilli - ((TimeUtils.getNowTime() - this.startSyncEpoch)/2);
                 this.startSyncEpoch = null;
             }
         }

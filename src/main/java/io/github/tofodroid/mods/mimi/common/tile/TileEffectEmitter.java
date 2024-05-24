@@ -6,6 +6,7 @@ import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -75,8 +76,8 @@ public class TileEffectEmitter extends AConfigurableTile {
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
+        super.loadAdditional(nbt, pRegistries);
         
         if(this.level != null && this.getBlockState() != null) {
             if(this.level.isClientSide) {

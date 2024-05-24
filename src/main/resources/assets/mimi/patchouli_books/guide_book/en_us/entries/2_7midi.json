@@ -10,11 +10,11 @@
         {
             "type": "patchouli:crafting",
             "recipe": "mimi:deviceconfig",
-            "text": "The Device Config Screen shows a list of MIDI Input Devices detected by your system at the bottom. Use the arrows to step through the devices and the save button to select one which will be saved and used by default if you restart the game."
+            "text": "The Device Config Screen shows a list of MIDI Input Devices detected by your system at the bottom. Use the arrows to step through the devices and the save button to select the device you'd like to connect to.$(br2)Once a device is selected you'll need to restart the game to select a new device."
         },
         {
             "type": "patchouli:text",
-            "text": "The device that you have selected will appear at the top of the Device Config Screen. The light next to the device name will change colors based on the device's status.$(br)$(li)$(l)Green$() - The device is ready to use.$(br)$(li)$(l)Yellow$() - The game must be restarted to configure this device.$(br)$(li)$(l)Red$() - The device is no longer available or is incompatible."
+            "text": "The device that you have selected will appear at the top of the Device Config Screen along with the status of the device."
         },
         {
             "type": "patchouli:text",
@@ -27,12 +27,17 @@
         },
         {
             "type": "patchouli:text",
+            "title": "Velocity Modifier",
+            "text": "You can also use the Velocity arrows to set a velocity modifier that should be applied to all notes recieved from the selected MIDI Input Device. This can be used to increase or decrease the volume of notes played by the device."
+        },
+        {
+            "type": "patchouli:text",
             "title": "Troubleshooting",
             "text": "Sometimes MIDI and Minecraft don't get along very well so here are some things to try if it just won't work.$(br2)$(l)Device Doesn't Show$()$(br2)1. Plug it in and ensure it's detected by your PC before starting Minecraft.$(br2)2. Restart it and/or unplug it and plug it back in. Seriously, this fixes most problems for me like 70% of the time!"
         },
         {
             "type": "patchouli:text",
-            "text": "$(l)Device Is Red$()$(br2)1. The same things from \"Device Doesn't Show\".$(br2)2. Ensure the device is not already being used by another program on your PC. Most MIDI Input Devices can only be used by one program at a time."
+            "text": "$(l)Device Status Error$()$(br2)1. The same things from \"Device Doesn't Show\".$(br2)2. Ensure the device is not already being used by another program on your PC. Most MIDI Input Devices can only be used by one program at a time."
         }
     ],
     "sortnum": 7

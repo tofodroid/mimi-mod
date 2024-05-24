@@ -23,16 +23,15 @@ public abstract class AContainerBlock<T extends BlockEntity & Container> extends
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
 			return;        
         this.dropContent(worldIn, pos, worldIn.getBlockEntity(pos));
         super.onRemove(state, worldIn, pos, newState, isMoving);
     }
-    
+
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         if(!worldIn.isClientSide) {
             T tile = getTileForBlock(worldIn, pos);
             if(tile != null) {
@@ -43,7 +42,7 @@ public abstract class AContainerBlock<T extends BlockEntity & Container> extends
 
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return getTileType().create(pos, state);

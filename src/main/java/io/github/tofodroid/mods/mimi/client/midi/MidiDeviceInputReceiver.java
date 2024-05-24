@@ -6,17 +6,23 @@ import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.client.ClientProxy;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
+import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
+import io.github.tofodroid.mods.mimi.util.MathUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class MidiDeviceInputReceiver implements Receiver {
+    public static final Integer MAX_MIDI_DEVICE_VOLUME = 10;
+
     private volatile boolean open = true;
 
-    public synchronized void send(MidiMessage msg, long timeStamp) {
+    public void send(MidiMessage msg, long timeStamp) {
         if(open && msg instanceof ShortMessage) {
             handleMessage((ShortMessage)msg);
         }
@@ -47,39 +53,72 @@ public class MidiDeviceInputReceiver implements Receiver {
             ((ClientProxy)MIMIMod.getProxy()).getMidiData().inputDeviceManager.getLocalInstrumentsForMidiDevice(player, Integer.valueOf(message.getChannel()).byteValue()).forEach(instrumentStack -> {
                 Byte instrumentId = MidiNbtDataUtils.getInstrumentId(instrumentStack.getRight());
                 if(isNoteOnMessage(message)) {
-                    handleMidiNoteOn(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], MidiNbtDataUtils.applyVolume(instrumentStack.getRight(), message.getMessage()[2]), player, instrumentStack.getLeft());
+                    handleMidiNoteOn(false, Integer.valueOf(message.getChannel()).byteValue(), instrumentStack.getRight(), message.getMessage()[1], message.getMessage()[2], player, instrumentStack.getLeft());
                 } else if(isNoteOffMessage(message)) {
-                    handleMidiNoteOff(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], player, instrumentStack.getLeft());
+                    handleMidiNoteOff(false, Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], player, instrumentStack.getLeft());
                 } else if(isAllNotesOffMessage(message)) {
-                    handleAllNotesOff(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, player, instrumentStack.getLeft());
+                    handleAllNotesOff(false, Integer.valueOf(message.getChannel()).byteValue(), instrumentId, player, instrumentStack.getLeft());
                 } else if(isSupportedControlMessage(message)) {
                     handleControlMessage(Integer.valueOf(message.getChannel()).byteValue(), instrumentId, message.getMessage()[1], message.getMessage()[2], player, instrumentStack.getLeft());
                 }
             });
+
+            if(((ClientProxy)MIMIMod.getProxy()).getMidiData().inputDeviceManager.getTransmitMidiInput()) {
+                if(isNoteOnMessage(message)) {
+                    handleMidiNoteOn(true, Integer.valueOf(message.getChannel()).byteValue(), null, message.getMessage()[1], message.getMessage()[2], player, null);
+                } else if(isNoteOffMessage(message)) {
+                    handleMidiNoteOff(true, Integer.valueOf(message.getChannel()).byteValue(), null, message.getMessage()[1], player,null);
+                } else if(isAllNotesOffMessage(message)) {
+                    handleAllNotesOff(true, Integer.valueOf(message.getChannel()).byteValue(), null, player, null);
+                } else if(isSupportedControlMessage(message)) {
+                    // Not yet supported
+                }
+            }
         }
     }
 
-    public void handleMidiNoteOn(Byte channel, Byte instrument, Byte midiNote, Byte velocity, Player player, InteractionHand handIn) {
+    public void handleMidiNoteOn(Boolean transmit, Byte channel, ItemStack instrument, Byte midiNote, Byte velocity, Player player, InteractionHand handIn) {
         if(MIMIMod.getProxy().isClient()) {
-            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, velocity, instrument, player.getUUID(), player.getOnPos(), handIn);
-            NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+            // Apply MIDI Input Device Config Velocity Adjuster
+            velocity = MathUtils.addClamped(velocity, ConfigProxy.getMidiDeviceVelocity(), 0, 127);
+
+            if(transmit) {
+                MidiDeviceBroadcastPacket packet = MidiDeviceBroadcastPacket.createNotePacket(channel, midiNote, velocity, player.getUUID(), player.getOnPos());
+                NetworkProxy.sendToServer(packet);
+            } else {
+                // Apply Instrument Volume Setting
+                velocity = MidiNbtDataUtils.applyInstrumentVolume(instrument, velocity);
+
+                MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, velocity, MidiNbtDataUtils.getInstrumentId(instrument), player.getUUID(), player.getOnPos(), handIn);
+                NetworkProxy.sendToServer(packet);
+                ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+            }
         }
     }
 
-    public void handleMidiNoteOff(Byte channel, Byte instrument, Byte midiNote, Player player, InteractionHand handIn) {
+    public void handleMidiNoteOff(Boolean transmit, Byte channel, Byte instrument, Byte midiNote, Player player, InteractionHand handIn) {
         if(MIMIMod.getProxy().isClient()) {
-            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos(), handIn);
-            NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+            if(transmit) {
+                MidiDeviceBroadcastPacket packet = MidiDeviceBroadcastPacket.createNotePacket(channel, midiNote, Integer.valueOf(0).byteValue(), player.getUUID(), player.getOnPos());
+                NetworkProxy.sendToServer(packet);
+            } else {
+                MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrument, player.getUUID(), player.getOnPos(), handIn);
+                NetworkProxy.sendToServer(packet);
+                ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+            }
         }
     }
 
-    public void handleAllNotesOff(Byte channel, Byte instrument, Player player, InteractionHand handIn) {
+    public void handleAllNotesOff(Boolean transmit, Byte channel, Byte instrument, Player player, InteractionHand handIn) {
         if(MIMIMod.getProxy().isClient()) {
-            MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrument, player.getUUID(), player.getOnPos(), handIn);
-            NetworkProxy.sendToServer(packet);
-            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+            if(transmit) {
+                MidiDeviceBroadcastPacket packet = MidiDeviceBroadcastPacket.createAllNotesOffPacket(channel, player.getUUID(), player.getOnPos());
+                NetworkProxy.sendToServer(packet);
+            } else {
+                MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrument, player.getUUID(), player.getOnPos(), handIn);
+                NetworkProxy.sendToServer(packet);
+                ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+            }
         }
     }
 

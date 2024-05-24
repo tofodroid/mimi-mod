@@ -1,16 +1,16 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiTransmitterBlock;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 
 public class ServerMusicPlayerSongListPacketHandler {   
     public static void handlePacketServer(final ServerMusicPlayerSongListPacket message, ServerPlayer sender) {
         ServerMidiManager.refreshServerSongs(false);
-        ServerMusicTransmitterManager.refreshSongs(message.musicPlayerId);
-        ServerMusicPlayerSongListPacket packet = ServerMusicTransmitterManager.createListPacket(message.musicPlayerId);
+        ServerTransmitterManager.refreshSongs(message.musicPlayerId);
+        ServerMusicPlayerSongListPacket packet = ServerTransmitterManager.createListPacket(message.musicPlayerId);
 
         if(packet != null) {
             NetworkProxy.sendToPlayer(sender, packet);

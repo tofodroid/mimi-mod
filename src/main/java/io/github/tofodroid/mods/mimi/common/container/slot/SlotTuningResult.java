@@ -67,7 +67,7 @@ public class SlotTuningResult extends Slot {
             if (!itemstack1.isEmpty()) {
                 if (itemstack.isEmpty()) {
                     
-                } else if (ItemStack.isSameItemSameTags(itemstack, itemstack1)) {
+                } else if (ItemStack.isSameItemSameComponents(itemstack, itemstack1)) {
                     itemstack1.grow(itemstack.getCount());
                     this.craftSlots.setItem(i, itemstack1);
                 } else if (!this.player.getInventory().add(itemstack1)) {

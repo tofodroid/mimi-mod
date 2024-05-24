@@ -6,10 +6,15 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
-public class SyncInstrumentPacket {
+public class SyncInstrumentPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, SyncInstrumentPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<SyncInstrumentPacket> TYPE = new Type<>(ID);
+
     public final UUID midiSource;
     public final String midiSourceName;
     public final Integer enabledChannelsInt;
@@ -33,6 +38,11 @@ public class SyncInstrumentPacket {
         this.sysInput = MidiNbtDataUtils.getSysInput(instrumentStack);
         this.volume = MidiNbtDataUtils.getInstrumentVolume(instrumentStack);
         this.handIn = handIn;
+    }
+    
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static Byte getInstrumentLocationByte(InteractionHand handIn) {

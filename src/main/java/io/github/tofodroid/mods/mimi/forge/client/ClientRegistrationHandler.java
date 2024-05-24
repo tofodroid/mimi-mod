@@ -12,16 +12,18 @@ import io.github.tofodroid.mods.mimi.common.block.AColoredBlock;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.container.ModContainers;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
-import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
+import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.keybind.ModBindings;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -51,8 +53,8 @@ public class ClientRegistrationHandler {
 
     @SubscribeEvent
     public static void register(RegisterColorHandlersEvent.Item event) {
-        registerIColorableItemColors(event, ModItems.INSTRUMENT_ITEMS.stream().filter(i -> i.isColorable()).collect(Collectors.toList()));
-        registerIColorableItemColors(event, ModItems.BLOCK_INSTRUMENT_ITEMS.stream().filter(i -> i.isColorable()).collect(Collectors.toList()));
+        registerDyeableItemColors(event, ModItems.INSTRUMENT_ITEMS.stream().filter(i -> i.getDefaultColor() != null).collect(Collectors.toList()));
+        registerDyeableItemColors(event, ModItems.BLOCK_INSTRUMENT_ITEMS.stream().filter(i -> i.getDefaultColor() != null).collect(Collectors.toList()));
         registerIDyeableItemColors(event, Arrays.asList(ModItems.LEDCUBE_A, ModItems.LEDCUBE_B, ModItems.LEDCUBE_C, ModItems.LEDCUBE_D, ModItems.LEDCUBE_E, ModItems.LEDCUBE_F, ModItems.LEDCUBE_G, ModItems.LEDCUBE_H));
     }
 
@@ -68,13 +70,16 @@ public class ClientRegistrationHandler {
         event.registerEntityRenderer(ModEntities.NOTERESPONSIVETILE, EntityNoteResponseTileRenderer::new);
     }
 
-    protected static void registerIColorableItemColors(RegisterColorHandlersEvent.Item event, List<? extends IColorableItem> items) {
-        event.getItemColors().register((stack, color) ->
-                    color > 0 ? -1 : ((IColorableItem) stack.getItem()).getColor(stack), items.toArray(new Item[items.size()]));
+    protected static void registerDyeableItemColors(RegisterColorHandlersEvent.Item event, List<? extends IInstrumentItem> items) {
+        event.getItemColors().register((stack, color) -> {
+            //stack.has(DataComponents.DYED_COLOR) ? stack.get(DataComponents.DYED_COLOR).rgb() : ((IInstrumentItem)stack.getItem()).getDefaultColor(), items.toArray(new Item[items.size()]));
+                return color > 0 ? -1 : DyedItemColor.getOrDefault(stack, FastColor.ARGB32.opaque(((IInstrumentItem)stack.getItem()).getDefaultColor()));
+            }, items.toArray(new Item[items.size()]) 
+        );
     }
 
     protected static void registerInstrumentBlockColors(RegisterColorHandlersEvent.Block event) {
-        List<? extends Block> blocks = ModBlocks.INSTRUMENTS.stream().filter(i -> i.isColorable()).collect(Collectors.toList());
+        List<? extends Block> blocks = ModBlocks.INSTRUMENTS.stream().filter(i -> i.getDefaultColor() != null).collect(Collectors.toList());
         event.getBlockColors().register((state, reader, pos, color) -> {
             return reader != null && pos != null && reader.getBlockEntity(pos) != null && reader.getBlockEntity(pos) instanceof TileInstrument ? 
                 ((TileInstrument)reader.getBlockEntity(pos)).getColor() : -1;
@@ -82,8 +87,10 @@ public class ClientRegistrationHandler {
     }
     
     protected static void registerIDyeableItemColors(RegisterColorHandlersEvent.Item event, List<? extends BlockItem> items) {
-        event.getItemColors().register((stack, color) ->
-                    color > 0 ? -1 : DyeColor.byId(TagUtils.getIntOrDefault(stack, AColoredBlock.DYE_ID.getName(), 0)).getFireworkColor(), items.toArray(new Item[items.size()]));
+        event.getItemColors().register((stack, color) -> { 
+            return color > 0 ? -1 : DyeColor.byId(TagUtils.getIntOrDefault(stack, AColoredBlock.DYE_ID.getName(), 0)).getFireworkColor();
+        }, items.toArray(new Item[items.size()])
+        );
     }
 
     protected static void registerAColoredBlockColors(RegisterColorHandlersEvent.Block event, List<? extends AColoredBlock> blocks) {

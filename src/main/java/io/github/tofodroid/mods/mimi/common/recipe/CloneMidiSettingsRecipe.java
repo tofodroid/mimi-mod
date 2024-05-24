@@ -3,8 +3,8 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 public class CloneMidiSettingsRecipe extends CustomRecipe {
     public static final String REGISTRY_NAME = "clonemidi";
-    public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER);
+    public static final List<Item> MIDI_ITEMS = Arrays.asList(ModItems.CONDUCTOR, ModItems.LISTENER, ModItems.RECEIVER, ModItems.RELAY);
 	public static final SimpleCraftingRecipeSerializer<?> SERIALIZER = new SimpleCraftingRecipeSerializer<CloneMidiSettingsRecipe>(CloneMidiSettingsRecipe::new);
     
     public CloneMidiSettingsRecipe(CraftingBookCategory category) {
@@ -58,7 +58,7 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess r) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
         ItemStack source = ItemStack.EMPTY;
         ItemStack target = ItemStack.EMPTY;
 
@@ -84,7 +84,6 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
                 MidiNbtDataUtils.setFilterNote(result, MidiNbtDataUtils.getFilterNote(source));
                 MidiNbtDataUtils.setInvertNoteOct(result, MidiNbtDataUtils.getInvertNoteOct(source));
                 MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
-                MidiNbtDataUtils.setInvertInstrument(result, MidiNbtDataUtils.getInvertInstrument(source));
                 MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
                 MidiNbtDataUtils.setTriggerNoteStart(result, MidiNbtDataUtils.getTriggerNoteStart(source));
                 MidiNbtDataUtils.setHoldTicks(result, MidiNbtDataUtils.getHoldTicks(source));

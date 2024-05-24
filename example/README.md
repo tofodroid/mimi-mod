@@ -92,7 +92,7 @@ Adding data for a hand-held instrument is a bit simpler than for a block instrum
                 }
             },
             "result": {
-                "item": "mimi:viola"
+                "id": "mimi:viola"
             }
         }
         ```
@@ -214,7 +214,7 @@ The process for adding a new block instrument is similar to the process for hand
                 }
             },
             "result": {
-                "item": "mimi:epiano"
+                "id": "mimi:epiano"
             }
         }
         ```

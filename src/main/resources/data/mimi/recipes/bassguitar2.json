@@ -7,6 +7,6 @@
         "item": "minecraft:leather"
     },
     "result": {
-        "item": "mimi:bassguitar2"
+        "id": "mimi:bassguitar2"
     }
 }

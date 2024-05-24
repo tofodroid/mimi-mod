@@ -1,0 +1,21 @@
+{
+    "name": "Audio Output",
+    "icon": "mimi:trumpet",
+    "category": "mimi:6settings",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "To configure MIMI's Audio Output settings, including global volume and output device, you can use the Device Config Screen which can be opened at any time with a key bind ($(l)$(k:key.mimi.midi.gui.settings)$()) or by crafting and right-clicking a Device Config item.$(br2)The Device Config Screen shows a list of Audio Output Devices detected by your system at the bottom."
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:deviceconfig",
+            "text": "Use the arrows to step through the devices and the save button to select the device you'd like MIMI to output audio to. Usually you can leave this on 'Automatic' (same device as Minecraft), but if you are playing on Mac or Linux this may not work."
+        },
+        {
+            "type": "patchouli:text",
+            "text": "The Device Config Screen also allows you to set a global volume for MIMI notes.$(br2)The volume of MIMI notes is also affected by the 'Jukebox/Noteblocks' and 'Master' volume sliders in Minecraft's settings."
+        }
+    ],
+    "sortnum": 1
+}

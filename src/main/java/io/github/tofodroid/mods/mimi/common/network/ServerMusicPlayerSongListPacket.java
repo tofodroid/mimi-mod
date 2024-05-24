@@ -7,8 +7,12 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-public class ServerMusicPlayerSongListPacket {
+public class ServerMusicPlayerSongListPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerSongListPacket.class.getSimpleName().toLowerCase());
+    public static final CustomPacketPayload.Type<ServerMusicPlayerSongListPacket> TYPE = new Type<>(ID);
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
 
     public final UUID musicPlayerId;
@@ -25,12 +29,17 @@ public class ServerMusicPlayerSongListPacket {
         this.musicPlayerId = musicPlayerId;
         this.favoriteIndicies = favoriteIndicies;
 
-        if(infos.size() > 100) {
-            MIMIMod.LOGGER.warn("ServerMusicPlayerSongListPacket can only accept up to 100 files. Trimming list ot 100.");
-            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 50);
+        if(infos.size() > 1000) {
+            MIMIMod.LOGGER.warn("ServerMusicPlayerSongListPacket can only accept up to 1000 files. Trimming list ot 1000.");
+            this.infos = new ArrayList<BasicMidiInfo>(infos).subList(0, 1000);
         } else {
             this.infos = infos;
         }
+    }
+    
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+       return TYPE;
     }
 
     public static ServerMusicPlayerSongListPacket decodePacket(FriendlyByteBuf buf) {

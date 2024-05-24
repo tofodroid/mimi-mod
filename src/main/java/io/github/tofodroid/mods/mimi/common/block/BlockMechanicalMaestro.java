@@ -4,13 +4,10 @@ import com.mojang.serialization.MapCodec;
 
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileMechanicalMaestro;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestro> {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -35,19 +31,6 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
     public BlockMechanicalMaestro(Properties props) {
         super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD));
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, Boolean.valueOf(false)));
-    }
-        
-    @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(!worldIn.isClientSide) {
-            TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
-
-            if(tile != null) {
-                // TODO link anything?
-            }
-        }
-
-        return super.use(state, worldIn, pos, player, hand, hit);
     }
     
     @Override
@@ -67,37 +50,30 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
-        TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
+        if(!worldIn.isClientSide) {
+            TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
+            Boolean shouldBePowered = worldIn.hasNeighborSignal(pos);
 
-        if (state.getValue(POWERED) && !worldIn.hasNeighborSignal(pos)) {
-            worldIn.setBlock(pos, state.cycle(POWERED), 2);
-
-            if(tile != null) {
-                tile.allNotesOff();
+            if (state.getValue(POWERED) != shouldBePowered) {
+                worldIn.setBlock(pos, state.cycle(POWERED), 2);
+    
+                if(tile != null) {
+                    if(!shouldBePowered) {
+                        tile.allNotesOff();
+                    }
+                    tile.refreshMidiReceivers();
+                }
             }
-        }
-
-        if(tile != null) {
-            tile.refreshMidiReceivers();
         }
     }
 
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         if(!worldIn.isClientSide) {
-            TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
             Boolean wasPowered = state.getValue(POWERED);
             
             if(wasPowered != worldIn.hasNeighborSignal(pos)) {
-                if(wasPowered) {
-                    worldIn.scheduleTick(pos, this, 4);
-                } else {
-                    worldIn.setBlock(pos, state.cycle(POWERED), 2);
-
-                    if(tile != null) {
-                        tile.refreshMidiReceivers();
-                    }
-                }
+                worldIn.scheduleTick(pos, this, 4);
             }
         }
     }
@@ -111,7 +87,7 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
             TileMechanicalMaestro tile = getTileForBlock(worldIn, pos);
             
             if (tile != null) {
-                ServerMusicReceiverManager.removeReceivers(tile.getUUID());
+                BroadcastManager.removeOwnedBroadcastConsumers(tile.getUUID());
                 tile.allNotesOff();
             }
         }

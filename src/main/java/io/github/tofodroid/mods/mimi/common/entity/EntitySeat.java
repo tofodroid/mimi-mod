@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.joml.Vector3d;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -53,7 +54,7 @@ public class EntitySeat extends Entity {
             this.ejectPassengers();
 
             if(this.rider != null) {
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(this.rider);
+                EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(this.rider);
             }
 
             this.level().updateNeighbourForOutputSignal(source, this.level().getBlockState(source).getBlock());
@@ -78,10 +79,10 @@ public class EntitySeat extends Entity {
         }
     }
 
-    @Override
-    public float ridingOffset(Entity e) {
-        return -0.2f;
-    }
+    // @Override
+    // public float ridingOffset(Entity e) {
+    //     return -0.2f;
+    // }
     
     public BlockPos getSource() {
         return source;
@@ -118,7 +119,7 @@ public class EntitySeat extends Entity {
             if(!seatExists(world, newSeat.getX(), newSeat.getY(), newSeat.getZ())) {
                 world.addFreshEntity(newSeat);
                 player.startRiding(newSeat, false);
-                ServerMusicReceiverManager.loadEntityInstrumentReceivers(player);
+                EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(player);
                 return newSeat;
             }
         }
@@ -145,5 +146,5 @@ public class EntitySeat extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() { }
+    protected void defineSynchedData(Builder pBuilder) { }
 }

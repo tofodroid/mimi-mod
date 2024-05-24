@@ -7,6 +7,6 @@
         "item": "minecraft:brick"
     },
     "result": {
-        "item": "mimi:prophet8"
+        "id": "mimi:prophet8"
     }
 }

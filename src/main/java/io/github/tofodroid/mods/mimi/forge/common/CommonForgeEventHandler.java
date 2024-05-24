@@ -1,11 +1,13 @@
 package io.github.tofodroid.mods.mimi.forge.common;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
 import io.github.tofodroid.mods.mimi.common.world.ModStructures;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.PlayerTransmitterProducerEventHandler;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
-import io.github.tofodroid.mods.mimi.server.midi.receiver.ServerMusicReceiverManager;
-import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMusicTransmitterManager;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
@@ -33,8 +35,9 @@ public class CommonForgeEventHandler {
             return;
         }
         ServerMidiManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
-        ServerMusicReceiverManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
-        ServerMusicTransmitterManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
+        PlayerTransmitterProducerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());
+        EntityInstrumentConsumerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());
+        ServerNoteConsumerManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
     }
 
     @SubscribeEvent
@@ -43,8 +46,9 @@ public class CommonForgeEventHandler {
             return;
         }
         ServerMidiManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
-        ServerMusicReceiverManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
-        ServerMusicTransmitterManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
+        PlayerTransmitterProducerEventHandler.onPlayerLoggedOut((ServerPlayer)event.getEntity());
+        EntityInstrumentConsumerEventHandler.onPlayerLoggedOut((ServerPlayer)event.getEntity());
+        ServerNoteConsumerManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
     }
 
     @SubscribeEvent
@@ -52,15 +56,15 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity() instanceof ServerPlayer)) {
             return;
         }
-        ServerMusicReceiverManager.onPlayerRespawn((ServerPlayer)event.getEntity());
+        EntityInstrumentConsumerEventHandler.onPlayerRespawn((ServerPlayer)event.getEntity());
+        ServerNoteConsumerManager.onPlayerRespawn((ServerPlayer)event.getEntity());
     }
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent event) {
         if(event.phase != Phase.END || event.side != LogicalSide.SERVER || !(event.player instanceof ServerPlayer)) {
             return;
-        }
-        
+        }  
     }
 
     @SubscribeEvent
@@ -68,7 +72,7 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity().level() instanceof ServerLevel)) {
             return;
         }
-        ServerMusicReceiverManager.onLivingEquipmentChange(event.getFrom(), event.getTo(), event.getEntity());
+        EntityInstrumentConsumerEventHandler.onLivingEquipmentChange(event.getFrom(), event.getTo(), event.getEntity());
     }
 
     @SubscribeEvent
@@ -76,8 +80,8 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity().level() instanceof ServerLevel)) {
             return;
         }
-        ServerMusicReceiverManager.onLivingDeath(event.getEntity());
-        ServerMusicTransmitterManager.onLivingDeath(event.getEntity());
+        EntityInstrumentConsumerEventHandler.onLivingDeath(event.getEntity());
+        ServerTransmitterManager.onLivingDeath(event.getEntity());
     }
 
     @SubscribeEvent
@@ -85,8 +89,8 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity().level() instanceof ServerLevel)) {
             return;
         }
-        ServerMusicReceiverManager.onEntityTeleport(event.getEntity());
-        ServerMusicTransmitterManager.onEntityTeleport(event.getEntity());
+        EntityInstrumentConsumerEventHandler.onEntityTeleport(event.getEntity());
+        ServerTransmitterManager.onEntityTeleport(event.getEntity());
     }
     
     @SubscribeEvent
@@ -94,8 +98,8 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity().level() instanceof ServerLevel)) {
             return;
         }
-        ServerMusicReceiverManager.onEntityChangeDimension(event.getEntity());
-        ServerMusicTransmitterManager.onEntityChangeDimension(event.getEntity());
+        EntityInstrumentConsumerEventHandler.onEntityChangeDimension(event.getEntity());
+        ServerTransmitterManager.onEntityChangeDimension(event.getEntity());
     }
     
     @SubscribeEvent
@@ -103,16 +107,15 @@ public class CommonForgeEventHandler {
         if(event.phase != Phase.END || event.side != LogicalSide.SERVER) {
             return;
         }
-        ServerMusicReceiverManager.onServerTick();
-        ServerMusicTransmitterManager.onServerTick();
+        BroadcastManager.onServerTick();
+        ServerNoteConsumerManager.onServerTick();
         ServerMidiUploadManager.onServerTick();
-        MidiNotePacketHandler.onServerTick();
     }
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
-        ServerMusicReceiverManager.onServerStopping();
-        ServerMusicTransmitterManager.onServerStopping();
+        BroadcastManager.onServerStopping();
+        ServerTransmitterManager.onServerStopping();
     }
 
     @SubscribeEvent
@@ -121,6 +124,6 @@ public class CommonForgeEventHandler {
             event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow(),
 		    event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow()
         );
-        ServerMusicTransmitterManager.onServerAboutToStart();
+        ServerTransmitterManager.onServerAboutToStart();
     }
 }

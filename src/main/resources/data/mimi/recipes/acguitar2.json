@@ -7,6 +7,6 @@
         "item": "minecraft:chain"
     },
     "result": {
-        "item": "mimi:acguitar2"
+        "id": "mimi:acguitar2"
     }
 }

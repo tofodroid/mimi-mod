@@ -38,7 +38,7 @@ public abstract class ClientGuiWrapper {
     }
 
     public static void openTransmitterGui(Level world, Player player) {
-        openGui(world, new GuiTransmitter(player.getUUID()));
+        openGui(world, new GuiTransmitterItem(player.getUUID()));
     }
 
     public static void openTransmitterBlockGui(Level world, UUID transmitterTileId) {
@@ -46,11 +46,19 @@ public abstract class ClientGuiWrapper {
     }
 
     public static void openConfigGui(Level world, Player player) {
-        openGui(world, new GuiMidiInputConfig(player));
+        openGui(world, new GuiDeviceConfig(player));
     }
 
     public static void openEffectEmitterGui(Level world, BlockPos tilePos, ItemStack emitterStack) {
-        openGui(world, new GuiEffectEmitter(world, tilePos, emitterStack));
+        if(emitterStack.getItem().equals(ModBlocks.EFFECTEMITTER.asItem())) {
+            openGui(world, new GuiEffectEmitter(world, tilePos, emitterStack));
+        }
+    }
+
+    public static void openRelayGui(Level world, Player player, BlockPos tilePos, ItemStack relayStack) {
+        if(relayStack.getItem().equals(ModBlocks.RELAY.asItem())) {
+            openGui(world, new GuiRelay(player, tilePos, relayStack));
+        }
     }
     
     public static void openGui(Level world, Screen screen) {

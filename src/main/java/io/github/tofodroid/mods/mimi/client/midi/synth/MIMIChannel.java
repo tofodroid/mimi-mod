@@ -62,10 +62,8 @@ public class MIMIChannel {
     public Boolean tick(Player clientPlayer, Boolean isClientChannel) {
         if(!this.isIdle()) {
             return true;
-        } else if(this.lastNoteTime != null) {
-            return false;
         } else {
-            return null;
+            return false;
         }
     }
     

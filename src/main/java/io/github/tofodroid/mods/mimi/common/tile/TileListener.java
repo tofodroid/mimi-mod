@@ -3,17 +3,13 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.github.tofodroid.mods.mimi.common.entity.EntityNoteResponsiveTile;
-import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileListener extends AConfigurableMidiPowerSourceTile {
     public static final String REGISTRY_NAME = "listener";
-    private static final Integer UPDATE_EVERY_TICKS = 8;
-
-    private Integer updateTickCount = 0;
 
     public TileListener(BlockPos pos, BlockState state) {
         super(ModTiles.LISTENER, pos, state);
@@ -22,26 +18,38 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
     @Override
     protected void tick(Level world, BlockPos pos, BlockState state) {
         super.tick(world, pos, state);
+    }
 
-        if(!isValid()) {
-            return;
+    @Override
+    public void cacheMidiSettings() {
+        super.cacheMidiSettings();
+
+        if(this.hasLevel() && !this.getLevel().isClientSide) {
+            ServerNoteConsumerManager.loadListenerTileConsumer(this);
         }
+    }
+    
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
 
-        if(this.updateTickCount >= UPDATE_EVERY_TICKS) {
-            this.updateTickCount = 0;
-
-            if(!world.isClientSide && !this.isRemoved()) {
-                EntityNoteResponsiveTile.create(world, pos);
-            }
-        } else {
-            this.updateTickCount++;
+        if(!this.getLevel().isClientSide()) {
+            ServerNoteConsumerManager.removeConsumers(this.getUUID());
+        }
+    }
+ 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+    
+        if(!this.getLevel().isClientSide()) {
+            ServerNoteConsumerManager.removeConsumers(this.getUUID());
         }
     }
     
     @Override
     public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note)) && 
-            (instrumentId == null || MidiNbtDataUtils.isInstrumentFiltered(filteredInstrument, invertFilterInstrument, instrumentId));
+        return true;
     }
 
     @Override

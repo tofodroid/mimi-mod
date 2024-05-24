@@ -7,6 +7,6 @@
         "item": "minecraft:snowball"
     },
     "result": {
-        "item": "mimi:elecguitar4"
+        "id": "mimi:elecguitar4"
     }
 }

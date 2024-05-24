@@ -6,6 +6,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.entity.npc.VillagerTrades;
 
@@ -30,6 +31,6 @@ public class ItemsForItemsTrade implements VillagerTrades.ItemListing {
    }
 
    public MerchantOffer getOffer(Entity trader, RandomSource rand) {
-      return new MerchantOffer(new ItemStack(buyItems.get(rand.nextInt(buyItems.size())).asItem(), buyCount),  new ItemStack(sellItems.get(rand.nextInt(sellItems.size())).asItem(), sellCount), this.maxUses, this.xpValue, this.priceMultiplier);
+      return new MerchantOffer(new ItemCost(buyItems.get(rand.nextInt(buyItems.size())).asItem(), buyCount), new ItemStack(sellItems.get(rand.nextInt(sellItems.size())).asItem(), sellCount), this.maxUses, this.xpValue, this.priceMultiplier);
    }
 }

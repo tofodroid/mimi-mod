@@ -7,6 +7,6 @@
         "item": "minecraft:phantom_membrane"
     },
     "result": {
-        "item": "mimi:microphone3"
+        "id": "mimi:microphone3"
     }
 }

@@ -1,17 +1,14 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import org.joml.Vector2f;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
@@ -88,33 +85,53 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
     protected abstract GuiGraphics renderGraphics(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks);
     protected abstract GuiGraphics renderText(GuiGraphics graphics, int mouseX, int mouseY);
 
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos) {
-        Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
-        Integer buttonMaxX = buttonMinX + STANDARD_BUTTON_SIZE;
-        Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();
-        Integer buttonMaxY = buttonMinY + STANDARD_BUTTON_SIZE;
+    // Absolute Position
+    protected void blitAbsolute(GuiGraphics graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
 
-        Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
+    protected void blitAbsolute(GuiGraphics graphics, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
 
-        if(result) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-        }
+    protected void blitAbsolute(GuiGraphics graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
 
-        return result;
+    protected void blitAbsolute(GuiGraphics graphics, ResourceLocation texture, int renderStartX, int renderStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, renderStartX, renderStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringAbsolute(GuiGraphics graphics, Font font, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
+    }
+
+    protected void drawStringAbsolute(GuiGraphics graphics, String string, Integer renderStartX, Integer renderStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, renderStartX, renderStartY, color);
     }
     
-    protected Boolean clickedBox(Integer mouseX, Integer mouseY, Vector2f buttonPos, Vector2f buttonSize) {
-        Integer buttonMinX = START_X + Float.valueOf(buttonPos.x()).intValue();
-        Integer buttonMaxX = buttonMinX + Float.valueOf(buttonSize.x()).intValue();
-        Integer buttonMinY = START_Y + Float.valueOf(buttonPos.y()).intValue();
-        Integer buttonMaxY = buttonMinY + Float.valueOf(buttonSize.y()).intValue();
+    // Relative Position
+    protected void blitRelative(GuiGraphics graphics, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
 
-        Boolean result = mouseX >= buttonMinX && mouseX <= buttonMaxX && mouseY >= buttonMinY && mouseY <= buttonMaxY;
+    protected void blitRelative(GuiGraphics graphics, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, this.guiTexture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
 
-        if(result) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-        }
+    protected void blitRelative(GuiGraphics graphics, ResourceLocation texture, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY, int textureSizeX, int textureSizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, textureSizeX, textureSizeY);
+    }
 
-        return result;
+    protected void blitRelative(GuiGraphics graphics, ResourceLocation texture, int relativeStartX, int relativeStartY, float atlasStartX, float atlasStartY, int sizeX, int sizeY) {
+        CommonGuiUtils.blitAbsolute(graphics, texture, START_X + relativeStartX, START_Y + relativeStartY, atlasStartX, atlasStartY, sizeX, sizeY, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    protected void drawStringRelative(GuiGraphics graphics, Font font, String string, Integer relativeStartX, Integer relativeStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, START_X + relativeStartX, START_Y + relativeStartY, color);
+    }
+
+    protected void drawStringRelative(GuiGraphics graphics, String string, Integer relativeStartX, Integer relativeStartY, Integer color) {
+        CommonGuiUtils.drawStringAbsolute(graphics, font, string, START_X + relativeStartX, START_Y + relativeStartY, color);
     }
 }

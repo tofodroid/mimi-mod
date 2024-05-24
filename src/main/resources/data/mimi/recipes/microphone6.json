@@ -7,6 +7,6 @@
         "item": "minecraft:chorus_fruit"
     },
     "result": {
-        "item": "mimi:microphone6"
+        "id": "mimi:microphone6"
     }
 }

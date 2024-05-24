@@ -4,9 +4,9 @@
         "tag": "mimi:instrument/synlead"
     },
     "addition": {
-        "item": "minecraft:scute"
+        "item": "minecraft:prismarine_crystals"
     },
     "result": {
-        "item": "mimi:synlead3"
+        "id": "mimi:synlead3"
     }
 }

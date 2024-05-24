@@ -7,6 +7,6 @@
         "item": "minecraft:stick"
     },
     "result": {
-        "item": "mimi:keyboard"
+        "id": "mimi:keyboard"
     }
 }
