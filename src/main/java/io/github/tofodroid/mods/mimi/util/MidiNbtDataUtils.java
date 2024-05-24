@@ -16,25 +16,7 @@ import net.minecraft.world.item.ItemStack;
 
 public abstract class MidiNbtDataUtils {
     public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
-    public static final String FILTER_NOTE_TAG = "filter_note";
-    public static final String FILTER_OCT_TAG = "filter_oct";
-    public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
     public static final Byte FILTER_NOTE_OCT_ALL = -1;
-    public static final String BROADCAST_NOTE_TAG = "broadcast_note";
-    public static final String SOURCE_TAG = "source_uuid";
-    public static final String SOURCE_NAME_TAG = "source_name";
-    public static final String SYS_INPUT_TAG = "sys_input";
-    public static final String ENABLED_CHANNELS_TAG = "channels";
-    public static final String INSTRUMENT_TAG = "filter_instrument";
-    public static final String INVERT_INSTRUMENT_TAG = "invert_instrument";
-    public static final String VOLUME_TAG = "instrument_volume";
-    public static final String INVERT_SIGNAL_TAG = "invert_signal";
-    public static final String NOTE_START_TRIGGER_TAG = "note_start";
-    public static final String HOLD_TICKS_TAG = "hold_ticks";
-    public static final String BROADCAST_RANGE_TAG = "broadcast_range";
-    public static final String TRANSMITTER_SOURCE_PREFIX = ";T;";
-    public static final String RELAY_SOURCE_PREFIX = ";R;";
-    public static final String CHANNEL_MAP_BASE_TAG = "channel_map_";
     public static final Byte INSTRUMENT_ALL = -1;
     public static final Byte MAX_TRIGGER_MODE = 3;
     public static final Byte MAX_HOLD_TICKS = 20;
@@ -48,6 +30,24 @@ public abstract class MidiNbtDataUtils {
     public static final Integer ALL_BUT_10_CHANNELS_INT = 65023;
     public static final Integer JUST_CHANNEL_10_INT = 512;
     public static final Integer NONE_CHANNELS_INT = 0;
+    public static final String TRANSMITTER_SOURCE_PREFIX = ";T;";
+    public static final String RELAY_SOURCE_PREFIX = ";R;";
+
+    public static final String FILTER_NOTE_TAG = "filter_note";
+    public static final String FILTER_OCT_TAG = "filter_oct";
+    public static final String INVERT_NOTE_OCT_TAG = "invert_note_oct";
+    public static final String BROADCAST_NOTE_TAG = "broadcast_note";
+    public static final String SOURCE_TAG = "source_uuid";
+    public static final String SOURCE_NAME_TAG = "source_name";
+    public static final String SYS_INPUT_TAG = "sys_input";
+    public static final String ENABLED_CHANNELS_TAG = "channels";
+    public static final String INSTRUMENT_TAG = "filter_instrument";
+    public static final String VOLUME_TAG = "instrument_volume";
+    public static final String INVERT_SIGNAL_TAG = "invert_signal";
+    public static final String NOTE_START_TRIGGER_TAG = "note_start";
+    public static final String HOLD_TICKS_TAG = "hold_ticks";
+    public static final String BROADCAST_RANGE_TAG = "broadcast_range";
+    public static final String CHANNEL_MAP_BASE_TAG = "channel_map_";
     
     private static Map<Byte,String> INSTRUMENT_NAME_MAP = null;
 
@@ -80,17 +80,8 @@ public abstract class MidiNbtDataUtils {
     }
 
     public static void setMidiSource(ItemStack stack, UUID sourceId, String sourceName) {
-        if (sourceId != null) {
-            stack.getOrCreateTag().putUUID(SOURCE_TAG, sourceId);
-        } else {
-            stack.getOrCreateTag().remove(SOURCE_TAG);
-        }
-
-        if(sourceName != null) {
-            stack.getOrCreateTag().putString(SOURCE_NAME_TAG, sourceName);
-        } else {
-            stack.getOrCreateTag().remove(SOURCE_NAME_TAG);
-        }
+        TagUtils.setOrRemoveUUID(stack, SOURCE_TAG, sourceId);
+        TagUtils.setOrRemoveString(stack, SOURCE_NAME_TAG, sourceName);
     }
 
     public static UUID getMidiSource(ItemStack stack) {
@@ -118,9 +109,7 @@ public abstract class MidiNbtDataUtils {
     }
 
     public static void setEnabledChannelsInt(ItemStack stack, Integer enabledChannels) {
-        if(enabledChannels != null) {
-            stack.getOrCreateTag().putInt(ENABLED_CHANNELS_TAG, enabledChannels);
-        }
+        TagUtils.setOrRemoveInt(stack, ENABLED_CHANNELS_TAG, enabledChannels);
     }
 
     public static Integer getEnabledChannelsInt(ItemStack stack) {
@@ -182,19 +171,11 @@ public abstract class MidiNbtDataUtils {
     }
 
     public static void setFilterOct(ItemStack stack, Byte oct) {
-        if (oct >= 0) {
-            stack.getOrCreateTag().putByte(FILTER_OCT_TAG, oct);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(FILTER_OCT_TAG);
-        }
+        TagUtils.setOrRemoveByte(stack, FILTER_OCT_TAG, oct >= 0 ? oct : null);
     }
     
     public static void setFilterNote(ItemStack stack, Byte note) {
-        if (note >= 0) {
-            stack.getOrCreateTag().putByte(FILTER_NOTE_TAG, note);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(FILTER_NOTE_TAG);
-        }
+        TagUtils.setOrRemoveByte(stack, FILTER_NOTE_TAG, note >= 0 ? note : null);
     }
 
     public static Byte getFilterOct(ItemStack stack) {
@@ -206,11 +187,7 @@ public abstract class MidiNbtDataUtils {
     }
 
     public static void setBroadcastNote(ItemStack stack, Byte note) {
-        if (note >= 0) {
-            stack.getOrCreateTag().putByte(BROADCAST_NOTE_TAG, note);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(BROADCAST_NOTE_TAG);
-        }
+        TagUtils.setOrRemoveByte(stack, BROADCAST_NOTE_TAG, note >= 0 ? note : null);
     }
 
     public static Byte getBroadcastNote(ItemStack stack) {
@@ -225,11 +202,7 @@ public abstract class MidiNbtDataUtils {
     }
 
     public static void setFilterInstrument(ItemStack stack, Byte instrumentId) {
-        if (instrumentId >= 0) {
-            stack.getOrCreateTag().putByte(INSTRUMENT_TAG, instrumentId);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(INSTRUMENT_TAG);
-        }
+        TagUtils.setOrRemoveByte(stack, INSTRUMENT_TAG, instrumentId >= 0 ? instrumentId : null);
     }
 
     public static Byte getFilterInstrument(ItemStack stack) {
@@ -237,11 +210,7 @@ public abstract class MidiNbtDataUtils {
     }
     
     public static void setSysInput(ItemStack stack, Boolean sysInput) {
-        if (sysInput) {
-            stack.getOrCreateTag().putBoolean(SYS_INPUT_TAG, sysInput);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(SYS_INPUT_TAG);
-        }
+        TagUtils.setOrRemoveBoolean(stack, SYS_INPUT_TAG, sysInput ? sysInput : null);
     }
 
     public static Boolean getSysInput(ItemStack stack) {
@@ -249,27 +218,11 @@ public abstract class MidiNbtDataUtils {
     }
     
     public static void setInvertNoteOct(ItemStack stack, Boolean invert) {
-        if (invert) {
-            stack.getOrCreateTag().putBoolean(INVERT_NOTE_OCT_TAG, invert);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(INVERT_NOTE_OCT_TAG);
-        }
+        TagUtils.setOrRemoveBoolean(stack, INVERT_NOTE_OCT_TAG, invert ? invert : null);
     }
 
     public static Boolean getInvertNoteOct(ItemStack stack) {
         return TagUtils.getBooleanOrDefault(stack, INVERT_NOTE_OCT_TAG, false);
-    }
-
-    public static void setInvertInstrument(ItemStack stack, Boolean invert) {
-        if (invert) {
-            stack.getOrCreateTag().putBoolean(INVERT_INSTRUMENT_TAG, invert);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(INVERT_INSTRUMENT_TAG);
-        }
-    }
-
-    public static Boolean getInvertInstrument(ItemStack stack) {
-        return TagUtils.getBooleanOrDefault(stack, INVERT_INSTRUMENT_TAG, false);
     }
 
     public static Boolean getInvertSignal(ItemStack stack) {
@@ -277,22 +230,14 @@ public abstract class MidiNbtDataUtils {
     }
 
     public static void setInvertSignal(ItemStack stack, Boolean invert) {
-        if (invert) {
-            stack.getOrCreateTag().putBoolean(INVERT_SIGNAL_TAG, invert);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(INVERT_SIGNAL_TAG);
-        }
+        TagUtils.setOrRemoveBoolean(stack, INVERT_SIGNAL_TAG, invert ? invert : null);
     }
     public static Boolean getTriggerNoteStart(ItemStack stack) {
         return TagUtils.getBooleanOrDefault(stack, NOTE_START_TRIGGER_TAG, false);
     }
 
     public static void setTriggerNoteStart(ItemStack stack, Boolean held) {
-        if (held) {
-            stack.getOrCreateTag().putBoolean(NOTE_START_TRIGGER_TAG, held);
-        } else if (stack.hasTag()) {
-            stack.getTag().remove(NOTE_START_TRIGGER_TAG);
-        }
+        TagUtils.setOrRemoveBoolean(stack, NOTE_START_TRIGGER_TAG, held ? held : null);
     }
 
     public static void setHoldTicks(ItemStack stack, Byte holdTicks) {
@@ -301,8 +246,7 @@ public abstract class MidiNbtDataUtils {
         } else if(holdTicks < 1) {
             holdTicks = 1;
         }
-
-        stack.getOrCreateTag().putByte(HOLD_TICKS_TAG, holdTicks);
+        TagUtils.setOrRemoveByte(stack, HOLD_TICKS_TAG, holdTicks);
     }
 
     public static Byte getHoldTicks(ItemStack stack) {
@@ -316,8 +260,7 @@ public abstract class MidiNbtDataUtils {
         } else if(broadcastRange < MIN_BROADCAST_RANGE) {
             broadcastRange = MIN_BROADCAST_RANGE;
         }
-
-        stack.getOrCreateTag().putByte(BROADCAST_RANGE_TAG, broadcastRange);
+        TagUtils.setOrRemoveByte(stack, BROADCAST_RANGE_TAG, broadcastRange);
     }
 
     public static Byte getBroadcastRange(ItemStack stack) {
@@ -331,8 +274,7 @@ public abstract class MidiNbtDataUtils {
         } else if(volume < MIN_INSTRUMENT_VOLUME) {
             volume = MIN_INSTRUMENT_VOLUME;
         }
-
-        stack.getOrCreateTag().putByte(VOLUME_TAG, volume);
+        TagUtils.setOrRemoveByte(stack, VOLUME_TAG, volume);
     }
 
     public static Byte getInstrumentVolume(ItemStack stack) {
@@ -474,11 +416,11 @@ public abstract class MidiNbtDataUtils {
 
     public static Boolean isInstrumentFiltered(ItemStack stack, Byte instrument) {
         Byte filterInstrument = getFilterInstrument(stack);
-        return filterInstrument.equals(INSTRUMENT_ALL) ? !getInvertInstrument(stack) : getInvertInstrument(stack) ? filterInstrument != instrument : filterInstrument == instrument;
+        return filterInstrument.equals(INSTRUMENT_ALL) ? true : filterInstrument == instrument;
     }
 
-    public static Boolean isInstrumentFiltered(Byte filterInstrument, Boolean invertInstrument, Byte instrument) {
-        return filterInstrument.equals(INSTRUMENT_ALL) ? !invertInstrument : invertInstrument ? filterInstrument != instrument : filterInstrument == instrument;
+    public static Boolean isInstrumentFiltered(Byte filterInstrument, Byte instrument) {
+        return filterInstrument.equals(INSTRUMENT_ALL) ? true : filterInstrument == instrument;
     }
 
     public static CompoundTag convertSwitchboardToDataTag(CompoundTag switchTag) {
