@@ -1,7 +1,7 @@
 # MIMI - Musical Instrument Minecraft Interface
 
 ## Overview
-MIMI is a Forge mod for Minecraft Java Edition that allows you to play music from MIDI files or a MIDI Input Device using a variety of instruments either solo or with a group. The implementation is similar to the way that Rust instruments work and makes for a really easy to use yet powerful system. Mod releases are available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) and now on [Modrinth](https://modrinth.com/mod/mimi/).
+MIMI is a Forge/NeoForge mod for Minecraft Java Edition that allows you to play music from MIDI files or a MIDI Input Device using a variety of instruments either solo or with a group. The implementation is similar to the way that Rust instruments work and makes for a really easy to use yet powerful system. Mod releases are available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mimi-mod/) and now on [Modrinth](https://modrinth.com/mod/mimi/).
 
 | Minecraft Version |        Mod Support Level |
 | -------------     |                    -----:|
