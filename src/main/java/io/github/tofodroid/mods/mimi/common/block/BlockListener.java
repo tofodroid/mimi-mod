@@ -71,7 +71,6 @@ public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListene
 
         // Filter Instrument
         tooltip.add(Component.literal("  Instrument: " 
-            + (MidiNbtDataUtils.getInvertInstrument(blockItemStack) ? "Not " : "")
             + MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(blockItemStack))).withStyle(ChatFormatting.GREEN)
         );
 

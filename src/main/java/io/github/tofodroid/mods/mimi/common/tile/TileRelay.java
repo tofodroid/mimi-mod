@@ -48,7 +48,14 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
 
-        this.linkedId = MidiNbtDataUtils.getMidiSource(this.getSourceStack());
+        UUID newLinkedId = MidiNbtDataUtils.getMidiSource(this.getSourceStack());
+
+        if(newLinkedId != null && newLinkedId.toString().equals(this.getOwnerId().toString())) {
+            this.linkedId = UUID.randomUUID();
+        } else {
+            this.linkedId = newLinkedId;
+        }
+
         this.enabledChannelsList = MidiNbtDataUtils.getEnabledChannelsList(getSourceStack());
         this.broadcastRange = MidiNbtDataUtils.getBroadcastRange(this.getSourceStack());
         this.channelMap = MidiNbtDataUtils.getChannelMap(this.getSourceStack());
@@ -68,6 +75,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
         super.setRemoved();
 
         if(!this.getLevel().isClientSide()) {
+            this.allNotesOff();
             BroadcastManager.removeBroadcastProducer(this.getUUID());
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
@@ -78,8 +86,9 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
         super.onChunkUnloaded();
     
         if(!this.getLevel().isClientSide()) {
-            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
+            this.allNotesOff();
             BroadcastManager.removeBroadcastProducer(this.getUUID());
+            BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
 
@@ -150,6 +159,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
 
     @Override
     public void close() throws Exception {
+        this.onProducerRemoved();
         this.onConsumerRemoved();
     }
 

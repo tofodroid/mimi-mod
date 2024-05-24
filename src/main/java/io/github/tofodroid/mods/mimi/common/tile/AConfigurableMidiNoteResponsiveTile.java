@@ -20,7 +20,6 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     protected Byte filterNote;
     protected Byte filteredInstrument;
     protected Boolean invertFilterNoteOct;
-    protected Boolean invertFilterInstrument;
 
     public static void doTick(Level world, BlockPos pos, BlockState state, AConfigurableMidiNoteResponsiveTile self) {
         self.tick(world, pos, state);
@@ -93,7 +92,6 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
         this.filterOctMax = (filterOct+1) * 12;
         this.filterNote = MidiNbtDataUtils.getFilterNote(this.getSourceStack());
         this.filteredInstrument = MidiNbtDataUtils.getFilterInstrument(this.getSourceStack());
-        this.invertFilterInstrument = MidiNbtDataUtils.getInvertInstrument(this.getSourceStack());
         this.invertFilterNoteOct = MidiNbtDataUtils.getInvertNoteOct(this.getSourceStack());
     }
 
