@@ -85,33 +85,37 @@ public abstract class ServerTransmitterManager {
     public static void onServerStopping() {
         shuttingDown = true;
 
-        pool.shutdown();
-        try {
-            pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI pool. Error: " + e.getMessage());
+        if(pool != null) {
+            pool.shutdown();
             try {
-                pool.shutdownNow();
                 pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
-            } catch(Exception e2) {
-                MIMIMod.LOGGER.error("Failed to force shutdown MIDI pool. Error: " + e.getMessage());
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI pool. Error: " + e.getMessage());
+                try {
+                    pool.shutdownNow();
+                    pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                } catch(Exception e2) {
+                    MIMIMod.LOGGER.error("Failed to force shutdown MIDI pool. Error: " + e.getMessage());
+                }
             }
+            pool = null;
         }
-        pool = null;
 
-        executor.shutdown();
-        try {
-            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI executor. Error: " + e.getMessage());
+        if(executor != null) {
+            executor.shutdown();
             try {
-                executor.shutdownNow();
                 executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
-            } catch(Exception e2) {
-                MIMIMod.LOGGER.error("Failed to force shutdown MIDI executor. Error: " + e.getMessage());
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to orderly shutdown MIDI executor. Error: " + e.getMessage());
+                try {
+                    executor.shutdownNow();
+                    executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                } catch(Exception e2) {
+                    MIMIMod.LOGGER.error("Failed to force shutdown MIDI executor. Error: " + e.getMessage());
+                }
             }
+            executor = null;
         }
-        executor = null;
     }
     
     public static ServerMusicPlayerSongListPacket createListPacket(UUID musicPlayerId) {
