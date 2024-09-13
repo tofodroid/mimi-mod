@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter;
 
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
+import io.github.tofodroid.mods.mimi.server.ServerExecutorProxy;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.TileTransmitterPlaylistHandler;
 
 public class TileTransmitterBroadcastProducer extends ATransmitterBroadcastProducer {
@@ -14,19 +15,19 @@ public class TileTransmitterBroadcastProducer extends ATransmitterBroadcastProdu
     @Override
     public void play() {
         super.play();
-        tile.setPowered();
+        ServerExecutorProxy.executeOnServerThread(() -> tile.setPowered());
     }
 
     @Override
     public void pause() {
         super.pause();
-        tile.setUnpowered();
+        ServerExecutorProxy.executeOnServerThread(() -> tile.setUnpowered());
     }
 
     @Override
     public void stop() {
         super.stop();
-        tile.setUnpowered();
+        ServerExecutorProxy.executeOnServerThread(() -> tile.setUnpowered());
     }
 
     @Override

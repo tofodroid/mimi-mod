@@ -81,18 +81,20 @@ public class MultiMidiNotePacket implements CustomPacketPayload {
 
         // Second order
         for(Map.Entry<Long, ArrayList<NetMidiEvent>> timeEntry : pkt.sourceMap.entrySet()) {
-            buf.writeLong(timeEntry.getKey());
+            if(timeEntry.getValue() != null && !timeEntry.getValue().isEmpty()) {
+                buf.writeLong(timeEntry.getKey());
 
-            // META - Number of Events
-            buf.writeInt(timeEntry.getValue().size());
+                // META - Number of Events
+                buf.writeInt(timeEntry.getValue().size());
 
-            // Third Order
-            for(NetMidiEvent noteEvent : timeEntry.getValue()) {
-                buf.writeUUID(noteEvent.playerId);
-                buf.writeBlockPos(noteEvent.pos);
-                buf.writeByte(noteEvent.instrumentId);
-                buf.writeByte(noteEvent.note);
-                buf.writeByte(noteEvent.velocity);
+                // Third Order
+                for(NetMidiEvent noteEvent : timeEntry.getValue()) {
+                    buf.writeUUID(noteEvent.playerId);
+                    buf.writeBlockPos(noteEvent.pos);
+                    buf.writeByte(noteEvent.instrumentId);
+                    buf.writeByte(noteEvent.note);
+                    buf.writeByte(noteEvent.velocity);
+                }
             }
         }
     }
