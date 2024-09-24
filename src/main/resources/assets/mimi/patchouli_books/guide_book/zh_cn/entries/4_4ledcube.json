@@ -1,0 +1,24 @@
+{
+    "name": "LED方块",
+    "icon": "mimi:ledcube_a",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "LED方块",
+            "item": "mimi:ledcube_a",
+            "text": "LED方块是一种能设定为16种不同颜色之一，且会在通入红石信号后发光的方块。$(br2)LED方块可以与侦听机和接收机有效配合，因为它们能快速对红石信号作出反应。但是LED方块并不会改变周围的光照等级，也不会阻止生物的生成。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "合成配方",
+            "recipe": "mimi:ledcube_a",
+            "text": "将四种同一外观的LED方块正方形排列放入合成方格即可改变外观。$(br2)你也可以将两摞LED方块放入合成方格并紧邻放置，这样可以将左侧那摞的外观、颜色、反转设定赋值给右边那摞。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "空手右键单击放置在世界中的LED方块即可改变其颜色。$(br2)手持红石火把或红石块右键单击放置在世界中的LED方块即可反转其输入(让其在没有红石信号时点亮)。"
+        }
+    ],
+    "sortnum": 4
+}

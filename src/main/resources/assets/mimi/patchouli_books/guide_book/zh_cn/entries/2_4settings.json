@@ -1,0 +1,16 @@
+{
+    "name": "配置乐器",
+    "icon": "minecraft:writable_book",
+    "category": "mimi:2instruments",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "除了打开乐器的GUI，还有其他几种方式来修改乐器的MIDI设定。$(br2)要将乐器连接到玩家的传输器或服务器传输器方块，只需手持待连接的乐器右键单击玩家或方块。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "要将某个乐器的MIDI设定复制给另一个乐器，只需将两个乐器放入合成方格并紧邻摆放。右侧的乐器会将其设定值同步为左侧乐器的值。"
+        }
+    ],
+    "sortnum": 4
+}

@@ -1,0 +1,12 @@
+{
+    "name": "接下来呢？",
+    "icon": "mimi:receiver",
+    "category": "mimi:1overview",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "现在你了解了基础，但MIMI模组能体验的内容还有很多！请看：$(br)$(li)接收器 - 在接收到特定音符时发出红石信号！$(br)$(li)LED方块 - 式样独特的彩色红石灯，搭建舞台的完美选择。$(br)$(li)机械乐师 - 不用人类玩家即可演奏乐器！"
+        }
+    ],
+    "sortnum": 6
+}

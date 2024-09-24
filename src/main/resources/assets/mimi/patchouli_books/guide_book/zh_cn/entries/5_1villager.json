@@ -1,0 +1,27 @@
+{
+    "name": "演奏家",
+    "icon": "minecraft:emerald",
+    "category": "mimi:5other",
+    "pages": [
+        {
+            "type": "patchouli:entity",
+            "entity": "minecraft:villager{VillagerData:{profession:\"mimi:instrumentalist\",level:3,type:plains}}"
+        },
+        {
+            "type": "patchouli:spotlight",
+            "item": "mimi:tuningtable",
+            "title": "工作站点",
+            "text": "演奏家村民的工作站点是MIMI模组的调音桌。$(br2)村庄中生成演奏家的房子时会生成调音桌，也可以按照$(l:2_5tuning)合成配方$()来合成调音桌。"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "交易",
+            "text": "乐器商人根据其等级不同，可能交易如下物品：$(br)$(li)$(l)等级1$() - Minecraft 'Cat'或'13'音乐唱片、音符盒$(br)$(li)$(l)等级2$() - 随机手持式乐器$(br)$(li)$(l)等级3$() - 随机方块式乐器、传输器"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)等级4$() - 随机手持式乐器、随机MIMI红石方块$(br)$(li)$(l)等级5$() - 随机方块式乐器、随机Minecraft音乐唱片('Otherside'除外)、唱片残片"
+        }
+    ],
+    "sortnum": 1
+}

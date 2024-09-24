@@ -1,0 +1,17 @@
+{
+    "name": "服务器传输器",
+    "icon": "mimi:transmitterblock",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "服务器传输器是方块形式的传输器，无需玩家手持即可播放MIDI文件。然而，它只能播放服务器提供的乐曲。$(br2)将MIDI文件放入MIMI的配置文件夹下的\"server_midi_files\"文件夹中并点击重新加载按钮即可添加到服务器传输器中。(也对单人模式和局域网联机起效)。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:transmitterblock",
+            "text": "不像手持式的传输器那样将配置与玩家绑定，服务器传输器的配置单独存在于方块内。$(br2)服务器传输器在播放乐曲时会发出红石信号。"
+        }
+    ],
+    "sortnum": 3
+}

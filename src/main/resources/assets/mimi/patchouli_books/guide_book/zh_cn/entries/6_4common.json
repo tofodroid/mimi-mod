@@ -1,0 +1,22 @@
+{
+    "name": "通用配置文件",
+    "icon": "minecraft:player_head",
+    "category": "mimi:6settings",
+    "pages": [
+        {
+            "type": "text",
+            "text": "MIMI还有一份包含了数种额外设置的通用配置文件，可以同时应用于客户端和服务端。$(br2)和其他模组一样，MIMI的配置文件可以在Minecraft游戏实例的$(#0046ff)config$()文件夹中找到，并且可以用任何文本编辑器或IDE修改。"
+        },
+        {
+            "type": "text",
+            "title": "演奏家的商店",
+            "text": "$(l)参数名：$() enableInstrumentalistShop$(br)$(l)类型：$() 布尔值$(br)$(l)默认值：$() true$(br2)此参数代表村庄中是否要生成演奏家的商店。"
+        },
+        {
+            "type": "text",
+            "title": "乐器生物",
+            "text": "$(l)参数名：$() allowedInstrumentMobs$(br)$(l)类型：$() 以逗号分隔的列表$(br)$(l)默认值：$() minecraft:zombie,minecraft:husk,minecraft:skeleton,minecraft:stray,minecraft:wither_skeleton$(br2)此参数是一份以逗号分隔的列表，代表可以持有乐器的生物。"
+        }
+    ],
+    "sortnum": 4
+}

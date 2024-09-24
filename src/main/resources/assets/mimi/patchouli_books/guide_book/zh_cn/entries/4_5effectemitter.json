@@ -1,0 +1,30 @@
+{
+    "name": "粒子效果发射器",
+    "icon": "mimi:effectemitter",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "粒子效果发射器",
+            "item": "mimi:effectemitter",
+            "text": "粒子效果发射器可以在被红石信号激活后发出音效并且/或者显示一种粒子效果。$(br2)音效和粒子效果有多种设置可以调节，点击输入框旁边的播放按钮可以预览设置的效果。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "合成配方",
+            "recipe": "mimi:effectemitter",
+            "text": "将两个粒子效果发射器放入合成方格并相邻放置即可复制设定。左侧机器的设定将会被复制给右侧机器。"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "音效",
+            "text": "要设定某种音效需要将其完整的资源名称输入音效文本框内。你可以输入/playsound命令然后查看自动补全建议以获取可用的音效。$(br2)你可以点击各项设定旁的箭头按钮来更改音效的音量、音高和循环间隔。"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "粒子效果",
+            "text": "要设定某种粒子效果需要将其完整的资源名称输入粒子效果文本框内。你可以输入/particle命令然后查看自动补全建议以获取可用的粒子效果(其中的一小部分无法使用)。$(br2)你可以点击各项设定旁的箭头按钮来更改粒子效果的方向、区域、数量、速度(有时改动的是其他属性)和循环间隔。"
+        }
+    ],
+    "sortnum": 5
+}

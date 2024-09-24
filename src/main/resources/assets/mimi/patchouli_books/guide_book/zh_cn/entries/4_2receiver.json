@@ -1,0 +1,29 @@
+{
+    "name": "接收器",
+    "icon": "mimi:receiver",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "接收器",
+            "item": "mimi:receiver",
+            "text": "接收器是一个能够接收它周围正在传输的音符的方块，当有音符匹配接收器设置的过滤器时，接收器将会发出红石信号。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "合成配方",
+            "link_recipe": true,
+            "recipe": "mimi:receiver"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "设定",
+            "text": "$(li)$(l)过滤音符$()：接收器会对哪个(或哪些)音符作出响应。取值可以为全部、特定音符(如C5)、某个八度的任意音符(如*5)、某一音符的任意八度(如C*)。$(br)$(li)$(l)传输来源$()：该接收器所连接的传输器或传输中继器。在接收器的GUI中可以设定为你自己，手持接收器右键单击玩家/方块即可设定为相应的目标。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)激活的MIDI通道$()：接收器会对哪个(或哪些)通道传入的音符作出响应。$(br)$(li)$(l)触发模式$()：接收器会在音符奏响的整段时间内发出信号还是仅在音符开始奏响的时刻发出脉冲。"
+        }
+    ],
+    "sortnum": 2
+}

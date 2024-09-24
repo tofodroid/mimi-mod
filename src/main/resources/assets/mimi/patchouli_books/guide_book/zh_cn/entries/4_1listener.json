@@ -1,0 +1,29 @@
+{
+    "name": "侦听器",
+    "icon": "mimi:listener",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "侦听器",
+            "item": "mimi:listener",
+            "text": "侦听器是一个能够收听周围奏响的音符的方块，当有音符匹配侦听器设置的过滤器时，侦听器将会发出红石信号。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "合成配方",
+            "link_recipe": true,
+            "recipe": "mimi:listener"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "设定",
+            "text": "$(li)$(l)过滤音符$()：侦听器会对哪个(或哪些)音符作出响应。取值可以为全部、特定音符(如C5)、某个八度的任意音符(如*5)、某一音符的任意八度(如C*)。$(br)$(li)$(l)过滤乐器$()：侦听器会对哪个(或哪些)乐器作出响应。取值可以为某种乐器或$(italic)除某种乐器外的$()任意乐器。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(li)$(l)触发模式$()：侦听器会在音符奏响的整段时间内发出信号还是仅在音符开始奏响的时刻发出脉冲。"
+        }
+    ],
+    "sortnum": 1
+}

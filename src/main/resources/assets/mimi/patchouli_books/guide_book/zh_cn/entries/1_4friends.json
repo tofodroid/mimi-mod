@@ -1,0 +1,16 @@
+{
+    "name": "与朋友合奏",
+    "icon": "minecraft:player_head",
+    "category": "mimi:1overview",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "如果你想同时利用超过三个乐器来演奏一首曲子，方法之一是与朋友合奏！$(br2)在你将乐器连接到你的传输器之后，即使是另一个玩家使用它也依然会播放你传输器中的音符，前提是其他玩家在你附近。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "其他玩家也可以将自己的乐器连接到你的传输器上，只需手持想连接的乐器对你右键单击即可。"
+        }
+    ],
+    "sortnum": 4
+}

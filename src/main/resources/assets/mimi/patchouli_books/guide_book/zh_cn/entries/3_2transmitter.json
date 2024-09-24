@@ -1,0 +1,18 @@
+{
+    "name": "传输器",
+    "icon": "mimi:transmitter",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "传输器的作用是将MIDI文件中的音符传输给MIMI模组的乐器。$(br2)要使用传输器，首先需要合成一个，将其放在你的主手或副手上，然后右键单击打开传输器的GUI。$(br2)传输器的工作方式类似末影箱，每个玩家只能拥有一个，对某个玩家而言任何传输器的效果都是一样的。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:transmitter",
+            "link_recipe": true,
+            "text": "乐曲开始播放后就会一直播放，只要你的任意一只手中持有一个传输器或者快捷栏中有一个传输器即可。$(br2)要在不选中的前提下打开快捷栏中的传输器可以设置键位($(l)$(k:key.mimi.midi.gui.transmitter)$())。"
+        }
+    ],
+    "sortnum": 2
+}

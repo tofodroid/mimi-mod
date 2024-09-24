@@ -1,0 +1,21 @@
+{
+    "name": "音频输出",
+    "icon": "mimi:trumpet",
+    "category": "mimi:6settings",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "使用设备配置界面即可修改MIMI的音频输出设定，包括全局音量和输出设备。配置界面随时都可以用设定的键位($(l)$(k:key.mimi.midi.gui.settings)$())打开，也可以合成设备配置器并右键单击。$(br2)设备配置界面的底部显示了系统所识别到的音频输出设备列表。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:deviceconfig",
+            "text": "点击箭头可以切换设备，点击保存按钮即可选中你想要MIMI输出音频的设备。通常而言你可以将其设为'Automatic'(自动)(选择和Minecraft相同的设备)，但如果你在Mac或Linux系统上游玩的话这一设定可能不会起效。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "在设备配置界面还能设定MIMI模组音符的全局音量。$(br2)MIMI模组的音符还会受到Minecraft设置中的'唱片机/音符盒'以及'主音量'两个音量条的影响。"
+        }
+    ],
+    "sortnum": 1
+}

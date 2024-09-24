@@ -1,0 +1,6 @@
+{
+	"name": "传输器",
+	"description": "传输器可以让MIMI乐器利用MIDI文件(来自你的电脑或多人游戏的服务器)来演奏音符。$(br2)MIDI文件是以数字化表格形式存在的，电脑可以读取的音乐，最多可拥有16部分(通道)。它们长久以来被用于多种场合，从卡拉OK机，到诸如$(l:https://www.youtube.com/watch?v=SJ0Ob4PlCDU)毁灭战士$()、$(l:https://www.youtube.com/watch?v=60d4uGPNblo)索尼克$()以及$(l:https://www.youtube.com/watch?v=QO6CMRg93dk)魔兽争霸$())这样的老游戏。",
+	"icon": "mimi:transmitter",
+	"sortnum": 3
+}

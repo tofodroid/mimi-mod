@@ -1,0 +1,17 @@
+{
+    "name": "MIDI文件",
+    "icon": "minecraft:music_disc_mellohi",
+    "category": "mimi:3transmitter",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "title": "寻找MIDI文件",
+            "text": "要使用传输器，首先应准备好供其播放的MIDI文件。$(br2)MIDI文件和你在电脑上听的普通的音乐(例如MP3文件)并不一样，MIMI模组也不支持播放其他格式的音乐文件。普通的音乐文件是乐器演奏的录音，而MIDI文件是音符本身，指挥电脑如何演奏。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "MIDI已经存在很长时间了，因此互联网上能找到很多MIDI音乐。然而要找到新歌的MIDI版本可能并不容易。此处列出了几个收录大量免费MIDI文件的网站链接：$(br2)1. $(l:https://bitmidi.com/)BitMidi.com$()$(br)2. $(l:https://freemidi.org/)FreeMidi.org$()$(br)3. $(l:https://www.midiworld.com/files/)MidiWorld.com$()$(br)4. $(l:https://freemidis.net)FreeMidis.net$()$(br)5. $(l:https://midifind.com/)MidiFind.com$()$(br2)通过谷歌搜索很容易就能找到更多网站！"
+        }
+    ],
+    "sortnum": 1
+}

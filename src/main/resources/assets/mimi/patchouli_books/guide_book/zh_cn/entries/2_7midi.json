@@ -1,0 +1,44 @@
+{
+    "name": "使用MIDI输入设备",
+    "icon": "mimi:deviceconfig",
+    "category": "mimi:2instruments",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "MIMI模组中的乐器还可通过连接到你电脑的MIDI输入设备(例如数码钢琴或合成器)演奏。$(br2)在设备配置界面中可以配置MIMI的乐器应接收哪个MIDI输入设备传入的音符，若绑定了键位则可以随时打开($(l)$(k:key.mimi.midi.gui.settings)$())，但也可以通过合成并手持设备配置器右键单击打开。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:deviceconfig",
+            "text": "设备配置界面的底部显示了系统所识别到的MIDI输入设备列表。点击箭头可以切换设备，点击保存按钮即可选中你想要连接的设备。$(br2)选定某个设备后你需要重启游戏才能选择其他设备。"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "你选中的设备及其状态将会显示在输入设备配置界面的顶部。"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "连接到输入设备",
+            "text": "在选定MIDI输入设备并准备就绪可以使用后，在乐器的MIDI设定页面启用\"Sys MIDI Device\"切换键即可通过输入设备向MIMI乐器发送音符。$(br2)你还需要在乐器中激活MIDI输入设备发送音符所用的通道(通常为通道1或通道2)。以防万一，也可以全部激活。:)"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "你现在应该能用MIDI输入设备演奏音符并听到音符在乐器上奏响了。$(br2)与传输器相同，在你关闭乐器的GUI后MIMI乐器仍然能继续演奏MIDI输入设备的音符，只要你仍然持有乐器或仍坐在乐器面前。"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "速度修改器",
+            "text": "你还可以使用速度调节箭头来设定速度修改值，这一数值将会被应用于从所选的MIDI输入设备收到的所有音符。该值可用于增加或减少设备所演奏音符的音量。"
+        },
+        {
+            "type": "patchouli:text",
+            "title": "错误排查",
+            "text": "有时候MIDI与Minecraft的配合不佳，故而此处给出了不能正常工作时可尝试的解决方法。$(br2)$(l)设备不显示$()$(br2)1. 在启动Minecraft前插入设备并确保电脑已经识别到了设备。$(br2)2. 重启输入设备并且/或者拔掉输入设备再重新插入。说真的，这个方法解决了我的大部分问题，至少有七成！"
+        },
+        {
+            "type": "patchouli:text",
+            "text": "$(l)设备状态错误$()$(br2)1. 与\"设备不显示\"相同的方案。$(br2)2. 确认设备未被电脑上的其他程序占用。大部分MIDI输入设备只能同时被一个程序占用。"
+        }
+    ],
+    "sortnum": 7
+}

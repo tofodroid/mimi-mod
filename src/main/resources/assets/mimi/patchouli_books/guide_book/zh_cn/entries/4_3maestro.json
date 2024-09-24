@@ -1,0 +1,19 @@
+{
+    "name": "机械乐师",
+    "icon": "mimi:mechanicalmaestro",
+    "category": "mimi:4redstone",
+    "pages": [
+        {
+            "type": "patchouli:spotlight",
+            "title": "机械乐师",
+            "item": "mimi:mechanicalmaestro",
+            "text": "机械乐师是一个方块，当输入红石信号并且给予乐器后将会弹奏从乐器所连接的附近的传输器中接收到的音符。"
+        },
+        {
+            "type": "patchouli:crafting",
+            "title": "合成配方",
+            "recipe": "mimi:mechanicalmaestro"
+        }
+    ],
+    "sortnum": 3
+}
