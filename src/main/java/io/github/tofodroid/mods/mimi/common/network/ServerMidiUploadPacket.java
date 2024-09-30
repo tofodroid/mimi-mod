@@ -3,13 +3,14 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public class ServerMidiUploadPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMidiUploadPacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(ServerMidiUploadPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<ServerMidiUploadPacket> TYPE = new Type<>(ID);
     public static final int MAX_DATA_SIZE = 30000;
     public static final Byte UPLOAD_SUCCESS = Integer.valueOf(0).byteValue();

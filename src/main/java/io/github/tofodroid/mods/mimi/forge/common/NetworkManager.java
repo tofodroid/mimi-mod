@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacket;
 import io.github.tofodroid.mods.mimi.common.network.ClientMidiListPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacket;
@@ -31,7 +32,6 @@ import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.network.CustomPayloadEvent;
@@ -39,7 +39,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.minecraftforge.network.PacketDistributor.TargetPoint;
@@ -49,7 +48,7 @@ public class NetworkManager {
     private static final Integer NET_PROTOCOL = 2;
 
     private static final SimpleChannel MOD_CHANNEL = ChannelBuilder
-            .named(new ResourceLocation(MIMIMod.MODID, "mod_channel"))
+            .named(ResourceUtils.newModLocation("mod_channel"))
             .networkProtocolVersion(NET_PROTOCOL)
             .simpleChannel();
 
@@ -102,7 +101,7 @@ public class NetworkManager {
 
     public static <T> BiConsumer<T, CustomPayloadEvent.Context> createHandler(Consumer<T> handleClient, BiConsumer<T, ServerPlayer> handleServer) {
         return (T message, CustomPayloadEvent.Context ctx) -> {
-            if(ctx.getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
+            if(ctx.isServerSide()) {
                 ctx.enqueueWork(() -> handleServer.accept(message, ctx.getSender()));
             } else {
                 ctx.enqueueWork(() -> handleClient.accept(message));

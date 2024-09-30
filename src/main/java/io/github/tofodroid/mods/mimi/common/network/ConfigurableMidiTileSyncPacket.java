@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.common.network;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
@@ -12,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ConfigurableMidiTileSyncPacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(ConfigurableMidiTileSyncPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<ConfigurableMidiTileSyncPacket> TYPE = new Type<>(ID);
 
     public final BlockPos tilePos;

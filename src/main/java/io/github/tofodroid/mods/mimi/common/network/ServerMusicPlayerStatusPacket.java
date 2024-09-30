@@ -7,12 +7,13 @@ import net.minecraft.resources.ResourceLocation;
 import io.netty.handler.codec.DecoderException;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.FavoriteMode;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.LoopMode;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler.SourceMode;
 
 public class ServerMusicPlayerStatusPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerStatusPacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(ServerMusicPlayerStatusPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<ServerMusicPlayerStatusPacket> TYPE = new Type<>(ID);
     private static final UUID NO_FILE_ID = new UUID(0,0);
 

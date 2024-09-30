@@ -4,13 +4,13 @@ import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -154,7 +154,7 @@ public class TileEffectEmitter extends AConfigurableTile {
                 ParticleOptions options = null;
 
                 try {
-                    options = (ParticleOptions)this.level.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(new ResourceLocation(particleStr));
+                    options = (ParticleOptions)this.level.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(ResourceUtils.parseLocation(particleStr));
                     particleValid = options != null;
                 } catch(Exception e) { /* No-op */ }
 
@@ -174,11 +174,11 @@ public class TileEffectEmitter extends AConfigurableTile {
                 Boolean soundValid = false;
 
                 try {
-                    soundValid = this.level.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(new ResourceLocation(soundStr));
+                    soundValid = this.level.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(ResourceUtils.parseLocation(soundStr));
                 } catch(Exception e) { /* No-op */ }
 
                 if(soundValid) {
-                    this._sound = SoundEvent.createVariableRangeEvent(new ResourceLocation(soundStr));
+                    this._sound = SoundEvent.createVariableRangeEvent(ResourceUtils.parseLocation(soundStr));
                 }
             }
         }

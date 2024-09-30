@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -16,7 +16,7 @@ public class ModEntities {
     public static final EntityType<EntityNoteResponsiveTile> NOTERESPONSIVETILE = create("noteresponsivetile", EntityType.Builder.of(EntityNoteResponsiveTile::new, MobCategory.MISC).sized(0F, 0F).noSummon().fireImmune());
 
     public static <T extends Entity> EntityType<T> create(String id, EntityType.Builder<T> builder) {
-        ResourceLocation location = new ResourceLocation(MIMIMod.MODID, id);
+        ResourceLocation location = ResourceUtils.newModLocation(id);
         EntityType<T> type = builder.build(location.toString());
         ENTITES.put(location, type);
         return type;

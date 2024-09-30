@@ -6,6 +6,7 @@ import java.util.List;
 import com.mojang.datafixers.util.Pair;
 
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -17,22 +18,20 @@ import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 public class ModStructures {
-    private static final ResourceLocation desertHouse = new ResourceLocation("mimi", "village/desert/houses/instrumentalist_house");
-    private static final ResourceLocation plainsHouse = new ResourceLocation("mimi", "village/plains/houses/instrumentalist_house");
-    private static final ResourceLocation savannaHouse = new ResourceLocation("mimi", "village/savanna/houses/instrumentalist_house");
-    private static final ResourceLocation snowyHouse = new ResourceLocation("mimi", "village/snowy/houses/instrumentalist_house");
-    private static final ResourceLocation taigaHouse = new ResourceLocation("mimi", "village/taiga/houses/instrumentalist_house");
-    private static final ResourceKey<StructureProcessorList> EMPTY_PROCESSOR_LIST_KEY = ResourceKey.create(Registries.PROCESSOR_LIST,
-            new ResourceLocation("minecraft", "empty"));
+    private static final ResourceLocation desertHouse = ResourceUtils.newModLocation("village/desert/houses/instrumentalist_house");
+    private static final ResourceLocation plainsHouse = ResourceUtils.newModLocation("village/plains/houses/instrumentalist_house");
+    private static final ResourceLocation savannaHouse = ResourceUtils.newModLocation("village/savanna/houses/instrumentalist_house");
+    private static final ResourceLocation snowyHouse = ResourceUtils.newModLocation("village/snowy/houses/instrumentalist_house");
+    private static final ResourceLocation taigaHouse = ResourceUtils.newModLocation("village/taiga/houses/instrumentalist_house");
+    private static final ResourceKey<StructureProcessorList> EMPTY_PROCESSOR_LIST_KEY = ResourceKey.create(Registries.PROCESSOR_LIST, ResourceUtils.newRootLocation("empty"));
 
-    
 	public static void registerVillageStructures(Registry<StructureProcessorList> structureProcessorList, Registry<StructureTemplatePool> structureTemplatePool) {
 		if(ConfigProxy.isInstrumentalistShopEnabled()) {
-			addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/desert/houses"), desertHouse.toString(), 2);
-			addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/plains/houses"), plainsHouse.toString(), 2);
-			addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/savanna/houses"), savannaHouse.toString(),2);
-			addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/snowy/houses"), snowyHouse.toString(), 2);
-			addBuildingToPool(structureTemplatePool, structureProcessorList, new ResourceLocation("minecraft:village/taiga/houses"), taigaHouse.toString(), 2);
+			addBuildingToPool(structureTemplatePool, structureProcessorList, ResourceUtils.newRootLocation("village/desert/houses"), desertHouse.toString(), 2);
+			addBuildingToPool(structureTemplatePool, structureProcessorList, ResourceUtils.newRootLocation("village/plains/houses"), plainsHouse.toString(), 2);
+			addBuildingToPool(structureTemplatePool, structureProcessorList, ResourceUtils.newRootLocation("village/savanna/houses"), savannaHouse.toString(),2);
+			addBuildingToPool(structureTemplatePool, structureProcessorList, ResourceUtils.newRootLocation("village/snowy/houses"), snowyHouse.toString(), 2);
+			addBuildingToPool(structureTemplatePool, structureProcessorList, ResourceUtils.newRootLocation("village/taiga/houses"), taigaHouse.toString(), 2);
 		}
 	}
     

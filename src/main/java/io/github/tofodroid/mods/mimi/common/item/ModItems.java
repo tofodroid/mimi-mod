@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.common.item;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -115,7 +116,7 @@ public final class ModItems {
     public static List<ItemInstrumentBlock> buildBlockInstruments() {
         List<ItemInstrumentBlock> list = new ArrayList<>();
         for(InstrumentSpec instrument : InstrumentConfig.getBlockInstruments()) {
-            Block block = ModBlocks.BLOCKS.get(new ResourceLocation(MIMIMod.MODID, instrument.registryName));
+            Block block = ModBlocks.BLOCKS.get(ResourceUtils.newModLocation(instrument.registryName));
 
             if(block instanceof BlockInstrument) {
                 list.add(create(instrument.registryName, new ItemInstrumentBlock((BlockInstrument)block, new Item.Properties().stacksTo(1), instrument.registryName)));
@@ -128,12 +129,12 @@ public final class ModItems {
 
     public static CreativeModeTab create(String id, CreativeModeTab.Builder builder) {
         CreativeModeTab tab = builder.build();
-        CREATIVE_TABS.put(new ResourceLocation(MIMIMod.MODID, id), tab);
+        CREATIVE_TABS.put(ResourceUtils.newModLocation(id), tab);
         return tab;
     }
 
     public static <T extends Item> T create(String id, T item) {
-        ITEMS.put(new ResourceLocation(MIMIMod.MODID, id), item);
+        ITEMS.put(ResourceUtils.newModLocation(id), item);
         return item;
     }
 }

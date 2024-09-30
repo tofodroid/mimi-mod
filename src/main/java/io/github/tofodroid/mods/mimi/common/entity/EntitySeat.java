@@ -7,9 +7,6 @@ import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -78,11 +75,6 @@ public class EntitySeat extends Entity {
             this.source = this.blockPosition();
         }
     }
-
-    // @Override
-    // public float ridingOffset(Entity e) {
-    //     return -0.2f;
-    // }
     
     public BlockPos getSource() {
         return source;
@@ -138,11 +130,6 @@ public class EntitySeat extends Entity {
             tag.putInt("source_y", source.getY());
             tag.putInt("source_z", source.getY());
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

@@ -7,8 +7,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -16,7 +16,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-public class TuningTableRecipe implements Recipe<CraftingContainer>{
+public class TuningTableRecipe implements Recipe<CraftingInput>{
 	public static final TuningTableRecipe.Serializer SERIALIZER = new TuningTableRecipe.Serializer();
 
     private final Ingredient instrument;
@@ -30,7 +30,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         return this.instrument.test(inv.getItem(0)) && this.addition.test(inv.getItem(1));
     }
 
@@ -55,8 +55,8 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-        return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
+        return NonNullList.withSize(inv.size(), ItemStack.EMPTY);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class TuningTableRecipe implements Recipe<CraftingContainer>{
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider pRegistries) {
         ItemStack itemstack = this.result.copy();
         itemstack.applyComponents(inv.getItem(0).getComponents());
         return itemstack;

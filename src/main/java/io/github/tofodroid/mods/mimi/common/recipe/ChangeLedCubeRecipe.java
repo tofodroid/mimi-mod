@@ -12,10 +12,10 @@ import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
@@ -41,13 +41,13 @@ public class ChangeLedCubeRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
+    public ItemStack assemble(CraftingInput pInput, HolderLookup.Provider pRegistries) {
         ItemStack source = ItemStack.EMPTY;
         Integer sourceDye = null;
 
         // Ensure dye colors match for all source cubes
-        for (int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack stackI = inv.getItem(i);
+        for (int i = 0; i < pInput.size(); i++) {
+            ItemStack stackI = pInput.getItem(i);
 
             if(!stackI.isEmpty()) {
                 if(stackI.getItem() instanceof BlockItem && ((BlockItem)stackI.getItem()).getBlock() instanceof BlockLedCube) {

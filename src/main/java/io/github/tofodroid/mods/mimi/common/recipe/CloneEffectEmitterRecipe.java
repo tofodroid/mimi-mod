@@ -5,10 +5,10 @@ import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
@@ -27,18 +27,18 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         ItemStack source = ItemStack.EMPTY;
         Integer foundSlots = 1;
         List<Integer> validSlots = null;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stackI = inv.getItem(i);
             if (!stackI.isEmpty() && !isValid(stackI)) {
                 // Invalid item found
                 return false;
             } else if(!stackI.isEmpty() && source.isEmpty()) {
-                validSlots = getValidSlots(i, inv.getWidth(), inv.getHeight());
+                validSlots = getValidSlots(i, inv.width(), inv.height());
 
                 if(validSlots != null) { 
                     source = stackI;
@@ -58,11 +58,11 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider pRegistries) {
         ItemStack source = ItemStack.EMPTY;
         ItemStack target = ItemStack.EMPTY;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stackI = inv.getItem(i);
             if(!stackI.isEmpty() && source.isEmpty()) {
                 source = stackI;
@@ -93,8 +93,8 @@ public class CloneEffectEmitterRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-        NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
+        NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inv.size(), ItemStack.EMPTY);
 
         for(int i = 0; i < nonnulllist.size(); ++i) {
             if(isValid(inv.getItem(i))) {

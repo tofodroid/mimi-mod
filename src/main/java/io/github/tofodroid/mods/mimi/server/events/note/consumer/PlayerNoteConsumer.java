@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.server.events.note.consumer;
 import java.util.ArrayList;
 import java.util.Map;
 
+import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetMidiEvent;
@@ -82,6 +83,7 @@ public class PlayerNoteConsumer extends ANoteConsumer {
     @Override
     public void tick() {
         if(!packetCacheMap.isEmpty() && this.playerIsAlive()) {
+            MIMIMod.LOGGER.info("Tick - Sending " + packetCacheMap.size() + " events to client.");
             NetworkProxy.sendToPlayer(new MultiMidiNotePacket(packetCacheMap), this.player);
             packetCacheMap.clear();
         }
@@ -91,6 +93,7 @@ public class PlayerNoteConsumer extends ANoteConsumer {
 
     private void cachePacket(MidiNotePacket packet) {
         if(packet.player != null && packet.pos != null) {
+            MIMIMod.LOGGER.info("Caching packet: " + packet.noteServerTime);
             ArrayList<NetMidiEvent> eventList = packetCacheMap.computeIfAbsent(packet.noteServerTime, (time) -> new ArrayList<>());
             eventList.add(new NetMidiEvent(packet));
         }
