@@ -2,11 +2,11 @@ package io.github.tofodroid.mods.mimi.common.recipe;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
@@ -25,10 +25,10 @@ public class ColoredItemRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         ItemStack instrument = ItemStack.EMPTY;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stackI = inv.getItem(i);
             if (stackI.is(ItemTags.DYEABLE) && instrument.isEmpty()) {
                 instrument = stackI;
@@ -41,11 +41,11 @@ public class ColoredItemRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider pRegistries) {
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider pRegistries) {
         ItemStack instrument = ItemStack.EMPTY;
         List<DyeItem> dyes = new ArrayList<>();
 
-        for (int i = 0; i < inv.getContainerSize(); ++i) {
+        for (int i = 0; i < inv.size(); ++i) {
             ItemStack stackI = inv.getItem(i);
             if (!stackI.isEmpty()) {
                 if (stackI.is(ItemTags.DYEABLE) && instrument.isEmpty()) {

@@ -5,13 +5,14 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public class MidiDeviceBroadcastPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MidiDeviceBroadcastPacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(MidiDeviceBroadcastPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<MidiDeviceBroadcastPacket> TYPE = new Type<>(ID);
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 

@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -13,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 
 public class MidiNotePacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, MidiNotePacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(MidiNotePacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<MidiNotePacket> TYPE = new Type<>(ID);
     private static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
 

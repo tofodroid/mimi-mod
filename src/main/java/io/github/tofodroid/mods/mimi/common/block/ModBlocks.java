@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.common.block.legacycompat.BlockBroadcaster;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
@@ -53,7 +53,7 @@ public class ModBlocks {
     }
 
     public static <T extends Block> T create(String id, T block) {
-        BLOCKS.put(new ResourceLocation(MIMIMod.MODID, id), block);
+        BLOCKS.put(ResourceUtils.newModLocation(id), block);
         return block;
     }
 }

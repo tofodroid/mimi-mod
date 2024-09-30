@@ -4,13 +4,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public class TransmitterControlPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, TransmitterControlPacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(TransmitterControlPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<TransmitterControlPacket> TYPE = new Type<>(ID);
 
     public enum CONTROL {

@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public class ServerMusicPlayerSongListPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, ServerMusicPlayerSongListPacket.class.getSimpleName().toLowerCase());
+    public static final ResourceLocation ID = ResourceUtils.newModLocation(ServerMusicPlayerSongListPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<ServerMusicPlayerSongListPacket> TYPE = new Type<>(ID);
     public static final Integer MAX_FILE_NAME_LENGTH = 200;
 

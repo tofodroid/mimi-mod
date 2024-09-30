@@ -136,7 +136,7 @@ public class MidiInputDeviceManager {
             return;
         }
 
-        if(player.isAlive() && player.isAddedToWorld()) {
+        if(player.isAlive() && player.isAddedToLevel()) {
             this.localInstrumentsToPlay = localInstrumentsToPlay(player);
         } else {
             this.localInstrumentsToPlay.clear();

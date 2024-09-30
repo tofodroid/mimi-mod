@@ -10,6 +10,7 @@ import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.MathUtils;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,7 +20,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -278,7 +278,7 @@ public class GuiEffectEmitter extends BaseGui {
     public Boolean validateParticle(String newParticleString) {
         if(!newParticleString.trim().isBlank()) {
             try {
-                ParticleOptions options = (ParticleOptions)this.world.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(new ResourceLocation(newParticleString.trim()));
+                ParticleOptions options = (ParticleOptions)this.world.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(ResourceUtils.parseLocation(newParticleString.trim()));
                 return options != null;
             } catch(Exception e) { /* No-op */ }
         }
@@ -288,7 +288,7 @@ public class GuiEffectEmitter extends BaseGui {
     public Boolean validateSound(String newSoundString) {
         if(!newSoundString.trim().isBlank()) {
             try {
-                return this.world.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(new ResourceLocation(newSoundString.trim()));
+                return this.world.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(ResourceUtils.parseLocation(newSoundString.trim()));
             } catch(Exception e) { /* No-op */ }
         }
         return false;

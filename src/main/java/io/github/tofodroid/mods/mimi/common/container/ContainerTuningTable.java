@@ -106,11 +106,11 @@ public class ContainerTuningTable extends APlayerInventoryContainer {
         if (container == craftingInventory && !this.playerInventory.player.level().isClientSide) {
             ServerPlayer serverplayer = (ServerPlayer)this.playerInventory.player;
             ItemStack itemstack = ItemStack.EMPTY;
-            Optional<RecipeHolder<TuningTableRecipe>> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory, serverplayer.level());
+            Optional<RecipeHolder<TuningTableRecipe>> optional = serverplayer.level().getServer().getRecipeManager().getRecipeFor(ModRecipes.TUNING_TYPE, this.craftingInventory.asCraftInput(), serverplayer.level());
             
             if (optional.isPresent()) {
                if (this.resultInventory.setRecipeUsed(serverplayer.level(), serverplayer, optional.get())) {
-                  itemstack = optional.get().value().assemble(this.craftingInventory, null);
+                  itemstack = optional.get().value().assemble(this.craftingInventory.asCraftInput(), null);
                }
             }
    

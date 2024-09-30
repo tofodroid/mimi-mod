@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.platform.InputConstants;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -24,7 +24,7 @@ public abstract class BaseContainerGui<T extends AbstractContainerMenu> extends 
 
     public BaseContainerGui(T container, Inventory inv, Integer gWidth, Integer gHeight, Integer textureSize, String textureResource, Component textComponent) {
         super(container, inv, textComponent);
-        this.guiTexture = new ResourceLocation(MIMIMod.MODID, textureResource);
+        this.guiTexture = ResourceUtils.newModLocation(textureResource);
         this.TEXTURE_SIZE = textureSize;
         this.GUI_HEIGHT = gHeight;
         this.GUI_WIDTH = gWidth;

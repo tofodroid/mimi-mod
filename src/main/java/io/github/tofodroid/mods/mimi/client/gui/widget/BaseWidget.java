@@ -1,8 +1,8 @@
 package io.github.tofodroid.mods.mimi.client.gui.widget;
 
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import io.github.tofodroid.mods.mimi.client.gui.CommonGuiUtils;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +16,7 @@ public abstract class BaseWidget {
     protected final Vector2Int WIDGET_SIZE;
     
     public BaseWidget(String textureResource, Integer textureSize, Vector2Int size, Vector2Int guiStartOffset, Vector2Int start) {
-        this.GUI_TEXTURE = new ResourceLocation(MIMIMod.MODID, textureResource);
+        this.GUI_TEXTURE = ResourceUtils.newModLocation(textureResource);
         this.TEXTURE_SIZE = textureSize;
         this.GUI_START = guiStartOffset;
         this.WIDGET_START = start;

@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.container;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,7 +17,7 @@ public class ModContainers {
 
     private static <T extends AbstractContainerMenu> MenuType<T> create(String id, MenuType.MenuSupplier<T> factory) {
         MenuType<T> type = new MenuType<>(factory, FeatureFlags.DEFAULT_FLAGS);
-        MENU_TYPES.put(new ResourceLocation(MIMIMod.MODID, id), type);
+        MENU_TYPES.put(ResourceUtils.newModLocation(id), type);
         return type;
     }
 }

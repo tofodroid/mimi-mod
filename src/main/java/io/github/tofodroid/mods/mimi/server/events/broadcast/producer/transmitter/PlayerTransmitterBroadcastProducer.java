@@ -19,7 +19,7 @@ public class PlayerTransmitterBroadcastProducer extends ATransmitterBroadcastPro
             this.player = ServerExecutorProxy.getServerPlayerById(this.player.getUUID());
         }
 
-        if(this.player != null && this.player.isAddedToWorld() && !this.player.isDeadOrDying()) {
+        if(this.player != null && this.player.isAddedToLevel() && !this.player.isDeadOrDying()) {
             return EntityUtils.playerHasActiveTransmitter(this.player);
         }
 

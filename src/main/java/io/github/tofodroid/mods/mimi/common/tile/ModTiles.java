@@ -3,7 +3,7 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.registry.RegistryOverrideProxy;
@@ -28,7 +28,7 @@ public class ModTiles {
     private static <T extends BlockEntity> BlockEntityType<T> create(String id, BlockEntityType.BlockEntitySupplier<T> blockEntity, Block... blocks) {
         blockEntity = RegistryOverrideProxy.getOrOverride(BlockEntityType.BlockEntitySupplier.class, id, blockEntity);
         BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntity, blocks).build(null);
-        BLOCK_ENTITIES.put(new ResourceLocation(MIMIMod.MODID, id), type);
+        BLOCK_ENTITIES.put(ResourceUtils.newModLocation(id), type);
         return type;
     }
 }

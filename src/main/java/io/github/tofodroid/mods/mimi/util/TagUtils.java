@@ -15,7 +15,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public final class TagUtils {
@@ -77,7 +76,7 @@ public final class TagUtils {
     
     // Create
     private static <T> DataComponentType<T> register(String pName, UnaryOperator<DataComponentType.Builder<T>> pBuilder) {
-        return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation(MIMIMod.MODID, pName).toString(), pBuilder.apply(DataComponentType.builder()).build());
+        return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceUtils.newModLocation(pName).toString(), pBuilder.apply(DataComponentType.builder()).build());
     }
     
     private static final DataComponentType<Byte> createByteComponent(String tag) {

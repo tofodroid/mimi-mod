@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableSet;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -48,12 +48,12 @@ public class ModVillagers {
     );
 
     public static PoiType create(String id, PoiType type) {
-        POI_TYPES.put(new ResourceLocation(MIMIMod.MODID, id), type);
+        POI_TYPES.put(ResourceUtils.newModLocation(id), type);
         return type;
     }
 
     public static VillagerProfession create(String id, VillagerProfession profession) {
-        PROFESSIONS.put(new ResourceLocation(MIMIMod.MODID, id), profession);
+        PROFESSIONS.put(ResourceUtils.newModLocation(id), profession);
         return profession;
     }
 
@@ -61,7 +61,7 @@ public class ModVillagers {
     public static void registerTrades(VillagerProfession profession, Int2ObjectMap<List<ItemListing>> trades) {
         // Instrumentalist
         if(profession == INSTRUMENTALIST) {
-            GiveGiftToHero.GIFTS.put(INSTRUMENTALIST, ResourceKey.create(Registries.LOOT_TABLE,  new ResourceLocation(MIMIMod.MODID, "gameplay/hero_of_the_village/instrumentalist_gift")));
+            GiveGiftToHero.GIFTS.put(INSTRUMENTALIST, ResourceKey.create(Registries.LOOT_TABLE,  ResourceUtils.newModLocation("gameplay/hero_of_the_village/instrumentalist_gift")));
             trades.get(1).addAll(Arrays.asList(
                 new ItemsForItemsTrade(Arrays.asList(Items.MUSIC_DISC_CAT,Items.MUSIC_DISC_13), 1, Arrays.asList(Items.EMERALD), 4, 16, 25),
                 new ItemsForItemsTrade(Arrays.asList(Items.NOTE_BLOCK), 1, Arrays.asList(Items.PAPER, Items.REDSTONE), 8, 16, 20)

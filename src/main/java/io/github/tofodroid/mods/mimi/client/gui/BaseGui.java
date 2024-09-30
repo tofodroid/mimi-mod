@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import io.github.tofodroid.mods.mimi.util.Vector2Int;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -24,7 +24,7 @@ public abstract class BaseGui extends Screen {
 
     public BaseGui(Integer gWidth, Integer gHeight, Integer textureSize, String textureResource, String translationKey) {
         super(Component.translatable(translationKey));
-        this.guiTexture = new ResourceLocation(MIMIMod.MODID, textureResource);
+        this.guiTexture = ResourceUtils.newModLocation(textureResource);
         this.TEXTURE_SIZE = textureSize;
         this.GUI_HEIGHT = gHeight;
         this.GUI_WIDTH = gWidth;

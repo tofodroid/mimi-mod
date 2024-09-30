@@ -5,9 +5,6 @@ import java.util.List;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableMidiNoteResponsiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -51,7 +48,7 @@ public class EntityNoteResponsiveTile extends Entity {
     }
 
     public AConfigurableMidiNoteResponsiveTile getTile() {
-        BlockEntity tile = this.isAddedToWorld() && this.isAlive() ? this.level().getBlockEntity(this.source) : null;
+        BlockEntity tile = this.isAddedToLevel() && this.isAlive() ? this.level().getBlockEntity(this.source) : null;
         return tile != null && tile instanceof AConfigurableMidiNoteResponsiveTile ? (AConfigurableMidiNoteResponsiveTile) tile : null;
     }
     
@@ -102,10 +99,5 @@ public class EntityNoteResponsiveTile extends Entity {
             tag.putInt("source_y", source.getY());
             tag.putInt("source_z", source.getY());
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 }
