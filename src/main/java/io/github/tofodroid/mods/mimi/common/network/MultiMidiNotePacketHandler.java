@@ -13,9 +13,7 @@ public class MultiMidiNotePacketHandler {
     }
 
     public static void handlePacketClient(final MultiMidiNotePacket message) {
-        MIMIMod.LOGGER.info("MultiMidiNotePacket - HandleClient");
         if(MIMIMod.getProxy().isClient()) {
-            MIMIMod.LOGGER.info("Do handle: " + message.resultPackets.entrySet().size() + " events");
             for(Map.Entry<Long, List<MidiNotePacket>> packetSet : message.resultPackets.entrySet()) {
                 for(MidiNotePacket packet : packetSet.getValue()) {
                     ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(packet); 

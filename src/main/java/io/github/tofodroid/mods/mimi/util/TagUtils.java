@@ -11,10 +11,9 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public final class TagUtils {
@@ -25,8 +24,10 @@ public final class TagUtils {
     private static final HashMap<String, DataComponentType<UUID>> UUID_COMPONENTS = new HashMap<>();
     private static final HashMap<String, DataComponentType<CompoundTag>> NBT_COMPONENTS = new HashMap<>();
 
-    public static void init() {
-        // Random
+    public static final HashMap<ResourceLocation, DataComponentType<?>> COMPONENT_TYPES = new HashMap<>();
+
+    static {
+        // Other
         createBoolComponent("inverted");
         createIntComponent("dye_id");
         
@@ -73,12 +74,15 @@ public final class TagUtils {
             createByteComponent("channel_map_" + i);
         }
     }
-    
-    // Create
+
+    // Register
     private static <T> DataComponentType<T> register(String pName, UnaryOperator<DataComponentType.Builder<T>> pBuilder) {
-        return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceUtils.newModLocation(pName).toString(), pBuilder.apply(DataComponentType.builder()).build());
+        DataComponentType<T> component = pBuilder.apply(DataComponentType.builder()).build();
+        COMPONENT_TYPES.put(ResourceUtils.newModLocation(pName), component);
+        return component;
     }
     
+    // Create
     private static final DataComponentType<Byte> createByteComponent(String tag) {
         return BYTE_COMPONENTS.computeIfAbsent(tag, (newTag) -> register(tag, builder -> builder
             .persistent(Codec.BYTE)
