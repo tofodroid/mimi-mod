@@ -29,7 +29,8 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public abstract class CommonRegistrationHandler {    
     @SubscribeEvent
     public static void register(final RegisterEvent event) {
-        TagUtils.init();
+        // Data Components
+        event.register(Registries.DATA_COMPONENT_TYPE, (reg) -> TagUtils.COMPONENT_TYPES.forEach(reg::register));
 
         // Blocks
         event.register(Registries.BLOCK, (reg) -> ModBlocks.BLOCKS.forEach(reg::register));
