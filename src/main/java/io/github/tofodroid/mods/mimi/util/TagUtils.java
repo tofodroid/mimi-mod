@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
 
 import com.mojang.serialization.Codec;
 
@@ -56,18 +57,18 @@ public final class TagUtils {
         createByteComponent("broadcast_range");
 
         // Effect Emitter
-        createStringComponent("sound");
-        createStringComponent("particle");
-        createByteComponent("volume");
-        createByteComponent("pitch");
-        createByteComponent("side");
-        createByteComponent("spread");
-        createByteComponent("count");
-        createByteComponent("speed_x");
-        createByteComponent("speed_y");
-        createByteComponent("speed_z");
-        createByteComponent("particle_loop");
-        createByteComponent("sound_loop");
+        createStringComponent(TileEffectEmitter.SOUND_ID_TAG);
+        createStringComponent(TileEffectEmitter.PARTICLE_ID_TAG);
+        createByteComponent(TileEffectEmitter.VOLUME_TAG);
+        createByteComponent(TileEffectEmitter.PITCH_TAG);
+        createByteComponent(TileEffectEmitter.SIDE_TAG);
+        createByteComponent(TileEffectEmitter.SPREAD_TAG);
+        createByteComponent(TileEffectEmitter.COUNT_TAG);
+        createByteComponent(TileEffectEmitter.SPEED_X_TAG);
+        createByteComponent(TileEffectEmitter.SPEED_Y_TAG);
+        createByteComponent(TileEffectEmitter.SPEED_Z_TAG);
+        createIntComponent(TileEffectEmitter.PARTICLE_LOOP_TAG);
+        createIntComponent(TileEffectEmitter.SOUND_LOOP_TAG);
 
         // Relay
         for(byte i = 0; i < 16; i++) {

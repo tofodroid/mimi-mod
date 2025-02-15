@@ -74,8 +74,8 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
     public static EffectEmitterUpdatePacket decodePacket(FriendlyByteBuf buf) {
         try {
             BlockPos tilePos = buf.readBlockPos();
-            String sound = buf.readUtf(256);
-            String particle = buf.readUtf(256);
+            String sound = buf.readUtf(512);
+            String particle = buf.readUtf(512);
             Byte volume = buf.readByte();
             Byte pitch = buf.readByte();
             Byte side = buf.readByte();
