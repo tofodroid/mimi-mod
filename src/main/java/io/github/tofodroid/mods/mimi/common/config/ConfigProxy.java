@@ -108,4 +108,12 @@ public class ConfigProxy {
     public static String getSoundfontPath() {
         return ModConfigs.CLIENT.soundfontPath.get();
     }
+
+    public static Boolean getDoLogMidiTaskErrors() {
+        return ModConfigs.COMMON.doLogMidiTaskErrors.get();
+    }
+
+    public static Integer getMidiTaskTimeoutMillis() {
+        return ModConfigs.COMMON.midiTaskTimeoutMillis.get();
+    }
 }

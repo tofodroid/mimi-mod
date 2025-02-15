@@ -4,13 +4,14 @@ import org.joml.Vector3d;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -33,10 +34,12 @@ public class TileEffectEmitter extends AConfigurableTile {
     public static final String PARTICLE_LOOP_TAG = "particle_loop";
     public static final String SOUND_LOOP_TAG = "sound_loop";
 
-    private SoundEvent _sound = null;
     private Boolean _inverted = null;
+
+    private SoundEvent _sound = null;
     private Float _volume = null;
     private Float _pitch = null;
+
     private ParticleOptions _particle = null;
     private Vector3d _offset = null;
     private Vector3d _speed = null;
@@ -45,6 +48,7 @@ public class TileEffectEmitter extends AConfigurableTile {
     private Integer _soundLoop = null;
     private Integer _particleLoop = null;
 
+    private Boolean firstTick = true;
     private Integer ticksSinceSound = 0;
     private Integer ticksSinceParticle = 0;
     private Boolean wasPowered;
@@ -58,21 +62,30 @@ public class TileEffectEmitter extends AConfigurableTile {
 
     @Override
     protected void onSourceStackChanged() {
-        this._inverted = null;
-        this._sound = null;
-        this._volume = null;
-        this._pitch = null;
-        this._particle = null;
-        this._offset = null;
-        this._speed = null;
-        this._spread = null;
-        this._count = null;
-        this._soundLoop = null;
-        this._particleLoop = null;
         this.ticksSinceSound = 0;
         this.ticksSinceParticle = 0;
+        this.cacheEffectSettings();
         this.updateBlockstate();
         this.setChanged();
+    }
+
+    protected void cacheEffectSettings() {
+        this._inverted = TagUtils.getBooleanOrDefault(getSourceStack(), INVERTED_TAG, false);
+        this._particle = this.getParticleFromString(TagUtils.getStringOrDefault(getSourceStack(), PARTICLE_ID_TAG, null));
+        this._speed = new Vector3d(
+            TagUtils.getByteOrDefault(getSourceStack(), SPEED_X_TAG, 0)/40.0f,
+            TagUtils.getByteOrDefault(getSourceStack(), SPEED_Y_TAG, 0)/40.0f,
+            TagUtils.getByteOrDefault(getSourceStack(), SPEED_Z_TAG, 0)/40.0f
+        );
+        this._offset = this.getOffsetFromByte(TagUtils.getByteOrDefault(getSourceStack(), SIDE_TAG, 0));
+        this._spread = TagUtils.getByteOrDefault(getSourceStack(), SPREAD_TAG, 0).intValue();
+        this._count = TagUtils.getByteOrDefault(getSourceStack(), COUNT_TAG, 1).intValue();
+        this._soundLoop = TagUtils.getIntOrDefault(getSourceStack(), SOUND_LOOP_TAG, 0);
+        this._particleLoop = TagUtils.getIntOrDefault(getSourceStack(), PARTICLE_LOOP_TAG, 0);
+
+        this._sound = this.getSoundFromString(TagUtils.getStringOrDefault(getSourceStack(), SOUND_ID_TAG, null));
+        this._volume = 5 * (TagUtils.getByteOrDefault(getSourceStack(), VOLUME_TAG, 5) / 10.f);
+        this._pitch = 1.0f + TagUtils.getByteOrDefault(getSourceStack(), PITCH_TAG, 0)/4.0f;
     }
 
     @Override
@@ -96,6 +109,7 @@ public class TileEffectEmitter extends AConfigurableTile {
                 this.updateBlockstate();
             }
         }
+        this.cacheEffectSettings();
     }
 
     public void updateBlockstate() {
@@ -113,6 +127,13 @@ public class TileEffectEmitter extends AConfigurableTile {
     }
 
     public void tick(Level world, BlockPos pos, BlockState state) {
+        if(world instanceof ServerLevel) {
+            if(firstTick) {
+                this.cacheEffectSettings();
+                this.firstTick = false;
+            }
+        }
+
         if(world.isClientSide && !this.isRemoved() && world.isLoaded(pos)) {
             Boolean powered = state.getValue(BlockEffectEmitter.POWERED);
 
@@ -139,142 +160,98 @@ public class TileEffectEmitter extends AConfigurableTile {
     }
 
     public Boolean isInverted() {
-        if(this._inverted == null) {
-            this._inverted = TagUtils.getBooleanOrDefault(getSourceStack(), INVERTED_TAG, false);
-        }
         return this._inverted;
     }
 
-    public ParticleOptions getParticle() { 
-        if(this._particle == null) {
-            String particleStr = TagUtils.getStringOrDefault(getSourceStack(), PARTICLE_ID_TAG, null);
+    public ParticleOptions getParticleFromString(String particleStr) {
+        if(particleStr != null && !particleStr.isBlank()) {
+            Boolean particleValid = false;
+            ParticleOptions options = null;
 
-            if(particleStr != null && !particleStr.isBlank()) {
-                Boolean particleValid = false;
-                ParticleOptions options = null;
+            try {
+                options = (ParticleOptions)this.level.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(ResourceUtils.parseLocation(particleStr));
+                particleValid = options != null;
+            } catch(Exception e) { /* No-op */ }
 
-                try {
-                    options = (ParticleOptions)this.level.registryAccess().registry(Registries.PARTICLE_TYPE).get().get(new ResourceLocation(particleStr));
-                    particleValid = options != null;
-                } catch(Exception e) { /* No-op */ }
-
-                if(particleValid) {
-                    this._particle = options;
-                }
+            if(particleValid) {
+                return options;
             }
         }
+
+        return null;
+    }
+
+    public SoundEvent getSoundFromString(String soundStr) {
+        if(soundStr != null && !soundStr.isBlank()) {
+            Boolean soundValid = false;
+
+            try {
+                soundValid = this.level.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(ResourceUtils.parseLocation(soundStr));
+            } catch(Exception e) { /* No-op */ }
+
+            if(soundValid) {
+                return SoundEvent.createVariableRangeEvent(ResourceUtils.parseLocation(soundStr));
+            }
+        }
+        return null;
+    }
+
+    public ParticleOptions getParticle() { 
         return this._particle;
     }
 
     public SoundEvent getSound() {
-        if(this._sound == null) {
-            String soundStr = TagUtils.getStringOrDefault(getSourceStack(), SOUND_ID_TAG, null);
-
-            if(soundStr != null && !soundStr.isBlank()) {
-                Boolean soundValid = false;
-
-                try {
-                    soundValid = this.level.registryAccess().registry(Registries.SOUND_EVENT).get().containsKey(new ResourceLocation(soundStr));
-                } catch(Exception e) { /* No-op */ }
-
-                if(soundValid) {
-                    this._sound = SoundEvent.createVariableRangeEvent(new ResourceLocation(soundStr));
-                }
-            }
-        }
-
         return this._sound;
     }
 
     public Float getVolume() {
-        if(this._volume == null) {
-            Byte volByte = TagUtils.getByteOrDefault(getSourceStack(), VOLUME_TAG, 5);
-            this._volume = 5 * (volByte / 10.f);
-        }
         return this._volume;
     }
 
     public Float getPitch() {
-        if(this._pitch == null) {
-            Byte pitchByte = TagUtils.getByteOrDefault(getSourceStack(), PITCH_TAG, 0);
-            this._pitch = 1.0f + pitchByte/4.0f;
-        }
         return this._pitch;
     }
 
     public Vector3d getSpeed() {
-        if(this._speed == null) {
-            this._speed = new Vector3d(
-                TagUtils.getByteOrDefault(getSourceStack(), SPEED_X_TAG, 0)/40.0f,
-                TagUtils.getByteOrDefault(getSourceStack(), SPEED_Y_TAG, 0)/40.0f,
-                TagUtils.getByteOrDefault(getSourceStack(), SPEED_Z_TAG, 0)/40.0f
-            );
-        }
         return this._speed;
     }
 
-    public Vector3d getOffset() {
-        if(this._offset == null) {
-            Byte sideByte = TagUtils.getByteOrDefault(getSourceStack(), SIDE_TAG, 0);
-            
-            switch(sideByte) {
-                case 0:
-                default:
-                    // Top
-                    this._offset = new Vector3d(0.5d, 1.1d, 0.5d);
-                    break;
-                case 1:
-                    this._offset = new Vector3d(0.5d,-0.1d, 0.5d);
-                    // Bottom
-                    break;
-                case 2:
-                    this._offset = new Vector3d(0.5d, 0.5d, -0.1d);
-                    // North
-                    break;
-                case 3:
-                    this._offset = new Vector3d(1.1d, 0.5d, 0.5d);
-                    // East
-                    break;
-                case 4:
-                    this._offset = new Vector3d(0.5d, 0.5d, 1.1d);
-                    // South
-                    break;
-                case 5:
-                    this._offset = new Vector3d(-0.1d, 0.5d, 0.5d);
-                    // West
-                    break;
-            }
+    public Vector3d getOffsetFromByte(Byte sideByte) {
+        switch(sideByte) {
+            case 0:
+            default:
+                // Top
+                return new Vector3d(0.5d, 1.1d, 0.5d);
+            case 1:
+                return new Vector3d(0.5d,-0.1d, 0.5d);
+            case 2:
+                return new Vector3d(0.5d, 0.5d, -0.1d);
+            case 3:
+                return new Vector3d(1.1d, 0.5d, 0.5d);
+            case 4:
+                return new Vector3d(0.5d, 0.5d, 1.1d);
+            case 5:
+                return new Vector3d(-0.1d, 0.5d, 0.5d);
         }
+    }
+
+    public Vector3d getOffset() {
         return this._offset;
     }
 
     public Integer getSpread() {
-        if(this._spread == null) {
-            Byte spreadByte = TagUtils.getByteOrDefault(getSourceStack(), SPREAD_TAG, 0);
-            this._spread = spreadByte.intValue();
-        }
         return this._spread;
     }
 
     public Integer getCount() {
-        if(this._count == null) {
-            Byte countByte = TagUtils.getByteOrDefault(getSourceStack(), COUNT_TAG, 1);
-            this._count = countByte.intValue();
-        }
         return this._count;
     }
 
     public Integer getSoundLoopTicks() {
-        if(this._soundLoop == null) {
-            this._soundLoop = TagUtils.getIntOrDefault(getSourceStack(), SOUND_LOOP_TAG, 0);
-        }
         return this._soundLoop;
     }
 
     public Integer getParticleLoopTicks() {
-        if(this._particleLoop == null) {
-            this._particleLoop = TagUtils.getIntOrDefault(getSourceStack(), PARTICLE_LOOP_TAG, 0);
-        }
         return this._particleLoop;
     }
 
