@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -83,7 +82,7 @@ public class MultiMidiNotePacket implements CustomPacketPayload {
 
         // Second order
         for(Map.Entry<Long, ArrayList<NetMidiEvent>> timeEntry : pkt.sourceMap.entrySet()) {
-            if(timeEntry.getValue() != null) {
+            if(timeEntry.getValue() != null && !timeEntry.getValue().isEmpty()) {
                 buf.writeLong(timeEntry.getKey());
 
                 // META - Number of Events

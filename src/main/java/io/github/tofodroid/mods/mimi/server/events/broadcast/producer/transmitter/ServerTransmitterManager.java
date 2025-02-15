@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.sound.midi.Sequence;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
@@ -31,6 +32,12 @@ public abstract class ServerTransmitterManager {
     private static ExecutorService pool;
     private static ExecutorService executor;
     private static Boolean shuttingDown = false;
+
+    private static void logMidiTaskError(String error, Exception e) {
+        if(ConfigProxy.getDoLogMidiTaskErrors()) {
+            MIMIMod.LOGGER.warn("MIDI task timed out. This usually indiciates performance trouble. Task: " + error, e);
+        }
+    }
 
     public static ATransmitterBroadcastProducer getTransmitter(UUID id) {
         IBroadcastProducer producer = BroadcastManager.getBroadcastProducer(id);
@@ -57,7 +64,7 @@ public abstract class ServerTransmitterManager {
                 Future<?> future = executor.submit(runnable);
 
                 try {
-                    future.get(10000, TimeUnit.MILLISECONDS);
+                    future.get(ConfigProxy.getMidiTaskTimeoutMillis(), TimeUnit.MILLISECONDS);
                 } catch (Exception e) {
                     future.cancel(true);
                     onFailed.accept(e);
@@ -148,21 +155,21 @@ public abstract class ServerTransmitterManager {
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.play();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to play transmitter: " + musicPlayer.getOwnerId().toString(), e);
+                        logMidiTaskError("Failed to play transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case PAUSE:
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.pause();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to pause transmitter: " + musicPlayer.getOwnerId().toString(), e);
+                        logMidiTaskError("Failed to pause transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case STOP:
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.stop();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to stop transmitter: " + musicPlayer.getOwnerId().toString(), e);
+                        logMidiTaskError("Failed to stop transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case RESTART:
@@ -170,14 +177,14 @@ public abstract class ServerTransmitterManager {
                         musicPlayer.stop();
                         musicPlayer.play();
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to restart transmitter: " + musicPlayer.getOwnerId().toString(), e);
+                        logMidiTaskError("Failed to restart transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case SEEK:
                     executeTaskOnMidiThread(() -> {
                         musicPlayer.seek(message.controlData.get());
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to seek transmitter: " + musicPlayer.getOwnerId().toString(), e);
+                        logMidiTaskError("Failed to seek transmitter: " + musicPlayer.getOwnerId().toString(), e);
                     });
                     break;
                 case PREV:
@@ -223,7 +230,7 @@ public abstract class ServerTransmitterManager {
                 handler.refreshSongs();
             }
         }, (e) -> {
-            MIMIMod.LOGGER.error("MIMI failed to refresh transmitter songs for ID: " + playerId.toString(), e);
+            logMidiTaskError("Failed to refresh transmitter songs for ID: " + playerId.toString(), e);
         });
     }
 
@@ -234,7 +241,7 @@ public abstract class ServerTransmitterManager {
                 transmitter.refreshSongs();
             }
         }, (e) -> {
-            MIMIMod.LOGGER.error("MIMI failed to refresh transmitter songs", e);
+            logMidiTaskError("Failed to refresh transmitter songs", e);
         });
     }
 
@@ -245,7 +252,7 @@ public abstract class ServerTransmitterManager {
             executeTaskOnMidiThread(() -> {
                 player.loadSong(newInfo);
             }, (e) -> {
-                MIMIMod.LOGGER.error("MIMI failed to load song into transmitter with ID: " + musicPlayerId, e);
+                logMidiTaskError("Failed to load song into transmitter with ID: " + musicPlayerId, e);
             });
         }
     }
@@ -280,7 +287,7 @@ public abstract class ServerTransmitterManager {
                     executeTaskOnMidiThread(() -> {
                         player.finishLoadSequence(info, sequence);
                     }, (e) -> {
-                        MIMIMod.LOGGER.error("MIMI failed to load song into transmitter with ID: " + musicPlayerId, e);
+                        logMidiTaskError("Failed to load song into transmitter with ID: " + musicPlayerId, e);
                     });
                 }
             }
@@ -301,7 +308,7 @@ public abstract class ServerTransmitterManager {
                 transmitter.stop();
             }
         }, (e) -> {
-            MIMIMod.LOGGER.error("MIMI failed to stop transmitter with ID: " + entity.getUUID(), e);
+            logMidiTaskError("Failed to stop transmitter with ID: " + entity.getUUID(), e);
         });
     }
 
@@ -317,7 +324,7 @@ public abstract class ServerTransmitterManager {
                 transmitter.allNotesOff();
             }
         }, (e) -> {
-            MIMIMod.LOGGER.error("MIMI failed to stop transmitter with ID: " + entity.getUUID(), e);
+            logMidiTaskError("Failed to silence transmitter with ID: " + entity.getUUID(), e);
         });
     }
 
@@ -332,7 +339,7 @@ public abstract class ServerTransmitterManager {
                 transmitter.allNotesOff();
             }
         }, (e) -> {
-            MIMIMod.LOGGER.error("MIMI failed to stop transmitter with ID: " + entity.getUUID(), e);
+            logMidiTaskError("Failed to stop transmitter with ID: " + entity.getUUID(), e);
         });
     }
 }
