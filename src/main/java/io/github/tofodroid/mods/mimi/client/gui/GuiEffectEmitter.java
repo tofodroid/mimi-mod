@@ -303,7 +303,6 @@ public class GuiEffectEmitter extends BaseGui {
         Boolean particleValid = validateParticle(newParticleString);
         this.particleBox.setTextColor(particleValid ? DEFAULT_TEXT_FIELD_COLOR : 13112340);
         TagUtils.setOrRemoveString(emitterStack, TileEffectEmitter.PARTICLE_ID_TAG, newParticleString.trim());
-        MIMIMod.LOGGER.info("Setting new particle: " + newParticleString.trim());
         this.syncEffectEmitterToServer();
     }
 
