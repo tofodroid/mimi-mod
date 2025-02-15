@@ -110,6 +110,11 @@ public class GuiEffectEmitter extends BaseGui {
             particleBox.setResponder(this::handleParticleChange);
             particleBox.setTextColor(this.validateParticle(particleBox.getValue()) ? DEFAULT_TEXT_FIELD_COLOR : 13112340);
     }
+
+    @Override
+    public boolean doCloseOnInventoryKeyPress() {
+        return !(this.soundBox.isFocused() || this.particleBox.isFocused());
+    }
     
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -255,16 +260,16 @@ public class GuiEffectEmitter extends BaseGui {
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_DOWN_BUTTON_COORDS))) {
-            Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
+            Integer loop = TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
             loop = MathUtils.addClamped(loop, -addAmount, 0, 999);
-            TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
+            TagUtils.setOrRemoveInt(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_UP_BUTTON_COORDS))) {
-            Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
+            Integer loop = TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
             loop = MathUtils.addClamped(loop, addAmount, 0, 999);
-            TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
+            TagUtils.setOrRemoveInt(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         }
 
@@ -298,6 +303,7 @@ public class GuiEffectEmitter extends BaseGui {
         Boolean particleValid = validateParticle(newParticleString);
         this.particleBox.setTextColor(particleValid ? DEFAULT_TEXT_FIELD_COLOR : 13112340);
         TagUtils.setOrRemoveString(emitterStack, TileEffectEmitter.PARTICLE_ID_TAG, newParticleString.trim());
+        MIMIMod.LOGGER.info("Setting new particle: " + newParticleString.trim());
         this.syncEffectEmitterToServer();
     }
 
@@ -352,13 +358,13 @@ public class GuiEffectEmitter extends BaseGui {
         this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_X_TAG, 0).toString(), START_X + SPEED_X_TEXT_COORDS.x, START_Y + SPEED_X_TEXT_COORDS.y, 0xFF00E600);
         this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Y_TAG, 0).toString(), START_X + SPEED_Y_TEXT_COORDS.x, START_Y + SPEED_Y_TEXT_COORDS.y, 0xFF00E600);
         this.drawStringAbsolute(graphics, font, TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SPEED_Z_TAG, 0).toString(), START_X + SPEED_Z_TEXT_COORDS.x, START_Y + SPEED_Z_TEXT_COORDS.y, 0xFF00E600);
-        this.drawStringAbsolute(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0)), START_X + S_LOOP_TEXT_COORDS.x, START_Y + S_LOOP_TEXT_COORDS.y, 0xFF00E600);
-        this.drawStringAbsolute(graphics, font, getLoopFromByte(TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0)), START_X + P_LOOP_TEXT_COORDS.x, START_Y + P_LOOP_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, getLoopFromInt(TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0)), START_X + S_LOOP_TEXT_COORDS.x, START_Y + S_LOOP_TEXT_COORDS.y, 0xFF00E600);
+        this.drawStringAbsolute(graphics, font, getLoopFromInt(TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0)), START_X + P_LOOP_TEXT_COORDS.x, START_Y + P_LOOP_TEXT_COORDS.y, 0xFF00E600);
 
         return graphics;
     }
 
-    public String getLoopFromByte(Byte loop) {
+    public String getLoopFromInt(Integer loop) {
         if(loop == 0) {
             return "None";
         }
