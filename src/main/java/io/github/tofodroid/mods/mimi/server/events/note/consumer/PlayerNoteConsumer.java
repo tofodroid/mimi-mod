@@ -90,9 +90,10 @@ public class PlayerNoteConsumer extends ANoteConsumer {
     }
 
     private void cachePacket(MidiNotePacket packet) {
-        if(packet.player != null && packet.pos != null) {
-            ArrayList<NetMidiEvent> eventList = packetCacheMap.computeIfAbsent(packet.noteServerTime, (time) -> new ArrayList<>());
+        if(packet.player != null && packet.pos != null && packet.noteServerTime != null) {
+            ArrayList<NetMidiEvent> eventList = packetCacheMap.getOrDefault(packet.noteServerTime, new ArrayList<>());
             eventList.add(new NetMidiEvent(packet));
+            packetCacheMap.put(packet.noteServerTime, eventList);
         }
     }
 
