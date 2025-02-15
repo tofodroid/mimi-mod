@@ -185,11 +185,11 @@ public class TileEffectEmitter extends AConfigurableTile {
             Boolean soundValid = false;
 
             try {
-                soundValid = this.level.registryAccess().registry(Registry.SOUND_EVENT_EVENT_REGISTRY).get().containsKey(ResourceUtils.parseLocation(soundStr));
+                soundValid = this.level.registryAccess().registry(Registry.SOUND_EVENT_REGISTRY).get().containsKey(ResourceUtils.parseLocation(soundStr));
             } catch(Exception e) { /* No-op */ }
 
             if(soundValid) {
-                return SoundEvent.createVariableRangeEvent(ResourceUtils.parseLocation(soundStr));
+                return new SoundEvent(ResourceUtils.parseLocation(soundStr));
             }
         }
         return null;
