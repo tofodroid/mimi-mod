@@ -5,6 +5,7 @@
 .classpath
 .project
 .idea
+.eclipse
 runClient.launch
 runData.launch
 runGameTestServer.launch
