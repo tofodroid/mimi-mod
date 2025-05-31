@@ -149,7 +149,7 @@ public class MidiInputDeviceManager {
         // Check for seated instrument
         TileInstrument instrumentEntity = BlockInstrument.getTileInstrumentForEntity(player);
         if(instrumentEntity != null) {
-            result.add(Pair.of(null, instrumentEntity.getInstrumentStack()));
+            result.add(Pair.of(null, instrumentEntity.getSourceStack()));
         }
 
         // Check for held instruments

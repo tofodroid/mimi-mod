@@ -32,6 +32,6 @@ public class CommonConfig {
             .define("doLogMidiTaskErrors", true);
         midiTaskTimeoutMillis = builder.comment("The number of milliseconds a MIDI thread task should wait before timing out. Longer times may reduce instances of tasks failing but also reduce responsiveness of Transmitters.")
             .translation(MIMIMod.MODID + ".config.server.other.midiTaskTimeoutMillis")
-            .define("doLogMidiTaskErrors", 15000);
+            .define("midiTaskTimeoutMillis", 15000);
     }
 }

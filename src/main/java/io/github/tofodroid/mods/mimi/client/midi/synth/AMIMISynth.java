@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import io.github.tofodroid.mods.mimi.util.TimeUtils;
 import net.minecraft.world.entity.player.Player;
 
@@ -48,7 +48,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         } catch(Exception e) {
             MIMIMod.LOGGER.error("Failed to initialize MIDI Synthesizer: ", e);
             this.internalSynth = null;
-            this.internalSynthReceiver = null;
+            this.internalSynth.getVoiceStatus();
         }
 
         Builder<T> builder = ImmutableList.builder();
@@ -69,7 +69,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
     public abstract Boolean tick(Player clientPlayer);
     protected abstract T createChannel(Integer num, MidiChannel channel);
-    protected abstract String createChannelId(MidiNotePacket message);
+    protected abstract String createChannelId(NoteEventPacket message);
     
     @Override
     public void close() {
@@ -77,7 +77,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
         // Close Midi
         if(internalSynth != null && internalSynth.isOpen()) {
-            this.allNotesOff();
+            this.reset();
 
             if(this.internalSynthReceiver != null) {
                 this.internalSynthReceiver.close();
@@ -92,7 +92,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         return Math.max(systemEventMillis*1000 + synthOffsetMicros, this.internalSynth.getMicrosecondPosition());
     }
 
-    public void noteOn(MidiNotePacket message, Long timestamp) {
+    public void noteOn(NoteEventPacket message, Long timestamp) {
         if(this.channelAssignmentMap == null || closing) {
             return;
         }
@@ -116,8 +116,8 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
                     new ShortMessage(
                         ShortMessage.NOTE_ON,
                         channel.getChannelNumber(),
-                        message.note,
-                        message.velocity
+                        message.data1,
+                        message.data2
                     ),
                     getSynthEventTimestamp(timestamp)
                 );
@@ -127,33 +127,26 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    public void noteOff(MidiNotePacket message, Long timestamp) {
+    public void noteOff(NoteEventPacket message, Long timestamp) {
         if(this.channelAssignmentMap == null || closing) {
             return;
         }
 
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
-        
+
         if(channel != null) {
-            if(message.isAllNotesOffPacket()) {
-                channel.allNotesOff();
-                channel.reset();
-                this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
-                channelAssignmentMap.remove(channel);
-            } else {
-                try {
-                    this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.note, 0), getSynthEventTimestamp(timestamp));
-                } catch(Exception e) {
-                    MIMIMod.LOGGER.error("Failed to handle note off: ", e);
-                }
+            try {
+                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.data1, 0), getSynthEventTimestamp(timestamp));
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to handle note off: ", e);
             }
         }
     }
 
-    public void allNotesOff() {
+    public void reset() {
         if(internalSynth != null ) {
             for(T channel : this.channelAssignmentMap.keySet()) {
-                channel.allNotesOff();
+                channel.reset();
 
                 if(this.internalSynth != null && this.internalSynth.isOpen() && this.internalSynth.getMainMixer() != null) {
                     this.internalSynth.getMainMixer().clearQueuedChannelEvents(channel.getChannelNumber());
@@ -162,16 +155,29 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         }
     }
 
-    public void controlChange(MidiNotePacket message, Long timestamp) {
+    public void controlChange(NoteEventPacket message, Long timestamp) {
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
         
         if(channel != null) {
             try {
-                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel.getChannelNumber(), message.getControllerNumber(), message.getControllerValue()), getSynthEventTimestamp(timestamp));
+                MIMIMod.LOGGER.info("Control change: " + message.data1 + " | " + message.data2);
+                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
-                MIMIMod.LOGGER.error("Failed to handle control change. Packet: " + message.note + " | " + message.getControllerValue(), e);
+                MIMIMod.LOGGER.error("Failed to handle control change. Packet: " + message.data1 + " | " + message.data2, e);
             }
-            channel.controlChange(message.getControllerNumber(), message.getControllerValue());
+        }
+    }
+
+    public void pitchBend(NoteEventPacket message, Long timestamp) {
+        T channel = channelAssignmentMap.inverse().get(createChannelId(message));
+        
+        if(channel != null) {
+            try {
+                MIMIMod.LOGGER.info("pitch bend: " + message.data1 + " | " + message.data2);
+                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.PITCH_BEND, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
+            } catch(Exception e) {
+                MIMIMod.LOGGER.error("Failed to handle pitch bend. Packet: " + message.data1 + " | " + message.data2, e);
+            }
         }
     }
 

@@ -12,13 +12,13 @@ import javax.sound.sampled.SourceDataLine;
 
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 
-public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
-    public LocalPlayerMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
+public class LocalNoteMIMISynth extends AMIMISynth<MIMIChannel> {
+    public LocalNoteMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
        super(format, dataLine, jitterCorrection, latency, sounds);
     }
 
@@ -47,7 +47,7 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
             // Unassign idle channels
             for(MIMIChannel remove : toRemove) {
                 channelAssignmentMap.remove(remove);
-                remove.reset();
+                remove.clear();
             }
 
 
@@ -63,7 +63,7 @@ public class LocalPlayerMIMISynth extends AMIMISynth<MIMIChannel> {
     }
 
     @Override
-    protected String createChannelId(MidiNotePacket message) {
+    protected String createChannelId(NoteEventPacket message) {
         return message.instrumentId.toString();
     }
 }

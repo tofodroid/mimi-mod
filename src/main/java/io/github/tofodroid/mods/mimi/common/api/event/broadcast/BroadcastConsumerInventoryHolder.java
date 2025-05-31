@@ -1,4 +1,4 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.api;
+package io.github.tofodroid.mods.mimi.common.api.event.broadcast;
 
 import java.util.ArrayList;
 import java.util.List;

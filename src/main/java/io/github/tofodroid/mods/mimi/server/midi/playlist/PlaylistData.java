@@ -42,9 +42,9 @@ public class PlaylistData extends SavedData {
             data.sourceMode = tag.getBoolean("source_mode") ? SourceMode.CLIENT : SourceMode.SERVER;
         }
 
-        if(tag.contains("SHUFFLED")) {
+        if(tag.contains("shuffled")) {
             data.isShuffled = true;
-            data.shuffleSeed = tag.getInt("SHUFFLED");
+            data.shuffleSeed = tag.getInt("shuffled");
         }
 
         return data;
@@ -81,9 +81,9 @@ public class PlaylistData extends SavedData {
         }
 
         if(data.isShuffled) {
-            resultTag.putInt("SHUFFLED", data.shuffleSeed);
+            resultTag.putInt("shuffled", data.shuffleSeed);
         } else {
-            resultTag.remove("SHUFFLED");
+            resultTag.remove("shuffled");
         }
 
         return resultTag;
@@ -112,7 +112,7 @@ public class PlaylistData extends SavedData {
             data.sourceMode = bval ? SourceMode.CLIENT : SourceMode.SERVER;
         }
 
-        Integer ival = TagUtils.getIntOrDefault(components, "shuffle", null);
+        Integer ival = TagUtils.getIntOrDefault(components, "shuffled", null);
         if(ival != null) {
             data.shuffleSeed = ival;
         }
@@ -133,7 +133,7 @@ public class PlaylistData extends SavedData {
         TagUtils.setOrRemoveBoolean(stack, "loop_mode", data.loopMode == LoopMode.NONE ? null : data.loopMode == LoopMode.ALL);
         TagUtils.setOrRemoveBoolean(stack, "favorite_mode", data.favoriteMode == FavoriteMode.ALL ? null : data.favoriteMode == FavoriteMode.FAVORITE);
         TagUtils.setOrRemoveBoolean(stack, "source_mode", data.sourceMode == SourceMode.ALL ? null : data.sourceMode == SourceMode.CLIENT);
-        TagUtils.setOrRemoveInt(stack, "SHUFFLED", data.isShuffled ? data.shuffleSeed : null);
+        TagUtils.setOrRemoveInt(stack, "shuffled", data.isShuffled ? data.shuffleSeed : null);
 
         return stack;
     }

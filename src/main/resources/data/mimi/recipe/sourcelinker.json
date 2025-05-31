@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "IPI",
+        "   "
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:iron_nugget"
+        },
+        "P": {
+            "item": "minecraft:paper"
+        }
+    },
+    "result": {
+        "id": "mimi:sourcelinker"
+    }
+}

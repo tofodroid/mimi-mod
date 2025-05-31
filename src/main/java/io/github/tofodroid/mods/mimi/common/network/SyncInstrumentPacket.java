@@ -5,6 +5,7 @@ import java.util.UUID;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.NetworkUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -46,24 +47,6 @@ public class SyncInstrumentPacket implements CustomPacketPayload {
        return TYPE;
     }
 
-    public static Byte getInstrumentLocationByte(InteractionHand handIn) {
-        if(handIn == InteractionHand.MAIN_HAND) {
-            return 0;
-        } else if(handIn == InteractionHand.OFF_HAND) {
-            return 1;
-        }
-        return 2;
-    }
-
-    public static InteractionHand getInstrumentLocationHand(Byte byteIn) {
-        if(byteIn == 0) {
-            return InteractionHand.MAIN_HAND;
-        } else if(byteIn == 1) {
-            return InteractionHand.OFF_HAND;
-        }
-        return null;
-    }
-
     public static SyncInstrumentPacket decodePacket(FriendlyByteBuf buf) {
         try {
             UUID midiSource = null;
@@ -79,7 +62,7 @@ public class SyncInstrumentPacket implements CustomPacketPayload {
             Integer enabledChannelsInt = buf.readInt();
             Boolean sysInput = buf.readBoolean();
             Byte volume = buf.readByte();
-            InteractionHand handIn = getInstrumentLocationHand(buf.readByte());
+            InteractionHand handIn = NetworkUtils.decodeHand(buf.readByte());
 
             return new SyncInstrumentPacket(midiSource, midiSourceName, enabledChannelsInt, sysInput,volume, handIn);
         } catch(IndexOutOfBoundsException e) {
@@ -109,6 +92,6 @@ public class SyncInstrumentPacket implements CustomPacketPayload {
         buf.writeInt(pkt.enabledChannelsInt);
         buf.writeBoolean(pkt.sysInput);
         buf.writeByte(pkt.volume);
-        buf.writeByte(getInstrumentLocationByte(pkt.handIn));
+        buf.writeByte(NetworkUtils.encodeHand(pkt.handIn));
     }
 }

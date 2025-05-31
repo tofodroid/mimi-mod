@@ -23,8 +23,9 @@ import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
+import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 
 public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
@@ -53,7 +54,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
-        MidiNbtDataUtils.appendSettingsTooltip(stack, tooltip);
+        this.appendSettingsTooltip(stack, tooltip);
     }
 
     @Override
@@ -65,14 +66,6 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     public Byte getInstrumentId() {
         return this.instrumentId;
     }
-
-    // @Override
-    // public InteractionResult useOn(UseOnContext context) {
-    //     if(washItem(context)) {
-    //         return InteractionResult.SUCCESS;
-    //     }
-    //     return super.useOn(context);
-    // }
     
     @Override
     public EquipmentSlot getEquipmentSlot(ItemStack stack) {
@@ -80,21 +73,21 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     }
 
     @Override
-    @SuppressWarnings({"resource", "deprecation"})
+    @SuppressWarnings("deprecation")
     public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity target, InteractionHand handIn) {
-        if(target instanceof Player) {
+        if(target instanceof Player && user.isCrouching()) {
             if(!user.level().isClientSide) {
                 MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
                 user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
-                ServerNoteConsumerManager.handlePacket(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), null, (ServerLevel)user.level());
+                ServerNoteConsumerManager.handlePacket(NoteEventPacket.createResetPacket(getInstrumentId(), user.getUUID(), EntityUtils.getEntityHeadPos(user), handIn), false, null, (ServerLevel)user.level());
             }
-             return InteractionResult.CONSUME;
+            return InteractionResult.SUCCESS;
         } else if(target instanceof Mob) {
             if(!user.level().isClientSide && ConfigProxy.getAllowedInstrumentMobs().contains(target.getType().builtInRegistryHolder().key().location().toString()) && !((Mob)target).equipItemIfPossible(stack).isEmpty()) {
                 user.setItemInHand(handIn, ItemStack.EMPTY);
                 target.playSound(SoundEvents.DONKEY_CHEST, 1.0F, 1.0F);
-                ServerNoteConsumerManager.handlePacket(MidiNotePacket.createAllNotesOffPacket(getInstrumentId(), user.getUUID(), user.getOnPos(), handIn), null, (ServerLevel)user.level());
+                ServerNoteConsumerManager.handlePacket(NoteEventPacket.createResetPacket(getInstrumentId(), user.getUUID(), EntityUtils.getEntityHeadPos(user), handIn),false, null, (ServerLevel)user.level());
             }
             return InteractionResult.CONSUME;
         }
@@ -106,7 +99,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         if(worldIn.isClientSide && !playerIn.isCrouching()) {
-            ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, handIn, playerIn.getItemInHand(handIn));
+            ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, handIn, playerIn.getItemInHand(handIn));
 		    return new InteractionResultHolder<>(InteractionResult.SUCCESS, playerIn.getItemInHand(handIn));
         }
 

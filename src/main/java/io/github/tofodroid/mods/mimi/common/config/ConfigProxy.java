@@ -89,6 +89,10 @@ public class ConfigProxy {
         return ModConfigs.CLIENT.jitterCorrection.get();
     }
 
+    public static Boolean getLocalJitterCorrection() {
+        return ModConfigs.CLIENT.jitterCorrectionLocal.get();
+    }
+
     public static Integer getLatency() {
         return ModConfigs.CLIENT.latency.get();
     }

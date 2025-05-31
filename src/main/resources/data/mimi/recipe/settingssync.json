@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "PIP",
+        "   "
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:iron_nugget"
+        },
+        "P": {
+            "item": "minecraft:paper"
+        }
+    },
+    "result": {
+        "id": "mimi:settingssync"
+    }
+}

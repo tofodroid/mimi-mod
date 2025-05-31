@@ -2,22 +2,18 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import org.joml.Vector3d;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
-import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileInstrument extends AStaticInventoryTile {
+public class TileInstrument extends AConfigurableTile {
     public static final String REGISTRY_NAME = "instrument";
     public static final String COLOR_TAG = "color";
     protected EntitySeat currentSeat = null;
@@ -27,7 +23,6 @@ public class TileInstrument extends AStaticInventoryTile {
         super(ModTiles.INSTRUMENT, pos, state, 1);
     }
 
-    @SuppressWarnings("resource")
     public void attemptSit(Player player) {
         if(player.level().isClientSide) {
             return;
@@ -69,19 +64,16 @@ public class TileInstrument extends AStaticInventoryTile {
         }
     }
 
-    public void setInstrumentStack(ItemStack stack) {
-        if(stack.getItem() instanceof IInstrumentItem) {
-            this.setItem(0, stack);
-            
-            if(stack.is(ItemTags.DYEABLE) && stack.has(DataComponents.DYED_COLOR)) {
-                this.color = stack.get(DataComponents.DYED_COLOR).rgb();
-            }
+    @Override
+    protected void onSourceStackChanged() {
+        if(this.getSourceStack().is(ItemTags.DYEABLE) && this.getSourceStack().has(DataComponents.DYED_COLOR)) {
+            this.color = this.getSourceStack().get(DataComponents.DYED_COLOR).rgb();
+        }
 
-            Player currentPlayer = this.getCurrentPlayer();
+        Player currentPlayer = this.getCurrentPlayer();
 
-            if(currentPlayer != null) {
-                EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(currentPlayer);
-            }
+        if(currentPlayer != null) {
+            EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(currentPlayer);
         }
     }
 
@@ -109,14 +101,6 @@ public class TileInstrument extends AStaticInventoryTile {
         }
     }
 
-    public ItemStack getInstrumentStack() {
-        if(items.isEmpty() || items.get(0) == null) {
-            return ItemStack.EMPTY;
-        } else {
-            return items.get(0);
-        }
-    }
-
     public Byte getInstrumentId() {
         return this.blockInstrument().getInstrumentId();
     }
@@ -136,25 +120,12 @@ public class TileInstrument extends AStaticInventoryTile {
 
     @Override
     public void onItemsLoaded() {
-        // Fallback for missing stack
-        if(this.items.get(0).isEmpty()) {
-            MIMIMod.LOGGER.warn("Instrument Tile is missing stack! Re-initializing.");
-            this.initializeInstrumentStack();
-        }
+        super.onItemsLoaded();
 
         // Load color from stack
-        Integer stackColor = DyedItemColor.getOrDefault(this.getInstrumentStack(), -1);
+        Integer stackColor = DyedItemColor.getOrDefault(this.getSourceStack(), -1);
         if(stackColor != -1) {
             this.color = stackColor;
         }
-    }
-
-    private ItemStack initializeInstrumentStack() {
-        return this.initializeInstrumentStack(null);
-    }
-
-    private ItemStack initializeInstrumentStack(CompoundTag stackTag) {
-        ItemStack instrumentStack = new ItemStack(this.blockInstrument().asItem(), 1);
-        return instrumentStack;
     }
 }

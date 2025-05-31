@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
@@ -20,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -76,13 +78,16 @@ public class GuiEffectEmitter extends BaseGui {
     private final Level world;
     private final ItemStack emitterStack;
     private final BlockPos tilePos;
+    private final InteractionHand handIn;
 
     // Instance Data
     private Boolean shiftModifier = false;
+    private Boolean settingsOnly = false;
 
-    public GuiEffectEmitter(Level world, BlockPos tilePos, ItemStack emitterStack) {
+    public GuiEffectEmitter(Level world, BlockPos tilePos, InteractionHand handIn, ItemStack emitterStack) {
         super(302, 146, 302, "textures/gui/gui_effect_emitter.png", "item.MIMIMod.gui_effect_emitter");
         this.tilePos = tilePos;
+        this.handIn = handIn;
         this.world = world;
 
         if(emitterStack == null || emitterStack.isEmpty()) {
@@ -91,6 +96,11 @@ public class GuiEffectEmitter extends BaseGui {
             this.emitterStack = null;
             return;
         }
+
+        if(emitterStack.getItem().equals(ModItems.SETTINGSSYNC)) {
+            this.settingsOnly = true;
+        }
+
         this.emitterStack = new ItemStack(emitterStack.getItem(), emitterStack.getCount());
         this.emitterStack.applyComponents(emitterStack.getComponents());
     }
@@ -147,7 +157,7 @@ public class GuiEffectEmitter extends BaseGui {
 
         if(invertSignalWidget.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncEffectEmitterToServer();
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_SOUND_BUTTON_COORDS))) {
+        } else if(!this.settingsOnly && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_SOUND_BUTTON_COORDS))) {
             this.playCurrentSound();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(VOL_DOWN_BUTTON_COORDS))) {
             Byte volume = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.VOLUME_TAG, 5);
@@ -173,7 +183,7 @@ public class GuiEffectEmitter extends BaseGui {
             pitch = MathUtils.addClamped(pitch, addAmount, -2, 2);
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.PITCH_TAG, pitch);
             this.syncEffectEmitterToServer();
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_PARTICLE_BUTTON_COORDS))) {
+        } else if(!this.settingsOnly && CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PLAY_PARTICLE_BUTTON_COORDS))) {
             this.playCurrentParticle();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(SIDE_DOWN_BUTTON_COORDS))) {
             Byte side = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SIDE_TAG, 0);
@@ -277,7 +287,7 @@ public class GuiEffectEmitter extends BaseGui {
     }
 
     public void syncEffectEmitterToServer() {
-        NetworkProxy.sendToServer(new EffectEmitterUpdatePacket(emitterStack, tilePos));
+        NetworkProxy.sendToServer(new EffectEmitterUpdatePacket(emitterStack, tilePos, handIn));
     }
 
     public Boolean validateParticle(String newParticleString) {

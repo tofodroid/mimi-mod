@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public abstract class ABroadcastConsumer implements IBroadcastConsumer {
+public abstract class AServerBroadcastConsumer implements IBroadcastConsumer {
     public static final Byte ALL_CHANNELS_ID = Byte.MAX_VALUE;
     
     protected UUID ownerId;
@@ -19,7 +19,7 @@ public abstract class ABroadcastConsumer implements IBroadcastConsumer {
     protected Integer enabledChannels;
     protected List<Byte> enabledChannelsList;
 
-    public ABroadcastConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dimension) {
+    public AServerBroadcastConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, Supplier<BlockPos> pos, Supplier<ResourceKey<Level>> dimension) {
         this.ownerId = ownerId;
         this.linkedId = linkedId;
         this.blockPos = pos;
@@ -28,7 +28,7 @@ public abstract class ABroadcastConsumer implements IBroadcastConsumer {
         this.enabledChannelsList = enabledChannelsList;
     }
 
-    public ABroadcastConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, BlockPos pos, ResourceKey<Level> dimension) {
+    public AServerBroadcastConsumer(UUID ownerId, UUID linkedId, Integer enabledChannels, List<Byte> enabledChannelsList, BlockPos pos, ResourceKey<Level> dimension) {
         this(ownerId, linkedId, enabledChannels, enabledChannelsList, () -> pos, () -> dimension);
     }
 
@@ -52,26 +52,8 @@ public abstract class ABroadcastConsumer implements IBroadcastConsumer {
         return this.enabledChannelsList;
     }
 
-    public List<ABroadcastConsumer> getConsumers() {
+    public List<AServerBroadcastConsumer> getConsumers() {
         return List.of(this);
-    }
-
-    public void consumeNoteOn(BroadcastEvent message) {
-        if(willHandleNoteOn(message) && isPacketInRange(message)) {
-            this.doHandleNoteOn(message);
-        }
-    }
-
-    public void consumeNoteOff(BroadcastEvent message) {
-        if(willHandleNoteOff(message) && isPacketInRange(message)) {
-            this.doHandleNoteOff(message);
-        }
-    }
-
-    public void consumeAllNotesOff(BroadcastEvent message) {
-        if(willHandleAllNotesOff(message) && isPacketInRange(message)) {
-            this.doHandleAllNotesOff(message);
-        }
     }
 
     public void tickConsumer() {/*Default no-op*/}

@@ -11,21 +11,21 @@ import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.SourceDataLine;
 
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import net.minecraft.world.entity.player.Player;
 
-public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
+public class BroadcastedNoteMIMISynth extends AMIMISynth<MIMIChannel> {
     protected SoftSynthesizer internalSynth;
     
-    public ServerPlayerMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
+    public BroadcastedNoteMIMISynth(AudioFormat format, SourceDataLine dataLine, Boolean jitterCorrection, Integer latency, Soundbank sounds)  {
        super(format, dataLine, jitterCorrection, latency, sounds);
     }
 
     public Boolean tick(Player clientPlayer) {
         if(this.channelAssignmentMap != null && !this.channelAssignmentMap.isEmpty()) {
             // Tick channels
-            List<PositionalMIMIChannel> toRemove = new ArrayList<>();
-            for(PositionalMIMIChannel channel : channelAssignmentMap.keySet()) {
+            List<MIMIChannel> toRemove = new ArrayList<>();
+            for(MIMIChannel channel : channelAssignmentMap.keySet()) {
                 UUID playerId = getUUIDFromChannelId(channelAssignmentMap.get(channel));
 
                 if(!channel.tick(clientPlayer, playerId.toString().equals(clientPlayer.getUUID().toString()))) {
@@ -34,8 +34,8 @@ public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
             }
     
             // Unassign idle channels
-            for(PositionalMIMIChannel remove : toRemove) {
-                remove.reset();
+            for(MIMIChannel remove : toRemove) {
+                remove.clear();
                 channelAssignmentMap.remove(remove);
             }
 
@@ -46,12 +46,12 @@ public class ServerPlayerMIMISynth extends AMIMISynth<PositionalMIMIChannel> {
     }
     
     @Override
-    protected PositionalMIMIChannel createChannel(Integer num, MidiChannel channel) {
-        return new PositionalMIMIChannel(num, channel);
+    protected MIMIChannel createChannel(Integer num, MidiChannel channel) {
+        return new MIMIChannel(num, channel);
     }
 
     @Override
-    protected String createChannelId(MidiNotePacket message) {
+    protected String createChannelId(NoteEventPacket message) {
         return getChannelIdForUUIDAndInstrumentId(message.player, message.instrumentId);
     }
 

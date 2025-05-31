@@ -29,6 +29,7 @@ public class ClientConfig {
     // SYNTH
     public ModConfigSpec.IntValue localBufferms;
     public ModConfigSpec.BooleanValue jitterCorrection;
+    public ModConfigSpec.BooleanValue jitterCorrectionLocal;
     public ModConfigSpec.IntValue latency;
     public ModConfigSpec.IntValue localLatency;
     public ModConfigSpec.ConfigValue<Integer> synthSampleRate;
@@ -64,12 +65,15 @@ public class ClientConfig {
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
             .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrection")
             .define("synthJitterCorrection", true);
+        jitterCorrectionLocal = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
+            .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrectionlocal")
+            .define("jitterCorrectionLocal", false);
         latency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes from other players? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.latency")
-            .defineInRange("synthBaselineLatency", 50, 10, 500);
+            .defineInRange("synthBaselineLatency", 50, 11, 200);
         localLatency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes played by you? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.localLatency")
-            .defineInRange("synthBaselineLocalLatency", 30, 10, 500);
+            .defineInRange("synthBaselineLocalLatency", 16, 11, 200);
         synthSampleRate = builder.comment("What sample rate should the built-in midi synthesizer use (hz)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8000,11025,16000,22050,44100,48000,96000]")
             .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
             .defineInList("synthSampleRate", 22050, Arrays.asList(8000,11025,16000,22050,44100,48000,96000));

@@ -6,14 +6,14 @@ import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsu
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-public class MidiNotePacketHandler {
-    public static void handlePacketServer(final MidiNotePacket message, ServerPlayer sender) {
+public class NoteEventPacketHandler {
+    public static void handlePacketServer(final NoteEventPacket message, ServerPlayer sender) {
         if(message != null) {
-            ServerNoteConsumerManager.handlePacket(message, sender.getUUID(), (ServerLevel)sender.level());
+            ServerNoteConsumerManager.handlePacket(message, true, sender.getUUID(), (ServerLevel)sender.level());
         }
     }
 
-    public static void handlePacketClient(final MidiNotePacket message) {
+    public static void handlePacketClient(final NoteEventPacket message) {
         if(MIMIMod.getProxy().isClient()) ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(message); 
     }
 }

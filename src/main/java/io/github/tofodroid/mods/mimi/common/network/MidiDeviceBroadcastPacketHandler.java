@@ -1,8 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.BasicMidiEvent;
-import io.github.tofodroid.mods.mimi.common.midi.MidiEventType;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ATransmitterBroadcastProducer;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,15 +12,7 @@ public class MidiDeviceBroadcastPacketHandler {
             ATransmitterBroadcastProducer musicPlayer = ServerTransmitterManager.getTransmitter(message.player);
 
             if(musicPlayer != null) {
-                if(message.isNoteOnPacket()) {
-                    musicPlayer.broadcast(new BasicMidiEvent(MidiEventType.NOTE_ON, message.channel, message.note, message.velocity, message.noteServerTime));
-                } else if(message.isNoteOffPacket()) {
-                    musicPlayer.broadcast(new BasicMidiEvent(MidiEventType.NOTE_OFF, message.channel, message.note, message.velocity, message.noteServerTime));                    
-                } else if(message.isAllNotesOffPacket()) {
-                    musicPlayer.broadcast(new BasicMidiEvent(MidiEventType.ALL_NOTES_OFF, message.channel, message.note, message.velocity, message.noteServerTime));
-                } else if(message.isControlPacket()) {
-                    // Not yet supported
-                }
+                musicPlayer.broadcast(new BroadcastEvent(message.type, message.channel, message.note, message.velocity, message.player, sender.level().dimension(), message.pos, 16, message.noteServerTime));
             }
         }
     }

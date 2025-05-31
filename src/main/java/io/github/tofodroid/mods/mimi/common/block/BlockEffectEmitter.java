@@ -11,7 +11,6 @@ import io.github.tofodroid.mods.mimi.util.TagUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -30,7 +29,7 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
     public static final String REGISTRY_NAME = "effectemitter";
     public static final MapCodec<BlockEffectEmitter> CODEC = simpleCodec(BlockEffectEmitter::new);
- 
+
     @Override
     public MapCodec<BlockEffectEmitter> codec() {
        return CODEC;
@@ -75,8 +74,8 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
     }
 
     @Override
-    protected void openGui(Level worldIn, Player player, TileEffectEmitter tile) {
-        ClientGuiWrapper.openEffectEmitterGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
+    public OpenGuiWrapper openGuiWrapper() {
+        return ClientGuiWrapper::openEffectEmitterGui;
     }
 
     @Override

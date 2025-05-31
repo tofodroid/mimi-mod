@@ -1,10 +1,8 @@
-package io.github.tofodroid.mods.mimi.server.events.broadcast.api;
+package io.github.tofodroid.mods.mimi.common.api.event.broadcast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
 
 public class BroadcastConsumerMapping {
     protected final UUID broadcasterId;
@@ -45,11 +43,5 @@ public class BroadcastConsumerMapping {
             return LINKED_CONSUMERS;
         }
         return CHANNEL_CONSUMERS[channel];
-    }
-
-    public void allNotesOff(BroadcastEvent event) {
-        for(IBroadcastConsumer consumer : LINKED_CONSUMERS) {
-            consumer.consumeAllNotesOff(event);
-        }
     }
 }

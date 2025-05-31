@@ -4,17 +4,20 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerMapping;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastProducer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public abstract class ABroadcastProducer implements IBroadcastProducer {
+public abstract class AServerBroadcastProducer implements IBroadcastProducer {
     protected final UUID ownerId;
     protected final Supplier<BlockPos> blockPos;
     protected final Supplier<ResourceKey<Level>> dimension;
     protected BroadcastConsumerMapping consumerCache;
 
-    public ABroadcastProducer(UUID ownerId, Supplier<BlockPos> blockPos, Supplier<ResourceKey<Level>> dimension) {
+    public AServerBroadcastProducer(UUID ownerId, Supplier<BlockPos> blockPos, Supplier<ResourceKey<Level>> dimension) {
         this.ownerId = ownerId;
         this.blockPos = blockPos;
         this.dimension = dimension;
