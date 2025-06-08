@@ -10,6 +10,8 @@ import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPack
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacket;
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
@@ -69,6 +71,7 @@ public class NetworkManager {
         registerMessage(registrar, EffectEmitterUpdatePacket.TYPE, EffectEmitterUpdatePacket::encodePacket, EffectEmitterUpdatePacket::decodePacket, EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer);
         registerMessage(registrar, MultiNoteEventPacket.TYPE, MultiNoteEventPacket::encodePacket, MultiNoteEventPacket::decodePacket, MultiNoteEventPacketHandler::handlePacketClient, MultiNoteEventPacketHandler::handlePacketServer);
         registerMessage(registrar, MidiDeviceBroadcastPacket.TYPE, MidiDeviceBroadcastPacket::encodePacket, MidiDeviceBroadcastPacket::decodePacket, MidiDeviceBroadcastPacketHandler::handlePacketClient, MidiDeviceBroadcastPacketHandler::handlePacketServer);
+        registerMessage(registrar, MIMIConfigPacket.TYPE, MIMIConfigPacket::encodePacket, MIMIConfigPacket::decodePacket, MIMIConfigPacketHandler::handlePacketClient, MIMIConfigPacketHandler::handlePacketServer);
     }
 
     public static <T extends CustomPacketPayload> StreamDecoder<RegistryFriendlyByteBuf, T> createDecoder(Function<FriendlyByteBuf, T> decodeFunc) {

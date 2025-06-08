@@ -22,6 +22,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemSourceLinker extends Item {
@@ -44,7 +45,8 @@ public class ItemSourceLinker extends Item {
             if(!user.level().isClientSide) {
                 MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
-                user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
+                Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(target.getName());
+                user.displayClientMessage(message, true);
             }
             return InteractionResult.SUCCESS;
         }
@@ -59,7 +61,8 @@ public class ItemSourceLinker extends Item {
             if(!worldIn.isClientSide) {
                 MidiNbtDataUtils.setMidiSource(heldItem, playerIn.getUUID(), playerIn.getName().getString());
                 playerIn.setItemInHand(handIn, heldItem);
-                playerIn.displayClientMessage(Component.literal("Linked to Self"), true);
+                Component message = Component.literal("Linked ").append(heldItem.getHoverName()).append(Component.literal(" to ")).append(playerIn.getName());
+                playerIn.displayClientMessage(message, true);
             }
             return InteractionResultHolder.success(heldItem);
         }
@@ -68,7 +71,8 @@ public class ItemSourceLinker extends Item {
 
     @Override
     public boolean doesSneakBypassUse(ItemStack stack, LevelReader level, BlockPos pos, Player player) {
-        return true;
+        Block block = level.getBlockState(pos).getBlock();
+        return block.equals(ModBlocks.TRANSMITTERBLOCK) || block.equals(ModBlocks.RELAY);
     }
 
     @Override
@@ -88,7 +92,7 @@ public class ItemSourceLinker extends Item {
                         ItemStack sourceStack = tile.getSourceStack();
                         MidiNbtDataUtils.setMidiSource(sourceStack, savedSource, savedSourceName);
                         tile.setSourceStack(sourceStack);
-                        Component message = Component.literal("Linked ").append(state.getBlock().getName()).append(Component.literal(" to " + MidiNbtDataUtils.getMidiSourceName(heldItem, true)));
+                        Component message = Component.literal("Linked ").append(state.getBlock().getName()).append(Component.literal(" to configured ")).append(MidiNbtDataUtils.getMidiSourceType(heldItem));
                         context.getPlayer().displayClientMessage(message, true);
                     }
                 }

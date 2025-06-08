@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -14,12 +15,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
@@ -79,7 +83,8 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
             if(!user.level().isClientSide) {
                 MidiNbtDataUtils.setMidiSource(stack, target.getUUID(), target.getName().getString());
                 user.setItemInHand(handIn, stack);
-                user.displayClientMessage(Component.literal("Linked to " + target.getName().getString()), true);
+                Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(target.getName());
+                user.displayClientMessage(message, true);
                 ServerNoteConsumerManager.handlePacket(NoteEventPacket.createResetPacket(getInstrumentId(), user.getUUID(), EntityUtils.getEntityHeadPos(user), handIn), false, null, (ServerLevel)user.level());
             }
             return InteractionResult.SUCCESS;
@@ -98,7 +103,7 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Override
     @Nonnull
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
-        if(worldIn.isClientSide && !playerIn.isCrouching()) {
+        if(worldIn.isClientSide) {
             ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, handIn, playerIn.getItemInHand(handIn));
 		    return new InteractionResultHolder<>(InteractionResult.SUCCESS, playerIn.getItemInHand(handIn));
         }
@@ -139,5 +144,11 @@ public class ItemInstrumentHandheld extends Item implements IInstrumentItem {
     @Override
     public String getRegistryName() {
         return this.REGISTRY_NAME;
+    }
+
+    @Override
+    public boolean doesSneakBypassUse(ItemStack stack, LevelReader level, BlockPos pos, Player player) {
+        Block block = level.getBlockState(pos).getBlock();
+        return block.equals(ModBlocks.TRANSMITTERBLOCK) || block.equals(ModBlocks.RELAY);
     }
 }

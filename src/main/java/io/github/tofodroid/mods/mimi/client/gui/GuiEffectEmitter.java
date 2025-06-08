@@ -258,16 +258,16 @@ public class GuiEffectEmitter extends BaseGui {
             TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SPEED_Z_TAG, speed);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(S_LOOP_DOWN_BUTTON_COORDS))) {
-            Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
+            Integer loop = TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
             loop = MathUtils.addClamped(loop, -addAmount, 0, 999);
-            TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
+            TagUtils.setOrRemoveInt(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(S_LOOP_UP_BUTTON_COORDS))) {
-            Byte loop = TagUtils.getByteOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
+            Integer loop = TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, 0);
             addAmount = mouseModifier ? 10 : addAmount;
             loop = MathUtils.addClamped(loop, addAmount, 0, 999);
-            TagUtils.setOrRemoveByte(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
+            TagUtils.setOrRemoveInt(emitterStack, TileEffectEmitter.SOUND_LOOP_TAG, loop);
             this.syncEffectEmitterToServer();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(P_LOOP_DOWN_BUTTON_COORDS))) {
             Integer loop = TagUtils.getIntOrDefault(emitterStack, TileEffectEmitter.PARTICLE_LOOP_TAG, 0);

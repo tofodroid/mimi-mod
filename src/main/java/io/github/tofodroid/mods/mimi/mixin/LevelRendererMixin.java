@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.api.event.note.NoteEvent;
+import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 
 import javax.annotation.Nullable;
 
@@ -31,10 +31,9 @@ public abstract class LevelRendererMixin {
 
     @Inject(method = "levelEvent", at = @At("HEAD"), cancellable = true)
     private void onMIMINoteEvent(int type, BlockPos pos, int data, CallbackInfo ci) {
-        if(type == NoteEvent.MIMI_NOTE_PLAYING_LEVEL_EVENT_ID) {
+        if(ConfigProxy.noteParticlesEnabled() && type == NoteEvent.MIMI_NOTE_PLAYING_LEVEL_EVENT_ID) {
             Vec3 vec3 = Vec3.atBottomCenterOf(pos).add(0.0, 1.2F, 0.0);
             Float noteVal = ((data + 6) % 12f) / 12f;
-            MIMIMod.LOGGER.info("Note: Raw - " + data + " | Parsed - " + noteVal);
             addParticle(ParticleTypes.NOTE, vec3.x() + level.getRandom().nextDouble() - 0.5d, vec3.y(), vec3.z() + level.getRandom().nextDouble() - 0.5d, noteVal, 0.0, 0.0);
             notifyNearbyEntities(level, pos, true);
             ci.cancel();

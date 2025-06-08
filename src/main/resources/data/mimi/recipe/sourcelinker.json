@@ -1,16 +1,14 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "   ",
-        "IPI",
-        "   "
+        "ISI"
     ],
     "key": {
         "I": {
             "item": "minecraft:iron_nugget"
         },
-        "P": {
-            "item": "minecraft:paper"
+        "S": {
+            "item": "minecraft:string"
         }
     },
     "result": {

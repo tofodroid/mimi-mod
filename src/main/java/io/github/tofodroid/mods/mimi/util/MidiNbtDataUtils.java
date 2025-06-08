@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.ChatFormatting;
@@ -434,12 +435,20 @@ public abstract class MidiNbtDataUtils {
         }
     }
 
-    public static void appendMidiSourceTooltip(ItemStack stack, List<Component> tooltip) {
+    public static Component getMidiSourceType(ItemStack stack) {
         if(MidiNbtDataUtils.getMidiSource(stack) != null) {
             Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(stack);
-            Boolean isRelay = MidiNbtDataUtils.getMidiSourceIsRelay(stack);
-            tooltip.add(Component.literal("  Receive Notes From: " + (isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"))).withStyle(ChatFormatting.GREEN));
-            tooltip.add(Component.literal("  " + MidiNbtDataUtils.getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+            Boolean isRelay = !isTransmitter && MidiNbtDataUtils.getMidiSourceIsRelay(stack);
+            return (isTransmitter ? ModBlocks.TRANSMITTERBLOCK.getName() : ( isRelay ? ModBlocks.RELAY.getName() : Component.literal("Player")));
+        }
+        return Component.literal("None");
+    }
+
+    public static void appendMidiSourceTooltip(ItemStack stack, List<Component> tooltip) {
+        if(MidiNbtDataUtils.getMidiSource(stack) != null) {
+            tooltip.add(Component.literal("  Receive Notes From: ").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.literal("  ").append(getMidiSourceType(stack)).append(Component.literal(":")).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal("    " + MidiNbtDataUtils.getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("  Receive Notes From: None").withStyle(ChatFormatting.GREEN));
         }

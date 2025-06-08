@@ -70,8 +70,6 @@ public class ConfigProxy {
         ModConfigs.CLIENT.transmitterMidiPath.set(path);
     }
 
-    // SYNTH
-
     // Read-Only
     public static Boolean isInstrumentalistShopEnabled() {
         return ModConfigs.COMMON.enableInstrumentalistShop.get();
@@ -81,6 +79,10 @@ public class ConfigProxy {
         return Arrays.asList(ModConfigs.COMMON.allowedInstrumentMobs.get().split(","));
     }
     
+    public static Boolean noteParticlesEnabled() {
+        return ModConfigs.CLIENT.noteParticlesEnabled.get();
+    }
+
     public static Integer getLocalBufferms() {
         return ModConfigs.CLIENT.localBufferms.get();
     }
@@ -119,5 +121,9 @@ public class ConfigProxy {
 
     public static Integer getMidiTaskTimeoutMillis() {
         return ModConfigs.COMMON.midiTaskTimeoutMillis.get();
+    }
+
+    public static Boolean getDoGiveBookOnFirstJoin() {
+        return ModConfigs.COMMON.doGiveBookOnFirstJoin.get();
     }
 }

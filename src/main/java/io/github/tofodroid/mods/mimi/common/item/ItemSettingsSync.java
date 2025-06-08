@@ -1,9 +1,11 @@
 package io.github.tofodroid.mods.mimi.common.item;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 import io.github.tofodroid.mods.mimi.client.gui.ClientGuiWrapper;
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableTileBlock;
+import io.github.tofodroid.mods.mimi.common.block.BlockEffectEmitter;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -33,10 +35,14 @@ public class ItemSettingsSync extends Item {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
-
-        tooltip.add(Component.literal(""));
-
         Integer settingType = getSettingType(stack);
+
+        if(settingType < 0) {
+            tooltip.add(Component.literal("Crouch + Right Block Click to Copy Settings").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        } else {
+            tooltip.add(Component.literal("Right Click Block of Same Type to Paste").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal(""));
+        }
 
         if(settingType == INSTRUMENT_SETTING_TYPE) {
             tooltip.add(Component.literal("Instrument").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD, ChatFormatting.ITALIC));
@@ -74,6 +80,7 @@ public class ItemSettingsSync extends Item {
 
         if(state.getBlock() instanceof AConfigurableTileBlock) {
             AConfigurableTileBlock<?> block = (AConfigurableTileBlock<?>)state.getBlock();
+            BiFunction<ItemStack, ItemStack, ItemStack> copyFunction = block.equals(ModBlocks.EFFECTEMITTER) ? BlockEffectEmitter::copyEffectEmitterSettings : MidiNbtDataUtils::copyMidiSettings;
             Integer blockSettingType = toSettingType(block);
             Integer stackSettingType = getSettingType(heldItem);
 
@@ -81,14 +88,16 @@ public class ItemSettingsSync extends Item {
                 if(!context.getLevel().isClientSide) {
                     if(context.isSecondaryUseActive()) {
                         // Copy Block --> Item
-                        ItemStack newStack = MidiNbtDataUtils.copyMidiSettings(block.getSourceStack(context.getLevel(), context.getClickedPos()), heldItem);
+                        ItemStack newStack = copyFunction.apply(block.getSourceStack(context.getLevel(), context.getClickedPos()), heldItem);
                         TagUtils.setOrRemoveInt(newStack, "setting_type", blockSettingType);
                         context.getPlayer().setItemInHand(context.getHand(), newStack);
-                        context.getPlayer().displayClientMessage(Component.literal("Copied Block Settings to Synchronizer"), true);
+                        Component message = Component.literal("Copied ").append(state.getBlock().getName()).append(Component.literal(" Settings to Synchronizer"));
+                        context.getPlayer().displayClientMessage(message, true);
                     } else if(stackSettingType == blockSettingType) {
                         // Paste Item --> Block
-                        block.setSourceStack(context.getLevel(), context.getClickedPos(), MidiNbtDataUtils.copyMidiSettings(heldItem, block.getSourceStack(context.getLevel(), context.getClickedPos())));
-                        context.getPlayer().displayClientMessage(Component.literal("Appiled Synchronzier Settings to Block"), true);
+                        block.setSourceStack(context.getLevel(), context.getClickedPos(), copyFunction.apply(heldItem, block.getSourceStack(context.getLevel(), context.getClickedPos())));
+                        Component message = Component.literal("Applied Synchronizer Settings to ").append(state.getBlock().getName());
+                        context.getPlayer().displayClientMessage(message, true);
                     }
                 }
                 return InteractionResult.SUCCESS;

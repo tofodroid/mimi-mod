@@ -57,16 +57,18 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
             TileTransmitter tile = getTileForBlock(level, pos);
 
             if(tile != null && player.isCrouching()) {
+                // Server: Link | Client: Don't open GUI
                 if(!level.isClientSide) {
                     String transmitterName = level.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
                     MidiNbtDataUtils.setMidiSourceFromTransmitter(stack, tile.getUUID(), transmitterName);
                     player.setItemInHand(player.getUsedItemHand(), stack);
-                    player.displayClientMessage(Component.literal("Linked Item to Transmitter"), true);
+                    Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(this.getName());
+                    player.displayClientMessage(message, true);
                 }
                 return ItemInteractionResult.SUCCESS;
             }
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override

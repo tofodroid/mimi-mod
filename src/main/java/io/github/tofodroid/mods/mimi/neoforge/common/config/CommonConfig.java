@@ -11,6 +11,7 @@ public class CommonConfig {
     public static final String OTHER_CATEGORY_NAME = "Other";
 
     public ModConfigSpec.BooleanValue enableInstrumentalistShop;
+    public ModConfigSpec.BooleanValue doGiveBookOnFirstJoin;
     public ModConfigSpec.BooleanValue doLogMidiTaskErrors;
     public ModConfigSpec.ConfigValue<String> allowedInstrumentMobs;
     public ModConfigSpec.ConfigValue<Integer> midiTaskTimeoutMillis;
@@ -20,11 +21,12 @@ public class CommonConfig {
         enableInstrumentalistShop = builder.comment("Toggles whether Instrumentalist shops should generate in villages.")
             .translation(MIMIMod.MODID + ".config.server.world.village.instrumentalist")
             .define("enableInstrumentalistShop", true);
-        builder.pop();
-        builder.push(WORLD_CATEGORY_NAME);
         allowedInstrumentMobs = builder.comment("Comma-separated list of mobs that can be given instruments to hold.")
             .translation(MIMIMod.MODID + ".config.server.mobs.allowed.instruments")
             .define("allowedInstrumentMobs", "minecraft:zombie,minecraft:husk,minecraft:skeleton,minecraft:stray,minecraft:wither_skeleton");
+        doGiveBookOnFirstJoin = builder.comment("Toggles wheter to give players the MIMI Guide Book on first join.")
+            .translation(MIMIMod.MODID + ".config.server.world.guide")
+            .define("doGiveBookOnFirstJoin", true);
         builder.pop();
         builder.push(OTHER_CATEGORY_NAME);
         doLogMidiTaskErrors = builder.comment("Toggles whether MIMI should log when the server fails to timely execute a MIDI command which usually just indiciates server performance trouble.")

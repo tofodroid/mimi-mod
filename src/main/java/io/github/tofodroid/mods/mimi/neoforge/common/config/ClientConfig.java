@@ -9,6 +9,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 // 1. Default MIDI Input Device
 
 public class ClientConfig {
+    public static final String CLIENT_EFFECTS = "Client Effects";
     public static final String AUDIO_OUTPUT_CATEGORY_NAME = "Audio Output";
     public static final String INSTRUMENT_GUI_CATEGORY_NAME = "Instrument GUI";
     public static final String MIDI_PLAYER_CATEGORY_NAME = "MIDI Player";
@@ -16,6 +17,7 @@ public class ClientConfig {
     public static final String MIDI_SYNTH_CATEGORY_NAME = "MIDI Synth";
     
     public ModConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
+    public ModConfigSpec.BooleanValue noteParticlesEnabled;
 
     // MIDI INPUT
     public ModConfigSpec.IntValue midiDeviceVelocity;
@@ -37,6 +39,10 @@ public class ClientConfig {
     public ModConfigSpec.ConfigValue<String> soundfontPath;
 
     public ClientConfig(ModConfigSpec.Builder builder) {
+        builder.push(CLIENT_EFFECTS);
+        noteParticlesEnabled = builder.comment("Toggles whether Note Particles should be rendered when notes are played.")
+            .translation(MIMIMod.MODID + ".config.client.effects.particles.enabled")
+            .define("noteParticlesEnabled", true);
         builder.push(AUDIO_OUTPUT_CATEGORY_NAME);
         automaticAudioDevice = builder.comment("Whether or not MIMI should attempt to automatically determine the audio output device to use based on the Minecraft audio device. Works best on Windows.")
             .translation(MIMIMod.MODID + ".config.audio.automatic")

@@ -2,6 +2,7 @@ package io.github.tofodroid.mods.mimi.neoforge.common;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.world.ModStructures;
+import io.github.tofodroid.mods.mimi.server.events.ServerEventHandler;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
@@ -32,6 +33,7 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity() instanceof ServerPlayer)) {
             return;
         }
+        ServerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         ServerMidiManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         ServerTransmitterManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         EntityInstrumentConsumerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());

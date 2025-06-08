@@ -69,11 +69,13 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
             TileRelay tile = getTileForBlock(level, pos);
 
             if(tile != null && player.isCrouching()) {
+                // Server: Link | Client: Don't open GUI
                 if(!level.isClientSide) {
                     String transmitterName = level.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
                     MidiNbtDataUtils.setMidiSourceFromRelay(stack, tile.getUUID(), transmitterName);
                     player.setItemInHand(player.getUsedItemHand(), stack);
-                    player.displayClientMessage(Component.literal("Linked Item to Relay"), true);
+                    Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(this.getName());
+                    player.displayClientMessage(message, true);
                 }
                 return ItemInteractionResult.SUCCESS;
             }

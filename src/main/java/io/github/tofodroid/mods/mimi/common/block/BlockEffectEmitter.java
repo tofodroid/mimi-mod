@@ -80,11 +80,13 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
 
     @Override
     protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
-        tooltip.add(Component.literal("Inverted:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
-        tooltip.add(Component.literal("  " + (TagUtils.getBooleanOrDefault(blockItemStack, INVERTED.getName(), false) ? "Yes" : "No")).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        tooltip.add(Component.literal(""));
+        tooltip.add(Component.literal("Effect Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        tooltip.add(Component.literal("Inverted:").withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.literal("  " + (TagUtils.getBooleanOrDefault(blockItemStack, TileEffectEmitter.INVERTED_TAG, false) ? "Yes" : "No")).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
 
         // Sound
-        tooltip.add(Component.literal("Sound:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        tooltip.add(Component.literal("Sound:").withStyle(ChatFormatting.GREEN));
         String soundResource = TagUtils.getStringOrDefault(blockItemStack, TileEffectEmitter.SOUND_ID_TAG, "");
         if(soundResource.isBlank()) {
             tooltip.add(Component.literal("  None").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
@@ -98,7 +100,7 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
         }
         
         // Particle
-        tooltip.add(Component.literal("Particle:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        tooltip.add(Component.literal("Particle:").withStyle(ChatFormatting.GREEN));
         String particleResource = TagUtils.getStringOrDefault(blockItemStack, TileEffectEmitter.PARTICLE_ID_TAG, "");
         if(particleResource.isBlank()) {
             tooltip.add(Component.literal("  None").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
@@ -136,5 +138,26 @@ public class BlockEffectEmitter extends AConfigurableTileBlock<TileEffectEmitter
             case 5:
                 return "West";
         }
+    }
+
+    public static ItemStack copyEffectEmitterSettings(ItemStack source, ItemStack target) {
+        if(!source.isEmpty() && !target.isEmpty()) {
+            ItemStack result = target.copyWithCount(1);
+            TagUtils.setOrRemoveString(result, TileEffectEmitter.SOUND_ID_TAG, TagUtils.getStringOrDefault(source, TileEffectEmitter.SOUND_ID_TAG,  ""));
+            TagUtils.setOrRemoveString(result, TileEffectEmitter.PARTICLE_ID_TAG, TagUtils.getStringOrDefault(source, TileEffectEmitter.PARTICLE_ID_TAG,  ""));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.VOLUME_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.VOLUME_TAG,  5));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.PITCH_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.PITCH_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SIDE_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SIDE_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPREAD_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPREAD_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.COUNT_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.COUNT_TAG,  1));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPEED_X_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPEED_X_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPEED_Y_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPEED_Y_TAG,  0));
+            TagUtils.setOrRemoveByte(result, TileEffectEmitter.SPEED_Z_TAG, TagUtils.getByteOrDefault(source, TileEffectEmitter.SPEED_Z_TAG,  0));
+            TagUtils.setOrRemoveInt(result, TileEffectEmitter.SOUND_LOOP_TAG, TagUtils.getIntOrDefault(source, TileEffectEmitter.SOUND_LOOP_TAG,  0));
+            TagUtils.setOrRemoveInt(result, TileEffectEmitter.PARTICLE_LOOP_TAG, TagUtils.getIntOrDefault(source, TileEffectEmitter.PARTICLE_LOOP_TAG,  0));
+            TagUtils.setOrRemoveBoolean(result, TileEffectEmitter.INVERTED_TAG, TagUtils.getBooleanOrDefault(source, TileEffectEmitter.INVERTED_TAG,  false));
+            return result;
+        }
+        return target;
     }
 }

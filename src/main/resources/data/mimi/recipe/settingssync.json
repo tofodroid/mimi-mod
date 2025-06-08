@@ -1,16 +1,14 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "   ",
-        "PIP",
-        "   "
+        "HN"
     ],
     "key": {
-        "I": {
-            "item": "minecraft:iron_nugget"
+        "H": {
+            "item": "minecraft:honey_bottle"
         },
-        "P": {
-            "item": "minecraft:paper"
+        "N": {
+            "item": "minecraft:note_block"
         }
     },
     "result": {
