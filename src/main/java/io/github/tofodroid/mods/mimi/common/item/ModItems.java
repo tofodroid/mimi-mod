@@ -48,7 +48,6 @@ public final class ModItems {
     // Other
     public static ItemSettingsSync SETTINGSSYNC = create(ItemSettingsSync.REGISTRY_NAME, new ItemSettingsSync(new Properties()));
     public static ItemSourceLinker SOURCELINKER = create(ItemSourceLinker.REGISTRY_NAME, new ItemSourceLinker(new Properties()));
-    //public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig(new Properties()));
     public static ItemTransmitter TRANSMITTER = create(ItemTransmitter.REGISTRY_NAME, new ItemTransmitter(new Properties()));
     public static ItemGuide GUIDE = create(ItemGuide.REGISTRY_NAME, new ItemGuide(new Properties()));
 

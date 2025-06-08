@@ -1,6 +1,6 @@
 {
     "name": "Devices",
-    "icon": "mimi:deviceconfig",
+    "icon": "mimi:settingssync",
     "category": "mimi:7midi",
     "pages": [
         {
