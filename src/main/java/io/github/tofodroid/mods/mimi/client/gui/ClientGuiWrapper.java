@@ -32,6 +32,12 @@ public abstract class ClientGuiWrapper {
         openGui(world, new GuiDeviceConfig(player));
     }
 
+    public static void openConfigGui() {
+        if(Minecraft.getInstance().player != null) {
+            openGui(Minecraft.getInstance().level, new GuiDeviceConfig(Minecraft.getInstance().player));
+        }
+    }
+
     // Configurable Block GUIs
     public static void openEffectEmitterGui(Level world, Player player, BlockPos tilePos, InteractionHand handIn, ItemStack emitterStack) {
         if(emitterStack.getItem().equals(ModBlocks.EFFECTEMITTER.asItem()) || emitterStack.getItem().equals(ModItems.SETTINGSSYNC)) {
