@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastConsumer;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastProducer;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastProducer;
 
 public class BroadcastManager {
     // Producers

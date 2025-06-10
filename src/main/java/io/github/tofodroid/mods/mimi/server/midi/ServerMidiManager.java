@@ -18,8 +18,8 @@ import net.minecraft.server.level.ServerPlayer;
 public abstract class ServerMidiManager {
     private static final Map<UUID, List<BasicMidiInfo>> CACHE_MAP = new HashMap<>();
 
-    public static void refreshServerSongs(Boolean forceFromDisk) {
-        MIMIMod.getProxy().serverMidiFiles().refresh(forceFromDisk);
+    public static void refreshServerSongs() {
+        MIMIMod.getProxy().serverMidiFiles().loadSongs();
         ServerTransmitterManager.onServerSongsRefreshed();
     }
 

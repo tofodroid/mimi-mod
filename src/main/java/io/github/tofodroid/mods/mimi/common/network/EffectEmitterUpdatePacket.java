@@ -1,6 +1,7 @@
 package io.github.tofodroid.mods.mimi.common.network;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.util.NetworkUtils;
 import io.github.tofodroid.mods.mimi.common.tile.TileEffectEmitter;
 import io.github.tofodroid.mods.mimi.util.TagUtils;
 import io.netty.handler.codec.DecoderException;
@@ -8,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 public class EffectEmitterUpdatePacket implements CustomPacketPayload {
@@ -15,6 +17,7 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<EffectEmitterUpdatePacket> TYPE = new Type<>(ID);
 
     public final BlockPos tilePos;
+    public final InteractionHand handIn;
     public final String sound;
     public final String particle;
     public final Byte volume;
@@ -29,9 +32,10 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
     public final Integer particle_loop;
     public final Boolean invertSignal;
 
-    public EffectEmitterUpdatePacket(ItemStack stack, BlockPos tilePos) {
+    public EffectEmitterUpdatePacket(ItemStack stack, BlockPos tilePos, InteractionHand handIn) {
         this(
             tilePos,
+            handIn,
             TagUtils.getStringOrDefault(stack, TileEffectEmitter.SOUND_ID_TAG, ""),
             TagUtils.getStringOrDefault(stack, TileEffectEmitter.PARTICLE_ID_TAG, ""),
             TagUtils.getByteOrDefault(stack, TileEffectEmitter.VOLUME_TAG, 5),
@@ -48,8 +52,9 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
         );
     }
 
-    public EffectEmitterUpdatePacket(BlockPos tilePos, String sound, String particle, Byte volume, Byte pitch, Byte side, Byte spread, Byte count, Byte speed_x, Byte speed_y, Byte speed_z, Integer sound_loop, Integer particle_loop, Boolean invertSignal) {
+    public EffectEmitterUpdatePacket(BlockPos tilePos, InteractionHand handIn, String sound, String particle, Byte volume, Byte pitch, Byte side, Byte spread, Byte count, Byte speed_x, Byte speed_y, Byte speed_z, Integer sound_loop, Integer particle_loop, Boolean invertSignal) {
         this.tilePos = tilePos;
+        this.handIn = handIn;
         this.sound = sound != null ? sound : "";
         this.particle = particle != null ? particle : "";
         this.volume = volume != null ? volume : 0;
@@ -72,7 +77,16 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
 
     public static EffectEmitterUpdatePacket decodePacket(FriendlyByteBuf buf) {
         try {
-            BlockPos tilePos = buf.readBlockPos();
+            Boolean isHand = buf.readBoolean();
+            InteractionHand handIn = null;
+            BlockPos tilePos = null;
+
+            if(isHand) {
+                handIn = NetworkUtils.decodeHand(buf.readByte());
+            } else {
+                tilePos= buf.readBlockPos();
+            }
+
             String sound = buf.readUtf(512);
             String particle = buf.readUtf(512);
             Byte volume = buf.readByte();
@@ -87,7 +101,7 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
             Integer particle_loop = buf.readInt();
             Boolean invertSignal = buf.readBoolean();
 
-            return new EffectEmitterUpdatePacket(tilePos, sound, particle, volume, pitch, side, spread, count, speed_x, speed_y, speed_z, sound_loop, particle_loop, invertSignal);
+            return new EffectEmitterUpdatePacket(tilePos, handIn, sound, particle, volume, pitch, side, spread, count, speed_x, speed_y, speed_z, sound_loop, particle_loop, invertSignal);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("EffectEmitterUpdatePacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -98,7 +112,14 @@ public class EffectEmitterUpdatePacket implements CustomPacketPayload {
     }
 
     public static void encodePacket(EffectEmitterUpdatePacket pkt, FriendlyByteBuf buf) {
-        buf.writeBlockPos(pkt.tilePos);
+        if(pkt.handIn != null) {
+            buf.writeBoolean(true);
+            buf.writeByte(NetworkUtils.encodeHand(pkt.handIn));
+        } else {
+            buf.writeBoolean(false);
+            buf.writeBlockPos(pkt.tilePos);
+        }
+
         buf.writeUtf(pkt.sound, 512);
         buf.writeUtf(pkt.particle, 512);
         buf.writeByte(pkt.volume);

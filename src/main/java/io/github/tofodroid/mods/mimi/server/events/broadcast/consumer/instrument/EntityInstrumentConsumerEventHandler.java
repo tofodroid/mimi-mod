@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastConsumer;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +24,6 @@ public class EntityInstrumentConsumerEventHandler {
         Arrays.asList(InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND, null)
     );
 
-    @SuppressWarnings("resource")
     public static void reloadEntityInstrumentConsumers(LivingEntity entity) {
         if(entity == null || entity.level() == null || !(entity.level() instanceof ServerLevel)) {
             return;
@@ -39,7 +39,7 @@ public class EntityInstrumentConsumerEventHandler {
             
             if(instrumentStack != null && MidiNbtDataUtils.getMidiSource(instrumentStack) != null) {
                 holder.putConsumer(i, new InstrumentBroadcastConsumer(
-                    entity::getOnPos,
+                    () -> EntityUtils.getEntityHeadPos(entity),
                     () -> entity.level().dimension(),
                     entity.getUUID(),
                     instrumentStack,
@@ -94,7 +94,7 @@ public class EntityInstrumentConsumerEventHandler {
         if(holder != null) {
             for(IBroadcastConsumer consumer : holder.getConsumers()) {
                 if(consumer instanceof InstrumentBroadcastConsumer) {
-                    ((InstrumentBroadcastConsumer)consumer).sendAllNotesOff();
+                    ((InstrumentBroadcastConsumer)consumer).sendReset();
                 }
             }
         }

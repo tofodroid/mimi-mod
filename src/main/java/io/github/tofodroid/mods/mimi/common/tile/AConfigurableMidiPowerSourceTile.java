@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import net.minecraft.core.BlockPos;
@@ -87,14 +87,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         }
     }
 
-    @Override
-    public Boolean shouldTriggerFromNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        return this.triggerHeld && this.noteHeld && this.shouldTriggerFromNoteOn(channel, note, velocity, instrumentId);
-    }
-
-    @Override
-    public Boolean shouldTriggerFromAllNotesOff(Byte channel, Byte instrumentId) {
-        return this.triggerHeld && this.noteHeld && this.shouldTriggerFromNoteOn(channel, null, null, instrumentId);
+    public Boolean isHeld() {
+        return this.triggerHeld && this.noteHeld;
     }
 
     public Boolean isBlockValid() {
@@ -182,6 +176,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
         Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
         this.heldNotes.put(noteId, Instant.now().toEpochMilli());
+        this.notesToTurnOff.remove(noteId);
         this.noteHeld = true;
     }
 
@@ -192,7 +187,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         }
     }
 
-    public void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime) {
+    public void onReset(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime) {
         if(this.triggerHeld) {
             Byte groupKey = getNoteGroupKey(channel, instrumentId);
 

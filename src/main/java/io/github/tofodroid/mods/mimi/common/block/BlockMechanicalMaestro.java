@@ -59,7 +59,7 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
     
                 if(tile != null) {
                     if(!shouldBePowered) {
-                        tile.allNotesOff();
+                        tile.reset();
                     }
                     tile.refreshMidiReceivers();
                 }
@@ -88,7 +88,7 @@ public class BlockMechanicalMaestro extends AContainerBlock<TileMechanicalMaestr
             
             if (tile != null) {
                 BroadcastManager.removeOwnedBroadcastConsumers(tile.getUUID());
-                tile.allNotesOff();
+                tile.reset();
             }
         }
 

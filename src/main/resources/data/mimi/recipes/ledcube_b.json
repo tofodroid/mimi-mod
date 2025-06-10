@@ -10,6 +10,7 @@
             "item": "mimi:ledcube_a"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:ledcube_b",
         "count": 4

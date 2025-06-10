@@ -19,6 +19,7 @@
             "item": "minecraft:string"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:harpsichord"
     }

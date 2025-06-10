@@ -9,6 +9,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 // 1. Default MIDI Input Device
 
 public class ClientConfig {
+    public static final String CLIENT_EFFECTS = "Client Effects";
     public static final String AUDIO_OUTPUT_CATEGORY_NAME = "Audio Output";
     public static final String INSTRUMENT_GUI_CATEGORY_NAME = "Instrument GUI";
     public static final String MIDI_PLAYER_CATEGORY_NAME = "MIDI Player";
@@ -16,6 +17,7 @@ public class ClientConfig {
     public static final String MIDI_SYNTH_CATEGORY_NAME = "MIDI Synth";
     
     public ModConfigSpec.EnumValue<KEYBOARD_LAYOUTS> keyboardLayout;
+    public ModConfigSpec.BooleanValue noteParticlesEnabled;
 
     // MIDI INPUT
     public ModConfigSpec.IntValue midiDeviceVelocity;
@@ -29,6 +31,7 @@ public class ClientConfig {
     // SYNTH
     public ModConfigSpec.IntValue localBufferms;
     public ModConfigSpec.BooleanValue jitterCorrection;
+    public ModConfigSpec.BooleanValue jitterCorrectionLocal;
     public ModConfigSpec.IntValue latency;
     public ModConfigSpec.IntValue localLatency;
     public ModConfigSpec.ConfigValue<Integer> synthSampleRate;
@@ -36,6 +39,10 @@ public class ClientConfig {
     public ModConfigSpec.ConfigValue<String> soundfontPath;
 
     public ClientConfig(ModConfigSpec.Builder builder) {
+        builder.push(CLIENT_EFFECTS);
+        noteParticlesEnabled = builder.comment("Toggles whether Note Particles should be rendered when notes are played.")
+            .translation(MIMIMod.MODID + ".config.client.effects.particles.enabled")
+            .define("noteParticlesEnabled", true);
         builder.push(AUDIO_OUTPUT_CATEGORY_NAME);
         automaticAudioDevice = builder.comment("Whether or not MIMI should attempt to automatically determine the audio output device to use based on the Minecraft audio device. Works best on Windows.")
             .translation(MIMIMod.MODID + ".config.audio.automatic")
@@ -64,12 +71,15 @@ public class ClientConfig {
         jitterCorrection = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
             .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrection")
             .define("synthJitterCorrection", true);
+        jitterCorrectionLocal = builder.comment("Should the built-in midi synthesizer enable Jitter Correction? When enabled note timing will be more accurate but latency will increase.")
+            .translation(MIMIMod.MODID + ".config.midi.synth.jittercorrectionlocal")
+            .define("jitterCorrectionLocal", false);
         latency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes from other players? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.latency")
-            .defineInRange("synthBaselineLatency", 50, 10, 500);
+            .defineInRange("synthBaselineLatency", 50, 11, 200);
         localLatency = builder.comment("What baseline latency should the built-in midi synthesizer use (ms) for notes played by you? Smaller values will decrease latency but may cause stutter when playing notes. Very small values may cause notes to fail to play at all.")
             .translation(MIMIMod.MODID + ".config.midi.synth.localLatency")
-            .defineInRange("synthBaselineLocalLatency", 30, 10, 500);
+            .defineInRange("synthBaselineLocalLatency", 16, 11, 200);
         synthSampleRate = builder.comment("What sample rate should the built-in midi synthesizer use (hz)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8000,11025,16000,22050,44100,48000,96000]")
             .translation(MIMIMod.MODID + ".config.midi.synth.samplerate")
             .defineInList("synthSampleRate", 22050, Arrays.asList(8000,11025,16000,22050,44100,48000,96000));

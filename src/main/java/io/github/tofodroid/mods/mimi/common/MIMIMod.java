@@ -25,5 +25,6 @@ public class MIMIMod {
 
     public static void postRegister() {
         MIMIMod.proxy.init();
+        LOGGER.info("Hello worldy mate");
     }
 }
