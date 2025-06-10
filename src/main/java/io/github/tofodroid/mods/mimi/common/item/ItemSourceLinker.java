@@ -37,7 +37,7 @@ public class ItemSourceLinker extends Item {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
 
-        if(MidiNbtDataUtils.getMidiSource(stack) != null) {
+        if(MidiNbtDataUtils.getMidiSource(stack) == null) {
             tooltip.add(Component.literal("Crouch + Right-Click to Link to a Transmitter").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("Right-Click Block to Link it to Saved Transmitter").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
