@@ -13,6 +13,7 @@
             "tag": "minecraft:planks"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:ocarina"
     }

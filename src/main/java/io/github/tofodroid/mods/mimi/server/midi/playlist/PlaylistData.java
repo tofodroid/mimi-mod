@@ -104,7 +104,7 @@ public class PlaylistData extends SavedData {
 
         bval = TagUtils.getBooleanOrDefault(components, "favorite_mode", null);
         if(bval != null) {
-            data.favoriteMode = bval ? FavoriteMode.FAVORITE : FavoriteMode.FAVORITE;
+            data.favoriteMode = bval ? FavoriteMode.FAVORITE : FavoriteMode.NOT_FAVORITE;
         }
 
         bval = TagUtils.getBooleanOrDefault(components, "source_mode", null);

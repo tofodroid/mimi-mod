@@ -8,15 +8,16 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-public class TuningTableRecipe implements Recipe<CraftingInput>{
+public class TuningTableRecipe implements CraftingRecipe {
 	public static final TuningTableRecipe.Serializer SERIALIZER = new TuningTableRecipe.Serializer();
 
     private final Ingredient instrument;
@@ -115,5 +116,10 @@ public class TuningTableRecipe implements Recipe<CraftingInput>{
     @Override
     public ItemStack getResultItem(HolderLookup.Provider r) {
         return this.result;
+    }
+
+    @Override
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;
     }
 }

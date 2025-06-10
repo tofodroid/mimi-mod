@@ -16,6 +16,7 @@
             "item": "minecraft:iron_ingot"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:microphone"
     }

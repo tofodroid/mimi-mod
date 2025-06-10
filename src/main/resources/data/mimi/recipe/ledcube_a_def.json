@@ -19,6 +19,7 @@
             "item": "minecraft:blue_dye"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:ledcube_a",
         "count": 4
