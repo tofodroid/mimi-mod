@@ -9,7 +9,7 @@
         },
         {
             "type": "patchouli:text",
-            "text": "Other players can also link their instruments to your Transmitter by right-clicking you while holding the instrument that they want to link."
+            "text": "Other players can also link their instruments to your Transmitter by shift + right-clicking you while holding the instrument that they want to link."
         }
     ],
     "sortnum": 4

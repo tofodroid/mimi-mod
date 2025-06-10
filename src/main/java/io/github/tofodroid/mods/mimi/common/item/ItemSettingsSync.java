@@ -38,9 +38,9 @@ public class ItemSettingsSync extends Item {
         Integer settingType = getSettingType(stack);
 
         if(settingType < 0) {
-            tooltip.add(Component.literal("Crouch + Right Block Click to Copy Settings").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal("Crouch + Right-Click Block to Copy Settings").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Component.literal("Right Click Block of Same Type to Paste").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal("Right-Click Block of Same Type to Paste").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             tooltip.add(Component.literal(""));
         }
 

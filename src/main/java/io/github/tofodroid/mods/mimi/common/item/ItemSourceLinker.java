@@ -9,6 +9,7 @@ import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableTile;
 import io.github.tofodroid.mods.mimi.common.tile.TileRelay;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -36,6 +37,13 @@ public class ItemSourceLinker extends Item {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
 
+        if(MidiNbtDataUtils.getMidiSource(stack) != null) {
+            tooltip.add(Component.literal("Crouch + Right-Click to Link to a Transmitter").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        } else {
+            tooltip.add(Component.literal("Right-Click Block to Link it to Saved Transmitter").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        }
+
+        tooltip.add(Component.literal(""));
         MidiNbtDataUtils.appendMidiSourceTooltip(stack, tooltip);
     }
     

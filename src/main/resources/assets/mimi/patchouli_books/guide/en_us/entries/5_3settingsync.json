@@ -1,0 +1,18 @@
+{
+    "name": "Settings Synchronizer",
+    "icon": "mimi:settingssync",
+    "category": "mimi:5other",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Settings Synchronizer is an item which lets you copy-paste settings between MIMI blocks of the same type.$(br2)To use a Settings Synchronizer, craft one and then shift + right-click on a block to copy its settings to the Synchronizer. Then, right-click on any other blocks of the same type to paste the copied settings."
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:settingssync",
+            "link_recipe": true,
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}
