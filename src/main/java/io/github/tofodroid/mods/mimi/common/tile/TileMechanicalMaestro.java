@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerInventoryHolder;
 import io.github.tofodroid.mods.mimi.common.block.BlockMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.container.ContainerMechanicalMaestro;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.InstrumentBroadcastConsumer;
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -57,7 +57,7 @@ public class TileMechanicalMaestro extends AContainerTile {
         ItemStack oldStack = this.getItem(i);
         
         if(!oldStack.isEmpty()) {
-            this.allNotesOff(((IInstrumentItem)oldStack.getItem()).getInstrumentId());
+            this.reset(((IInstrumentItem)oldStack.getItem()).getInstrumentId());
         }
 
         super.setItem(i, item);
@@ -67,7 +67,7 @@ public class TileMechanicalMaestro extends AContainerTile {
     @Override
     public ItemStack removeItem(int i, int count) {
         ItemStack result = super.removeItem(i, count);
-        this.allNotesOff(((IInstrumentItem)result.getItem()).getInstrumentId());
+        this.reset(((IInstrumentItem)result.getItem()).getInstrumentId());
         this.refreshMidiReceivers();
         return result;
     }
@@ -75,14 +75,14 @@ public class TileMechanicalMaestro extends AContainerTile {
     @Override
     public ItemStack removeItemNoUpdate(int i) {
         ItemStack result = super.removeItemNoUpdate(i);
-        this.allNotesOff(((IInstrumentItem)result.getItem()).getInstrumentId());
+        this.reset(((IInstrumentItem)result.getItem()).getInstrumentId());
         this.refreshMidiReceivers();
         return result;
     }
     
     @Override
     public void clearContent() {
-        this.allNotesOff();
+        this.reset();
         super.clearContent();
         BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
     }
@@ -109,7 +109,7 @@ public class TileMechanicalMaestro extends AContainerTile {
         super.setRemoved();
 
         if(!this.getLevel().isClientSide()) {
-            this.allNotesOff();
+            this.reset();
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
@@ -119,7 +119,7 @@ public class TileMechanicalMaestro extends AContainerTile {
         super.onChunkUnloaded();
 
         if(!this.getLevel().isClientSide()) {
-            this.allNotesOff();
+            this.reset();
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
     }
@@ -137,18 +137,19 @@ public class TileMechanicalMaestro extends AContainerTile {
         return this.getItems().stream().anyMatch(i -> i.getItem() instanceof IInstrumentItem);
     }
 
-    public void allNotesOff() {
+    public void reset() {
         this.getItems().stream().forEach(i -> {
             if(i.getItem() instanceof IInstrumentItem) {
-                this.allNotesOff(((IInstrumentItem)i.getItem()).getInstrumentId());
+                this.reset(((IInstrumentItem)i.getItem()).getInstrumentId());
             }
         });
     }
     
-    public void allNotesOff(Byte instrumentId) {
+    public void reset(Byte instrumentId) {
 		if(instrumentId != null && this.getLevel() instanceof ServerLevel) {
 			ServerNoteConsumerManager.handlePacket(
-                MidiNotePacket.createAllNotesOffPacket(instrumentId, this.getUUID(), this.getBlockPos(), null),
+                NoteEventPacket.createResetPacket(instrumentId, this.getUUID(), this.getBlockPos(), null),
+                false,
                 this.getUUID(),
                 (ServerLevel)this.getLevel()
             );
@@ -175,7 +176,7 @@ public class TileMechanicalMaestro extends AContainerTile {
                 BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
                 BroadcastManager.registerConsumers(holder);
             } else {
-                this.allNotesOff();
+                this.reset();
                 BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
             }
         }

@@ -36,7 +36,7 @@ public class ModBindings {
 
         // MIDI All Off
         if(MIDIALLOFF.isDown() && MIMIMod.getProxy().isClient()) {
-            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().allNotesOff();
+            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().reset();
         }
 
         // GUIs
@@ -44,14 +44,14 @@ public class ModBindings {
             if(GUIFILECASTER.isDown() && EntityUtils.playerHasActiveTransmitter(playerIn)) {
                 ClientGuiWrapper.openTransmitterGui(worldIn, playerIn);
             } else if(MIDIGUIMAIN.isDown()) {
-                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.MAIN_HAND, playerIn.getItemInHand(InteractionHand.MAIN_HAND));
+                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, InteractionHand.MAIN_HAND, playerIn.getItemInHand(InteractionHand.MAIN_HAND));
             } else if(MIDIGUIOFF.isDown()) {
-                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, InteractionHand.OFF_HAND, playerIn.getItemInHand(InteractionHand.OFF_HAND));
+                ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, InteractionHand.OFF_HAND, playerIn.getItemInHand(InteractionHand.OFF_HAND));
             } else if(MIDIGUISEAT.isDown()) {
                 TileInstrument tile = BlockInstrument.getTileInstrumentForEntity(playerIn);
 
                 if(tile != null) {
-                    ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, tile.getInstrumentStack());
+                    ClientGuiWrapper.openInstrumentGui(worldIn, playerIn, null, null, tile.getSourceStack());
                 }
             } else if(MIDISETTINGS.isDown()) {
                 ClientGuiWrapper.openConfigGui(worldIn, playerIn);

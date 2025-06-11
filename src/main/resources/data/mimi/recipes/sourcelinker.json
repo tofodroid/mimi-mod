@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ISI"
+    ],
+    "key": {
+        "I": {
+            "item": "minecraft:iron_nugget"
+        },
+        "S": {
+            "item": "minecraft:string"
+        }
+    },
+    "category": "misc",
+    "result": {
+        "item": "mimi:sourcelinker"
+    }
+}

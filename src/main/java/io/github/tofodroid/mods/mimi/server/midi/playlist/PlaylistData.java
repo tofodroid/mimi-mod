@@ -43,9 +43,9 @@ public class PlaylistData extends SavedData {
             data.sourceMode = tag.getBoolean("SOURCE_MODE") ? SourceMode.CLIENT : SourceMode.SERVER;
         }
 
-        if(tag.contains("SHUFFLED")) {
+        if(tag.contains("shuffled")) {
             data.isShuffled = true;
-            data.shuffleSeed = tag.getInt("SHUFFLED");
+            data.shuffleSeed = tag.getInt("shuffled");
         }
 
         return data;
@@ -82,9 +82,9 @@ public class PlaylistData extends SavedData {
         }
 
         if(data.isShuffled) {
-            resultTag.putInt("SHUFFLED", data.shuffleSeed);
+            resultTag.putInt("shuffled", data.shuffleSeed);
         } else {
-            resultTag.remove("SHUFFLED");
+            resultTag.remove("shuffled");
         }
 
         return resultTag;

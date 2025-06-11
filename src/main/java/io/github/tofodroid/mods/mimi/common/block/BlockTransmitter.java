@@ -51,25 +51,30 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        TileTransmitter tile = getTileForBlock(worldIn, pos);
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        ItemStack stack = player.getItemInHand(hand);
+        TileTransmitter tile = getTileForBlock(level, pos);
         
-        if(tile != null) {
-            ItemStack handStack = player.getItemInHand(hand);
-
-            if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER) || handStack.getItem().equals(ModItems.RELAY))) {
-                if(!worldIn.isClientSide) {
-                    String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
-                    MidiNbtDataUtils.setMidiSourceFromTransmitter(handStack, tile.getUUID(), transmitterName);
-                    player.setItemInHand(hand, handStack);
-                    player.displayClientMessage(Component.literal("Linked to Transmitter"), true);
+        if(stack.getItem() instanceof IInstrumentItem || stack.getItem().equals(ModItems.RECEIVER) || stack.getItem().equals(ModItems.RELAY) || stack.getItem().equals(ModItems.SOURCELINKER)) {
+            if(tile != null && player.isCrouching()) {
+                // Server: Link | Client: Don't open GUI
+                if(!level.isClientSide) {
+                    String transmitterName = level.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
+                    MidiNbtDataUtils.setMidiSourceFromTransmitter(stack, tile.getUUID(), transmitterName);
+                    player.setItemInHand(player.getUsedItemHand(), stack);
+                    Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(this.getName());
+                    player.displayClientMessage(message, true);
                 }
-            } else if(worldIn.isClientSide) {
-                ClientGuiWrapper.openTransmitterBlockGui(worldIn, tile.getUUID());
+                return InteractionResult.SUCCESS;
             }
         }
 
-        return InteractionResult.SUCCESS;
+        if(tile != null && level.isClientSide) {
+            ClientGuiWrapper.openTransmitterBlockGui(level, tile.getUUID());
+            return InteractionResult.SUCCESS;
+        }
+
+        return super.use(state, level, pos, player, hand, hit);
     }
 
     @Override

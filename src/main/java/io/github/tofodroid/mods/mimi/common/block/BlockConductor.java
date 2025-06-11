@@ -18,7 +18,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -98,10 +97,10 @@ public class BlockConductor extends AConfigurableTileBlock<TileConductor> {
     }
 
     @Override
-    protected void openGui(Level worldIn, Player player, TileConductor tile) {
-        //ClientGuiWrapper.openConductorGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
-
-        player.sendSystemMessage(Component.translatableWithFallback("block.mimi.conductor.wip", "Coming soon!"));
+    public OpenGuiWrapper openGuiWrapper() {
+        return (level, player, tilePos, handIn, itemStack) -> {
+            player.sendSystemMessage(Component.translatableWithFallback("block.mimi.conductor.wip", "Coming soon!"));
+        };
     }
 
     @Override

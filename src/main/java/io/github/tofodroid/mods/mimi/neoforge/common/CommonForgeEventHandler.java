@@ -2,10 +2,11 @@ package io.github.tofodroid.mods.mimi.neoforge.common;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.world.ModStructures;
+import io.github.tofodroid.mods.mimi.server.events.ServerEventHandler;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.PlayerTransmitterProducerEventHandler;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.producer.transmitter.ServerTransmitterManager;
+import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumer;
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
@@ -34,8 +35,9 @@ public class CommonForgeEventHandler {
         if(!(event.getEntity() instanceof ServerPlayer)) {
             return;
         }
+        ServerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         ServerMidiManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
-        PlayerTransmitterProducerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());
+        ServerTransmitterManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         EntityInstrumentConsumerEventHandler.onPlayerLoggedIn((ServerPlayer)event.getEntity());
         ServerNoteConsumerManager.onPlayerLoggedIn((ServerPlayer)event.getEntity());
     }
@@ -46,7 +48,7 @@ public class CommonForgeEventHandler {
             return;
         }
         ServerMidiManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
-        PlayerTransmitterProducerEventHandler.onPlayerLoggedOut((ServerPlayer)event.getEntity());
+        ServerTransmitterManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
         EntityInstrumentConsumerEventHandler.onPlayerLoggedOut((ServerPlayer)event.getEntity());
         ServerNoteConsumerManager.onPlayerLoggedOut((ServerPlayer)event.getEntity());
     }
@@ -109,6 +111,7 @@ public class CommonForgeEventHandler {
         }
         BroadcastManager.onServerTick();
         ServerNoteConsumerManager.onServerTick();
+        ServerNoteConsumer.onServerTick();
         ServerMidiUploadManager.onServerTick();
     }
 

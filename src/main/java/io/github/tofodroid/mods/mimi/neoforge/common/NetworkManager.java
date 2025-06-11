@@ -9,12 +9,14 @@ import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPack
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacket;
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MultiNoteEventPacket;
+import io.github.tofodroid.mods.mimi.common.network.MultiNoteEventPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
@@ -64,7 +66,7 @@ public class NetworkManager {
     }
 
     public static void registerPackets(final IPayloadRegistrar registrar) {
-        registerMessage(registrar, MidiNotePacket.ID, MidiNotePacket::decodePacket, MidiNotePacketHandler::handlePacketClient, MidiNotePacketHandler::handlePacketServer);
+        registerMessage(registrar, NoteEventPacket.ID, NoteEventPacket::decodePacket, NoteEventPacketHandler::handlePacketClient, NoteEventPacketHandler::handlePacketServer);
         registerMessage(registrar, SyncInstrumentPacket.ID, SyncInstrumentPacket::decodePacket, SyncInstrumentPacketHandler::handlePacketClient, SyncInstrumentPacketHandler::handlePacketServer);
         registerMessage(registrar, ServerMusicPlayerStatusPacket.ID, ServerMusicPlayerStatusPacket::decodePacket, ServerMusicPlayerStatusPacketHandler::handlePacketClient, ServerMusicPlayerStatusPacketHandler::handlePacketServer);
         registerMessage(registrar, ServerMusicPlayerSongListPacket.ID, ServerMusicPlayerSongListPacket::decodePacket, ServerMusicPlayerSongListPacketHandler::handlePacketClient, ServerMusicPlayerSongListPacketHandler::handlePacketServer);
@@ -74,8 +76,9 @@ public class NetworkManager {
         registerMessage(registrar, TransmitterControlPacket.ID, TransmitterControlPacket::decodePacket, TransmitterControlPacketHandler::handlePacketClient, TransmitterControlPacketHandler::handlePacketServer);
         registerMessage(registrar, ServerMidiUploadPacket.ID, ServerMidiUploadPacket::decodePacket, ServerMidiUploadPacketHandler::handlePacketClient, ServerMidiUploadPacketHandler::handlePacketServer);
         registerMessage(registrar, EffectEmitterUpdatePacket.ID, EffectEmitterUpdatePacket::decodePacket, EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer);
-        registerMessage(registrar, MultiMidiNotePacket.ID, MultiMidiNotePacket::decodePacket, MultiMidiNotePacketHandler::handlePacketClient, MultiMidiNotePacketHandler::handlePacketServer);
+        registerMessage(registrar, MultiNoteEventPacket.ID, MultiNoteEventPacket::decodePacket, MultiNoteEventPacketHandler::handlePacketClient, MultiNoteEventPacketHandler::handlePacketServer);
         registerMessage(registrar, MidiDeviceBroadcastPacket.ID, MidiDeviceBroadcastPacket::decodePacket, MidiDeviceBroadcastPacketHandler::handlePacketClient, MidiDeviceBroadcastPacketHandler::handlePacketServer);
+        registerMessage(registrar, MIMIConfigPacket.ID, MIMIConfigPacket::decodePacket, MIMIConfigPacketHandler::handlePacketClient, MIMIConfigPacketHandler::handlePacketServer);
     }
 
     public static <T extends CustomPacketPayload> void registerMessage(final IPayloadRegistrar registrar, final ResourceLocation packetId, FriendlyByteBuf.Reader<T> decoder, Consumer<T> handleClient, BiConsumer<T, ServerPlayer> handleServer) {
