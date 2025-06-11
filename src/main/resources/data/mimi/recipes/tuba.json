@@ -16,6 +16,7 @@
             "item": "minecraft:stone_button"
         }
     },
+    "category": "misc",
     "result": {
         "item": "mimi:tuba"
     }

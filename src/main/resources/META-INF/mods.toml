@@ -13,12 +13,13 @@ displayURL="https://github.com/tofodroid/mimi-mod"
 authors="${mod_authors}"
 description='''${mod_description}'''
 
+# The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
+
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
 
-# The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
-#[[mixins]]
-#config="${mod_id}.mixins.json"
+[[mixins]]
+config="mimi.mixins.json"
 
 [[dependencies.${mod_id}]]
     modId="${engine_name}"

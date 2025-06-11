@@ -4,6 +4,7 @@ plugins {
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 version = mod_version
@@ -17,6 +18,7 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+apply plugin: 'org.spongepowered.mixin'
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
     // Channel:   Version:
@@ -74,6 +76,10 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
+            
+            // Mixin
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
         }
 
         client {
@@ -113,6 +119,7 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven { url 'https://maven.blamejared.com' }
 }
 
 dependencies {
@@ -127,12 +134,14 @@ dependencies {
     // JEI
     implementation fg.deobf("curse.maven:jei-238222:4644453")
 
-    // Patchouli
-    //implementation fg.deobf("curse.maven:patchouli-306770:4636277")
+    // Note: Patchouli does not seem to support Forge 1.20.4+, so attempt to use NeoForge lib
+    compileOnly("vazkii.patchouli:Patchouli:1.20.4-85-NEOFORGE")
+}
 
-    // Runtime
-    // 
-    implementation fg.deobf("curse.maven:spark-361579:4738952")
+mixin {
+    // MixinGradle Settings
+    add sourceSets.main, 'mimi.mixins.refmap.json'
+    config 'mimi.mixins.json'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -171,7 +180,8 @@ tasks.named('jar', Jar).configure {
             'Specification-Version'   : '1', // We are version 1 of ourselves
             'Implementation-Title'    : project.name,
             'Implementation-Version'  : project.jar.archiveVersion,
-            'Implementation-Vendor'   : mod_authors
+            'Implementation-Vendor'   : mod_authors,
+            "MixinConfigs"            : "mimi.mixins.json"
         ])
     }
 

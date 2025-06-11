@@ -22,6 +22,10 @@ public abstract class AConfigurableTile extends AStaticInventoryTile {
         if(stack.getItem().getClass().equals(this.getBlockState().getBlock().asItem().getClass())) {
             this.setItem(SOURCE_STACK_SLOT, stack);
             this.onSourceStackChanged();
+
+            if(getLevel() != null) {
+                getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
+            }
         }
     }
 

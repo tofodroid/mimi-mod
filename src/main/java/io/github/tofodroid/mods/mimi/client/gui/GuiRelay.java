@@ -1,5 +1,6 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
+import io.github.tofodroid.mods.mimi.util.ByteUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.Vector2Int;
 import io.github.tofodroid.mods.mimi.client.gui.widget.BroadcastRangeWidget;
@@ -11,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -45,11 +47,13 @@ public class GuiRelay extends BaseGui {
     private final Player player;
     private final ItemStack relayStack;
     private final BlockPos tilePos;
+    private final InteractionHand handIn;
 
-    public GuiRelay(Player player, BlockPos tilePos, ItemStack relayStack) {
+    public GuiRelay(Player player, BlockPos tilePos, InteractionHand handIn, ItemStack relayStack) {
         super(300, 177, 300, "textures/gui/container_relay.png", "item.MIMIMod.gui_relay");
         this.player = player;
         this.tilePos = tilePos;
+        this.handIn = handIn;
 
         if(relayStack == null || relayStack.isEmpty()) {
             MIMIMod.LOGGER.error("Relay stack is null or empty. Force closing GUI!");
@@ -69,7 +73,7 @@ public class GuiRelay extends BaseGui {
     }
 
     public void syncRelayToServer() {
-        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(relayStack, tilePos));
+        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(relayStack, tilePos, handIn));
     }
 
     public Byte channelButtonClicked(int imouseX, int imouseY, Vector2Int channelOne, Vector2Int channelTwo) {
@@ -146,7 +150,7 @@ public class GuiRelay extends BaseGui {
 
         // Lights
         // Channel 1
-        if(MidiNbtDataUtils.isChannelEnabled(relayStack, Integer.valueOf(0).byteValue())) {
+        if(MidiNbtDataUtils.isChannelEnabled(relayStack, ByteUtils.ZERO)) {
             this.blitRelative(graphics, CHANNEL_ONE_LIGHT_COORDS.x, CHANNEL_ONE_LIGHT_COORDS.y, 0, 177, 3, 3);
         }
 
@@ -169,7 +173,7 @@ public class GuiRelay extends BaseGui {
 
         // Mappings
         // Channel 1
-        Integer mapValue = MidiNbtDataUtils.getChannelMap(relayStack, Integer.valueOf(0).byteValue())+1;
+        Integer mapValue = MidiNbtDataUtils.getChannelMap(relayStack, ByteUtils.ZERO)+1;
         this.drawStringRelative(graphics, mapValue < 10 ? "0" + mapValue : mapValue.toString() , CHANNEL_ONE_SCREEN_COORDS.x, CHANNEL_ONE_SCREEN_COORDS.y, 0xFF00E600);
 
         // Others
