@@ -9,7 +9,7 @@ public class PlayerTransmitterBroadcastProducer extends ATransmitterBroadcastPro
     protected ServerPlayer player;
 
     public PlayerTransmitterBroadcastProducer(ServerPlayer player) {
-        super(player.getUUID(), new PlayerPlaylistHandler(player), player::getOnPos, () -> player.getLevel().dimension());
+        super(player.getUUID(), new PlayerPlaylistHandler(player), () -> EntityUtils.getEntityHeadPos(player), () -> player.getLevel().dimension());
         this.player = player;
     }
 

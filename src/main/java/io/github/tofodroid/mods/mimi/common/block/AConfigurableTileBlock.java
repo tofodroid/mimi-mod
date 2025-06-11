@@ -22,25 +22,36 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extends AContainerBlock<B> {
+    @FunctionalInterface
+    public interface OpenGuiWrapper {
+        void accept(Level level, Player player, BlockPos tilePos, InteractionHand handIn, ItemStack sourceStack);
+    }
 
     public AConfigurableTileBlock(Properties builder) {
         super(builder);
     }
 
-    protected abstract void openGui(Level worldIn, Player player, B tile);
+    public abstract OpenGuiWrapper openGuiWrapper();
     protected abstract void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip);
+    
+    protected Boolean shouldSkipUse(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand) {
+        return false;
+    }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {        
+        if(shouldSkipUse(state, worldIn, pos, player, hand)) {
+            return worldIn.isClientSide ? InteractionResult.CONSUME : InteractionResult.PASS;
+        }
+        
         B tile = getTileForBlock(worldIn, pos);
         
         if(tile != null) {
-           if(worldIn.isClientSide) {
-                this.openGui(worldIn, player, tile);
+            if(worldIn.isClientSide) {
+                this.openGuiWrapper().accept(worldIn, player, tile.getBlockPos(), null, tile.getSourceStack());
                 return InteractionResult.CONSUME;
             }
         }
-
         return InteractionResult.SUCCESS;
     }
 
@@ -75,5 +86,23 @@ public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extend
     @Override
     public List<ItemStack> getDrops(BlockState p_60537_, LootContext.Builder p_60538_) {
         return Arrays.asList();
+    }
+    
+    
+    public ItemStack getSourceStack(Level worldIn, BlockPos pos) {
+        B tile = getTileForBlock(worldIn, pos);
+
+        if(tile != null) {
+            return tile.getSourceStack();
+        }
+        return null;
+    }
+
+    public void setSourceStack(Level worldIn, BlockPos pos, ItemStack stack) {
+        B tile = getTileForBlock(worldIn, pos);
+
+        if(tile != null) {
+            tile.setSourceStack(stack);
+        }
     }
 }

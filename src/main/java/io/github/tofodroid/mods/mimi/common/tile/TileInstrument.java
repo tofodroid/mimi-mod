@@ -2,23 +2,17 @@ package io.github.tofodroid.mods.mimi.common.tile;
 
 import org.joml.Vector3d;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.item.IColorableItem;
-import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.consumer.instrument.EntityInstrumentConsumerEventHandler;
-import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileInstrument extends AStaticInventoryTile {
+public class TileInstrument extends AConfigurableTile {
     public static final String REGISTRY_NAME = "instrument";
     public static final String COLOR_TAG = "color";
     protected EntitySeat currentSeat = null;
@@ -28,7 +22,6 @@ public class TileInstrument extends AStaticInventoryTile {
         super(ModTiles.INSTRUMENT, pos, state, 1);
     }
 
-    @SuppressWarnings("resource")
     public void attemptSit(Player player) {
         if(player.getLevel().isClientSide) {
             return;
@@ -70,19 +63,16 @@ public class TileInstrument extends AStaticInventoryTile {
         }
     }
 
-    public void setInstrumentStack(ItemStack stack) {
-        if(stack.getItem() instanceof IInstrumentItem) {
-            this.setItem(0, stack);
-            
-            if(this.blockInstrument().isColorable() && ((IColorableItem)stack.getItem()).hasColor(stack)) {
-                this.color = ((IColorableItem)stack.getItem()).getColor(stack);
-            }
+    @Override
+    protected void onSourceStackChanged() {
+        if(this.blockInstrument().isColorable() && ((IColorableItem)this.getSourceStack().getItem()).hasColor(this.getSourceStack())) {
+            this.color = ((IColorableItem)this.getSourceStack().getItem()).getColor(this.getSourceStack());
+        }
 
-            Player currentPlayer = this.getCurrentPlayer();
+        Player currentPlayer = this.getCurrentPlayer();
 
-            if(currentPlayer != null) {
-                EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(currentPlayer);
-            }
+        if(currentPlayer != null) {
+            EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(currentPlayer);
         }
     }
 
@@ -107,14 +97,6 @@ public class TileInstrument extends AStaticInventoryTile {
         if(currentPlayer != null && !this.getLevel().isClientSide()) {
             this.ejectPlayer();
             EntityInstrumentConsumerEventHandler.reloadEntityInstrumentConsumers(currentPlayer);
-        }
-    }
-
-    public ItemStack getInstrumentStack() {
-        if(items.isEmpty() || items.get(0) == null) {
-            return ItemStack.EMPTY;
-        } else {
-            return items.get(0);
         }
     }
 
@@ -147,68 +129,8 @@ public class TileInstrument extends AStaticInventoryTile {
         }
     }
 
-    @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
-        
-        // Fallback for missing stack data
-        if(this.items.get(0).isEmpty()) {
-            MIMIMod.LOGGER.warn("TileInstrument had no saved instrument stack! Re-initializing.");
-            this.setInstrumentStack(this.initializeInstrumentStack());
-        }
-
-        // START TEMPORARY LEGACY COMPATIBILITY CODE
-        // Fallback for stack missing color
-        if(compound.contains(COLOR_TAG) && !this.hasColor()) {
-            this.color = compound.getInt(COLOR_TAG);
-            ItemStack stack = this.getInstrumentStack();
-            ((IColorableItem)stack.getItem()).setColor(stack, this.color);
-            this.setInstrumentStack(stack);
-        }
-        // END TEMPORARY LEGACY COMPATIBILITY CODE
-    }
-
-    @Override
-    public void loadItems(CompoundTag compound) {
-        // START TEMPORARY LEGACY COMPATIBILITY CODE
-        // Filter out switchboard items so that we can convert them
-        ListTag listtag = compound.getList("Items", 10);
-        ItemStack convertStack = null;
-
-        if(listtag.size() > 0) {
-            CompoundTag stackTag = listtag.getCompound(0);
-            String itemId = stackTag.getString("id");
-
-            if(itemId.equalsIgnoreCase("mimi:switchboard")) {
-                convertStack = initializeInstrumentStack(MidiNbtDataUtils.convertSwitchboardToDataTag(stackTag.getCompound("tag")));
-
-                if(compound.contains(COLOR_TAG)) {
-                    ((IColorableItem)convertStack.getItem()).setColor(convertStack, compound.getInt(COLOR_TAG));
-                }
-            }
-        }
-
-        ContainerHelper.loadAllItems(compound, items);
-
-        if(convertStack != null) {  
-            this.setInstrumentStack(convertStack);
-        }
-        // END TEMPORARY LEGACY COMPATIBILITY CODE
-    }
-
-    private ItemStack initializeInstrumentStack() {
-        return this.initializeInstrumentStack(null);
-    }
-
-    private ItemStack initializeInstrumentStack(CompoundTag stackTag) {
-        ItemStack instrumentStack = new ItemStack(this.blockInstrument().asItem(), 1);
-
-        if(stackTag != null) {
-            instrumentStack.setTag(stackTag);
-        } else {
-            instrumentStack.setTag(new CompoundTag());
-        }
-
-        return instrumentStack;
+    public void onItemsLoaded() {
+        super.onItemsLoaded();
+        this.onSourceStackChanged();
     }
 }

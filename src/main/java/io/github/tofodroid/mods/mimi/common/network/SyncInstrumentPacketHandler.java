@@ -19,7 +19,7 @@ public class SyncInstrumentPacketHandler {
             instrumentStack = sender.getItemInHand(message.handIn);
         } else {
             tileInstrument = BlockInstrument.getTileInstrumentForEntity(sender);
-            instrumentStack = tileInstrument.getInstrumentStack();
+            instrumentStack = tileInstrument.getSourceStack();
         }
         
         MidiNbtDataUtils.setMidiSource(instrumentStack, message.midiSource, message.midiSourceName);
@@ -30,8 +30,7 @@ public class SyncInstrumentPacketHandler {
         if(tileInstrument == null) {
             sender.setItemInHand(message.handIn, instrumentStack);
         } else {
-            tileInstrument.setInstrumentStack(instrumentStack);
-            sender.getLevel().sendBlockUpdated(tileInstrument.getBlockPos(), tileInstrument.getBlockState(), tileInstrument.getBlockState(), 2);
+            tileInstrument.setSourceStack(instrumentStack);
         }
     }
 }

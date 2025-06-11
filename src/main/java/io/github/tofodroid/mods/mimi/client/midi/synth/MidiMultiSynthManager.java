@@ -18,7 +18,7 @@ import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.client.midi.AudioOutputDeviceManager;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerTimeSyncPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.util.TimeUtils;
@@ -33,8 +33,8 @@ public class MidiMultiSynthManager {
     protected Soundbank soundbank = null;
     protected Integer midiTickCounter = 0;
     public AudioOutputDeviceManager audioDeviceManager;
-    protected LocalPlayerMIMISynth localSynth;
-    protected ServerPlayerMIMISynth networkSynth;
+    protected LocalNoteMIMISynth localSynth;
+    protected BroadcastedNoteMIMISynth networkSynth;
 
     public MidiMultiSynthManager() {
         this.audioDeviceManager = new AudioOutputDeviceManager();
@@ -50,14 +50,13 @@ public class MidiMultiSynthManager {
         }
     }
 
-    @SuppressWarnings("resource")
     public void handleClientTick() {
         midiTickCounter++;
 
         // Pause Synths on Game Paused
         Boolean gamePaused = Minecraft.getInstance().isPaused();
         if(!paused && gamePaused) {
-            this.allNotesOff();
+            this.reset();
             paused = true;
         } else if(paused && !gamePaused) {
             paused = false;
@@ -95,10 +94,10 @@ public class MidiMultiSynthManager {
             networkSynth.close();
 
         Pair<AudioFormat, SourceDataLine> netOutLine = audioDeviceManager.getOutputFormatLine();
-        this.networkSynth = new ServerPlayerMIMISynth(netOutLine.getLeft(), netOutLine.getRight(), ConfigProxy.getJitterCorrection(), ConfigProxy.getLatency(), this.soundbank);
+        this.networkSynth = new BroadcastedNoteMIMISynth(netOutLine.getLeft(), netOutLine.getRight(), ConfigProxy.getJitterCorrection(), ConfigProxy.getLatency(), this.soundbank);
         
         Pair<AudioFormat, SourceDataLine> localOutLine = audioDeviceManager.getOutputFormatLine();
-        this.localSynth = new LocalPlayerMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), ConfigProxy.getJitterCorrection(), ConfigProxy.getLocalLatency(), this.soundbank);
+        this.localSynth = new LocalNoteMIMISynth(localOutLine.getLeft(), localOutLine.getRight(), ConfigProxy.getLocalJitterCorrection(), ConfigProxy.getLocalLatency(), this.soundbank);
     }
 
     public Long getBufferTime(Long noteServerTime) {
@@ -107,18 +106,17 @@ public class MidiMultiSynthManager {
 
     public void close() {
         if(localSynth != null) {
-            localSynth.allNotesOff();
+            localSynth.reset();
             localSynth.close();
         }
 
         if(networkSynth != null) {
-            networkSynth.allNotesOff();
+            networkSynth.reset();
             networkSynth.close();
         }
     }
 
-    @SuppressWarnings("resource")
-    public void sendToGui(MidiNotePacket message) {
+    public void sendToGui(NoteEventPacket message) {
         if(Minecraft.getInstance().player == null || !message.player.equals(Minecraft.getInstance().player.getUUID()) || Minecraft.getInstance().screen == null || !(Minecraft.getInstance().screen instanceof GuiInstrument)) {
             return;
         }
@@ -126,68 +124,66 @@ public class MidiMultiSynthManager {
         GuiInstrument gui = (GuiInstrument)Minecraft.getInstance().screen;
 
         if(message.instrumentId == gui.getInstrumentId() && message.instrumentHand == gui.getHandIn()) {
-            if(message.velocity > 0) {
-                gui.onExternalNotePress(message.note);
+            if(message.data2 > 0) {
+                gui.onExternalNotePress(message.data1);
             } else {
-                gui.onExternalNoteRelease(message.note);
+                gui.onExternalNoteRelease(message.data1);
             }
         }
     }
 
-    @SuppressWarnings("resource")
-    public void handlePacket(MidiNotePacket message) {
+    public void handlePacket(NoteEventPacket message) {
+        handleEventOnSynth(message, networkSynth, getBufferTime(message.noteServerTime));
+    }
+    
+    public void handleLocalPacketInstant(NoteEventPacket message) {
+        handleEventOnSynth(message, localSynth, TimeUtils.getNowTime());
+    }
+
+    private void handleEventOnSynth(NoteEventPacket message, AMIMISynth<?> synth, Long timestamp) {
         if(loggingOff || Minecraft.getInstance().player == null)
             return;
 
-        if(networkSynth != null) {
-            if(!message.isControlPacket()) {
-                if(message.velocity > 0 && !Minecraft.getInstance().isPaused()) {
-                    //MIMIMod.LOGGER.info("Note On: " + message.note + " | " + message.instrumentId + " | " + message.noteServerTime);
-                    networkSynth.noteOn(message, getBufferTime(message.noteServerTime));
-                } else if(message.velocity <= 0) {
-                    //MIMIMod.LOGGER.info("Note Off: " + message.note + " | " + message.instrumentId + " | " + message.noteServerTime);
-                    networkSynth.noteOff(message, getBufferTime(message.noteServerTime));
-                }
-                this.sendToGui(message);
-            } else if(message.isControlPacket() && !message.isAllNotesOffPacket() && !Minecraft.getInstance().isPaused()) {
-                networkSynth.controlChange(message, getBufferTime(message.noteServerTime));
+        if(synth != null && !Minecraft.getInstance().isPaused()) {
+            switch(message.type) {
+                case NOTE_ON:
+                    synth.noteOn(message, timestamp);
+                    this.sendToGui(message);
+                    break;
+                case NOTE_OFF:
+                    synth.noteOff(message, timestamp);
+                    this.sendToGui(message);
+                    break;
+                case RESET:
+                    synth.reset();
+                    break;
+                case CONTROL:
+                    synth.controlChange(message, timestamp);
+                    break;
+                case PITCH_BEND:
+                    synth.pitchBend(message, timestamp);
+                default: break;
             }
-        }
-    }
-    
-    public void handleLocalPacketInstant(MidiNotePacket message) {
-        if(loggingOff) return;
-
-        if(localSynth != null) {
-            if(!message.isControlPacket()) {
-                if(message.velocity > 0) {
-                    localSynth.noteOn(message, TimeUtils.getNowTime());
-                } else if(message.velocity <= 0) {
-                    localSynth.noteOff(message, TimeUtils.getNowTime());
-                }
-                this.sendToGui(message);
-            } else if(message.isControlPacket() && !message.isAllNotesOffPacket()) {
-                localSynth.controlChange(message, TimeUtils.getNowTime());
-            }
+        } else if(Minecraft.getInstance().isPaused()) {
+            synth.reset();
         }
     }
 
-    @SuppressWarnings("resource")
     public void handlePlayerTick(Player player) {
         if(player.getUUID().equals(Minecraft.getInstance().player.getUUID())) {
             if(!player.isAlive() && !this.dead) {
-                this.allNotesOff();
+                this.reset();
             } else {
                 this.dead = !player.isAlive();
             }
         }
     }
 
-    public void allNotesOff() {
+    public void reset() {
         if(localSynth != null)
-            localSynth.allNotesOff();
+            localSynth.reset();
         if(networkSynth != null)
-            networkSynth.allNotesOff();
+            networkSynth.reset();
     }
     
     protected Soundbank openSoundbank(String resourcePath) {

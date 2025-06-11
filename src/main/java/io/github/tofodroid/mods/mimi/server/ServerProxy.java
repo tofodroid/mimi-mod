@@ -7,11 +7,12 @@ import io.github.tofodroid.mods.mimi.util.TimeUtils;
 public class ServerProxy implements Proxy {
     private Boolean initialized = false;
     private final Long serverStartEpoch = TimeUtils.getNowTime();
-    private FilesystemMidiFileProvider MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
+    private FilesystemMidiFileProvider MIDI_FILES;
 
     @Override
     public void init() {
-        MIDI_FILES.refresh(true);
+        MIDI_FILES = new FilesystemMidiFileProvider(true);
+        MIDI_FILES.loadSongs();
         this.initialized = true;
     }
 
