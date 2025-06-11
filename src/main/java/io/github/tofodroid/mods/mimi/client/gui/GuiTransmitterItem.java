@@ -32,6 +32,7 @@ public class GuiTransmitterItem extends GuiTransmitterBlock {
     protected static final Vector2Int SOURCE_FILTER_SCREEN = new Vector2Int(283,33);
     protected static final Vector2Int OPEN_LOCAL_FOLDER_BUTTON = new Vector2Int(10,32);
     protected static final Vector2Int EDIT_LOCAL_FOLDER_BUTTON = new Vector2Int(28, 32);
+    protected static final Vector2Int REFRESH_FOLDER_BUTTON = new Vector2Int(10,32);
     
     // Widgets
     private EditBox folderPathField;
@@ -89,12 +90,12 @@ public class GuiTransmitterItem extends GuiTransmitterBlock {
                 if(this.folderPathString != null) {
                     ConfigProxy.setTransmitterMidiPath(this.folderPathString);
                     MIMIMod.getProxy().clientMidiFiles().setDirectory(this.folderPathString);
-                    MIMIMod.getProxy().clientMidiFiles().refresh(true);
+                    MIMIMod.getProxy().clientMidiFiles().loadSongs();
                     NetworkProxy.sendToServer(new ClientMidiListPacket(MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
                 } else {
                     ConfigProxy.setTransmitterMidiPath("");
                     MIMIMod.getProxy().clientMidiFiles().init();
-                    MIMIMod.getProxy().clientMidiFiles().refresh(true);
+                    MIMIMod.getProxy().clientMidiFiles().loadSongs();
                     NetworkProxy.sendToServer(new ClientMidiListPacket(MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
                 }
                 this.editMode = false;
@@ -164,9 +165,14 @@ public class GuiTransmitterItem extends GuiTransmitterBlock {
     
     @Override
     protected void startRefreshSongList() {
-        MIMIMod.getProxy().clientMidiFiles().refresh(true);
         NetworkProxy.sendToServer(new ClientMidiListPacket(MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
         NetworkProxy.sendToServer(new ServerMusicPlayerSongListPacket(musicPlayerId));
+    }
+
+    @Override
+    protected void onRefreshClick() {
+        MIMIMod.getProxy().clientMidiFiles().loadSongs();
+        this.startRefreshSongList();
     }
     
     protected void handlePathChange(String folderPath) {

@@ -6,11 +6,13 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.sound.midi.Sequence;
+import javax.sound.midi.ShortMessage;
 
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacket;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.ABroadcastProducer;
+import io.github.tofodroid.mods.mimi.server.events.broadcast.api.AServerBroadcastProducer;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import io.github.tofodroid.mods.mimi.server.midi.playlist.APlaylistHandler;
 import io.github.tofodroid.mods.mimi.server.midi.transmitter.ServerMidiSequencer;
@@ -18,7 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public abstract class ATransmitterBroadcastProducer extends ABroadcastProducer {
+public abstract class ATransmitterBroadcastProducer extends AServerBroadcastProducer {
     protected Boolean loading = false;
     protected Boolean loadFailed = false;
     protected Boolean shouldPlayNextLoad = false;
@@ -28,7 +30,11 @@ public abstract class ATransmitterBroadcastProducer extends ABroadcastProducer {
     public ATransmitterBroadcastProducer(UUID id, APlaylistHandler playlistHandler, Supplier<BlockPos> blockPos, Supplier<ResourceKey<Level>> dimension) {
         super(id, blockPos, dimension);
         this.playlistHandler = playlistHandler;
-        this.midiHandler = new ServerMidiSequencer(this::broadcast, this::onSongEnd);
+        this.midiHandler = new ServerMidiSequencer(this::handleMidiMessage, this::onSongEnd);
+    }
+
+    public void handleMidiMessage(ShortMessage message) {
+        this.broadcast(BroadcastEvent.fromShortMessage(message, getOwnerId(), getDimension(), getBlockPos(), getBroadcastRange()));
     }
 
     public void onLoad() {
@@ -62,12 +68,12 @@ public abstract class ATransmitterBroadcastProducer extends ABroadcastProducer {
 
     public void pause() {
         this.midiHandler.pause();
-        this.allNotesOff();
+        this.reset();
     }
 
     public void stop() {
         this.midiHandler.stop();
-        this.allNotesOff();
+        this.reset();
     }
 
     public void seek(Integer percent) {
@@ -147,7 +153,7 @@ public abstract class ATransmitterBroadcastProducer extends ABroadcastProducer {
     @Override
     public void close() {
         this.midiHandler.stop();
-        this.allNotesOff();
+        this.reset();
         this.midiHandler.close();
     }
 

@@ -3,6 +3,7 @@ package io.github.tofodroid.mods.mimi.integration.jei;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -19,13 +20,13 @@ public class TuningTableRecipeCategory implements IRecipeCategory<TuningTableRec
 	private final String title;
 	private final IDrawable icon;
 	private final IDrawable background;
-	public static final ResourceLocation CATEGORY_UID = new ResourceLocation(MIMIMod.MODID, "tuning");
+	public static final ResourceLocation CATEGORY_UID = ResourceUtils.newModLocation("tuning");
     public static final RecipeType<TuningTableRecipe> RECIPE_TYPE = new RecipeType<TuningTableRecipe>(CATEGORY_UID, TuningTableRecipe.class);
 
 	public TuningTableRecipeCategory(IGuiHelper helper) {
         title = Component.translatable("gui.jei." + MIMIMod.MODID + ".tuning").getString();
 		icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.TUNINGTABLE));
-		background = helper.createDrawable(new ResourceLocation(MIMIMod.MODID, "textures/jei/tuning.png"), 0, 0, 59, 40);
+		background = helper.createDrawable(ResourceUtils.newModLocation("textures/jei/tuning.png"), 0, 0, 59, 40);
 	}
 
 	@Override

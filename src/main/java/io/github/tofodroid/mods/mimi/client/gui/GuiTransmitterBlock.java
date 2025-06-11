@@ -130,7 +130,7 @@ public class GuiTransmitterBlock extends BaseGui {
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OPEN_LOCAL_FOLDER_BUTTON)) && this.isSinglePlayerOrLANHost()) {
             Util.getPlatform().openUri(Path.of(MIMIMod.getProxy().serverMidiFiles().getCurrentFolderPath()).toUri());
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(REFRESH_SONGS_BUTTON))) {
-            this.startRefreshSongList();
+            this.onRefreshClick();
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(TOGGLE_FAVORITE_BUTTON))) {
             this.sendTransmitterCommand(CONTROL.MARKFAVE);
         } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(PREVIOUS_BUTTON))) {
@@ -168,9 +168,12 @@ public class GuiTransmitterBlock extends BaseGui {
         
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
+    protected void onRefreshClick() {
+        this.startRefreshSongList();
+    }
     
 
-    @SuppressWarnings("resource")
     public Boolean isSinglePlayerOrLANHost() {
         return Minecraft.getInstance().player != null && Minecraft.getInstance().hasSingleplayerServer();
     }

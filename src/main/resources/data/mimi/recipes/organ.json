@@ -19,6 +19,7 @@
             "item": "minecraft:gold_nugget"
         }
     },
+    "category": "misc",
     "result": {
         "item": "mimi:organ"
     }

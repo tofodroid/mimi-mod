@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -22,8 +23,9 @@ public class FilesystemMidiFileProvider {
     public static final String MIMI_CONFIG_DIR = "mimi";
     public static final String DEFAULT_CLIENT_MIDI_DIR = "midi_files";
     public static final String SERVER_MIDI_DIR = "server_midi_files";
+    public static final Integer MAX_SONG_COUNT = 50;
+    public static final Integer MAX_FILESIZE_BYTES = 1000;
     public static final FilenameFilter MIDI_FILTER = (dir, name) -> name.endsWith(".mid") || name.endsWith(".midi");
-    protected final Integer updateAfterSeconds;
     protected final Boolean isServer;
     protected Map<UUID, LocalMidiInfo> songMap;
     protected List<UUID> orderedSongList;
@@ -31,9 +33,8 @@ public class FilesystemMidiFileProvider {
     protected File selectedFolder = null;
     protected String lastFolderHash = null;
 
-    public FilesystemMidiFileProvider(Boolean isServer, Integer updateAfterSeconds) {
+    public FilesystemMidiFileProvider(Boolean isServer) {
         this.isServer = isServer;
-        this.updateAfterSeconds = updateAfterSeconds;
         this.songMap = new HashMap<>();
         this.orderedSongList = new ArrayList<>();
         this.init();
@@ -50,10 +51,6 @@ public class FilesystemMidiFileProvider {
 
     public void setDirectory(String newDirectory) {
         this.initFromDirectory(new File(newDirectory));
-    }
-
-    public void refresh(Boolean forceFromDisk) {
-        this.loadSongs(forceFromDisk);
     }
 
     public List<BasicMidiInfo> getSortedSongInfos() {
@@ -101,15 +98,9 @@ public class FilesystemMidiFileProvider {
         return result;
     }
 
-    public void loadSongs(Boolean forceFromDisk) {
-        if(!forceFromDisk && Instant.now().isBefore(this.lastLoad.plusSeconds(this.updateAfterSeconds))) {
-            return;
-        }
-
-        this.lastLoad = Instant.now();
-
+    public void loadSongs() {
         if(this.folderExists()) {
-            File[] midiFiles = this.folderHasChanges(forceFromDisk);
+            File[] midiFiles = this.loadFiles();
 
             if(midiFiles != null) {
                 this.clear();
@@ -128,29 +119,16 @@ public class FilesystemMidiFileProvider {
         return this.selectedFolder.exists() && this.selectedFolder.isDirectory();
     }
 
-    public File[] folderHasChanges(Boolean forceFromDisk) {
+    public File[] loadFiles() {
         File[] files = this.selectedFolder.listFiles(MIDI_FILTER);
+        Arrays.sort(files, (a, b) -> a.getName().compareTo(b.getName()));
 
-        Long totalSize = 0l;
-        Long totalModified = 0l;
-        Long totalNameHash = 0l;
-        Long totalNameSize = 0l;
-
-        for(File file : files) {
-            totalSize += file.length();
-            totalModified += file.lastModified();
-            totalNameHash += file.getName().hashCode();
-            totalNameSize += file.getName().length();
+        if(files.length > MAX_SONG_COUNT) {
+            MIMIMod.LOGGER.warn("More than " + MAX_SONG_COUNT + " MIDI files found in current folder. MIMI can currently only load up to " + MAX_SONG_COUNT + ".");
+            files = Arrays.copyOfRange(files, 0, MAX_SONG_COUNT);
         }
-
-        String newFolderHash = "folder-"+totalNameSize+"-"+totalSize+"-"+totalModified+"-"+totalNameHash;
-
-        if(!newFolderHash.equals(this.lastFolderHash) || forceFromDisk) {
-            this.lastFolderHash = newFolderHash;
-            return files;
-        }
-
-        return null;
+        
+        return files;
     }
 
     public String getCurrentFolderPath() {
@@ -162,7 +140,7 @@ public class FilesystemMidiFileProvider {
 
         if(directory != null && directory.exists() && directory.isDirectory()) {
             selectedFolder = directory;
-            this.loadSongs(true);
+            this.loadSongs();
         } else {
             MIMIMod.LOGGER.error("Failed to open MIDI directory: " + directory.getAbsolutePath());
         }

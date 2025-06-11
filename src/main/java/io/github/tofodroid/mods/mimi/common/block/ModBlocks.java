@@ -19,11 +19,13 @@ public class ModBlocks {
 
     // Redstone Blocks
     public static final BlockTransmitter TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockTransmitter(Properties.of(Material.METAL)));
-    public static final BlockListener LISTENER = create(BlockListener.REGISTRY_NAME, new BlockListener(Properties.of(Material.METAL)));
-    public static final BlockReceiver RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockReceiver(Properties.of(Material.METAL)));
     public static final BlockMechanicalMaestro MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockMechanicalMaestro(Properties.of(Material.METAL)));
     public static final BlockConductor CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockConductor(Properties.of(Material.METAL)));
     public static final BlockEffectEmitter EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockEffectEmitter(Properties.of(Material.METAL)));
+
+    // Redstone Blocks - Note-Responsive
+    public static final BlockListener LISTENER = create(BlockListener.REGISTRY_NAME, new BlockListener(Properties.of(Material.METAL)));
+    public static final BlockReceiver RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockReceiver(Properties.of(Material.METAL)));
     public static final BlockRelay RELAY = create(BlockRelay.REGISTRY_NAME, new BlockRelay(Properties.of(Material.METAL)));
 
     // Legacy Compat
@@ -44,6 +46,9 @@ public class ModBlocks {
 
     // Instrument Blocks
     public static final List<BlockInstrument> INSTRUMENTS = buildInstruments();
+
+    // Holders
+    public static final List<? extends AConfigurableTileBlock<?>> SETTINGS_SYNC_BLOCKS = List.of(LISTENER, RECEIVER, RELAY, EFFECTEMITTER);
 
     public static List<BlockInstrument> buildInstruments()  {
         List<BlockInstrument> result = new ArrayList<>();

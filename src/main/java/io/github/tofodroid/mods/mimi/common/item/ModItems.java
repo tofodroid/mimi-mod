@@ -45,18 +45,20 @@ public final class ModItems {
     public static BlockItem BROADCASTER = create(BlockBroadcaster.REGISTRY_NAME, new BlockItem(ModBlocks.BROADCASTER, new Properties().stacksTo(64)));
 
     // Other
-    public static ItemMidiDeviceConfig DEVICECONFIG = create(ItemMidiDeviceConfig.REGISTRY_NAME, new ItemMidiDeviceConfig(new Properties().tab(MOD_TAB)));
+    public static ItemSettingsSync SETTINGSSYNC = create(ItemSettingsSync.REGISTRY_NAME, new ItemSettingsSync(new Properties().tab(MOD_TAB)));
+    public static ItemSourceLinker SOURCELINKER = create(ItemSourceLinker.REGISTRY_NAME, new ItemSourceLinker(new Properties().tab(MOD_TAB)));
     public static ItemTransmitter TRANSMITTER = create(ItemTransmitter.REGISTRY_NAME, new ItemTransmitter(new Properties().tab(MOD_TAB)));
+    public static ItemGuide GUIDE = create(ItemGuide.REGISTRY_NAME, new ItemGuide(new Properties().tab(MOD_TAB)));
 
     // Blocks - Redstone
-    public static BlockItem TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockItem(ModBlocks.TRANSMITTERBLOCK, new Properties().tab(MOD_TAB).stacksTo(64)));
-    public static BlockItem LISTENER = create(BlockListener.REGISTRY_NAME, new BlockItem(ModBlocks.LISTENER, new Properties().tab(MOD_TAB).stacksTo(64)));
-    public static BlockItem RECEIVER = create(BlockReceiver.REGISTRY_NAME, new BlockItem(ModBlocks.RECEIVER, new Properties().tab(MOD_TAB).stacksTo(64)));
-    public static BlockItem MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockItem(ModBlocks.MECHANICALMAESTRO, new Properties().tab(MOD_TAB).stacksTo(64)));
-    public static BlockItem CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockItem(ModBlocks.CONDUCTOR, new Properties().tab(MOD_TAB).stacksTo(64)));
-    public static BlockItem EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockItem(ModBlocks.EFFECTEMITTER, new Properties().tab(MOD_TAB).stacksTo(64)));
-    public static BlockItem RELAY = create(BlockRelay.REGISTRY_NAME, new BlockItem(ModBlocks.RELAY, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
-    
+    public static BlockItem TRANSMITTERBLOCK = create(BlockTransmitter.REGISTRY_NAME, new BlockItem(ModBlocks.TRANSMITTERBLOCK, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+    public static BlockItem LISTENER = create(BlockListener.REGISTRY_NAME, new BlockItem(ModBlocks.LISTENER, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+    public static BlockItem CONDUCTOR = create(BlockConductor.REGISTRY_NAME, new BlockItem(ModBlocks.CONDUCTOR, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+    public static BlockItem EFFECTEMITTER = create(BlockEffectEmitter.REGISTRY_NAME, new BlockItem(ModBlocks.EFFECTEMITTER, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+    public static BlockItem MECHANICALMAESTRO = create(BlockMechanicalMaestro.REGISTRY_NAME, new BlockItem(ModBlocks.MECHANICALMAESTRO, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+    public static BlockItem RECEIVER = create(BlockReceiver.REGISTRY_NAME, new ItemMidiSourceLinkableBlock(ModBlocks.RECEIVER, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+    public static BlockItem RELAY = create(BlockRelay.REGISTRY_NAME, new ItemMidiSourceLinkableBlock(ModBlocks.RELAY, new Item.Properties().tab(MOD_TAB).stacksTo(64)));
+
     // Blocks - LED Cubes
     public static BlockItem LEDCUBE_A = create(BlockLedCube.REGISTRY_NAME_A, new BlockItem(ModBlocks.LEDCUBE_A, new Properties().tab(MOD_TAB).stacksTo(64)));
     public static BlockItem LEDCUBE_B = create(BlockLedCube.REGISTRY_NAME_B, new BlockItem(ModBlocks.LEDCUBE_B, new Properties().tab(MOD_TAB).stacksTo(64)));

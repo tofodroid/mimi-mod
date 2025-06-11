@@ -5,50 +5,52 @@ import java.time.temporal.ChronoUnit;
 
 import javax.sound.midi.MidiChannel;
 
+import io.github.tofodroid.mods.mimi.common.api.event.note.NoteEvent;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
+import io.github.tofodroid.mods.mimi.util.ByteUtils;
+import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
 public class MIMIChannel {
     public static final Integer MIDI_CHANNEL_IDLE_SECONDS = 8;
+    public static final Integer MAX_NOTE_DIST = 2 * NoteEvent.NOTE_DEF_RANGE;
 
     protected final MidiChannel channel;
     protected final Integer channelNum;
     protected Instant lastNoteTime;
+    protected BlockPos lastNotePos;
 
     public MIMIChannel(Integer channelNum, MidiChannel channel) {
         this.channelNum = channelNum;
         this.channel = channel;
-        this.setVolume(Integer.valueOf(0).byteValue());
+        this.setVolume(ByteUtils.ZERO);
     }
 
     public void setInstrument(InstrumentSpec instrument) {
         this.channel.programChange(instrument.midiBankNumber * 128, instrument.midiPatchNumber);
-        this.setVolume(Integer.valueOf(0).byteValue());
+        this.setVolume(ByteUtils.ZERO);
         this.channel.allSoundOff();
         this.channel.resetAllControllers();
     }
 
-    public void reset() {
+    public void clear() {
         this.lastNoteTime = null;
-        this.setVolume(Integer.valueOf(0).byteValue());
-        this.channel.allSoundOff();
-        this.channel.resetAllControllers();
+        this.setVolume(ByteUtils.ZERO);
+        this.reset();
     }
 
     public void noteOn(BlockPos notePos) {
         this.lastNoteTime = Instant.now();
+        this.lastNotePos = notePos;
     }
 
-    public void allNotesOff() {
+    public void reset() {
         if(this.channel != null) {
             this.channel.resetAllControllers();
+            this.channel.setPitchBend(8192);
             this.channel.allSoundOff();
         }
-    }
-
-    public void controlChange(Byte controller, Byte value) {
-        this.channel.controlChange(controller, value);
     }
 
     public void setVolume(Byte volume) {
@@ -60,13 +62,25 @@ public class MIMIChannel {
     }
 
     public Boolean tick(Player clientPlayer, Boolean isClientChannel) {
-        if(!this.isIdle()) {
-            return true;
-        } else {
-            return false;
+        if(!this.isIdle() && this.lastNotePos != null) {
+            double lastNoteDist = Math.abs(Math.sqrt(EntityUtils.getEntityHeadPos(clientPlayer).distSqr(lastNotePos)));
+
+            if(lastNoteDist <= MAX_NOTE_DIST) {
+                if(!isClientChannel) {
+                    this.channel.controlChange(7, MIMISynthUtils.getVolumeForRelativeNotePosition(clientPlayer.getEyePosition(), lastNotePos));
+                    this.channel.controlChange(10, MIMISynthUtils.getLRPanForRelativeNotePosition(clientPlayer.getEyePosition(), lastNotePos, clientPlayer.getYHeadRot()));
+                } else {
+                    this.channel.controlChange(7, MIMISynthUtils.getVolumeForRelativeNoteDistance(0d));
+                    this.channel.controlChange(10, 63);
+                }
+                return true;
+            } else {
+                this.channel.allNotesOff();
+            }
         }
+        return false;
     }
-    
+
     public Integer getChannelNumber() {
         return this.channelNum;
     }

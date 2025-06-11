@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 public class GuiListener extends BaseGui {
@@ -39,8 +40,9 @@ public class GuiListener extends BaseGui {
     protected Integer filterInstrumentIndex = 0;
     private final ItemStack listenerStack;
     private final BlockPos tilePos;
+    private final InteractionHand handIn;
 
-    public GuiListener(BlockPos tilePos, ItemStack listenerStack) {
+    public GuiListener(BlockPos tilePos, InteractionHand handIn, ItemStack listenerStack) {
         super(302, 86, 302, "textures/gui/container_listener.png", "item.MIMIMod.gui_listener");
 
         if(listenerStack == null || listenerStack.isEmpty()) {
@@ -48,9 +50,11 @@ public class GuiListener extends BaseGui {
             Minecraft.getInstance().forceSetScreen((Screen)null);
             this.listenerStack = null;
             this.tilePos = null;
+            this.handIn = null;
             return;
         }
         this.tilePos = tilePos;
+        this.handIn = handIn;
         this.listenerStack = new ItemStack(listenerStack.getItem(), listenerStack.getCount());
         this.listenerStack.setTag(listenerStack.getOrCreateTag().copy());
     }
@@ -66,7 +70,7 @@ public class GuiListener extends BaseGui {
     }
 
     public void syncListenerToServer() {
-        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(listenerStack, tilePos));
+        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(listenerStack, tilePos, handIn));
     }
 
     @Override

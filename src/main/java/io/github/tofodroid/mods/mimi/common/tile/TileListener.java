@@ -1,15 +1,15 @@
 package io.github.tofodroid.mods.mimi.common.tile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import io.github.tofodroid.mods.mimi.common.api.event.note.NoteEvent;
+import io.github.tofodroid.mods.mimi.server.events.note.api.INoteConsumer;
 import io.github.tofodroid.mods.mimi.server.events.note.consumer.ServerNoteConsumerManager;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileListener extends AConfigurableMidiPowerSourceTile {
+public class TileListener extends AConfigurableMidiPowerSourceTile implements INoteConsumer {
     public static final String REGISTRY_NAME = "listener";
 
     public TileListener(BlockPos pos, BlockState state) {
@@ -49,12 +49,53 @@ public class TileListener extends AConfigurableMidiPowerSourceTile {
     }
     
     @Override
-    public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note));
+    public Byte getNoteGroupKey(Byte channel, Byte instrumentId) {
+        return instrumentId;
     }
 
     @Override
-    public Byte getNoteGroupKey(Byte channel, Byte instrumentId) {
-        return instrumentId;
+    public ResourceKey<Level> getDimension() {
+        return this.getLevel().dimension();
+    }
+
+    @Override
+    public void tickConsumer() { /* No-op */ }
+
+    @Override
+    public void onConsumerRemoved() { /* No-op */ }
+
+    @Override
+    public void doHandleEvent(NoteEvent message) {
+        switch(message.type) {
+            case NOTE_ON:
+                this.onNoteOn(null, message.note, message.velocity, message.instrumentId, message.eventTime);
+                break;
+            case NOTE_OFF:
+                this.onNoteOff(null, message.note, message.velocity, message.instrumentId, message.eventTime);
+                break;
+            case RESET:
+                this.onReset(null, message.instrumentId, message.eventTime);
+                break;
+            default: break;
+        }
+    }
+
+    @Override
+    public Boolean willHandleEvent(NoteEvent message) {
+        switch(message.type) {
+            case NOTE_ON:
+                return (message.note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, message.note));
+            case NOTE_OFF:
+                return this.isHeld() && (message.note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, message.note));
+            case RESET:
+                return this.isHeld();
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public Byte getInstrumentId() {
+        return this.getFilteredInstrument();
     }
 }

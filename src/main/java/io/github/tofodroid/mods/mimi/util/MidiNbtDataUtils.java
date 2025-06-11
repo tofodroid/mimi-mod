@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.github.tofodroid.mods.mimi.common.block.ModBlocks;
 import io.github.tofodroid.mods.mimi.common.item.IInstrumentItem;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import net.minecraft.ChatFormatting;
@@ -71,7 +72,7 @@ public abstract class MidiNbtDataUtils {
         return INSTRUMENT_NAME_MAP;
     }
 
-    public static void setMidiSourceFromRelay(ItemStack stack,UUID sourceId, String sourceName) {
+    public static void setMidiSourceFromRelay(ItemStack stack, UUID sourceId, String sourceName) {
         setMidiSource(stack, sourceId, RELAY_SOURCE_PREFIX + sourceName);
     }
 
@@ -95,7 +96,6 @@ public abstract class MidiNbtDataUtils {
     public static Boolean getMidiSourceIsRelay(ItemStack stack) {
         return TagUtils.getStringOrDefault(stack, SOURCE_NAME_TAG, "").startsWith(RELAY_SOURCE_PREFIX);
     }
-
 
     public static String getMidiSourceName(ItemStack stack, Boolean forDisplay) {
         UUID sourceId = getMidiSource(stack);
@@ -315,28 +315,6 @@ public abstract class MidiNbtDataUtils {
         TagUtils.setOrRemoveByte(stack, CHANNEL_MAP_BASE_TAG + index, value == index.byteValue() ? null : (value < 0 ? 0 : (value > 15 ? 15 : value)));
     }
 
-    public static List<Byte> getFilterNotes(Byte note, Byte oct) {
-        List<Byte> result = new ArrayList<>();
-
-        if(oct != FILTER_NOTE_OCT_ALL && note != FILTER_NOTE_OCT_ALL && Integer.valueOf(oct*12+note) <= Byte.MAX_VALUE) {
-            result.add(Integer.valueOf(oct*12+note).byteValue());
-        } else if(oct != FILTER_NOTE_OCT_ALL) {
-            for(int i = 0; i < 12; i++) {
-                if(Integer.valueOf(oct*12+i) <= Byte.MAX_VALUE) {
-                    result.add(Integer.valueOf(oct*12+i).byteValue());
-                }
-            }
-        } else if(note != FILTER_NOTE_OCT_ALL) {
-            for(int i = 0; i < 10; i++) {
-                if(Integer.valueOf(i*12+note) <= Byte.MAX_VALUE) {
-                    result.add(Integer.valueOf(i*12+note).byteValue());
-                }
-            }
-        }
-
-        return result;
-    }
-
     public static Integer getDefaultChannelsForBank(Integer bankNumber) {
         if(bankNumber == PERCUSSION_BANK) {
             return JUST_CHANNEL_10_INT;
@@ -349,10 +327,6 @@ public abstract class MidiNbtDataUtils {
         Byte filterNoteOctave = getFilterOct(stack);
         String filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave != FILTER_NOTE_OCT_ALL ? filterNoteOctave : "*");
         return "**".equals(filterNoteString) ? "All" : filterNoteString;
-    }
-
-    public static String getBroadcastNoteAsString(ItemStack stack) {
-        return getMidiNoteAsString(getBroadcastNote(stack));
     }
 
     public static String getMidiNoteAsString(Byte note) {
@@ -414,15 +388,6 @@ public abstract class MidiNbtDataUtils {
         return invertNoteOct ? !isFiltered : isFiltered;
     }
 
-    public static Boolean isInstrumentFiltered(ItemStack stack, Byte instrument) {
-        Byte filterInstrument = getFilterInstrument(stack);
-        return filterInstrument.equals(INSTRUMENT_ALL) ? true : filterInstrument == instrument;
-    }
-
-    public static Boolean isInstrumentFiltered(Byte filterInstrument, Byte instrument) {
-        return filterInstrument.equals(INSTRUMENT_ALL) ? true : filterInstrument == instrument;
-    }
-
     public static CompoundTag convertSwitchboardToDataTag(CompoundTag switchTag) {
         CompoundTag instrumentTag = switchTag != null ? switchTag.copy() : new CompoundTag();
 
@@ -457,44 +422,80 @@ public abstract class MidiNbtDataUtils {
         return instrumentTag;
     }
 
-    public static Boolean shouldInstrumentRespondToMessage(ItemStack stack, UUID sender, Byte channel) {
-        return stack.getItem() instanceof IInstrumentItem && MidiNbtDataUtils.isChannelEnabled(stack, channel) && 
-               (sender != null && sender.equals(MidiNbtDataUtils.getMidiSource(stack)));
-    }
-
-    public static void appendSettingsTooltip(ItemStack stack, List<Component> tooltip) {
-        tooltip.add(Component.literal(""));
-        tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
-
-        Integer enabledChannels = getEnabledChannelsInt(stack);
+    public static void appendEnabledChannelsTooltip(ItemStack stack, List<Component> tooltip) {
+        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(stack);
         if(enabledChannels != null) {
-            if(enabledChannels.equals(ALL_CHANNELS_INT)) {
+            if(enabledChannels.equals(MidiNbtDataUtils.ALL_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: All").withStyle(ChatFormatting.GREEN));
-            } else if(enabledChannels.equals(NONE_CHANNELS_INT)) {
+            } else if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
                 tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
             } else {
-                tooltip.add(Component.literal("  Channels: " + getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
+                tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
             }
         }
+    }
 
-        // Note Source
-        if(getMidiSource(stack) != null) {
-            Boolean isTransmitter = getMidiSourceIsTransmitter(stack);
-            Boolean isRelay = getMidiSourceIsRelay(stack);
-            tooltip.add(Component.literal("  Play Notes From: " + (isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"))).withStyle(ChatFormatting.GREEN));
-            tooltip.add(Component.literal("  " + getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
-        } else {
-            tooltip.add(Component.literal("  Play Notes From: None").withStyle(ChatFormatting.GREEN));
+    public static Component getMidiSourceType(ItemStack stack) {
+        if(MidiNbtDataUtils.getMidiSource(stack) != null) {
+            Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(stack);
+            Boolean isRelay = !isTransmitter && MidiNbtDataUtils.getMidiSourceIsRelay(stack);
+            return (isTransmitter ? ModBlocks.TRANSMITTERBLOCK.getName() : ( isRelay ? ModBlocks.RELAY.getName() : Component.literal("Player")));
         }
+        return Component.literal("None");
+    }
 
-        // Instrument Volume
-        tooltip.add(Component.literal("  Volume: " + getInstrumentVolume(stack)).withStyle(ChatFormatting.GREEN));
+    public static void appendMidiSourceTooltip(ItemStack stack, List<Component> tooltip) {
+        if(MidiNbtDataUtils.getMidiSource(stack) != null) {
+            tooltip.add(Component.literal("  Receive Notes From: ").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.literal("  ").append(getMidiSourceType(stack)).append(Component.literal(":")).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal("    " + MidiNbtDataUtils.getMidiSourceName(stack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
+        } else {
+            tooltip.add(Component.literal("  Receive Notes From: None").withStyle(ChatFormatting.GREEN));
+        }
+    }
 
-        // MIDI Device Input
-        if(getSysInput(stack)) {
+    public static void appendInstrumentVolumeTooltip(ItemStack stack, List<Component> tooltip) {
+        tooltip.add(Component.literal("  Volume: " + MidiNbtDataUtils.getInstrumentVolume(stack)).withStyle(ChatFormatting.GREEN));
+    }
+
+    public static void appendDeviceInputEnabledTooltip(ItemStack stack, List<Component> tooltip) {
+        if(MidiNbtDataUtils.getSysInput(stack)) {
             tooltip.add(Component.literal("  Device Input: Enabled").withStyle(ChatFormatting.GREEN));
         } else {
             tooltip.add(Component.literal("  Device Input: Disabled").withStyle(ChatFormatting.GREEN));
         }
+    }
+
+    public static void appendInvertSignalTooltip(ItemStack stack, List<Component> tooltip) {
+        tooltip.add(Component.literal("  Invert Power: "  + (MidiNbtDataUtils.getInvertSignal(stack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN));
+    }
+
+    public static void appendFilterNoteTooltip(ItemStack stack, List<Component> tooltip) {
+        tooltip.add(Component.literal("  Instrument: " + MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(stack))).withStyle(ChatFormatting.GREEN));
+    }
+
+    public static void appendFilterInstrumentTooltip(ItemStack stack, List<Component> tooltip) {
+        tooltip.add(Component.literal("  Note(s): " + (MidiNbtDataUtils.getInvertNoteOct(stack) ? "Not " : "")  + MidiNbtDataUtils.getFilteredNotesAsString(stack)).withStyle(ChatFormatting.GREEN));
+    }
+
+    public static ItemStack copyMidiSettings(ItemStack source, ItemStack target) {
+        if(!source.isEmpty() && !target.isEmpty()) {
+            ItemStack result = target.copy();
+            result.setCount(1);
+            MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
+            MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
+            MidiNbtDataUtils.setSysInput(result, MidiNbtDataUtils.getSysInput(source));
+            MidiNbtDataUtils.setInstrumentVolume(result, MidiNbtDataUtils.getInstrumentVolume(source));
+            MidiNbtDataUtils.setFilterOct(result, MidiNbtDataUtils.getFilterOct(source));
+            MidiNbtDataUtils.setFilterNote(result, MidiNbtDataUtils.getFilterNote(source));
+            MidiNbtDataUtils.setInvertNoteOct(result, MidiNbtDataUtils.getInvertNoteOct(source));
+            MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
+            MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
+            MidiNbtDataUtils.setTriggerNoteStart(result, MidiNbtDataUtils.getTriggerNoteStart(source));
+            MidiNbtDataUtils.setHoldTicks(result, MidiNbtDataUtils.getHoldTicks(source));
+            return result;
+        }
+
+        return target;
     }
 }

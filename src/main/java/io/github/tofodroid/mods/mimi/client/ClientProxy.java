@@ -27,11 +27,11 @@ public class ClientProxy implements Proxy {
         MIDI_SYNTH = new MidiMultiSynthManager();        
         MIDI_DATA = new MidiDataManager();
     
-        CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false, 0);
-        CLIENT_MIDI_FILES.refresh(true);
+        CLIENT_MIDI_FILES = new FilesystemMidiFileProvider(false);
+        CLIENT_MIDI_FILES.loadSongs();
 
-        SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true, 1);
-        SERVER_MIDI_FILES.refresh(true);
+        SERVER_MIDI_FILES = new FilesystemMidiFileProvider(true);
+        SERVER_MIDI_FILES.loadSongs();
         this.initialized = true;
     }
 
