@@ -1,0 +1,18 @@
+{
+    "name": "Source Linker",
+    "icon": "mimi:sourcelinker",
+    "category": "mimi:5other",
+    "pages": [
+        {
+            "type": "patchouli:text",
+            "text": "The Source Linker is an item that can be used to link Block Instruments, Receivers, and Relays to a Transmitter.$(br2)To use a Source Linker, craft one and then shift + right-click on a Transmitter source (Player, Server Transmitter, or Relay) to link to that Transmitter. Then, right-click on any blocks you want to link to the Transmitter."
+        },
+        {
+            "type": "patchouli:crafting",
+            "recipe": "mimi:sourcelinker",
+            "link_recipe": true,
+            "text": ""
+        }
+    ],
+    "sortnum": 1
+}

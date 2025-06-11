@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.sound.midi.Sequence;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastProducer;
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
@@ -21,8 +22,8 @@ import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerStatusPacke
 import io.github.tofodroid.mods.mimi.common.network.TransmitterControlPacket;
 import io.github.tofodroid.mods.mimi.common.tile.TileTransmitter;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastProducer;
 import io.github.tofodroid.mods.mimi.server.network.ServerMidiUploadManager;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -321,7 +322,7 @@ public abstract class ServerTransmitterManager {
             ATransmitterBroadcastProducer transmitter = getTransmitter(entity.getUUID());
 
             if(transmitter != null) {
-                transmitter.allNotesOff();
+                transmitter.reset();
             }
         }, (e) -> {
             logMidiTaskError("Failed to silence transmitter with ID: " + entity.getUUID(), e);
@@ -336,10 +337,20 @@ public abstract class ServerTransmitterManager {
         executeTaskOnMidiThread(() -> {
             ATransmitterBroadcastProducer transmitter = getTransmitter(entity.getUUID());
             if(transmitter != null) {
-                transmitter.allNotesOff();
+                transmitter.reset();
             }
         }, (e) -> {
             logMidiTaskError("Failed to stop transmitter with ID: " + entity.getUUID(), e);
         });
+    }
+    
+    public static void onPlayerLoggedIn(ServerPlayer player) {
+        ServerTransmitterManager.createTransmitter(player);
+    }
+
+    public static void onPlayerLoggedOut(ServerPlayer player) {
+        if(player.level() instanceof ServerLevel) {
+            BroadcastManager.removeBroadcastProducer(player.getUUID());
+        }
     }
 }

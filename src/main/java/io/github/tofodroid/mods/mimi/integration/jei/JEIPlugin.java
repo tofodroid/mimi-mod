@@ -2,10 +2,10 @@ package io.github.tofodroid.mods.mimi.integration.jei;
 
 import io.github.tofodroid.mods.mimi.client.gui.GuiInstrument;
 import io.github.tofodroid.mods.mimi.client.gui.GuiTuningTableContainerScreen;
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.recipe.ModRecipes;
 import io.github.tofodroid.mods.mimi.common.recipe.TuningTableRecipe;
+import io.github.tofodroid.mods.mimi.util.ResourceUtils;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.*;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
-	private static final ResourceLocation ID = new ResourceLocation(MIMIMod.MODID, "jeiplugin");
+	private static final ResourceLocation ID = ResourceUtils.newModLocation("jeiplugin");
 	private static final Minecraft MC = Minecraft.getInstance();
 	
 	@Override

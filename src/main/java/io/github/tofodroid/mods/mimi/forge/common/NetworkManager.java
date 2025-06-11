@@ -11,12 +11,14 @@ import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPack
 import io.github.tofodroid.mods.mimi.common.network.ConfigurableMidiTileSyncPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacket;
 import io.github.tofodroid.mods.mimi.common.network.EffectEmitterUpdatePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacket;
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacket;
 import io.github.tofodroid.mods.mimi.common.network.MidiDeviceBroadcastPacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacketHandler;
-import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacket;
-import io.github.tofodroid.mods.mimi.common.network.MultiMidiNotePacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacketHandler;
+import io.github.tofodroid.mods.mimi.common.network.MultiNoteEventPacket;
+import io.github.tofodroid.mods.mimi.common.network.MultiNoteEventPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacketHandler;
 import io.github.tofodroid.mods.mimi.common.network.ServerMusicPlayerSongListPacket;
@@ -39,7 +41,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.minecraftforge.network.PacketDistributor.TargetPoint;
@@ -78,7 +79,7 @@ public class NetworkManager {
 
     @SubscribeEvent
     public static void init(final FMLCommonSetupEvent event) {
-        registerMessage(MidiNotePacket.class, MidiNotePacket::encodePacket, MidiNotePacket::decodePacket, createHandler(MidiNotePacketHandler::handlePacketClient, MidiNotePacketHandler::handlePacketServer));
+        registerMessage(NoteEventPacket.class, NoteEventPacket::encodePacket, NoteEventPacket::decodePacket, createHandler(NoteEventPacketHandler::handlePacketClient, NoteEventPacketHandler::handlePacketServer));
         registerMessage(SyncInstrumentPacket.class, SyncInstrumentPacket::encodePacket, SyncInstrumentPacket::decodePacket, createHandler(SyncInstrumentPacketHandler::handlePacketClient, SyncInstrumentPacketHandler::handlePacketServer));
         registerMessage(ClientMidiListPacket.class, ClientMidiListPacket::encodePacket, ClientMidiListPacket::decodePacket, createHandler(ClientMidiListPacketHandler::handlePacketClient, ClientMidiListPacketHandler::handlePacketServer));
         registerMessage(ServerMusicPlayerStatusPacket.class, ServerMusicPlayerStatusPacket::encodePacket, ServerMusicPlayerStatusPacket::decodePacket, createHandler(ServerMusicPlayerStatusPacketHandler::handlePacketClient, ServerMusicPlayerStatusPacketHandler::handlePacketServer));
@@ -88,8 +89,9 @@ public class NetworkManager {
         registerMessage(TransmitterControlPacket.class, TransmitterControlPacket::encodePacket, TransmitterControlPacket::decodePacket, createHandler(TransmitterControlPacketHandler::handlePacketClient, TransmitterControlPacketHandler::handlePacketServer));
         registerMessage(ServerMidiUploadPacket.class, ServerMidiUploadPacket::encodePacket, ServerMidiUploadPacket::decodePacket, createHandler(ServerMidiUploadPacketHandler::handlePacketClient, ServerMidiUploadPacketHandler::handlePacketServer));
         registerMessage(EffectEmitterUpdatePacket.class, EffectEmitterUpdatePacket::encodePacket, EffectEmitterUpdatePacket::decodePacket, createHandler(EffectEmitterUpdatePacketHandler::handlePacketClient, EffectEmitterUpdatePacketHandler::handlePacketServer));
-        registerMessage(MultiMidiNotePacket.class, MultiMidiNotePacket::encodePacket, MultiMidiNotePacket::decodePacket, createHandler(MultiMidiNotePacketHandler::handlePacketClient, MultiMidiNotePacketHandler::handlePacketServer));
+        registerMessage(MultiNoteEventPacket.class, MultiNoteEventPacket::encodePacket, MultiNoteEventPacket::decodePacket, createHandler(MultiNoteEventPacketHandler::handlePacketClient, MultiNoteEventPacketHandler::handlePacketServer));
         registerMessage(MidiDeviceBroadcastPacket.class, MidiDeviceBroadcastPacket::encodePacket, MidiDeviceBroadcastPacket::decodePacket, createHandler(MidiDeviceBroadcastPacketHandler::handlePacketClient, MidiDeviceBroadcastPacketHandler::handlePacketServer));
+        registerMessage(MIMIConfigPacket.class, MIMIConfigPacket::encodePacket, MIMIConfigPacket::decodePacket, createHandler(MIMIConfigPacketHandler::handlePacketClient, MIMIConfigPacketHandler::handlePacketServer));
     }
 
     public static <T> void registerMessage(Class<T> messageClass, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, CustomPayloadEvent.Context> handler) {
@@ -102,7 +104,7 @@ public class NetworkManager {
 
     public static <T> BiConsumer<T, CustomPayloadEvent.Context> createHandler(Consumer<T> handleClient, BiConsumer<T, ServerPlayer> handleServer) {
         return (T message, CustomPayloadEvent.Context ctx) -> {
-            if(ctx.getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
+            if(ctx.isServerSide()) {
                 ctx.enqueueWork(() -> handleServer.accept(message, ctx.getSender()));
             } else {
                 ctx.enqueueWork(() -> handleClient.accept(message));

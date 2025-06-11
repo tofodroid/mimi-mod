@@ -22,6 +22,7 @@
             "item": "minecraft:leather"
         }
     },
+    "category": "misc",
     "result": {
         "item": "mimi:banjo"
     }

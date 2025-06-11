@@ -1,8 +1,11 @@
 package io.github.tofodroid.mods.mimi.util;
 
 import io.github.tofodroid.mods.mimi.common.item.ItemTransmitter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class EntityUtils {
     public static Boolean playerHasActiveTransmitter(Player player) {
@@ -24,5 +27,9 @@ public abstract class EntityUtils {
         }
         
         return false;
+    }
+
+    public static BlockPos getEntityHeadPos(LivingEntity entity) {
+        return BlockPos.containing(new Vec3(entity.getX(), entity.isPassenger() ? entity.getVehicle().getPassengerRidingPosition(entity).y : entity.getEyeY(), entity.getZ()));
     }
 }

@@ -11,6 +11,7 @@ import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentConfig;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.common.entity.EntitySeat;
 import io.github.tofodroid.mods.mimi.common.entity.ModEntities;
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.ModTiles;
 import io.github.tofodroid.mods.mimi.common.tile.TileInstrument;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
@@ -18,9 +19,11 @@ import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -45,7 +48,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BlockInstrument extends AContainerBlock<TileInstrument> implements SimpleWaterloggedBlock {
+public class BlockInstrument extends AConfigurableTileBlock<TileInstrument> implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -82,21 +85,24 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
         return VoxelShapeUtils.generateFacingShape(shape);
     }
-    
+
     @Override
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         TileInstrument tileInstrument = getTileForBlock(worldIn, pos);
-        
+
+        if(shouldSkipUse(state, worldIn, pos, player, hand)) {
+            return worldIn.isClientSide ? InteractionResult.CONSUME : InteractionResult.PASS;
+        }
+
         if(tileInstrument != null) {
            if(!worldIn.isClientSide) {
                 if(player.getVehicle() == null) {
                     tileInstrument.attemptSit(player);
                 }
             } else if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
+                ClientGuiWrapper.openInstrumentGui(worldIn, player, null, null, tileInstrument.getSourceStack());
             }
         }
-
         return InteractionResult.SUCCESS;
     }
     
@@ -126,7 +132,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         TileInstrument tileInstrument = reader.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
         
         if(tileInstrument != null) {
-            return tileInstrument.getInstrumentStack();
+            return tileInstrument.getSourceStack();
         }
 
         return super.getCloneItemStack(reader, pos, state);
@@ -151,15 +157,13 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     }
 
     @Override
-    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation)
-    {
+    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation) {
         return state.setValue(DIRECTION, rotation.rotate(state.getValue(DIRECTION)));
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public BlockState mirror(BlockState state, Mirror mirror)
-    {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(DIRECTION)));
     }
 
@@ -175,7 +179,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         if (tileEntity instanceof TileInstrument) {
             ItemStack newStack = new ItemStack(stack.getItem(), stack.getCount());
             newStack.setTag(stack.getOrCreateTag().copy());
-            ((TileInstrument)tileEntity).setInstrumentStack(newStack);
+            ((TileInstrument)tileEntity).setSourceStack(newStack);
         }
     }
     
@@ -204,7 +208,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         return this.defaultChannels;
     }
 
-    @SuppressWarnings("null")
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
         return entity.isPassenger() && entity.getVehicle() != null && ModEntities.SEAT.equals(entity.getVehicle().getType());
     }
@@ -213,7 +216,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         if(isEntitySittingAtInstrument(entity)) {
             return (EntitySeat) entity.getVehicle();
         }
-
         return null;
     }
 
@@ -221,7 +223,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         TileInstrument tile = getTileInstrumentForEntity(entity);
 
         if(tile != null) {
-            return tile.getInstrumentStack();
+            return tile.getSourceStack();
         }
         return null;
     }
@@ -237,5 +239,21 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         }
 
         return null;
+    }
+
+    @Override
+    public OpenGuiWrapper openGuiWrapper() {
+        return ClientGuiWrapper::openInstrumentGui;
+    }
+
+    @Override
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+        // No-op, handled by ItemBlockInstrument
+    }
+
+    @Override
+    protected Boolean shouldSkipUse(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand) {
+        Item useItem = player.getItemInHand(hand).getItem();
+        return useItem.equals(ModItems.SETTINGSSYNC) || useItem.equals(ModItems.SOURCELINKER);
     }
 }

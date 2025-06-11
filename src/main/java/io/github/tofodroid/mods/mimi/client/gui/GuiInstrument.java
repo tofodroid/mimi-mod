@@ -20,9 +20,11 @@ import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.TransmitterSourceWidget;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.config.ConfigProxy;
-import io.github.tofodroid.mods.mimi.common.network.MidiNotePacket;
+import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
 import io.github.tofodroid.mods.mimi.common.network.SyncInstrumentPacket;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
+import io.github.tofodroid.mods.mimi.util.ByteUtils;
+import io.github.tofodroid.mods.mimi.util.EntityUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -150,11 +152,16 @@ public class GuiInstrument extends BaseGui {
     private String instrumentNameString = null;
     private Byte instrumentId = null;
     private Boolean editMode = false;
+    private Boolean settingsOnly = false;
     private Integer visibleNoteShift = KEYBOARD_START_NOTE;
     private String noteIdString = "C3,F4 | G4,C6";
     private Byte mouseNote = null;
 
     public GuiInstrument(Player player, ItemStack instrumentStack, InteractionHand handIn) {
+        this(player, instrumentStack,  handIn, false);
+    }
+
+    public GuiInstrument(Player player, ItemStack instrumentStack, InteractionHand handIn, Boolean settingsOnly) {
         super(328, 184, 530, "textures/gui/container_instrument.png", "item.MIMIMod.gui_instrument");
 
         if(instrumentStack == null || instrumentStack.isEmpty()) {
@@ -164,12 +171,19 @@ public class GuiInstrument extends BaseGui {
             return;
         }
 
+        this.settingsOnly = settingsOnly;
+        this.editMode = settingsOnly;
         this.player = player;
         this.handIn = handIn;
         this.instrumentStack = new ItemStack(instrumentStack.getItem(), instrumentStack.getCount());
         this.instrumentStack.setTag(instrumentStack.getOrCreateTag().copy());
-        this.instrumentId = MidiNbtDataUtils.getInstrumentId(this.instrumentStack);
-        this.instrumentNameString = MidiNbtDataUtils.getInstrumentName(this.instrumentId);
+
+        if(!this.settingsOnly) {
+            this.instrumentId = MidiNbtDataUtils.getInstrumentId(this.instrumentStack);
+            this.instrumentNameString = MidiNbtDataUtils.getInstrumentName(this.instrumentId);
+        } else {
+            this.instrumentNameString = "Settings";
+        }
     }
 
     @Override
@@ -208,16 +222,18 @@ public class GuiInstrument extends BaseGui {
         int imouseY = (int)Math.round(dmouseY);
 
         // Keyboard Controls
-        if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_UP_BUTTON_COORDS))) {
-            this.shiftVisibleNotes(true, 1);
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_DOWN_BUTTON_COORDS))) {
-            this.shiftVisibleNotes(false, 1);
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OCT_SHIFT_UP_BUTTON_COORDS))) {
-            this.shiftVisibleNotes(true, 7);
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OCT_SHIFT_DOWN_BUTTON_COORDS))) {
-            this.shiftVisibleNotes(false, 7);
-        } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(MIDI_EDIT_BUTTON_COORDS))) {
-            editMode = !editMode;
+        if(!settingsOnly) {
+            if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_UP_BUTTON_COORDS))) {
+                this.shiftVisibleNotes(true, 1);
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(NOTE_SHIFT_DOWN_BUTTON_COORDS))) {
+                this.shiftVisibleNotes(false, 1);
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OCT_SHIFT_UP_BUTTON_COORDS))) {
+                this.shiftVisibleNotes(true, 7);
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(OCT_SHIFT_DOWN_BUTTON_COORDS))) {
+                this.shiftVisibleNotes(false, 7);
+            } else if(CommonGuiUtils.clickedBox(imouseX, imouseY, guiToScreenCoords(MIDI_EDIT_BUTTON_COORDS))) {
+                editMode = !editMode;
+            }
         }
         
         if(!editMode) {
@@ -301,31 +317,33 @@ public class GuiInstrument extends BaseGui {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
         
-        if(keyCode == GLFW.GLFW_KEY_LEFT) {
-            shiftVisibleNotes(false, 1);
-            return true;
-        } else if(keyCode == GLFW.GLFW_KEY_RIGHT) {
-            shiftVisibleNotes(true, 1);
-            return true;
-        } else if(keyCode == GLFW.GLFW_KEY_DOWN) {
-            shiftVisibleNotes(false, 7);
-            return true;
-        } else if(keyCode == GLFW.GLFW_KEY_UP) {
-            shiftVisibleNotes(true, 7);
-            return true;
-        } else if(keyCode == GLFW.GLFW_KEY_SPACE) {
-            this.toggleHoldPedal(true);
-            return true;
-        } else {
-            Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
-
-            if(midiNoteNums != null) {
-                for(Byte midiNoteNum : midiNoteNums) {
-                    if(!this.heldNotes.containsKey(midiNoteNum)) {
-                        this.onGuiNotePress(midiNoteNum, Byte.MAX_VALUE);
-                    }
-                }
+        if(!settingsOnly) {
+            if(keyCode == GLFW.GLFW_KEY_LEFT) {
+                shiftVisibleNotes(false, 1);
                 return true;
+            } else if(keyCode == GLFW.GLFW_KEY_RIGHT) {
+                shiftVisibleNotes(true, 1);
+                return true;
+            } else if(keyCode == GLFW.GLFW_KEY_DOWN) {
+                shiftVisibleNotes(false, 7);
+                return true;
+            } else if(keyCode == GLFW.GLFW_KEY_UP) {
+                shiftVisibleNotes(true, 7);
+                return true;
+            } else if(keyCode == GLFW.GLFW_KEY_SPACE) {
+                this.toggleHoldPedal(true);
+                return true;
+            } else {
+                Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
+
+                if(midiNoteNums != null) {
+                    for(Byte midiNoteNum : midiNoteNums) {
+                        if(!this.heldNotes.containsKey(midiNoteNum)) {
+                            this.onGuiNotePress(midiNoteNum, Byte.MAX_VALUE);
+                        }
+                    }
+                    return true;
+                }
             }
         }
 
@@ -336,17 +354,19 @@ public class GuiInstrument extends BaseGui {
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         super.keyReleased(keyCode, scanCode, modifiers);
 
-        if(keyCode == GLFW.GLFW_KEY_SPACE) {
-            this.toggleHoldPedal(false);
-            return true;
-        } else {
-            Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
-
-            if(midiNoteNums != null) {
-                for(Byte midiNoteNum : midiNoteNums) {
-                    this.onGuiNoteRelease(midiNoteNum);
-                }
+        if(!settingsOnly) {
+            if(keyCode == GLFW.GLFW_KEY_SPACE) {
+                this.toggleHoldPedal(false);
                 return true;
+            } else {
+                Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, true);
+
+                if(midiNoteNums != null) {
+                    for(Byte midiNoteNum : midiNoteNums) {
+                        this.onGuiNoteRelease(midiNoteNum);
+                    }
+                    return true;
+                }
             }
         }
 
@@ -354,11 +374,13 @@ public class GuiInstrument extends BaseGui {
     }
 
     private void toggleHoldPedal(Boolean on) {
-        Byte controller = 64;
-        Byte value = on ? Byte.MAX_VALUE : 0;
-        MidiNotePacket packet = MidiNotePacket.createControlPacket(controller, value, instrumentId, player.getUUID(), player.getOnPos(), handIn);
-        NetworkProxy.sendToServer(packet);
-        ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+        if(this.instrumentId != null) {
+            Byte controller = 64;
+            Byte value = on ? Byte.MAX_VALUE : 0;
+            NoteEventPacket packet = NoteEventPacket.createControlPacket(controller, value, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NetworkProxy.sendToServer(packet);
+            ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
+        }
     }
 
     // Midi Functions
@@ -416,7 +438,7 @@ public class GuiInstrument extends BaseGui {
                 this.onGuiNoteRelease(note);
             }
 
-            MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos(), handIn);
+            NoteEventPacket packet = NoteEventPacket.createResetPacket(instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(packet);
@@ -429,7 +451,7 @@ public class GuiInstrument extends BaseGui {
         if(this.heldNotes != null && this.instrumentId != null) {
             this.releaseHeldNotes();
 
-            MidiNotePacket packet = MidiNotePacket.createAllNotesOffPacket(instrumentId, player.getUUID(), player.getOnPos(), handIn);
+            NoteEventPacket packet = NoteEventPacket.createResetPacket(instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             // Turn off matching notes from BOTH synths because it could affect local notes and transmitter notes
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handlePacket(packet);
@@ -454,7 +476,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         if(this.instrumentId != null) {
-            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), player.getOnPos(), handIn);
+            NoteEventPacket packet = NoteEventPacket.createNotePacket(midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);
@@ -464,7 +486,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNoteRelease(Byte midiNote) {
         if(this.instrumentId != null) {
-            MidiNotePacket packet = MidiNotePacket.createNotePacket(midiNote, Integer.valueOf(0).byteValue(), instrumentId, player.getUUID(), player.getOnPos(), handIn);
+            NoteEventPacket packet = NoteEventPacket.createNotePacket(midiNote, ByteUtils.ZERO, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
 
@@ -634,14 +656,16 @@ public class GuiInstrument extends BaseGui {
         // Instrument Name
         this.drawStringAbsolute(graphics, font, this.instrumentNameString, START_X + 198, START_Y + 13, 0xFF00E600);
 
-        // Note Text: Left
-        this.drawStringAbsolute(graphics, font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 165, 0xFF00E600);
+        if(!this.settingsOnly) {
+            // Note Text: Left
+            this.drawStringAbsolute(graphics, font, this.noteIdString.split(",")[0], START_X + 102, START_Y + 165, 0xFF00E600);
 
-        // Note Text: Middle
-        this.drawStringAbsolute(graphics, font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 165, 0xFF00E600);
+            // Note Text: Middle
+            this.drawStringAbsolute(graphics, font, this.noteIdString.split(",")[1], START_X + 143, START_Y + 165, 0xFF00E600);
 
-        // Note Text: Right
-        this.drawStringAbsolute(graphics, font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 165, 0xFF00E600);
+            // Note Text: Right
+            this.drawStringAbsolute(graphics, font, this.noteIdString.split(",")[2], START_X + 198, START_Y + 165, 0xFF00E600);
+        }
 
         // MIDI Source Name & Volume
         if(editMode) {
