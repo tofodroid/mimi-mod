@@ -13,6 +13,7 @@
             "item": "minecraft:iron_ingot"
         }
     },
+    "category": "misc",
     "result": {
         "item": "mimi:flute"
     }

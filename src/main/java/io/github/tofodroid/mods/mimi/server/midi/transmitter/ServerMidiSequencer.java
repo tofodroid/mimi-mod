@@ -6,11 +6,11 @@ import java.util.function.Consumer;
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.Sequence;
+import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.com.sun.media.sound.SimpleThreadSequencer;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.common.midi.BasicMidiEvent;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 
@@ -29,7 +29,7 @@ public class ServerMidiSequencer {
     // Midi System
     private SimpleThreadSequencer<ServerMidiInputReceiver> activeSequencer;
 
-    public ServerMidiSequencer(Consumer<BasicMidiEvent> eventHandler, Runnable sequenceEndCallback) {
+    public ServerMidiSequencer(Consumer<ShortMessage> eventHandler, Runnable sequenceEndCallback) {
         initializeSequencer(new ServerMidiInputReceiver(eventHandler));
         this.sequenceEndCallback = sequenceEndCallback;
     }

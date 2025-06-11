@@ -2,6 +2,8 @@ package io.github.tofodroid.mods.mimi.common.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
+import io.github.tofodroid.mods.mimi.common.network.MIMIConfigPacket;
+import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.server.midi.ServerMidiManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -9,6 +11,9 @@ import net.minecraft.network.chat.Component;
 
 public class ModCommands {
     public static final LiteralArgumentBuilder<CommandSourceStack> COMMANDS = Commands.literal("mimi")
+        .then(Commands.literal("config")
+            .executes(ctx -> configureMIMI(ctx.getSource()))
+        )
         .then(Commands.literal("server")
             .then(Commands.literal("reload")
                 .requires(cs -> cs.getServer().isSingleplayer() || cs.hasPermission(3))
@@ -17,8 +22,13 @@ public class ModCommands {
         );
 
     private static int reloadServerMusicList(CommandSourceStack source) {
-        ServerMidiManager.refreshServerSongs(true);
+        ServerMidiManager.refreshServerSongs();
         source.sendSuccess(() -> Component.literal("Server saved music reloaded. Found " + ServerMidiManager.getServerSongs().size() + " files."), true);
+        return 0;
+    }
+
+    private static int configureMIMI(CommandSourceStack source) {
+        NetworkProxy.sendToPlayer(source.getPlayer(), new MIMIConfigPacket());
         return 0;
     }
 }

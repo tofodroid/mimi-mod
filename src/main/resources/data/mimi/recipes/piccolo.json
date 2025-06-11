@@ -19,6 +19,7 @@
             "tag": "minecraft:planks"
         }
     },
+    "category": "misc",
     "result": {
         "item": "mimi:piccolo"
     }

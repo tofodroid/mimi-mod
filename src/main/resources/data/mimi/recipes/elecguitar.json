@@ -22,6 +22,7 @@
             "item": "minecraft:redstone"
         }
     },
+    "category": "misc",
     "result": {
         "item": "mimi:elecguitar"
     }

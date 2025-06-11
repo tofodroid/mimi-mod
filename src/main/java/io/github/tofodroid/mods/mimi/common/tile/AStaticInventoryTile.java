@@ -49,6 +49,11 @@ public abstract class AStaticInventoryTile extends BlockEntity implements Worldl
     public void loadItems(CompoundTag nbt) {
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         ContainerHelper.loadAllItems(nbt, this.items);
+        this.onItemsLoaded();
+    }
+
+    public void onItemsLoaded() {
+        // No-op
     }
     
     @Override

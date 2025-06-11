@@ -35,7 +35,7 @@ public abstract class MIMISynthUtils {
 
             // Minecraft Settings Volumes
             Float catVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.RECORDS);
-            catVolume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
+            catVolume = Math.min(Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER), catVolume);
             volume *= catVolume.doubleValue();
         }
 
