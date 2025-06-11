@@ -12,7 +12,6 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
@@ -34,15 +33,15 @@ public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListene
     }
 
     @Override
-    protected void openGui(Level worldIn, Player player, TileListener tile) {
-        ClientGuiWrapper.openListenerGui(worldIn, tile.getBlockPos(), tile.getSourceStack());
+    public OpenGuiWrapper openGuiWrapper() {
+        return ClientGuiWrapper::openListenerGui;
     }
 
     @Override
     public BlockEntityType<TileListener> getTileType() {
         return ModTiles.LISTENER;
     }
-    
+
     @Override
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if(!worldIn.isClientSide) {
@@ -58,26 +57,13 @@ public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListene
         super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
-
     @Override
     protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        // Invert Signal
-        tooltip.add(Component.literal("  Invert Power: " 
-            + (MidiNbtDataUtils.getInvertSignal(blockItemStack) ? "Yes " : "No")).withStyle(ChatFormatting.GREEN)
-        );
-
-        // Filter Instrument
-        tooltip.add(Component.literal("  Instrument: " 
-            + MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(blockItemStack))).withStyle(ChatFormatting.GREEN)
-        );
-
-        // Filter Note
-        tooltip.add(Component.literal("  Note(s): " 
-            + (MidiNbtDataUtils.getInvertNoteOct(blockItemStack) ? "Not " : "")
-            + MidiNbtDataUtils.getFilteredNotesAsString(blockItemStack)).withStyle(ChatFormatting.GREEN)
-        );
+        MidiNbtDataUtils.appendInvertSignalTooltip(blockItemStack, tooltip);
+        MidiNbtDataUtils.appendFilterInstrumentTooltip(blockItemStack, tooltip);
+        MidiNbtDataUtils.appendFilterNoteTooltip(blockItemStack, tooltip);
     }
 }

@@ -101,8 +101,5 @@ public abstract class AConfigurableMidiNoteResponsiveTile extends AConfigurableM
     
     public abstract void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime);
     public abstract void onNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime);
-    public abstract void onAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime);
-    public abstract Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
-    public abstract Boolean shouldTriggerFromNoteOff(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId);
-    public abstract Boolean shouldTriggerFromAllNotesOff(@Nullable Byte channel, @Nullable Byte instrumentId);
+    public abstract void onReset(@Nullable Byte channel, @Nullable Byte instrumentId, Long noteTime);
 }

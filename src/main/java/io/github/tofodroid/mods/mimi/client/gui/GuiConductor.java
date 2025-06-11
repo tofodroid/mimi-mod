@@ -51,7 +51,7 @@ public class GuiConductor extends BaseGui {
     }
 
     public void syncConductorToServer() {
-        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(conductorStack, tilePos));
+        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(conductorStack, tilePos, null));
     }
 
     @Override
@@ -99,10 +99,10 @@ public class GuiConductor extends BaseGui {
             if(broadcastNote + 1 <= Byte.MAX_VALUE) {
                 broadcastNote++;
             } else {
-                broadcastNote = Integer.valueOf(broadcastNote - (broadcastNote % 12)).byteValue();
+                broadcastNote = (byte)(broadcastNote - (broadcastNote % 12));
             }
         } else {
-            broadcastNote = Integer.valueOf(broadcastNote - 11).byteValue();
+            broadcastNote = (byte)(broadcastNote - 11);
         }
         MidiNbtDataUtils.setBroadcastNote(conductorStack, broadcastNote);
     }
@@ -110,12 +110,12 @@ public class GuiConductor extends BaseGui {
     protected void shiftBroadcastNoteOctave() {
         if((broadcastNote / 12)  < 10) {
             if(broadcastNote + 12 <= Byte.MAX_VALUE) {
-                broadcastNote = Integer.valueOf(broadcastNote + 12).byteValue();
+                broadcastNote = (byte)(broadcastNote + 12);
             } else {
-                broadcastNote = Integer.valueOf(broadcastNote + - 108).byteValue();
+                broadcastNote = (byte)(broadcastNote + - 108);
             }
         } else {
-            broadcastNote = Integer.valueOf(broadcastNote - 120).byteValue();
+            broadcastNote = (byte)(broadcastNote - 120);
         }
         MidiNbtDataUtils.setBroadcastNote(conductorStack, broadcastNote);
     }

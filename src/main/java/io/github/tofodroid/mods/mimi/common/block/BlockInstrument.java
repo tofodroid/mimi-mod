@@ -1,11 +1,8 @@
 package io.github.tofodroid.mods.mimi.common.block;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -22,6 +19,7 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import io.github.tofodroid.mods.mimi.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +28,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -46,12 +43,11 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BlockInstrument extends AContainerBlock<TileInstrument> implements SimpleWaterloggedBlock {
+public class BlockInstrument extends AConfigurableTileBlock<TileInstrument> implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
     public static final MapCodec<BlockInstrument> CODEC = instrumentCodec(BlockInstrument::new);
@@ -61,21 +57,14 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected final Integer defaultChannels;
     protected final Integer defaultColor;
     protected final String REGISTRY_NAME;
- 
+
     @Override
     public MapCodec<BlockInstrument> codec() {
        return CODEC;
     }
 
     public BlockInstrument(Properties props, Byte instrumentId) {
-        super(props.explosionResistance(6.f).strength(2.f).sound(SoundType.WOOD).dynamicShape().noOcclusion());
-        InstrumentSpec spec = InstrumentConfig.getBydId(instrumentId);
-        this.SHAPES = this.generateShapes(VoxelShapeUtils.loadFromStrings(spec.collisionShapes));
-        this.REGISTRY_NAME = spec.registryName;
-        this.defaultChannels = MidiNbtDataUtils.getDefaultChannelsForBank(spec.midiBankNumber);
-        this.instrumentId = instrumentId;
-        this.defaultColor = spec.defaultColor();
-        this.registerDefaultState(this.stateDefinition.any().setValue(DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+        this(props, InstrumentConfig.getBydId(instrumentId));
     }
 
     public BlockInstrument(Properties props, InstrumentSpec spec) {
@@ -100,7 +89,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     protected Map<Direction, VoxelShape> generateShapes(VoxelShape shape) {
         return VoxelShapeUtils.generateFacingShape(shape);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         TileInstrument tileInstrument = getTileForBlock(worldIn, pos);
@@ -112,7 +101,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
                     return InteractionResult.CONSUME;
                 }
             } else if(tileInstrument.equals(getTileInstrumentForEntity(player))) {
-                ClientGuiWrapper.openInstrumentGui(worldIn, player, null, tileInstrument.getInstrumentStack());
+                this.openGuiWrapper().accept(worldIn, player, null, null, tileInstrument.getSourceStack());
                 return InteractionResult.CONSUME;
             }
         }
@@ -139,18 +128,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         super.onRemove(state, worldIn, pos, newState, isMoving);
     }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public ItemStack getCloneItemStack(LevelReader reader, BlockPos pos, BlockState state) {
-        TileInstrument tileInstrument = reader.getBlockEntity(pos, ModTiles.INSTRUMENT).orElse(null);
-        
-        if(tileInstrument != null) {
-            return tileInstrument.getInstrumentStack();
-        }
-
-        return super.getCloneItemStack(reader, pos, state);
-    }
     
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -165,20 +142,18 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
        return SHAPES.get(state.getValue(DIRECTION));
     }
 
-    public FluidState getFluidState(BlockState p_51581_) {
-        return p_51581_.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(p_51581_);
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation)
-    {
+    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation) {
         return state.setValue(DIRECTION, rotation.rotate(state.getValue(DIRECTION)));
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public BlockState mirror(BlockState state, Mirror mirror)
-    {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(DIRECTION)));
     }
 
@@ -187,21 +162,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
 		TileInstrument tile = (TileInstrument)super.newBlockEntity(pos, state);
         return tile;
 	}
-
-    @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
-        if (tileEntity instanceof TileInstrument) {
-            ItemStack newStack = new ItemStack(stack.getItem(), stack.getCount());
-            newStack.applyComponents(stack.getComponents());
-            ((TileInstrument)tileEntity).setInstrumentStack(newStack);
-        }
-    }
-    
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-        return Arrays.asList();
-    }
 
     public String getRegistryName() {
         return this.REGISTRY_NAME;
@@ -219,7 +179,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         return this.defaultChannels;
     }
 
-    @SuppressWarnings("null")
     public static Boolean isEntitySittingAtInstrument(LivingEntity entity) {
         return entity.isPassenger() && entity.getVehicle() != null && ModEntities.SEAT.equals(entity.getVehicle().getType());
     }
@@ -228,7 +187,6 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         if(isEntitySittingAtInstrument(entity)) {
             return (EntitySeat) entity.getVehicle();
         }
-
         return null;
     }
 
@@ -236,7 +194,7 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         TileInstrument tile = getTileInstrumentForEntity(entity);
 
         if(tile != null) {
-            return tile.getInstrumentStack();
+            return tile.getSourceStack();
         }
         return null;
     }
@@ -252,5 +210,15 @@ public class BlockInstrument extends AContainerBlock<TileInstrument> implements 
         }
 
         return null;
+    }
+
+    @Override
+    public OpenGuiWrapper openGuiWrapper() {
+        return ClientGuiWrapper::openInstrumentGui;
+    }
+
+    @Override
+    protected void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip) {
+        // No-op, handled by ItemBlockInstrument
     }
 }

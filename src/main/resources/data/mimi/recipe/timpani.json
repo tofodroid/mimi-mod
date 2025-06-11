@@ -19,6 +19,7 @@
             "item": "minecraft:stone_button"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:timpani"
     }

@@ -31,13 +31,14 @@ public final class TagUtils {
         // Other
         createBoolComponent("inverted");
         createIntComponent("dye_id");
+        createIntComponent("setting_type");
         
         // Playlist
         createNbtComponent("favorite_songs");
         createBoolComponent("loop_mode");
         createBoolComponent("favorite_mode");
         createBoolComponent("source_mode");
-        createIntComponent("shuffle");
+        createIntComponent("shuffled");
 
         // MIDI
         createByteComponent("filter_note");

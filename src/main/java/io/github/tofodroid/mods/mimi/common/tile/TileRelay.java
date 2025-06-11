@@ -3,14 +3,13 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import java.util.List;
 import java.util.UUID;
 
-import io.github.tofodroid.mods.mimi.common.midi.BasicMidiEvent;
-import io.github.tofodroid.mods.mimi.common.midi.MidiEventType;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
+import io.github.tofodroid.mods.mimi.common.api.event.MidiEventType;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerMapping;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastConsumer;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastProducer;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerMapping;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastConsumer;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastProducer;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -44,7 +43,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
         // Remove old consumers before changing linked ID
         if(this.hasLevel() && !this.getLevel().isClientSide) {
             // Stop all notes
-            this.allNotesOff();
+            this.reset();
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
 
@@ -75,7 +74,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
         super.setRemoved();
 
         if(!this.getLevel().isClientSide()) {
-            this.allNotesOff();
+            this.reset();
             BroadcastManager.removeBroadcastProducer(this.getUUID());
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
@@ -86,7 +85,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
         super.onChunkUnloaded();
     
         if(!this.getLevel().isClientSide()) {
-            this.allNotesOff();
+            this.reset();
             BroadcastManager.removeBroadcastProducer(this.getUUID());
             BroadcastManager.removeOwnedBroadcastConsumers(this.getUUID());
         }
@@ -103,27 +102,12 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     }
 
     @Override
-    public void onAllNotesOff(Byte channel, Byte instrumentId, Long noteTime) {
-        this.broadcast(BasicMidiEvent.allNotesOff(channel, noteTime));
+    public void onReset(Byte channel, Byte instrumentId, Long noteTime) {
+        this.broadcast(BroadcastEvent.reset(channel, this.getUUID(), this.getDimension(), this.getBlockPos(), noteTime));
     }
 
-    public BasicMidiEvent mapEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, Long noteTime) {
-        return new BasicMidiEvent(type, channelMap[channel], note, velocity, noteTime);
-    }
-
-    @Override
-    public Boolean shouldTriggerFromNoteOn(Byte channel, Byte note, Byte velocity, Byte instrumentId) {
-        return true;        
-    }
-
-    @Override
-    public Boolean shouldTriggerFromNoteOff(Byte channel, Byte note, Byte velocity, Byte instrumentId) {
-        return true;        
-    }
-
-    @Override
-    public Boolean shouldTriggerFromAllNotesOff(Byte channel, Byte instrumentId) {
-        return true;
+    public BroadcastEvent mapEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, Long noteTime) {
+        return new BroadcastEvent(type, channel == BroadcastEvent.ALL_CHANNELS ? BroadcastEvent.ALL_CHANNELS : channelMap[channel], note, velocity, this.getUUID(), this.getDimension(), this.getBlockPos(), this.getBroadcastRange(), noteTime);
     }
 
     @Override
@@ -164,32 +148,13 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     }
 
     @Override
-    public void doHandleNoteOn(BroadcastEvent message) {
-        this.onNoteOn(message.channel, message.note, message.velocity, null, message.eventTime);
+    public void doHandleEvent(BroadcastEvent message) {
+        this.broadcast(mapEvent(message.type, message.channel, message.note, message.velocity, message.eventTime));
     }
     
     @Override
-    public void doHandleNoteOff(BroadcastEvent message) {
-        this.onNoteOff(message.channel, message.note, message.velocity, null, message.eventTime);
-    }
-
-    @Override
-    public void doHandleAllNotesOff(BroadcastEvent message) {
-        this.onAllNotesOff(message.channel, null, message.eventTime);
-    }
-    @Override
-    public Boolean willHandleNoteOn(BroadcastEvent message) {
-        return this.shouldTriggerFromNoteOn(message.channel, message.note, message.velocity, null);
-    }
-
-    @Override
-    public Boolean willHandleNoteOff(BroadcastEvent message) {
-        return this.shouldTriggerFromNoteOff(message.channel, message.note, message.velocity, null);
-    }
-
-    @Override
-    public Boolean willHandleAllNotesOff(BroadcastEvent message) {
-        return this.shouldTriggerFromAllNotesOff(message.channel, null);
+    public Boolean willHandleEvent(BroadcastEvent message) {
+        return true;
     }
 
     @Override

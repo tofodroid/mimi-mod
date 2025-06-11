@@ -7,13 +7,11 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ClientMidiListPacketHandler {
     public static void handlePacketClient(final ClientMidiListPacket message) {
-        MIMIMod.getProxy().clientMidiFiles().refresh(true);
         NetworkProxy.sendToServer(new ClientMidiListPacket(MIMIMod.getProxy().clientMidiFiles().getSortedSongInfos()));
     }
     
     public static void handlePacketServer(final ClientMidiListPacket message, ServerPlayer sender) {
         ServerMidiManager.setCacheInfosForSource(sender.getUUID(), message.infos);
-        ServerMidiManager.refreshServerSongs(false);
         ServerTransmitterManager.refreshSongs(sender.getUUID());
         ServerMusicPlayerSongListPacket packet = ServerTransmitterManager.createListPacket(sender.getUUID());
 

@@ -18,7 +18,9 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -50,26 +52,35 @@ public class BlockTransmitter extends AContainerBlock<TileTransmitter> {
     }
 
     @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(stack.getItem() instanceof IInstrumentItem || stack.getItem().equals(ModItems.RECEIVER) || stack.getItem().equals(ModItems.RELAY) || stack.getItem().equals(ModItems.SOURCELINKER)) {
+            TileTransmitter tile = getTileForBlock(level, pos);
+
+            if(tile != null && player.isCrouching()) {
+                // Server: Link | Client: Don't open GUI
+                if(!level.isClientSide) {
+                    String transmitterName = level.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
+                    MidiNbtDataUtils.setMidiSourceFromTransmitter(stack, tile.getUUID(), transmitterName);
+                    player.setItemInHand(player.getUsedItemHand(), stack);
+                    Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(this.getName());
+                    player.displayClientMessage(message, true);
+                }
+                return ItemInteractionResult.SUCCESS;
+            }
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
     public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         TileTransmitter tile = getTileForBlock(worldIn, pos);
         
         if(tile != null) {
-            ItemStack handStack = player.getItemInHand(player.getUsedItemHand());
-
-            if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER) || handStack.getItem().equals(ModItems.RELAY))) {
-                if(!worldIn.isClientSide) {
-                    String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
-                    MidiNbtDataUtils.setMidiSourceFromTransmitter(handStack, tile.getUUID(), transmitterName);
-                    player.setItemInHand(player.getUsedItemHand(), handStack);
-                    player.displayClientMessage(Component.literal("Linked to Transmitter"), true);
-                    return InteractionResult.CONSUME;
-                }
-            } else if(worldIn.isClientSide) {
+            if(worldIn.isClientSide) {
                 ClientGuiWrapper.openTransmitterBlockGui(worldIn, tile.getUUID());
                 return InteractionResult.CONSUME;
             }
         }
-
         return InteractionResult.SUCCESS;
     }
 

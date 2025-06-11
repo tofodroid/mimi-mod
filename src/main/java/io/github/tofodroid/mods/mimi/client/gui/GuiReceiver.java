@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -39,11 +40,13 @@ public class GuiReceiver extends BaseGui {
     private final Player player;
     private final ItemStack receiverStack;
     private final BlockPos tilePos;
+    private final InteractionHand handIn;
 
-    public GuiReceiver(Player player, BlockPos tilePos, ItemStack receiverStack) {
+    public GuiReceiver(Player player, BlockPos tilePos, InteractionHand handIn, ItemStack receiverStack) {
         super(302, 131, 302, "textures/gui/container_receiver.png", "item.MIMIMod.gui_receiver");
         this.player = player;
         this.tilePos = tilePos;
+        this.handIn = handIn;
 
         if(receiverStack == null || receiverStack.isEmpty()) {
             MIMIMod.LOGGER.error("Receiver stack is null or empty. Force closing GUI!");
@@ -67,7 +70,7 @@ public class GuiReceiver extends BaseGui {
     }
 
     public void syncListenerToServer() {
-        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(receiverStack, tilePos));
+        NetworkProxy.sendToServer(new ConfigurableMidiTileSyncPacket(receiverStack, tilePos, handIn));
     }
 
     @Override

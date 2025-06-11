@@ -19,6 +19,7 @@
             "tag": "minecraft:logs"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:accordion"
     }

@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ServerMusicPlayerSongListPacketHandler {   
     public static void handlePacketServer(final ServerMusicPlayerSongListPacket message, ServerPlayer sender) {
-        ServerMidiManager.refreshServerSongs(false);
+        ServerMidiManager.refreshServerSongs();
         ServerTransmitterManager.refreshSongs(message.musicPlayerId);
         ServerMusicPlayerSongListPacket packet = ServerTransmitterManager.createListPacket(message.musicPlayerId);
 
@@ -17,7 +17,6 @@ public class ServerMusicPlayerSongListPacketHandler {
         }
     }
 
-    @SuppressWarnings({"resource"})
     public static void handlePacketClient(final ServerMusicPlayerSongListPacket message) {
         if(Minecraft.getInstance().screen != null && Minecraft.getInstance().screen instanceof GuiTransmitterBlock) {
             ((GuiTransmitterBlock)Minecraft.getInstance().screen).handleMusicplayerSongListPacket(message);
