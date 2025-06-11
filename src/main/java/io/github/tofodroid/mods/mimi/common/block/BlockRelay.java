@@ -15,7 +15,8 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,7 +34,7 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final String REGISTRY_NAME = "relay";
     public static final MapCodec<BlockRelay> CODEC = simpleCodec(BlockRelay::new);
- 
+
     @Override
     public MapCodec<BlockRelay> codec() {
        return CODEC;
@@ -53,8 +54,8 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
     }
 
     @Override
-    protected void openGui(Level worldIn, Player player, TileRelay tile) {
-        ClientGuiWrapper.openRelayGui(worldIn, player, tile.getBlockPos(), tile.getSourceStack());
+    public OpenGuiWrapper openGuiWrapper() {
+        return ClientGuiWrapper::openRelayGui;
     }
 
     @Override
@@ -63,27 +64,23 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
-        TileRelay tile = getTileForBlock(worldIn, pos);
-        
-        if(tile != null) {
-            ItemStack handStack = player.getItemInHand(player.getUsedItemHand());
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(stack.getItem() instanceof IInstrumentItem || stack.getItem().equals(ModItems.RECEIVER) || stack.getItem().equals(ModItems.RELAY) || stack.getItem().equals(ModItems.SOURCELINKER)) {
+            TileRelay tile = getTileForBlock(level, pos);
 
-            if(!player.isCrouching() && (handStack.getItem() instanceof IInstrumentItem || handStack.getItem().equals(ModItems.RECEIVER) || handStack.getItem().equals(ModItems.RELAY))) {
-                if(!worldIn.isClientSide) {
-                    String transmitterName = worldIn.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
-                    MidiNbtDataUtils.setMidiSourceFromRelay(handStack, tile.getUUID(), transmitterName);
-                    player.setItemInHand(player.getUsedItemHand(), handStack);
-                    player.displayClientMessage(Component.literal("Linked to Relay"), true);
-                    return InteractionResult.CONSUME;
+            if(tile != null && player.isCrouching()) {
+                // Server: Link | Client: Don't open GUI
+                if(!level.isClientSide) {
+                    String transmitterName = level.dimension().location().getPath() + "@(" + pos.toShortString() + ")";
+                    MidiNbtDataUtils.setMidiSourceFromRelay(stack, tile.getUUID(), transmitterName);
+                    player.setItemInHand(player.getUsedItemHand(), stack);
+                    Component message = Component.literal("Linked ").append(stack.getHoverName()).append(Component.literal(" to ")).append(this.getName());
+                    player.displayClientMessage(message, true);
                 }
-            } else if(worldIn.isClientSide) {
-                ClientGuiWrapper.openRelayGui(worldIn, player, tile.getBlockPos(), tile.getSourceStack());
-                return InteractionResult.CONSUME;
+                return ItemInteractionResult.SUCCESS;
             }
         }
-
-        return InteractionResult.SUCCESS;
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
     
     @Override
@@ -128,15 +125,7 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
                 tooltip.add(Component.literal("    Default").withStyle(ChatFormatting.GREEN));
             }
         }
-
-        // Note Source
-        if(MidiNbtDataUtils.getMidiSource(blockItemStack) != null) {
-            Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(blockItemStack);
-            Boolean isRelay = MidiNbtDataUtils.getMidiSourceIsRelay(blockItemStack);
-            tooltip.add(Component.literal("  Recieve Notes From: " + (isTransmitter ? "Transmitter:" : ( isRelay ? "Relay:" : "Player:"))).withStyle(ChatFormatting.GREEN));
-            tooltip.add(Component.literal("  " + MidiNbtDataUtils.getMidiSourceName(blockItemStack, true)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
-        } else {
-            tooltip.add(Component.literal("  Recieve Notes From: None").withStyle(ChatFormatting.GREEN));
-        }
+        
+        MidiNbtDataUtils.appendMidiSourceTooltip(blockItemStack, tooltip);
     }
 }

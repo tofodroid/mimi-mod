@@ -4,11 +4,13 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
+import io.github.tofodroid.mods.mimi.util.NetworkUtils;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
@@ -16,6 +18,8 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ConfigurableMidiTileSyncPacket> TYPE = new Type<>(ID);
 
     public final BlockPos tilePos;
+    public final InteractionHand handIn;
+
     public final UUID midiSource;
     public final String midiSourceName;
     public final Byte filterOct;
@@ -29,7 +33,8 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     public final Byte broadcastRange;
     public final Byte[] channelMap;
 
-    public ConfigurableMidiTileSyncPacket(BlockPos tilePos, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertSignal, Boolean triggerNoteStart, Byte holdTicks, Byte broadcastRange, Byte channelMap[]) {
+    private ConfigurableMidiTileSyncPacket(BlockPos tilePos, InteractionHand handIn, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertSignal, Boolean triggerNoteStart, Byte holdTicks, Byte broadcastRange, Byte channelMap[]) {
+        this.handIn = handIn;
         this.tilePos = tilePos;
         this.midiSource = midiSource;
         this.midiSourceName = midiSourceName;
@@ -44,8 +49,9 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         this.broadcastRange = broadcastRange;
         this.channelMap = channelMap;
     }
-    
-    public ConfigurableMidiTileSyncPacket(ItemStack sourceStack, BlockPos tilePos) {
+
+    public ConfigurableMidiTileSyncPacket(ItemStack sourceStack, BlockPos tilePos, InteractionHand handIn) {
+        this.handIn = handIn;
         this.tilePos = tilePos;
         this.midiSource = MidiNbtDataUtils.getMidiSource(sourceStack);
         this.midiSourceName = MidiNbtDataUtils.getMidiSourceName(sourceStack, false);
@@ -68,7 +74,15 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
 
     public static ConfigurableMidiTileSyncPacket decodePacket(FriendlyByteBuf buf) {
          try {
-            BlockPos tilePos = buf.readBlockPos();
+            Boolean isHand = buf.readBoolean();
+            InteractionHand handIn = null;
+            BlockPos tilePos = null;
+
+            if(isHand) {
+                handIn = NetworkUtils.decodeHand(buf.readByte());
+            } else {
+                tilePos= buf.readBlockPos();
+            }
 
             UUID midiSource = null;
             if(buf.readBoolean()) {
@@ -95,7 +109,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
                 channelMap[i] = buf.readByte();
             }
 
-            return new ConfigurableMidiTileSyncPacket(tilePos, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertSignal, triggerNoteStart, holdTicks, broadcastRange, channelMap);
+            return new ConfigurableMidiTileSyncPacket(tilePos, handIn, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertSignal, triggerNoteStart, holdTicks, broadcastRange, channelMap);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ConfigurableMidiTileSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -106,7 +120,13 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     }
     
     public static void encodePacket(ConfigurableMidiTileSyncPacket pkt, FriendlyByteBuf buf) {
-        buf.writeBlockPos(pkt.tilePos);
+        if(pkt.handIn != null) {
+            buf.writeBoolean(true);
+            buf.writeByte(NetworkUtils.encodeHand(pkt.handIn));
+        } else {
+            buf.writeBoolean(false);
+            buf.writeBlockPos(pkt.tilePos);
+        }
 
         if(pkt.midiSource != null) {
             buf.writeBoolean(true);

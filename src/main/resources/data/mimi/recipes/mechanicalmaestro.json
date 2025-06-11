@@ -19,6 +19,7 @@
             "item": "mimi:receiver"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:mechanicalmaestro"
     }

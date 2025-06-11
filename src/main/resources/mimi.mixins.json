@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "io.github.tofodroid.mods.mimi.mixin",
+  "compatibilityLevel": "JAVA_11",
+  "mixins": [
+  ],
+  "server": [],
+  "client": [
+    "LevelRendererMixin",
+    "ParrotMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

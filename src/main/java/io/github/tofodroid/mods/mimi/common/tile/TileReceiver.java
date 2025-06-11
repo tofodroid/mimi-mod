@@ -3,13 +3,10 @@ package io.github.tofodroid.mods.mimi.common.tile;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastEvent;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastConsumerInventoryHolder;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
+import io.github.tofodroid.mods.mimi.common.api.event.broadcast.IBroadcastConsumer;
 import io.github.tofodroid.mods.mimi.server.events.broadcast.BroadcastManager;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.BroadcastConsumerInventoryHolder;
-import io.github.tofodroid.mods.mimi.server.events.broadcast.api.IBroadcastConsumer;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -72,11 +69,6 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile implements IB
     }
 
     @Override
-    public Boolean shouldTriggerFromNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId) {
-        return (note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, note));
-    }
-
-    @Override
     public Byte getNoteGroupKey(Byte channel, Byte instrumentId) {
         return channel;
     }
@@ -113,31 +105,32 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile implements IB
     }
 
     @Override
-    public void doHandleNoteOn(BroadcastEvent message) {
-        this.onNoteOn(message.channel, message.note, message.velocity, null, message.eventTime);
-    }
-    
-    @Override
-    public void doHandleNoteOff(BroadcastEvent message) {
-        this.onNoteOff(message.channel, message.note, message.velocity, null, message.eventTime);
-    }
-
-    @Override
-    public void doHandleAllNotesOff(BroadcastEvent message) {
-        this.onAllNotesOff(message.channel, null, message.eventTime);
-    }
-    @Override
-    public Boolean willHandleNoteOn(BroadcastEvent message) {
-        return this.shouldTriggerFromNoteOn(message.channel, message.note, message.velocity, null);
+    public void doHandleEvent(BroadcastEvent message) {
+        switch(message.type) {
+            case NOTE_ON:
+                this.onNoteOn(message.channel, message.note, message.velocity, null, message.eventTime);
+                break;
+            case NOTE_OFF:
+                this.onNoteOff(message.channel, message.note, message.velocity, null, message.eventTime);
+                break;
+            case RESET:
+                this.onReset(message.channel, null, message.eventTime);
+                break;
+            default: break;
+        }
     }
 
     @Override
-    public Boolean willHandleNoteOff(BroadcastEvent message) {
-        return this.shouldTriggerFromNoteOff(message.channel, message.note, message.velocity, null);
-    }
-
-    @Override
-    public Boolean willHandleAllNotesOff(BroadcastEvent message) {
-        return this.shouldTriggerFromAllNotesOff(message.channel, null);
+    public Boolean willHandleEvent(BroadcastEvent message) {
+        switch(message.type) {
+            case NOTE_ON:
+                return (message.note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, message.note));
+            case NOTE_OFF:
+                return this.isHeld() && (message.note == null || MidiNbtDataUtils.isNoteFiltered(filterNote, filterOctMin, filterOctMax, invertFilterNoteOct, message.note));
+            case RESET:
+                return this.isHeld();
+            default:
+                return false;
+        }
     }
 }

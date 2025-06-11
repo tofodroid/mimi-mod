@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "HN"
+    ],
+    "key": {
+        "H": {
+            "item": "minecraft:honey_bottle"
+        },
+        "N": {
+            "item": "minecraft:note_block"
+        }
+    },
+    "category": "misc",
+    "result": {
+        "id": "mimi:settingssync"
+    }
+}

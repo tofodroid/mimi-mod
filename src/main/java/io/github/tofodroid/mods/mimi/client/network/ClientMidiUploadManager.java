@@ -9,6 +9,7 @@ import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
 import io.github.tofodroid.mods.mimi.common.network.ServerMidiUploadPacket;
+import io.github.tofodroid.mods.mimi.util.ByteUtils;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 
 public abstract class ClientMidiUploadManager {
@@ -81,7 +82,7 @@ public abstract class ClientMidiUploadManager {
                     uploadFileToServer(fileInfo);
                 }
             } else {
-                NetworkProxy.sendToServer(new ServerMidiUploadPacket(message.fileId, Integer.valueOf(0).byteValue(), Integer.valueOf(0).byteValue(), new byte[]{}));
+                NetworkProxy.sendToServer(new ServerMidiUploadPacket(message.fileId, ByteUtils.ZERO, ByteUtils.ZERO, new byte[]{}));
             }
         }
     }

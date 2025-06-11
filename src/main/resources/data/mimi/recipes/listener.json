@@ -13,6 +13,7 @@
             "item": "minecraft:note_block"
         }
     },
+    "category": "misc",
     "result": {
         "id": "mimi:listener"
     }

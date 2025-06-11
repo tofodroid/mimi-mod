@@ -5,10 +5,13 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.github.tofodroid.mods.mimi.common.item.ModItems;
 import io.github.tofodroid.mods.mimi.common.tile.AConfigurableTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,12 +25,16 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extends AContainerBlock<B> {
+    @FunctionalInterface
+    public interface OpenGuiWrapper {
+        void accept(Level level, Player player, BlockPos tilePos, InteractionHand handIn, ItemStack sourceStack);
+    }
 
     public AConfigurableTileBlock(Properties builder) {
         super(builder);
     }
 
-    protected abstract void openGui(Level worldIn, Player player, B tile);
+    public abstract OpenGuiWrapper openGuiWrapper();
     protected abstract void appendSettingsTooltip(ItemStack blockItemStack, List<Component> tooltip);
 
     @Override
@@ -36,12 +43,19 @@ public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extend
         
         if(tile != null) {
            if(worldIn.isClientSide) {
-                this.openGui(worldIn, player, tile);
+                this.openGuiWrapper().accept(worldIn, player, tile.getBlockPos(), null, tile.getSourceStack());
                 return InteractionResult.CONSUME;
             }
         }
-
         return InteractionResult.SUCCESS;
+    }
+    
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(stack.getItem().equals(ModItems.SETTINGSSYNC) || stack.getItem().equals(ModItems.SOURCELINKER)) {
+            return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+        }
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
@@ -75,5 +89,23 @@ public abstract class AConfigurableTileBlock<B extends AConfigurableTile> extend
     @Override
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         return Arrays.asList();
+    }
+    
+    
+    public ItemStack getSourceStack(Level worldIn, BlockPos pos) {
+        B tile = getTileForBlock(worldIn, pos);
+
+        if(tile != null) {
+            return tile.getSourceStack();
+        }
+        return null;
+    }
+
+    public void setSourceStack(Level worldIn, BlockPos pos, ItemStack stack) {
+        B tile = getTileForBlock(worldIn, pos);
+
+        if(tile != null) {
+            tile.setSourceStack(stack);
+        }
     }
 }

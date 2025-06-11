@@ -72,25 +72,8 @@ public class CloneMidiSettingsRecipe extends CustomRecipe {
         }
         
         if(!source.isEmpty() && !target.isEmpty()) {
-            ItemStack result = target.copyWithCount(1);
-            MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
-            MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
-
-            if(source.getItem() instanceof IInstrumentItem) {
-                MidiNbtDataUtils.setSysInput(result, MidiNbtDataUtils.getSysInput(source));
-                MidiNbtDataUtils.setInstrumentVolume(result, MidiNbtDataUtils.getInstrumentVolume(source));
-            } else {
-                MidiNbtDataUtils.setFilterOct(result, MidiNbtDataUtils.getFilterOct(source));
-                MidiNbtDataUtils.setFilterNote(result, MidiNbtDataUtils.getFilterNote(source));
-                MidiNbtDataUtils.setInvertNoteOct(result, MidiNbtDataUtils.getInvertNoteOct(source));
-                MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
-                MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
-                MidiNbtDataUtils.setTriggerNoteStart(result, MidiNbtDataUtils.getTriggerNoteStart(source));
-                MidiNbtDataUtils.setHoldTicks(result, MidiNbtDataUtils.getHoldTicks(source));
-            }
-            return result;
+            return MidiNbtDataUtils.copyMidiSettings(source, target);
         }
-
         return ItemStack.EMPTY;
     }
 
