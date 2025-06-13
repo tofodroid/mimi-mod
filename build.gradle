@@ -38,7 +38,7 @@ minecraft {
     mappings channel: mapping_channel, version: mapping_version
     
     // Tell FG to not automtically create the reobf tasks, as we now use Official mappings at runtime, If you don't use them at dev time then you'll have to fix your reobf yourself.
-    //reobf = false
+    reobf = false
 
     // When true, this property will have all Eclipse/IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
     // In most cases, it is not necessary to enable.
@@ -134,18 +134,14 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    
-    // mixin
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    
-    // compile against the JEI API but do not include it at runtime
-    compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-    // at runtime, use the full JEI jar for Forge
-    //runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
 
-    // Note: Patchouli does not seem to support Forge 1.21+, so attempt to use NeoForge lib
-    compileOnly("vazkii.patchouli:Patchouli:1.21-88-NEOFORGE")
-    //runtimeOnly("vazkii.patchouli:Patchouli:1.21-88-NEOFORGE")
+    // Mod Integrations
+    compileOnly("mezz.jei:jei-1.20.6-forge-api:18.0.0.66")
+    //runtimeOnly("mezz.jei:jei-1.20.6-forge:18.0.0.66")
+
+    // Note: Patchouli does not seem to support Forge 1.20.2+, so attempt to use NeoForge lib
+    compileOnly("vazkii.patchouli:Patchouli:1.20.6-86.1-NEOFORGE")
     
     // Hack fix for now, force jopt-simple to be exactly 5.0.4 because Mojang ships that version, but some transtive dependencies request 6.0+ 
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
@@ -153,7 +149,7 @@ dependencies {
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mimi.mixins.refmap.json'
+    add sourceSets.main, 'mimi.refmap.json'
     config 'mimi.mixins.json'
 }
 
@@ -199,13 +195,8 @@ tasks.named('jar', Jar).configure {
     }
     
     // This is the preferred method to reobfuscate your jar file
-    finalizedBy 'reobfJar'
+    //finalizedBy 'reobfJar'
 }
-
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
-// tasks.named('publish').configure {
-//     dependsOn 'reobfJar'
-// }
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
