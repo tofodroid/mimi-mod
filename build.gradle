@@ -129,18 +129,19 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Mod Integrations
-    // JEI
-    implementation fg.deobf("curse.maven:jei-238222:5101374")
+    compileOnly("mezz.jei:jei-1.20.2-forge-api:16.0.0.28")
+    //runtimeOnly("mezz.jei:jei-1.20.2-forge:16.0.0.28")
 
-    // Note: Patchouli does not seem to support Forge 1.20.4+, so attempt to use NeoForge lib
+    // Note: Patchouli does not seem to support Forge 1.20.2+, so attempt to use NeoForge lib
     compileOnly("vazkii.patchouli:Patchouli:1.20.4-85-NEOFORGE")
 }
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mimi.mixins.refmap.json'
+    add sourceSets.main, 'mimi.refmap.json'
     config 'mimi.mixins.json'
 }
 
@@ -188,11 +189,6 @@ tasks.named('jar', Jar).configure {
     // This is the preferred method to reobfuscate your jar file
     // finalizedBy 'reobfJar'
 }
-
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
-// tasks.named('publish').configure {
-//     dependsOn 'reobfJar'
-// }
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
