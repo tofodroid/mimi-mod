@@ -103,11 +103,11 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
 
     @Override
     public void onReset(Byte channel, Byte instrumentId, Long noteTime) {
-        this.broadcast(BroadcastEvent.reset(channel, this.getUUID(), this.getDimension(), this.getBlockPos(), noteTime));
+        this.broadcast(BroadcastEvent.reset(channel, this.getUUID(), this.getBroadcastDimension(), this.getBroadcastPos(), noteTime));
     }
 
     public BroadcastEvent mapEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, Long noteTime) {
-        return new BroadcastEvent(type, channel == BroadcastEvent.ALL_CHANNELS ? BroadcastEvent.ALL_CHANNELS : channelMap[channel], note, velocity, this.getUUID(), this.getDimension(), this.getBlockPos(), this.getBroadcastRange(), noteTime);
+        return new BroadcastEvent(type, channel == BroadcastEvent.ALL_CHANNELS ? BroadcastEvent.ALL_CHANNELS : channelMap[channel], note, velocity, this.getUUID(), this.getBroadcastDimension(), this.getBroadcastPos(), this.getBroadcastRange(), noteTime);
     }
 
     @Override
@@ -131,7 +131,22 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     }
 
     @Override
-    public ResourceKey<Level> getDimension() {
+    public BlockPos getConsumePos() {
+        return this.getBlockPos();
+    }
+
+    @Override
+    public ResourceKey<Level> getConsumeDimension() {
+        return this.getLevel().dimension();
+    }
+
+    @Override
+    public BlockPos getBroadcastPos() {
+        return this.getBlockPos();
+    }
+
+    @Override
+    public ResourceKey<Level> getBroadcastDimension() {
         return this.getLevel().dimension();
     }
 

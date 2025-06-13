@@ -34,7 +34,7 @@ public abstract class ATransmitterBroadcastProducer extends AServerBroadcastProd
     }
 
     public void handleMidiMessage(ShortMessage message) {
-        this.broadcast(BroadcastEvent.fromShortMessage(message, getOwnerId(), getDimension(), getBlockPos(), getBroadcastRange()));
+        this.broadcast(BroadcastEvent.fromShortMessage(message, getOwnerId(), getBroadcastDimension(), getBroadcastPos(), getBroadcastRange()));
     }
 
     public void onLoad() {
