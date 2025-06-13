@@ -119,6 +119,8 @@ public abstract class MidiNbtDataUtils {
     public static Integer getDefaultChannelsInt(ItemStack stack) {
         if(stack.getItem() instanceof IInstrumentItem) {
             return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+        } else if(stack.getItem().equals(ModItems.RELAY)) {
+            return ALL_CHANNELS_INT;
         }
         return NONE_CHANNELS_INT;
     }
@@ -422,6 +424,12 @@ public abstract class MidiNbtDataUtils {
         return instrumentTag;
     }
 
+    public static void appendBroadcastRangeTooltip(ItemStack stack, List<Component> tooltip) {
+        int broadcastRange = MidiNbtDataUtils.getBroadcastRange(stack);
+        String rangeDisplay = broadcastRange + "/" + MAX_BROADCAST_RANGE;
+        tooltip.add(Component.literal("  Range: " + rangeDisplay).withStyle(ChatFormatting.GREEN));
+    }
+
     public static void appendEnabledChannelsTooltip(ItemStack stack, List<Component> tooltip) {
         Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(stack);
         if(enabledChannels != null) {
@@ -431,6 +439,30 @@ public abstract class MidiNbtDataUtils {
                 tooltip.add(Component.literal("  Channels: None").withStyle(ChatFormatting.GREEN));
             } else {
                 tooltip.add(Component.literal("  Channels: " + MidiNbtDataUtils.getEnabledChannelsAsString(enabledChannels)).withStyle(ChatFormatting.GREEN));
+            }
+        }
+    }
+
+    public static void appendMidiChannelMappingsTooltip(ItemStack stack, List<Component> tooltip) {
+        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(stack);
+        tooltip.add(Component.literal("  Channels:").withStyle(ChatFormatting.GREEN));
+
+        if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
+            tooltip.add(Component.literal("    None").withStyle(ChatFormatting.GREEN));
+        } else {
+            Byte[] channelMap = MidiNbtDataUtils.getChannelMap(stack);
+            Boolean channelRendered = false;
+            for(byte i = 0; i < 16; i++) {
+                Boolean enabled = MidiNbtDataUtils.isChannelEnabled(enabledChannels, i);
+                
+                if(!enabled || channelMap[i] != i) {
+                    tooltip.add(Component.literal("    " + (i+1) + " (" + (enabled ? "On" : "Off") + ") --> " + (channelMap[i]+1)).withStyle(ChatFormatting.GREEN));
+                    channelRendered = true;
+                }
+            }
+
+            if(!channelRendered) {
+                tooltip.add(Component.literal("    Default").withStyle(ChatFormatting.GREEN));
             }
         }
     }
@@ -483,6 +515,8 @@ public abstract class MidiNbtDataUtils {
             ItemStack result = target.copyWithCount(1);
             MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
             MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
+            MidiNbtDataUtils.setChannelMap(result, MidiNbtDataUtils.getChannelMap(source));
+            MidiNbtDataUtils.setBroadcastRange(result, MidiNbtDataUtils.getBroadcastRange(source));
             MidiNbtDataUtils.setSysInput(result, MidiNbtDataUtils.getSysInput(source));
             MidiNbtDataUtils.setInstrumentVolume(result, MidiNbtDataUtils.getInstrumentVolume(source));
             MidiNbtDataUtils.setFilterOct(result, MidiNbtDataUtils.getFilterOct(source));

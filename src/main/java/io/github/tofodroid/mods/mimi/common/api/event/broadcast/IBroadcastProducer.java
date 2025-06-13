@@ -12,9 +12,9 @@ import net.minecraft.world.level.Level;
 public interface IBroadcastProducer extends AutoCloseable {
     // Data
     public abstract UUID getOwnerId();
-    public abstract BlockPos getBlockPos();
+    public abstract BlockPos getBroadcastPos();
     public abstract Integer getBroadcastRange();
-    public abstract ResourceKey<Level> getDimension();
+    public abstract ResourceKey<Level> getBroadcastDimension();
     public abstract BroadcastConsumerMapping getConsumers();
     public abstract void linkConsumers(List<IBroadcastConsumer> consumers);
 
@@ -28,7 +28,7 @@ public interface IBroadcastProducer extends AutoCloseable {
 
     // Events
     default public void reset() {
-        this.broadcast(BroadcastEvent.reset(getOwnerId(), getDimension(), getBlockPos(), MIMIMod.getProxy().getCurrentServerMillis()));
+        this.broadcast(BroadcastEvent.reset(getOwnerId(), getBroadcastDimension(), getBroadcastPos(), MIMIMod.getProxy().getCurrentServerMillis()));
     }
 
     default public void broadcast(BroadcastEvent event) {
