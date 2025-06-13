@@ -109,6 +109,9 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
+        // Range
+        MidiNbtDataUtils.appendBroadcastRangeTooltip(blockItemStack, tooltip);
+
         // Channel Mappings
         MidiNbtDataUtils.appendMidiChannelMappingsTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendMidiSourceTooltip(blockItemStack, tooltip);

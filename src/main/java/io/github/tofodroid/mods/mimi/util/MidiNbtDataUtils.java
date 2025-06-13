@@ -424,6 +424,12 @@ public abstract class MidiNbtDataUtils {
         return instrumentTag;
     }
 
+    public static void appendBroadcastRangeTooltip(ItemStack stack, List<Component> tooltip) {
+        int broadcastRange = MidiNbtDataUtils.getBroadcastRange(stack);
+        String rangeDisplay = broadcastRange + "/" + MAX_BROADCAST_RANGE;
+        tooltip.add(Component.literal("  Range: " + rangeDisplay).withStyle(ChatFormatting.GREEN));
+    }
+
     public static void appendEnabledChannelsTooltip(ItemStack stack, List<Component> tooltip) {
         Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(stack);
         if(enabledChannels != null) {
@@ -511,6 +517,7 @@ public abstract class MidiNbtDataUtils {
             MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
             MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
             MidiNbtDataUtils.setChannelMap(result, MidiNbtDataUtils.getChannelMap(source));
+            MidiNbtDataUtils.setBroadcastRange(result, MidiNbtDataUtils.getBroadcastRange(source));
             MidiNbtDataUtils.setSysInput(result, MidiNbtDataUtils.getSysInput(source));
             MidiNbtDataUtils.setInstrumentVolume(result, MidiNbtDataUtils.getInstrumentVolume(source));
             MidiNbtDataUtils.setFilterOct(result, MidiNbtDataUtils.getFilterOct(source));
