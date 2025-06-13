@@ -133,4 +133,9 @@ public class TileInstrument extends AConfigurableTile {
         super.onItemsLoaded();
         this.onSourceStackChanged();
     }
+
+    @Override
+    public BlockPos getBlockPos() {
+        return this.worldPosition;
+    }
 }
