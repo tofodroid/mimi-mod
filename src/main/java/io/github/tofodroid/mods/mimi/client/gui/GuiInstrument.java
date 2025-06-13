@@ -60,14 +60,28 @@ public class GuiInstrument extends BaseGui {
     private static final Integer MAX_NOTE_SHIFT = 53;
 
     // MIMI Layout
-    private final Integer ACCENT_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S);
-    private final Integer ACCENT_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_APOSTROPHE);
-    private final Integer ACCENT_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_1);
-    private final Integer ACCENT_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_EQUAL);
-    private final Integer NOTE_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Z);
-    private final Integer NOTE_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_SLASH);
-    private final Integer NOTE_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Q);
-    private final Integer NOTE_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_RIGHT_BRACKET);
+    private final Integer MIMI_ACCENT_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S);
+    private final Integer MIMI_ACCENT_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_APOSTROPHE);
+    private final Integer MIMI_ACCENT_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_1);
+    private final Integer MIMI_ACCENT_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_EQUAL);
+    private final Integer MIMI_NOTE_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Z);
+    private final Integer MIMI_NOTE_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_SLASH);
+    private final Integer MIMI_NOTE_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Q);
+    private final Integer MIMI_NOTE_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_RIGHT_BRACKET);
+
+    // LMMS Layout
+    private final Integer LMMS_ACCENT_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_S);
+    private final Integer LMMS_ACCENT_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_K);
+    private final Integer LMMS_ACCENT_LEFT_CROSS_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_APOSTROPHE);
+
+    private final Integer LMMS_NOTE_LEFT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Z);
+    private final Integer LMMS_NOTE_LEFT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_M);
+    private final Integer LMMS_NOTE_LEFT_CROSS_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_SLASH);
+
+    private final Integer LMMS_ACCENT_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_1);
+    private final Integer LMMS_ACCENT_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_EQUAL);
+    private final Integer LMMS_NOTE_RIGHT_MIN_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_Q);
+    private final Integer LMMS_NOTE_RIGHT_MAX_SCAN = GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_RIGHT_BRACKET);
 
     // VPiano Layout
     private final Integer V_PIANO_MIN_SHIFT = 14;
@@ -156,13 +170,14 @@ public class GuiInstrument extends BaseGui {
     private Integer visibleNoteShift = KEYBOARD_START_NOTE;
     private String noteIdString = "C3,F4 | G4,C6";
     private Byte mouseNote = null;
+    private Boolean pedalToggle = false;
 
     public GuiInstrument(Player player, ItemStack instrumentStack, InteractionHand handIn) {
         this(player, instrumentStack,  handIn, false);
     }
 
     public GuiInstrument(Player player, ItemStack instrumentStack, InteractionHand handIn, Boolean settingsOnly) {
-        super(328, 184, 530, "textures/gui/container_instrument.png", "item.MIMIMod.gui_instrument");
+        super(328, 184, 563, "textures/gui/container_instrument.png", "item.MIMIMod.gui_instrument");
 
         if(instrumentStack == null || instrumentStack.isEmpty()) {
             MIMIMod.LOGGER.error("Instrument stack is null or empty. Force closing GUI!");
@@ -332,6 +347,10 @@ public class GuiInstrument extends BaseGui {
                 return true;
             } else if(keyCode == GLFW.GLFW_KEY_SPACE) {
                 this.toggleHoldPedal(true);
+                return true;
+            } else if(keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+                this.toggleHoldPedal(!this.pedalToggle);
+                this.pedalToggle = !this.pedalToggle;
                 return true;
             } else {
                 Set<Byte> midiNoteNums = getMidiNoteFromScanCode(scanCode, modifiers == 1, false);
@@ -505,30 +524,70 @@ public class GuiInstrument extends BaseGui {
             case VPiano:
                 return Arrays.asList(getMidiNoteFromScanCode_VPiano(scanCode, modifier), ignoreModifier ? getMidiNoteFromScanCode_VPiano(scanCode, !modifier) : null)
                     .stream().filter(b -> b != null).collect(Collectors.toSet());
+            case LMMS:
+                return Arrays.asList(getMidiNoteFromScanCode_LMMS(scanCode))
+                    .stream().filter(b -> b != null).collect(Collectors.toSet());
             default:
                 MIMIMod.LOGGER.warn("Warning: Unknown keyboard layout selected for Instrument GUI.");
                 return null;
         }
     }
 
+    private Byte getMidiNoteFromScanCode_LMMS(Integer scanCode) {
+        Integer keyNum = null;
+
+        if (scanCode >= LMMS_ACCENT_LEFT_MIN_SCAN && scanCode <= LMMS_ACCENT_LEFT_MAX_SCAN) {
+            //Accent note - 1st row
+            keyNum = scanCode - LMMS_ACCENT_LEFT_MIN_SCAN + 1;
+            keyNum *= 2;
+        } else if (scanCode > LMMS_ACCENT_LEFT_MAX_SCAN && scanCode <= LMMS_ACCENT_LEFT_CROSS_MAX_SCAN) {
+            //Accent note - 1st row - crossover
+            keyNum = scanCode - LMMS_ACCENT_LEFT_MAX_SCAN + (LMMS_ACCENT_LEFT_MAX_SCAN - LMMS_ACCENT_LEFT_MIN_SCAN) + 1;
+            keyNum *= 2;
+        } else if(scanCode >= LMMS_NOTE_LEFT_MIN_SCAN && scanCode <= LMMS_NOTE_LEFT_MAX_SCAN) {
+            //Primary note - 1st row
+            keyNum = scanCode - LMMS_NOTE_LEFT_MIN_SCAN + 1;
+            keyNum += (keyNum-1);
+        } else if(scanCode > LMMS_NOTE_LEFT_MAX_SCAN && scanCode <= LMMS_NOTE_LEFT_CROSS_MAX_SCAN) {
+            //Primary note - 1st row - crossover
+            keyNum = scanCode - LMMS_NOTE_LEFT_MAX_SCAN + (LMMS_NOTE_LEFT_MAX_SCAN - LMMS_NOTE_LEFT_MIN_SCAN) + 1;
+            keyNum += (keyNum-1);
+        } else if(scanCode >= LMMS_ACCENT_RIGHT_MIN_SCAN && scanCode <= LMMS_ACCENT_RIGHT_MAX_SCAN) {
+            //Accent note - 2nd row
+            keyNum = scanCode - LMMS_ACCENT_RIGHT_MIN_SCAN + (LMMS_ACCENT_LEFT_MAX_SCAN - LMMS_ACCENT_LEFT_MIN_SCAN) + 1;
+            keyNum *= 2;
+        } else if(scanCode >= LMMS_NOTE_RIGHT_MIN_SCAN && scanCode <= LMMS_NOTE_RIGHT_MAX_SCAN) {
+            //Primary note 2nd row
+            keyNum = scanCode - LMMS_NOTE_RIGHT_MIN_SCAN + (LMMS_NOTE_LEFT_MAX_SCAN - LMMS_NOTE_LEFT_MIN_SCAN) + 2;
+            keyNum += (keyNum-1);
+        }
+
+        if(keyNum != null) {
+            Byte result = keyNumToMidiNote(keyNum);
+            return result;
+        }
+
+        return null;
+    }
+
     private Byte getMidiNoteFromScanCode_MIMI(Integer scanCode) {
         Integer keyNum = null;
 
-        if (scanCode >= ACCENT_LEFT_MIN_SCAN && scanCode <= ACCENT_LEFT_MAX_SCAN) {
+        if (scanCode >= MIMI_ACCENT_LEFT_MIN_SCAN && scanCode <= MIMI_ACCENT_LEFT_MAX_SCAN) {
             //Accent note - 1st row
-            keyNum = scanCode - ACCENT_LEFT_MIN_SCAN + 1;
+            keyNum = scanCode - MIMI_ACCENT_LEFT_MIN_SCAN + 1;
             keyNum *= 2;
-        } else if(scanCode >= NOTE_LEFT_MIN_SCAN && scanCode <= NOTE_LEFT_MAX_SCAN) {
+        } else if(scanCode >= MIMI_NOTE_LEFT_MIN_SCAN && scanCode <= MIMI_NOTE_LEFT_MAX_SCAN) {
             //Primary note 1st row
-            keyNum = scanCode - NOTE_LEFT_MIN_SCAN + 1;
+            keyNum = scanCode - MIMI_NOTE_LEFT_MIN_SCAN + 1;
             keyNum += (keyNum-1);
-        } else if(scanCode >= ACCENT_RIGHT_MIN_SCAN && scanCode <= ACCENT_RIGHT_MAX_SCAN) {
+        } else if(scanCode >= MIMI_ACCENT_RIGHT_MIN_SCAN && scanCode <= MIMI_ACCENT_RIGHT_MAX_SCAN) {
             //Accent note - 2nd row
-            keyNum = scanCode - ACCENT_RIGHT_MIN_SCAN + (ACCENT_LEFT_MAX_SCAN - ACCENT_LEFT_MIN_SCAN) + 1;
+            keyNum = scanCode - MIMI_ACCENT_RIGHT_MIN_SCAN + (MIMI_ACCENT_LEFT_MAX_SCAN - MIMI_ACCENT_LEFT_MIN_SCAN) + 1;
             keyNum *= 2;
-        } else if(scanCode >= NOTE_RIGHT_MIN_SCAN && scanCode <= NOTE_RIGHT_MAX_SCAN) {
+        } else if(scanCode >= MIMI_NOTE_RIGHT_MIN_SCAN && scanCode <= MIMI_NOTE_RIGHT_MAX_SCAN) {
             //Primary note 2nd row
-            keyNum = scanCode - NOTE_RIGHT_MIN_SCAN + (NOTE_LEFT_MAX_SCAN - NOTE_LEFT_MIN_SCAN) + 2;
+            keyNum = scanCode - MIMI_NOTE_RIGHT_MIN_SCAN + (MIMI_NOTE_LEFT_MAX_SCAN - MIMI_NOTE_LEFT_MIN_SCAN) + 2;
             keyNum += (keyNum-1);
         }
 
@@ -555,7 +614,9 @@ public class GuiInstrument extends BaseGui {
         // Note Labels
         if(ConfigProxy.KEYBOARD_LAYOUTS.MIMI.equals(ConfigProxy.getKeyboardLayout())) {
             this.blitAbsolute(graphics, guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, 0, 457, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
-        } else {
+        } else if(ConfigProxy.KEYBOARD_LAYOUTS.LMMS.equals(ConfigProxy.getKeyboardLayout())) {
+            this.blitAbsolute(graphics, guiTexture, START_X + NOTE_OFFSET_X - 1, START_Y + NOTE_OFFSET_Y + 70, 0, 510, 308, 53, TEXTURE_SIZE, TEXTURE_SIZE);
+        } else if (ConfigProxy.KEYBOARD_LAYOUTS.VPiano.equals(ConfigProxy.getKeyboardLayout())) {
             if(visibleNoteShift < V_PIANO_MIN_SHIFT) {
                 Integer widthShift = (V_PIANO_MIN_SHIFT - visibleNoteShift) * NOTE_WIDTH;
                 this.blitAbsolute(graphics, guiTexture, START_X + NOTE_OFFSET_X - 1 + widthShift, START_Y + NOTE_OFFSET_Y + 70, 0, 404, 308 - widthShift, 53, TEXTURE_SIZE, TEXTURE_SIZE);

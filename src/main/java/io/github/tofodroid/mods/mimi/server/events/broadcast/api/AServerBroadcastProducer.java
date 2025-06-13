@@ -23,18 +23,22 @@ public abstract class AServerBroadcastProducer implements IBroadcastProducer {
         this.dimension = dimension;
     }
 
+    @Override
     public UUID getOwnerId() {
         return this.ownerId;
     }
     
-    public ResourceKey<Level> getDimension() {
+    @Override
+    public ResourceKey<Level> getBroadcastDimension() {
         return this.dimension.get();
     }
 
-    public BlockPos getBlockPos() {
+    @Override
+    public BlockPos getBroadcastPos() {
         return this.blockPos.get();
     }
     
+    @Override
     public BroadcastConsumerMapping getConsumers() {
         return this.consumerCache;
     }

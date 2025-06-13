@@ -12,14 +12,14 @@ public interface IBroadcastConsumer extends AutoCloseable {
 
     // Data
     default public Boolean isEventInRange(BroadcastEvent event) {
-        return event.dimension.equals(getDimension()) && (event.range < 0 || Math.floor(Math.abs(Math.sqrt(event.pos.distSqr(getBlockPos())))) <= event.range);
+        return event.dimension.equals(getConsumeDimension()) && (event.range < 0 || Math.floor(Math.abs(Math.sqrt(event.pos.distSqr(getConsumePos())))) <= event.range);
     }
 
     public abstract UUID getLinkedId();
     public abstract UUID getOwnerId();
     public abstract List<Byte> getEnabledChannelsList();
-    public abstract BlockPos getBlockPos();
-    public abstract ResourceKey<Level> getDimension();
+    public abstract BlockPos getConsumePos();
+    public abstract ResourceKey<Level> getConsumeDimension();
 
     // Lifecycle
     public abstract void tickConsumer();
