@@ -110,28 +110,7 @@ public class BlockRelay extends AConfigurableNoteResponsiveTileBlock<TileRelay> 
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
         // Channel Mappings
-        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(blockItemStack);
-        tooltip.add(Component.literal("  Channels:").withStyle(ChatFormatting.GREEN));
-
-        if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
-            tooltip.add(Component.literal("    None").withStyle(ChatFormatting.GREEN));
-        } else {
-            Byte[] channelMap = MidiNbtDataUtils.getChannelMap(blockItemStack);
-            Boolean channelRendered = false;
-            for(byte i = 0; i < 16; i++) {
-                Boolean enabled = MidiNbtDataUtils.isChannelEnabled(enabledChannels, i);
-                
-                if(!enabled || channelMap[i] != i) {
-                    tooltip.add(Component.literal("    " + (i+1) + " (" + (enabled ? "On" : "Off") + ") --> " + (channelMap[i]+1)).withStyle(ChatFormatting.GREEN));
-                    channelRendered = true;
-                }
-            }
-
-            if(!channelRendered) {
-                tooltip.add(Component.literal("    Default").withStyle(ChatFormatting.GREEN));
-            }
-        }
-        
+        MidiNbtDataUtils.appendMidiChannelMappingsTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendMidiSourceTooltip(blockItemStack, tooltip);
     }
 }

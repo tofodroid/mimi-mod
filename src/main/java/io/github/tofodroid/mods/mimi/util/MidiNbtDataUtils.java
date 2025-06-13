@@ -119,6 +119,8 @@ public abstract class MidiNbtDataUtils {
     public static Integer getDefaultChannelsInt(ItemStack stack) {
         if(stack.getItem() instanceof IInstrumentItem) {
             return ((IInstrumentItem)stack.getItem()).getDefaultChannels();
+        } else if(stack.getItem().equals(ModItems.RELAY)) {
+            return ALL_CHANNELS_INT;
         }
         return NONE_CHANNELS_INT;
     }
@@ -435,6 +437,30 @@ public abstract class MidiNbtDataUtils {
         }
     }
 
+    public static void appendMidiChannelMappingsTooltip(ItemStack stack, List<Component> tooltip) {
+        Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(stack);
+        tooltip.add(Component.literal("  Channels:").withStyle(ChatFormatting.GREEN));
+
+        if(enabledChannels.equals(MidiNbtDataUtils.NONE_CHANNELS_INT)) {
+            tooltip.add(Component.literal("    None").withStyle(ChatFormatting.GREEN));
+        } else {
+            Byte[] channelMap = MidiNbtDataUtils.getChannelMap(stack);
+            Boolean channelRendered = false;
+            for(byte i = 0; i < 16; i++) {
+                Boolean enabled = MidiNbtDataUtils.isChannelEnabled(enabledChannels, i);
+                
+                if(!enabled || channelMap[i] != i) {
+                    tooltip.add(Component.literal("    " + (i+1) + " (" + (enabled ? "On" : "Off") + ") --> " + (channelMap[i]+1)).withStyle(ChatFormatting.GREEN));
+                    channelRendered = true;
+                }
+            }
+
+            if(!channelRendered) {
+                tooltip.add(Component.literal("    Default").withStyle(ChatFormatting.GREEN));
+            }
+        }
+    }
+
     public static Component getMidiSourceType(ItemStack stack) {
         if(MidiNbtDataUtils.getMidiSource(stack) != null) {
             Boolean isTransmitter = MidiNbtDataUtils.getMidiSourceIsTransmitter(stack);
@@ -484,6 +510,7 @@ public abstract class MidiNbtDataUtils {
             result.setCount(1);
             MidiNbtDataUtils.setMidiSource(result, MidiNbtDataUtils.getMidiSource(source), MidiNbtDataUtils.getMidiSourceName(source, false));
             MidiNbtDataUtils.setEnabledChannelsInt(result, MidiNbtDataUtils.getEnabledChannelsInt(source));
+            MidiNbtDataUtils.setChannelMap(result, MidiNbtDataUtils.getChannelMap(source));
             MidiNbtDataUtils.setSysInput(result, MidiNbtDataUtils.getSysInput(source));
             MidiNbtDataUtils.setInstrumentVolume(result, MidiNbtDataUtils.getInstrumentVolume(source));
             MidiNbtDataUtils.setFilterOct(result, MidiNbtDataUtils.getFilterOct(source));

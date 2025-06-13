@@ -32,28 +32,29 @@ public abstract class AServerBroadcastConsumer implements IBroadcastConsumer {
         this(ownerId, linkedId, enabledChannels, enabledChannelsList, () -> pos, () -> dimension);
     }
 
+    @Override
     public UUID getLinkedId() {
         return this.linkedId;
     }
 
+    @Override
     public UUID getOwnerId() {
         return this.ownerId;
     }
 
-    public ResourceKey<Level> getDimension() {
+    @Override
+    public ResourceKey<Level> getConsumeDimension() {
         return this.dimension.get();
     }
 
-    public BlockPos getBlockPos() {
+    @Override
+    public BlockPos getConsumePos() {
         return this.blockPos.get();
     }
 
+    @Override
     public List<Byte> getEnabledChannelsList() {
         return this.enabledChannelsList;
-    }
-
-    public List<AServerBroadcastConsumer> getConsumers() {
-        return List.of(this);
     }
 
     public void tickConsumer() {/*Default no-op*/}
