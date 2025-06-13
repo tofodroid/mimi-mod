@@ -65,7 +65,7 @@ public class TileInstrument extends AConfigurableTile {
 
     @Override
     protected void onSourceStackChanged() {
-        if(this.blockInstrument().isColorable() && ((IColorableItem)this.getSourceStack().getItem()).hasColor(this.getSourceStack())) {
+        if(this.blockInstrument().isColorable() && this.getSourceStack().getItem() instanceof IColorableItem && ((IColorableItem)this.getSourceStack().getItem()).hasColor(this.getSourceStack())) {
             this.color = ((IColorableItem)this.getSourceStack().getItem()).getColor(this.getSourceStack());
         }
 
