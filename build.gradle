@@ -38,7 +38,7 @@ minecraft {
     mappings channel: mapping_channel, version: mapping_version
     
     // Tell FG to not automtically create the reobf tasks, as we now use Official mappings at runtime, If you don't use them at dev time then you'll have to fix your reobf yourself.
-    //reobf = false
+    reobf = false
 
     // When true, this property will have all Eclipse/IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
     // In most cases, it is not necessary to enable.
@@ -153,7 +153,7 @@ dependencies {
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mimi.mixins.refmap.json'
+    add sourceSets.main, 'mimi.refmap.json'
     config 'mimi.mixins.json'
 }
 

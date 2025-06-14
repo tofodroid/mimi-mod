@@ -84,7 +84,12 @@ public class TileReceiver extends AConfigurableMidiPowerSourceTile implements IB
     }
 
     @Override
-    public ResourceKey<Level> getDimension() {
+    public BlockPos getConsumePos() {
+        return this.getBlockPos();
+    }
+
+    @Override
+    public ResourceKey<Level> getConsumeDimension() {
         return this.getLevel().dimension();
     }
 
