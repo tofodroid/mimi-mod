@@ -98,4 +98,9 @@ public class TileListener extends AConfigurableMidiPowerSourceTile implements IN
     public Byte getInstrumentId() {
         return this.getFilteredInstrument();
     }
+
+    @Override
+    public BlockPos getBlockPos() {
+        return this.worldPosition;
+    }
 }

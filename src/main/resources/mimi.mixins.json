@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "io.github.tofodroid.mods.mimi.mixin",
-  "compatibilityLevel": "JAVA_11",
+  "compatibilityLevel": "JAVA_8",
   "mixins": [
   ],
   "server": [],
@@ -11,5 +11,6 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+	"minVersion": "0.8"
 }
