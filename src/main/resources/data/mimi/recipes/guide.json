@@ -17,9 +17,9 @@
         }
     },
     "result": {
-        "id": "patchouli:guide_book",
+        "id": "mimi:guide",
         "nbt": {
-            "patchouli:book": "mimi:guide_book"
+            "patchouli:book": "mimi:guide"
         }
     }
 }

@@ -10,7 +10,8 @@ public class ConfigProxy {
     // INSTRUMENT GUI
     public static enum KEYBOARD_LAYOUTS {
         MIMI,
-        VPiano
+        VPiano,
+        LMMS
     }
 
     public static Path getConfigPath() {

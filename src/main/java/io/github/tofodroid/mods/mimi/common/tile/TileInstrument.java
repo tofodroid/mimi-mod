@@ -128,4 +128,9 @@ public class TileInstrument extends AConfigurableTile {
             this.color = stackColor;
         }
     }
+
+    @Override
+    public BlockPos getBlockPos() {
+        return this.worldPosition;
+    }
 }
