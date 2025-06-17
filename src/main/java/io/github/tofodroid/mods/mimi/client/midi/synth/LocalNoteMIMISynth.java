@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map.Entry;
 
-import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.SourceDataLine;
 
+import io.github.tofodroid.com.sun.media.sound.SoftChannelProxy;
 import io.github.tofodroid.mods.mimi.common.block.BlockInstrument;
 import io.github.tofodroid.mods.mimi.common.item.ItemInstrumentHandheld;
 import io.github.tofodroid.mods.mimi.common.network.NoteEventPacket;
@@ -35,7 +35,7 @@ public class LocalNoteMIMISynth extends AMIMISynth<MIMIChannel> {
 
             // Tick Channels
             for(Entry<MIMIChannel,String> entry : channelAssignmentMap.entrySet()) {
-                Byte instrumentId = Byte.parseByte(entry.getValue());
+                Byte instrumentId = getInstrumentIdFromChannelId(entry.getValue());
 
                 if(!entry.getKey().tick(clientPlayer, true) || (instrumentId == null || !playerInstruments.contains(instrumentId))) {
                     toRemove.add(entry.getKey());
@@ -58,12 +58,20 @@ public class LocalNoteMIMISynth extends AMIMISynth<MIMIChannel> {
     }
     
     @Override
-    protected MIMIChannel createChannel(Integer num, MidiChannel channel) {
+    protected MIMIChannel createChannel(Integer num, SoftChannelProxy channel) {
         return new MIMIChannel(num, channel);
     }
 
     @Override
     protected String createChannelId(NoteEventPacket message) {
-        return message.instrumentId.toString();
+        return message.instrumentId.toString() + "$" + message.channel.toString();
+    }
+
+    protected Byte getInstrumentIdFromChannelId(String channelId) {
+        return Byte.valueOf(channelId.substring(0, channelId.indexOf("$")));
+    }
+
+    protected Byte getChannelFromChannelId(String channelId) {
+        return Byte.valueOf(channelId.substring(channelId.indexOf("$")+1));
     }
 }

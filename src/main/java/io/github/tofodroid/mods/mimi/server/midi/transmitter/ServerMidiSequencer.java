@@ -12,6 +12,7 @@ import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.com.sun.media.sound.SimpleThreadSequencer;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.server.ServerExecutorProxy;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 
 public class ServerMidiSequencer {
@@ -176,8 +177,10 @@ public class ServerMidiSequencer {
                 @Override
                 public void meta(MetaMessage meta) {
                     if(MidiUtils.isMetaEndOfTrack(meta) && !activeSequencer.isRunning()) {
-                        self.stop();
-                        self.sequenceEndCallback.run();
+                        ServerExecutorProxy.executeOnServerThread(() -> {
+                            self.stop();
+                            self.sequenceEndCallback.run();
+                        });
                     }
                 }
             });

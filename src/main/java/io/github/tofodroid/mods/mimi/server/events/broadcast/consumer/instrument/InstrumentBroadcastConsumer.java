@@ -57,24 +57,24 @@ public class InstrumentBroadcastConsumer extends AServerBroadcastConsumer {
         switch(message.type) {
             case NOTE_ON:
                 ServerNoteConsumerManager.handleEvent(
-                    new NoteEvent(MidiEventType.NOTE_ON, false, instrumentId, handIn, message.note, MidiNbtDataUtils.applyVolume(this.volume, message.velocity), this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
+                    new NoteEvent(MidiEventType.NOTE_ON, false, instrumentId, handIn, message.channel, message.note, MidiNbtDataUtils.applyVolume(this.volume, message.velocity), this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
                 );
                 break;
             case NOTE_OFF:
                 ServerNoteConsumerManager.handleEvent(
-                    new NoteEvent(MidiEventType.NOTE_OFF, false, instrumentId, handIn, message.note, ByteUtils.ZERO, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
+                    new NoteEvent(MidiEventType.NOTE_OFF, false, instrumentId, handIn, message.channel, message.note, ByteUtils.ZERO, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
                 );
                 break;
             case CONTROL:
                 ServerNoteConsumerManager.handleEvent(
-                    new NoteEvent(MidiEventType.CONTROL, false, instrumentId, handIn, message.note, message.velocity, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
+                    new NoteEvent(MidiEventType.CONTROL, false, instrumentId, handIn, message.channel, message.note, message.velocity, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
                 );
                 break;
             case RESET:
                 this.sendReset();
             case PITCH_BEND:
                 ServerNoteConsumerManager.handleEvent(
-                    new NoteEvent(MidiEventType.PITCH_BEND, false, instrumentId, handIn, message.note, message.velocity, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
+                    new NoteEvent(MidiEventType.PITCH_BEND, false, instrumentId, handIn, message.channel, message.note, message.velocity, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
                 );
                 break;
             default:

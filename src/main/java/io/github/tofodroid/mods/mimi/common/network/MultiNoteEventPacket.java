@@ -65,6 +65,7 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
 
                 for(Integer eventIndex = 0; eventIndex < numEvents; eventIndex++) {
                     MidiEventType type = MidiEventType.fromByte(buf.readByte());
+                    Byte channel = buf.readByte();
                     Byte data1 = ByteUtils.ZERO;
                     Byte data2 = ByteUtils.ZERO;
 
@@ -81,7 +82,7 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
                     Byte instrumentId = buf.readByte();
                     InteractionHand instrumentHand = NetworkUtils.decodeHand(buf.readByte());
 
-                    timePackets.add(new NoteEventPacket(type, data1, data2, instrumentId, playerId, pos, noteServerTime, instrumentHand));
+                    timePackets.add(new NoteEventPacket(type, channel, data1, data2, instrumentId, playerId, pos, noteServerTime, instrumentHand));
                 }
             }
             return new MultiNoteEventPacket(resultMap);
@@ -106,6 +107,7 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
                 // Third Order
                 for(NetMidiEvent noteEvent : timeEntry.getValue()) {
                     buf.writeByte(noteEvent.type.toByte());
+                    buf.writeByte(noteEvent.channel);
 
                     if(noteEvent.type != MidiEventType.RESET) {
                         buf.writeByte(noteEvent.note);

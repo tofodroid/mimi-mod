@@ -58,10 +58,11 @@ public class MidiDeviceInputReceiver implements Receiver {
     private void playInstrument(BroadcastEvent event, Player player, InteractionHand hand, ItemStack instrument) {
         // Apply Instrument Volume Setting
         NoteEventPacket packet = NoteEventPacket.fromNoteEvent(new NoteEvent(
-                event.type, 
+                event.type,
                 true,
                 MidiNbtDataUtils.getInstrumentId(instrument),
                 hand,
+                event.channel,
                 event.note,
                 event.type == MidiEventType.NOTE_ON ? MidiNbtDataUtils.applyInstrumentVolume(instrument, event.velocity) : event.velocity,
                 event.senderId,

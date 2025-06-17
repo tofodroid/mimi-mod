@@ -3,8 +3,7 @@ package io.github.tofodroid.mods.mimi.client.midi.synth;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import javax.sound.midi.MidiChannel;
-
+import io.github.tofodroid.com.sun.media.sound.SoftChannelProxy;
 import io.github.tofodroid.mods.mimi.common.api.event.note.NoteEvent;
 import io.github.tofodroid.mods.mimi.common.config.instrument.InstrumentSpec;
 import io.github.tofodroid.mods.mimi.util.ByteUtils;
@@ -16,22 +15,22 @@ public class MIMIChannel {
     public static final Integer MIDI_CHANNEL_IDLE_SECONDS = 8;
     public static final Integer MAX_NOTE_DIST = 2 * NoteEvent.NOTE_DEF_RANGE;
 
-    protected final MidiChannel channel;
+    protected final SoftChannelProxy channel;
     protected final Integer channelNum;
     protected Instant lastNoteTime;
     protected BlockPos lastNotePos;
 
-    public MIMIChannel(Integer channelNum, MidiChannel channel) {
+    public MIMIChannel(Integer channelNum, SoftChannelProxy channel) {
         this.channelNum = channelNum;
         this.channel = channel;
         this.setVolume(ByteUtils.ZERO);
+        this.reset();
     }
 
     public void setInstrument(InstrumentSpec instrument) {
         this.channel.programChange(instrument.midiBankNumber * 128, instrument.midiPatchNumber);
         this.setVolume(ByteUtils.ZERO);
-        this.channel.allSoundOff();
-        this.channel.resetAllControllers();
+        this.reset();
     }
 
     public void clear() {
@@ -47,8 +46,7 @@ public class MIMIChannel {
 
     public void reset() {
         if(this.channel != null) {
-            this.channel.resetAllControllers();
-            this.channel.setPitchBend(8192);
+            this.channel.resetAllControllers(true);
             this.channel.allSoundOff();
         }
     }
@@ -75,7 +73,7 @@ public class MIMIChannel {
                 }
                 return true;
             } else {
-                this.channel.allNotesOff();
+                this.reset();
             }
         }
         return false;

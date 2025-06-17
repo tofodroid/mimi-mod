@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import io.github.tofodroid.com.sun.media.sound.SoftChannelProxy;
 import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
 
-import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
@@ -55,8 +55,8 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
         if(internalSynth != null) {
             // Setup channel map
-            for(int i = 0; i < internalSynth.getChannels().length; i++) {
-                builder.add(createChannel(i, this.internalSynth.getChannels()[i]));
+            for(int i = 0; i < internalSynth.getSoftChannels().length; i++) {
+                builder.add(createChannel(i, this.internalSynth.getSoftChannels()[i]));
             }
             this.midiChannelSet = builder.build();
             this.channelAssignmentMap = HashBiMap.create(midiChannelSet.size());
@@ -68,7 +68,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public abstract Boolean tick(Player clientPlayer);
-    protected abstract T createChannel(Integer num, MidiChannel channel);
+    protected abstract T createChannel(Integer num, SoftChannelProxy channel);
     protected abstract String createChannelId(NoteEventPacket message);
     
     @Override
@@ -89,7 +89,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
     public long getSynthEventTimestamp(Long systemEventMillis) {
         Long synthOffsetMicros = this.internalSynth.getMicrosecondPosition() - TimeUtils.getNowTime()*1000;
-        return Math.max(systemEventMillis*1000 + synthOffsetMicros, this.internalSynth.getMicrosecondPosition());
+        return Math.max(systemEventMillis*1000 + synthOffsetMicros, this.internalSynth.getMicrosecondPosition()+1000);
     }
 
     public void noteOn(NoteEventPacket message, Long timestamp) {
@@ -112,15 +112,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(channel != null) {
             try {
                 channel.noteOn(message.pos);
-                this.internalSynthReceiver.send(
-                    new ShortMessage(
-                        ShortMessage.NOTE_ON,
-                        channel.getChannelNumber(),
-                        message.data1,
-                        message.data2
-                    ),
-                    getSynthEventTimestamp(timestamp)
-                );
+                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_ON, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle note on: ", e);
             }
@@ -128,7 +120,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     }
 
     public void noteOff(NoteEventPacket message, Long timestamp) {
-        if(this.channelAssignmentMap == null || closing) {
+        if(this.channelAssignmentMap == null) {
             return;
         }
 
@@ -183,13 +175,14 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         SoftSynthesizer midiSynth = new SoftSynthesizer();
 
         if(midiSynth.getMaxReceivers() != 0) {
-            midiSynth.open();
-            midiSynth.close();
-     
             Map<String, Object> params = new HashMap<>();
             params.put("jitter correction", jitterCorrection);
             params.put("limit channel 10", limitChannel10);
             params.put("latency", latency * 1000);
+            params.put("interpolation", "sinc");
+            params.put("midi channels", 64);
+            params.put("max polyphony", 256);
+            params.put("large mode", false);
 
             if(format != null && dataLine != null) {
                 MIMIMod.LOGGER.info("Opened data line on device: " + format.toString());

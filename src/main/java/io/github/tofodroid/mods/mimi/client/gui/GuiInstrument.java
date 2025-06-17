@@ -396,7 +396,7 @@ public class GuiInstrument extends BaseGui {
         if(this.instrumentId != null) {
             Byte controller = 64;
             Byte value = on ? Byte.MAX_VALUE : 0;
-            NoteEventPacket packet = NoteEventPacket.createControlPacket(controller, value, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NoteEventPacket packet = NoteEventPacket.createControlPacket(ByteUtils.ZERO, controller, value, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
         }
@@ -495,7 +495,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         if(this.instrumentId != null) {
-            NoteEventPacket packet = NoteEventPacket.createNotePacket(midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NoteEventPacket packet = NoteEventPacket.createNotePacket(ByteUtils.ZERO, midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);
@@ -505,7 +505,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNoteRelease(Byte midiNote) {
         if(this.instrumentId != null) {
-            NoteEventPacket packet = NoteEventPacket.createNotePacket(midiNote, ByteUtils.ZERO, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NoteEventPacket packet = NoteEventPacket.createNotePacket(ByteUtils.ZERO, midiNote, ByteUtils.ZERO, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
 

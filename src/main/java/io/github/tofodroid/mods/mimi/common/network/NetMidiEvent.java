@@ -12,15 +12,17 @@ public class NetMidiEvent {
     public final UUID playerId;
     public final BlockPos pos;
     public final Byte instrumentId;
+    public final Byte channel;
     public final Byte note;
     public final Byte velocity;
     public final InteractionHand instrumentHand;
 
-    public NetMidiEvent(MidiEventType type, UUID playerId, BlockPos pos, Byte instrumentId, Byte note, Byte velocity, InteractionHand instrumentHand) {
+    public NetMidiEvent(MidiEventType type, UUID playerId, BlockPos pos, Byte instrumentId, Byte channel, Byte note, Byte velocity, InteractionHand instrumentHand) {
         this.type = type;
         this.playerId = playerId;
         this.pos = pos;
         this.instrumentId = instrumentId;
+        this.channel = channel;
         this.note = note;
         this.velocity = velocity;
         this.instrumentHand = instrumentHand;
@@ -31,6 +33,7 @@ public class NetMidiEvent {
         this.playerId = event.senderId;
         this.pos = event.pos;
         this.instrumentId = event.instrumentId;
+        this.channel = event.channel;
         this.note = event.note;
         this.velocity = event.velocity;
         this.instrumentHand = event.handIn;

@@ -35,13 +35,13 @@ import javax.sound.midi.MidiChannel;
  */
 public final class SoftChannelProxy implements MidiChannel {
 
-    private MidiChannel channel = null;
+    private SoftChannel channel = null;
 
     public MidiChannel getChannel() {
         return channel;
     }
 
-    public void setChannel(MidiChannel channel) {
+    public void setChannel(SoftChannel channel) {
         this.channel = channel;
     }
 
@@ -176,6 +176,11 @@ public final class SoftChannelProxy implements MidiChannel {
         if (channel == null)
             return;
         channel.resetAllControllers();
+    }
+
+    public void resetAllControllers(Boolean all) {
+        if (channel == null) return;
+        ((SoftChannel)channel).resetAllControllers(all);
     }
 
     @Override

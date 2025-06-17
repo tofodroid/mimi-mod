@@ -91,10 +91,12 @@ public abstract class ATransmitterBroadcastProducer extends AServerBroadcastProd
     public void onSongEnd() {
         switch(this.playlistHandler.getLoopMode()) {
             case ALL:
+                this.stop();
                 this.next();
                 this.shouldPlayNextLoad = true;
                 break;
             case SINGLE:
+                this.stop();
                 this.play();
                 break;
             default:

@@ -533,6 +533,13 @@ public final class SoftSynthesizer implements AudioSynthesizer,
         }
     }
 
+    public SoftChannelProxy[] getSoftChannels() {
+        synchronized (control_mutex) {
+            getChannels();
+            return external_channels;
+        }
+    }
+
     @Override
     public VoiceStatus[] getVoiceStatus() {
         if (!isOpen()) {
