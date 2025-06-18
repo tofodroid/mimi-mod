@@ -26,6 +26,7 @@ public class ServerMidiSequencer {
 
     // Runtime
     private Long startPlayMicros = null;
+    private Integer pitchBendRange = null;
 
     // Midi System
     private SimpleThreadSequencer<ServerMidiInputReceiver> activeSequencer;
@@ -57,6 +58,7 @@ public class ServerMidiSequencer {
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
+        this.pitchBendRange = null;
     }
 
     public UUID getSequenceId() {
@@ -75,6 +77,10 @@ public class ServerMidiSequencer {
         return this.songLengthSeconds;
     }
 
+    public Integer getPitchBendRange() {
+        return this.pitchBendRange;
+    }
+
     public byte[] getChannelMapping() {
         return this.channelMapping;
     }
@@ -88,6 +94,7 @@ public class ServerMidiSequencer {
                 this.activeSequence = sequence;
                 this.songLengthSeconds = MidiFileUtils.getSongLenghtSeconds(sequence);
                 this.channelMapping = MidiFileUtils.getChannelMapping(sequence);
+                this.pitchBendRange = MidiFileUtils.getPitchBendRange(sequence);
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to load sequence: " + info.fileName + " - " + e.getMessage());
                 this.close();
@@ -167,6 +174,7 @@ public class ServerMidiSequencer {
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
+        this.pitchBendRange = null;
     }
 
     protected Boolean initializeSequencer(ServerMidiInputReceiver receiver) {

@@ -164,6 +164,9 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         
         if(channel != null) {
             try {
+                if(message.extData != null) {
+                    channel.setPitchBendRange(message.extData);
+                }
                 this.internalSynthReceiver.send(new ShortMessage(ShortMessage.PITCH_BEND, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle pitch bend. Packet: " + message.data1 + " | " + message.data2, e);

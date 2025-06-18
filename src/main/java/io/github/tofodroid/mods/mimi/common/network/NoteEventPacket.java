@@ -32,44 +32,41 @@ public class NoteEventPacket implements CustomPacketPayload {
     public final @Nonnull BlockPos pos;
     public final @Nonnull Byte instrumentId;
     public final @Nullable InteractionHand instrumentHand;
+    public final @Nullable Integer extData;
     
     public static NoteEventPacket createControlPacket(Byte channel, Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos, InteractionHand instrumentHand) {
-        return new NoteEventPacket(MidiEventType.CONTROL, channel, controller, value, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand);
+        return new NoteEventPacket(MidiEventType.CONTROL, channel, controller, value, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand, null);
     }
 
     public static NoteEventPacket createControlPacket(Byte channel, Byte controller, Byte value, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
-        return new NoteEventPacket(MidiEventType.CONTROL, channel, controller, value, instrumentId, player, pos, noteServerTime, instrumentHand);
+        return new NoteEventPacket(MidiEventType.CONTROL, channel, controller, value, instrumentId, player, pos, noteServerTime, instrumentHand, null);
     }
     
     public static NoteEventPacket createResetPacket(Byte instrumentId, UUID player, BlockPos pos, InteractionHand instrumentHand) {
-        return new NoteEventPacket(MidiEventType.RESET, AMidiEvent.ALL_CHANNELS, ByteUtils.ZERO, ByteUtils.ZERO, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand);
+        return new NoteEventPacket(MidiEventType.RESET, AMidiEvent.ALL_CHANNELS, ByteUtils.ZERO, ByteUtils.ZERO, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand, null);
     }
 
     public static NoteEventPacket createResetPacket(Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
-        return new NoteEventPacket(MidiEventType.RESET, AMidiEvent.ALL_CHANNELS, ByteUtils.ZERO, ByteUtils.ZERO, instrumentId, player, pos, noteServerTime, instrumentHand);
+        return new NoteEventPacket(MidiEventType.RESET, AMidiEvent.ALL_CHANNELS, ByteUtils.ZERO, ByteUtils.ZERO, instrumentId, player, pos, noteServerTime, instrumentHand, null);
     }
 
     public static NoteEventPacket createNotePacket(Byte channel, Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
-        return new NoteEventPacket(velocity == 0 ? MidiEventType.NOTE_OFF : MidiEventType.NOTE_ON, channel, note, velocity, instrumentId, player, pos, noteServerTime, instrumentHand);
+        return new NoteEventPacket(velocity == 0 ? MidiEventType.NOTE_OFF : MidiEventType.NOTE_ON, channel, note, velocity, instrumentId, player, pos, noteServerTime, instrumentHand, null);
     }
 
     public static NoteEventPacket createNotePacket(Byte channel, Byte note, Byte velocity, Byte instrumentId, UUID player, BlockPos pos, InteractionHand instrumentHand) {
-        return new NoteEventPacket(velocity == 0 ? MidiEventType.NOTE_OFF : MidiEventType.NOTE_ON, channel, note, velocity, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand);
+        return new NoteEventPacket(velocity == 0 ? MidiEventType.NOTE_OFF : MidiEventType.NOTE_ON, channel, note, velocity, instrumentId, player, pos, MIMIMod.getProxy().getCurrentServerMillis(), instrumentHand, null);
     }
 
     public static NoteEventPacket fromNoteEvent(NoteEvent event) {
-        return new NoteEventPacket(event.type, event.channel, event.note, event.velocity, event.instrumentId, event.senderId, event.pos, event.eventTime, event.handIn);
-    }
-
-    public static NoteEventPacket fromNetMidiEvent(NetMidiEvent event, Long eventTime) {
-        return new NoteEventPacket(event.type, event.channel, event.note, event.velocity, event.instrumentId, event.playerId, event.pos, eventTime, event.instrumentHand);
+        return new NoteEventPacket(event.type, event.channel, event.note, event.velocity, event.instrumentId, event.senderId, event.pos, event.eventTime, event.handIn, null);
     }
 
     public NoteEvent toNoteEvent(Boolean clientSource, UUID senderId, ServerLevel sourceLevel) {
-        return new NoteEvent(type, clientSource, instrumentId, instrumentHand, channel, data1, data2, senderId, sourceLevel.dimension(), pos, noteServerTime);
+        NoteEvent event = new NoteEvent(type, clientSource, instrumentId, instrumentHand, channel, data1, data2, senderId, sourceLevel.dimension(), pos, noteServerTime);
+        return this.extData != null ? event.withExtData(this.extData) : event;
     }
-
-    protected NoteEventPacket(MidiEventType type, Byte channel, Byte data1, Byte data2, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand) {
+    protected NoteEventPacket(MidiEventType type, Byte channel, Byte data1, Byte data2, Byte instrumentId, UUID player, BlockPos pos, Long noteServerTime, InteractionHand instrumentHand, Integer extData) {
         this.type = type;
         this.channel = channel;
         this.data1 = data1;
@@ -79,6 +76,7 @@ public class NoteEventPacket implements CustomPacketPayload {
         this.pos = pos;
         this.noteServerTime = noteServerTime;
         this.instrumentHand = instrumentHand;
+        this.extData = extData;
     }
     
     @Override
@@ -107,7 +105,12 @@ public class NoteEventPacket implements CustomPacketPayload {
             Long noteServerTime = buf.readLong();
             InteractionHand instrumentHand = NetworkUtils.decodeHand(buf.readByte());
 
-            return new NoteEventPacket(type, channel, data1, data2, instrumentId, player, pos, noteServerTime, instrumentHand);
+            Integer extData = null;
+            if(buf.readBoolean()) {
+                extData = buf.readInt();
+            }
+
+            return new NoteEventPacket(type, channel, data1, data2, instrumentId, player, pos, noteServerTime, instrumentHand, extData);
         } catch (IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("MidiNoteOnPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -131,5 +134,10 @@ public class NoteEventPacket implements CustomPacketPayload {
         buf.writeBlockPos(pkt.pos);
         buf.writeLong(pkt.noteServerTime);
         buf.writeByte(NetworkUtils.encodeHand(pkt.instrumentHand));
+
+        buf.writeBoolean(pkt.extData != null);
+        if(pkt.extData != null) {
+            buf.writeInt(pkt.extData);
+        }
     }
 }

@@ -37,7 +37,7 @@ public final class SoftChannelProxy implements MidiChannel {
 
     private SoftChannel channel = null;
 
-    public MidiChannel getChannel() {
+    public SoftChannel getChannel() {
         return channel;
     }
 
@@ -179,8 +179,9 @@ public final class SoftChannelProxy implements MidiChannel {
     }
 
     public void resetAllControllers(Boolean all) {
-        if (channel == null) return;
-        ((SoftChannel)channel).resetAllControllers(all);
+        if (channel == null) 
+            return;
+        channel.resetAllControllers(all);
     }
 
     @Override

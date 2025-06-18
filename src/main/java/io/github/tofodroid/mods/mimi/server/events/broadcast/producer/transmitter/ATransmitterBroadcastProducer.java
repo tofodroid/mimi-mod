@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 
+import io.github.tofodroid.mods.mimi.common.api.event.MidiEventType;
 import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.common.midi.LocalMidiInfo;
@@ -34,7 +35,8 @@ public abstract class ATransmitterBroadcastProducer extends AServerBroadcastProd
     }
 
     public void handleMidiMessage(ShortMessage message) {
-        this.broadcast(BroadcastEvent.fromShortMessage(message, getOwnerId(), getBroadcastDimension(), getBroadcastPos(), getBroadcastRange()));
+        BroadcastEvent event = BroadcastEvent.fromShortMessage(message, getOwnerId(), getBroadcastDimension(), getBroadcastPos(), getBroadcastRange());
+        this.broadcast(event.type == MidiEventType.PITCH_BEND ? event.withExtData(this.midiHandler.getPitchBendRange()) : event);
     }
 
     public void onLoad() {

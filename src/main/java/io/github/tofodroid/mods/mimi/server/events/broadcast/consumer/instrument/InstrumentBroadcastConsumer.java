@@ -74,7 +74,7 @@ public class InstrumentBroadcastConsumer extends AServerBroadcastConsumer {
                 this.sendReset();
             case PITCH_BEND:
                 ServerNoteConsumerManager.handleEvent(
-                    new NoteEvent(MidiEventType.PITCH_BEND, false, instrumentId, handIn, message.channel, message.note, message.velocity, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime)
+                    new NoteEvent(MidiEventType.PITCH_BEND, false, instrumentId, handIn, message.channel, message.note, message.velocity, this.ownerId, this.getConsumeDimension(), getConsumePos(), message.eventTime).withExtData(message.extData)
                 );
                 break;
             default:

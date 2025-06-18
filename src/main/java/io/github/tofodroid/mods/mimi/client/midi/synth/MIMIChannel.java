@@ -19,6 +19,7 @@ public class MIMIChannel {
     protected final Integer channelNum;
     protected Instant lastNoteTime;
     protected BlockPos lastNotePos;
+    protected Integer pitchBendRange = 2 << 7;
 
     public MIMIChannel(Integer channelNum, SoftChannelProxy channel) {
         this.channelNum = channelNum;
@@ -35,6 +36,7 @@ public class MIMIChannel {
 
     public void clear() {
         this.lastNoteTime = null;
+        this.pitchBendRange = 2 << 7;
         this.setVolume(ByteUtils.ZERO);
         this.reset();
     }
@@ -49,6 +51,7 @@ public class MIMIChannel {
             this.channel.resetAllControllers(true);
             this.channel.allSoundOff();
         }
+        this.pitchBendRange = 2 << 7;
     }
 
     public void setVolume(Byte volume) {
@@ -57,6 +60,13 @@ public class MIMIChannel {
 
     public void setLRPan(Byte lrPan) {
         this.channel.controlChange(10, lrPan);
+    }
+
+    public void setPitchBendRange(Integer range) {
+        if(range != this.pitchBendRange && this.channel.getChannel() != null) {
+            this.channel.getChannel().rpnChange(0, range);
+            this.pitchBendRange = range;
+        }
     }
 
     public Boolean tick(Player clientPlayer, Boolean isClientChannel) {

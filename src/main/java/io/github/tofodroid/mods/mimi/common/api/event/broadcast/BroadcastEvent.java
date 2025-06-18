@@ -12,7 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public class BroadcastEvent extends AMidiEvent {
+public class BroadcastEvent extends AMidiEvent<BroadcastEvent> {
     public BroadcastEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, UUID senderId, ResourceKey<Level> dimension, BlockPos pos, Integer range, Long eventTime) {
         super(type, channel, note, velocity, eventTime, senderId, dimension, pos, BroadcastEvent.getRealRange(type, range));
     }

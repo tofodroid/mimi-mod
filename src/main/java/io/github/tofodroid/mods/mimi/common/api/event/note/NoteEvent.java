@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 
-public class NoteEvent extends AMidiEvent {
+public class NoteEvent extends AMidiEvent<NoteEvent> {
     public static final Integer MIMI_NOTE_PLAYING_LEVEL_EVENT_ID = 11320;
     public static final Integer NOTE_DEF_RANGE = 32;
 

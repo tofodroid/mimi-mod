@@ -5,7 +5,6 @@ import java.util.Map;
 
 import io.github.tofodroid.mods.mimi.common.api.event.note.NoteEvent;
 import io.github.tofodroid.mods.mimi.common.network.MultiNoteEventPacket;
-import io.github.tofodroid.mods.mimi.common.network.NetMidiEvent;
 import io.github.tofodroid.mods.mimi.common.network.NetworkProxy;
 import io.github.tofodroid.mods.mimi.server.events.note.api.ANoteConsumer;
 import io.github.tofodroid.mods.mimi.util.EntityUtils;
@@ -17,7 +16,7 @@ import net.minecraft.world.level.Level;
 
 public class PlayerNoteConsumer extends ANoteConsumer {
     private ServerPlayer player;
-    private Map<Long, ArrayList<NetMidiEvent>> packetCacheMap = new Long2ObjectOpenHashMap<>();
+    private Map<Long, ArrayList<NoteEvent>> packetCacheMap = new Long2ObjectOpenHashMap<>();
     private BlockPos cachedPos;
     private ResourceKey<Level> cachedDimension;
 
@@ -61,8 +60,8 @@ public class PlayerNoteConsumer extends ANoteConsumer {
 
     private void cacheEvent(NoteEvent event) {
         if(event.senderId != null && event.pos != null && event.eventTime != null) {
-            ArrayList<NetMidiEvent> eventList = packetCacheMap.getOrDefault(event.eventTime, new ArrayList<>());
-            eventList.add(new NetMidiEvent(event));
+            ArrayList<NoteEvent> eventList = packetCacheMap.getOrDefault(event.eventTime, new ArrayList<>());
+            eventList.add(event);
             packetCacheMap.put(event.eventTime, eventList);
         }
     }

@@ -2,12 +2,13 @@ package io.github.tofodroid.mods.mimi.common.api.event;
 
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public abstract class AMidiEvent {
+public abstract class AMidiEvent<E extends AMidiEvent<E>> {
     public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
     public static final Byte ALL_NOTES_OFF = Byte.MIN_VALUE;
     public static final Integer INF_RANGE = -1;
@@ -21,8 +22,9 @@ public abstract class AMidiEvent {
     public final @Nonnull ResourceKey<Level> dimension;
     public final @Nonnull BlockPos pos;
     public final @Nonnull Integer range;
+    public @Nullable Integer extData;
 
-    public AMidiEvent(AMidiEvent source) {
+    public AMidiEvent(E source) {
         this(source.type, source.channel, source.note, source.velocity, source.eventTime, source.senderId, source.dimension, source.pos, source.range);
     }
 
@@ -36,5 +38,15 @@ public abstract class AMidiEvent {
         this.pos = pos;
         this.senderId = senderId;
         this.dimension = dimension;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final E getThis() {
+        return (E)this;
+    }
+
+    public E withExtData(Integer extData) {
+        this.extData = extData;
+        return getThis();
     }
 }
