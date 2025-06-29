@@ -37,6 +37,7 @@ public class ConfigurableMidiTileSyncPacketHandler {
         MidiNbtDataUtils.setFilterOct(midiStack, message.filterOct);
         MidiNbtDataUtils.setInvertNoteOct(midiStack, message.invertNoteOct);
         MidiNbtDataUtils.setInvertSignal(midiStack, message.invertSignal);
+        MidiNbtDataUtils.setAnalogMode(midiStack, message.analogMode);
         MidiNbtDataUtils.setTriggerNoteStart(midiStack, message.triggerNoteStart);
         MidiNbtDataUtils.setHoldTicks(midiStack, message.holdTicks);
         MidiNbtDataUtils.setBroadcastRange(midiStack, message.broadcastRange);

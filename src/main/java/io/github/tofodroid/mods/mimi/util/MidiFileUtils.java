@@ -8,7 +8,6 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
-import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.DrumKitName;
 import io.github.tofodroid.mods.mimi.common.midi.MidiPatchName;
 
@@ -95,49 +94,5 @@ public abstract class MidiFileUtils {
 
     public static Integer getTempoBPM(Sequence sequence) {
         return getTempoBPM(sequence, 0l);
-    }
-
-    public static Integer getPitchBendRange(Sequence sequence) {
-        // Safe default
-        Integer pitchRange = 2 << 7;
-        Boolean flag1 = false;
-        Boolean flag2 = false;
-
-        for(Track track : sequence.getTracks()) {
-            if(track != null && track.size() > 0) {
-                for(int i = 0; i < track.size(); i++) {
-                    if(track.get(i).getMessage() instanceof ShortMessage) {
-                        ShortMessage message = (ShortMessage)track.get(i).getMessage();
-
-                        if(flag1 && flag2) {
-                            MIMIMod.LOGGER.info(message.toString());
-                        }
-
-                        if(message.getCommand() == ShortMessage.CONTROL_CHANGE) {
-                            if(message.getData1() == 100 && message.getData2() == 0) {
-                                flag1 = true;
-                                flag2 = false;
-                            } else if(message.getData1() == 101 && message.getData2() == 0) {
-                                if(flag1) {
-                                    flag2 = true;
-                                } else {
-                                    flag1 = false;
-                                    flag2 = false;
-                                }
-                            } else if(message.getData1() == 6) {
-                                if(flag1 && flag2) {
-                                    return message.getData2() * 128;
-                                } else {
-                                    flag1 = false;
-                                    flag2 = false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return pitchRange;
     }
 }

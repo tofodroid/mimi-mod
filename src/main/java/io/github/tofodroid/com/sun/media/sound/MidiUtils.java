@@ -37,6 +37,7 @@ import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 import static javax.sound.midi.SysexMessage.SPECIAL_SYSTEM_EXCLUSIVE;
@@ -57,6 +58,41 @@ public final class MidiUtils {
      * Suppresses default constructor, ensuring non-instantiability.
      */
     private MidiUtils() {
+    }
+
+    /**
+     * Returns whether a given message is a pitch bend range set message.
+     *
+     * @param message A shortmessage to check against
+     * @param flag1 If the 100 controller is set to 0
+     * @param flag2 If the 101 controller is set to 0
+     * @return an exception instance
+     */
+    public static Integer isPitchBendRangeMessage(ShortMessage message, Boolean flag1, Boolean flag2) {
+        if(message.getCommand() == ShortMessage.CONTROL_CHANGE) {
+            if(message.getData1() == 100 && message.getData2() == 0) {
+                return 1;
+            } else if(message.getData1() == 101 && message.getData2() == 0) {
+                if(flag1) {
+                    return 2;
+                } else {
+                    flag1 = false;
+                    flag2 = false;
+                }
+            } else if(message.getData1() == 6) {
+                if(flag1 && flag2) {
+                    return 3;
+                } else {
+                    flag1 = false;
+                    flag2 = false;
+                }
+            }
+        }
+        return 0;
+    }
+
+    public static Integer isPitchBendRangeMessage(ShortMessage message, Integer status) {
+        return isPitchBendRangeMessage(message, status > 0, status > 1);
     }
 
     public static byte[] sequenceToByteArray(Sequence sequence) throws IOException {

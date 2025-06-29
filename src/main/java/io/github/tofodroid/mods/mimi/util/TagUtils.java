@@ -53,6 +53,7 @@ public final class TagUtils {
         createBoolComponent("invert_instrument");
         createByteComponent("instrument_volume");
         createBoolComponent("invert_signal");
+        createBoolComponent("analog_mode");
         createBoolComponent("note_start");
         createByteComponent("hold_ticks");
         createByteComponent("broadcast_range");

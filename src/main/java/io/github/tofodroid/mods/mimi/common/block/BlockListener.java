@@ -62,7 +62,7 @@ public class BlockListener extends AConfigurableMidiPowerSourceBlock<TileListene
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        MidiNbtDataUtils.appendInvertSignalTooltip(blockItemStack, tooltip);
+        MidiNbtDataUtils.appendPowerModeTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendFilterInstrumentTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendFilterNoteTooltip(blockItemStack, tooltip);
     }

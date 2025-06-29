@@ -36,7 +36,7 @@ public abstract class ATransmitterBroadcastProducer extends AServerBroadcastProd
 
     public void handleMidiMessage(ShortMessage message) {
         BroadcastEvent event = BroadcastEvent.fromShortMessage(message, getOwnerId(), getBroadcastDimension(), getBroadcastPos(), getBroadcastRange());
-        this.broadcast(event.type == MidiEventType.PITCH_BEND ? event.withExtData(this.midiHandler.getPitchBendRange()) : event);
+        this.broadcast(event.type == MidiEventType.PITCH_BEND ? event.withExtData(this.midiHandler.getPitchBendRange(message.getChannel())) : event);
     }
 
     public void onLoad() {

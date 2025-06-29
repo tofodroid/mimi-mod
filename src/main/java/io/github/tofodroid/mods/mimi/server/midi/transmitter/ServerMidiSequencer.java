@@ -14,9 +14,11 @@ import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
 import io.github.tofodroid.mods.mimi.server.ServerExecutorProxy;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 
 public class ServerMidiSequencer {
     private final Runnable sequenceEndCallback;
+    private final Consumer<ShortMessage> eventHandler;
     
     // MIDI Sequence
     private Sequence activeSequence;
@@ -26,14 +28,37 @@ public class ServerMidiSequencer {
 
     // Runtime
     private Long startPlayMicros = null;
-    private Integer pitchBendRange = null;
+    private Int2IntArrayMap pitchBendRangeChannelMap = new Int2IntArrayMap(16);
+    private Int2IntArrayMap pitchBendSetStatusMap = new Int2IntArrayMap(16);
 
     // Midi System
     private SimpleThreadSequencer<ServerMidiInputReceiver> activeSequencer;
 
     public ServerMidiSequencer(Consumer<ShortMessage> eventHandler, Runnable sequenceEndCallback) {
-        initializeSequencer(new ServerMidiInputReceiver(eventHandler));
+        initializeSequencer(new ServerMidiInputReceiver(this::handleMessage));
         this.sequenceEndCallback = sequenceEndCallback;
+        this.eventHandler = eventHandler;
+        resetPitchBendRange();
+    }
+
+    private void resetPitchBendRange() {
+        pitchBendRangeChannelMap.clear();
+        pitchBendSetStatusMap.clear();
+        for(int i = 0; i < 16; i++) {
+            pitchBendRangeChannelMap.put(i, 2 << 7);
+            pitchBendSetStatusMap.put(i, 0);
+        }
+    }
+
+    protected void handleMessage(ShortMessage message) {
+        int newStatus = MidiUtils.isPitchBendRangeMessage(message, pitchBendSetStatusMap.get(message.getChannel()));
+        pitchBendSetStatusMap.put(message.getChannel(), newStatus);
+
+        if(newStatus == 3) {
+            pitchBendRangeChannelMap.put(message.getChannel(), message.getData2() * 128);
+            pitchBendSetStatusMap.put(message.getChannel(), 0);
+        }
+        this.eventHandler.accept(message);
     }
 
     public Boolean isPlaying() {
@@ -58,7 +83,7 @@ public class ServerMidiSequencer {
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
-        this.pitchBendRange = null;
+        this.resetPitchBendRange();
     }
 
     public UUID getSequenceId() {
@@ -77,8 +102,8 @@ public class ServerMidiSequencer {
         return this.songLengthSeconds;
     }
 
-    public Integer getPitchBendRange() {
-        return this.pitchBendRange;
+    public Integer getPitchBendRange(int channel) {
+        return pitchBendRangeChannelMap.get(channel);
     }
 
     public byte[] getChannelMapping() {
@@ -94,7 +119,6 @@ public class ServerMidiSequencer {
                 this.activeSequence = sequence;
                 this.songLengthSeconds = MidiFileUtils.getSongLenghtSeconds(sequence);
                 this.channelMapping = MidiFileUtils.getChannelMapping(sequence);
-                this.pitchBendRange = MidiFileUtils.getPitchBendRange(sequence);
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to load sequence: " + info.fileName + " - " + e.getMessage());
                 this.close();
@@ -174,7 +198,7 @@ public class ServerMidiSequencer {
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
-        this.pitchBendRange = null;
+        this.resetPitchBendRange();
     }
 
     protected Boolean initializeSequencer(ServerMidiInputReceiver receiver) {

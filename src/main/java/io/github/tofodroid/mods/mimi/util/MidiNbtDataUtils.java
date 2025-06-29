@@ -45,6 +45,7 @@ public abstract class MidiNbtDataUtils {
     public static final String INSTRUMENT_TAG = "filter_instrument";
     public static final String VOLUME_TAG = "instrument_volume";
     public static final String INVERT_SIGNAL_TAG = "invert_signal";
+    public static final String ANALOG_MODE_TAG = "analog_mode";
     public static final String NOTE_START_TRIGGER_TAG = "note_start";
     public static final String HOLD_TICKS_TAG = "hold_ticks";
     public static final String BROADCAST_RANGE_TAG = "broadcast_range";
@@ -234,6 +235,15 @@ public abstract class MidiNbtDataUtils {
     public static void setInvertSignal(ItemStack stack, Boolean invert) {
         TagUtils.setOrRemoveBoolean(stack, INVERT_SIGNAL_TAG, invert ? invert : null);
     }
+
+    public static Boolean getAnalogMode(ItemStack stack) {
+        return TagUtils.getBooleanOrDefault(stack, ANALOG_MODE_TAG, false);
+    }
+
+    public static void setAnalogMode(ItemStack stack, Boolean analog) {
+        TagUtils.setOrRemoveBoolean(stack, ANALOG_MODE_TAG, analog ? analog : null);
+    }
+
     public static Boolean getTriggerNoteStart(ItemStack stack) {
         return TagUtils.getBooleanOrDefault(stack, NOTE_START_TRIGGER_TAG, false);
     }
@@ -430,6 +440,12 @@ public abstract class MidiNbtDataUtils {
         tooltip.add(Component.literal("  Range: " + rangeDisplay).withStyle(ChatFormatting.GREEN));
     }
 
+    public static void appendPowerModeTooltip(ItemStack stack, List<Component> tooltip) {
+        Boolean inverted = MidiNbtDataUtils.getInvertSignal(stack);
+        Boolean analog = MidiNbtDataUtils.getAnalogMode(stack);
+        tooltip.add(Component.literal("  Power: " + (analog ? "Velocity" : "Constant") + (inverted ? " (Inv)" : "")).withStyle(ChatFormatting.GREEN));
+    }
+
     public static void appendEnabledChannelsTooltip(ItemStack stack, List<Component> tooltip) {
         Integer enabledChannels = MidiNbtDataUtils.getEnabledChannelsInt(stack);
         if(enabledChannels != null) {
@@ -524,6 +540,7 @@ public abstract class MidiNbtDataUtils {
             MidiNbtDataUtils.setInvertNoteOct(result, MidiNbtDataUtils.getInvertNoteOct(source));
             MidiNbtDataUtils.setFilterInstrument(result, MidiNbtDataUtils.getFilterInstrument(source));
             MidiNbtDataUtils.setInvertSignal(result, MidiNbtDataUtils.getInvertSignal(source));
+            MidiNbtDataUtils.setAnalogMode(result, MidiNbtDataUtils.getAnalogMode(source));
             MidiNbtDataUtils.setTriggerNoteStart(result, MidiNbtDataUtils.getTriggerNoteStart(source));
             MidiNbtDataUtils.setHoldTicks(result, MidiNbtDataUtils.getHoldTicks(source));
             return result;
