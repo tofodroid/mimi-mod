@@ -10,8 +10,10 @@ import javax.annotation.Nullable;
 
 import io.github.tofodroid.mods.mimi.common.api.event.broadcast.BroadcastEvent;
 import io.github.tofodroid.mods.mimi.common.block.AConfigurableMidiPowerSourceBlock;
+import io.github.tofodroid.mods.mimi.util.ByteUtils;
 import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ByteArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -22,11 +24,14 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     
     // Runtime data
     protected Map<Integer, Long> heldNotes = new Int2LongArrayMap();
+    protected Map<Integer, Byte> heldVelocities = new Int2ByteArrayMap();
     protected List<Integer> notesToTurnOff = new ArrayList<>();
+    protected Byte heldVelocity = 0;
     protected Boolean noteHeld = false;
     protected Integer offCounter = 0;
 
     // Config data
+    protected Boolean analogMode = false;
     protected Boolean triggerHeld = false;
     protected Byte holdTicks = 0;
 
@@ -60,6 +65,7 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     protected void cacheMidiSettings() {
         super.cacheMidiSettings();
         this.setInverted(MidiNbtDataUtils.getInvertSignal(getSourceStack()));
+        this.analogMode = MidiNbtDataUtils.getAnalogMode(getSourceStack());
         this.triggerHeld = !MidiNbtDataUtils.getTriggerNoteStart(getSourceStack());
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(getSourceStack());
         this.noteHeld = false;
@@ -72,12 +78,12 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
             Boolean shouldBePowered = this.noteHeld;
 
             if(shouldBePowered) {
-                this.setPowered(true);
+                this.setPower(this.velocityToPower(this.heldVelocity));
                 this.offCounter = 0;
-            } else if(state.getValue(AConfigurableMidiPowerSourceBlock.POWERED)) {
+            } else if(state.getValue(AConfigurableMidiPowerSourceBlock.POWER) > 0) {
                 if(this.offCounter >= (this.holdTicks-1)) {
                     this.offCounter = 0;
-                    this.setPowered(false);
+                    this.setPower(0);
                 } else {
                     this.offCounter++;
                 }
@@ -91,12 +97,34 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         return this.triggerHeld && this.noteHeld;
     }
 
+    public Byte getHeldVelocity() {
+        return this.heldVelocity;
+    }
+
+    public Integer velocityToPower(Byte velocity) {
+        int stepAmount = 8;
+        int powerLevel = 15;
+
+        if(velocity <= 0) {
+            return 0;
+        }
+
+        for(int i = 120; i >= 1; i-= stepAmount) {
+            if(velocity >= i) {
+                return powerLevel;
+            }
+            powerLevel--;
+            stepAmount = stepAmount == 8 ? 9 : 8;
+        }
+        return 0;
+    }
+
     public Boolean isBlockValid() {
         return getBlockState().getBlock() instanceof AConfigurableMidiPowerSourceBlock;
     }
 
     public Boolean isPowered() {
-        return getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWERED);
+        return getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWER) > 0;
     }
 
     public Boolean isInverted() {
@@ -119,8 +147,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
         }
     }
 
-    public void setPowered(Boolean powered) {
-        if(this.getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWERED) != powered) {
+    public void setPower(Integer power) {
+        if(this.getBlockState().getValue(AConfigurableMidiPowerSourceBlock.POWER) != power) {
             if(!this.isValid()) {
                 return;
             }
@@ -128,11 +156,15 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
             this.getLevel().setBlockAndUpdate(
                 getBlockPos(), 
                 getBlockState()
-                    .setValue(AConfigurableMidiPowerSourceBlock.POWERED, powered)
+                    .setValue(AConfigurableMidiPowerSourceBlock.POWER, power)
             );
             
             getLevel().updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
+    }
+
+    protected Byte calcHeldVelocity() {
+        return this.analogMode ? this.heldVelocities.values().stream().max(Byte::compareTo).orElse(ByteUtils.ZERO) : Byte.MAX_VALUE;
     }
 
     protected Integer getUniqueNoteInt(Byte group, Byte note) {
@@ -152,8 +184,13 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
             }
 
             // Remove identified notes
-            for(Integer noteId : notesToRemove) {
-                this.heldNotes.remove(noteId);
+            if(!this.notesToTurnOff.isEmpty()) {
+                for(Integer noteId : notesToRemove) {
+                    this.heldNotes.remove(noteId);
+                    this.heldVelocities.remove(noteId);
+                }
+                // Re-calculate max velocity
+                this.heldVelocity = this.calcHeldVelocity();
             }
 
             this.notesToTurnOff.clear();
@@ -166,6 +203,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
 
     protected void clearNotes() {
         this.heldNotes.clear();
+        this.heldVelocities.clear();
+        this.heldVelocity = 0;
         this.notesToTurnOff.clear();
     }
 
@@ -176,6 +215,8 @@ public abstract class AConfigurableMidiPowerSourceTile extends AConfigurableMidi
     public void onNoteOn(@Nullable Byte channel, @Nonnull Byte note, @Nonnull Byte velocity, @Nullable Byte instrumentId, Long noteTime) {
         Integer noteId = this.getUniqueNoteInt(getNoteGroupKey(channel, instrumentId), note);
         this.heldNotes.put(noteId, Instant.now().toEpochMilli());
+        this.heldVelocities.put(noteId, velocity);
+        this.heldVelocity = velocity > this.heldVelocity ? velocity : this.heldVelocity;
         this.notesToTurnOff.remove(noteId);
         this.noteHeld = true;
     }

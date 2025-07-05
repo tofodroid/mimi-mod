@@ -31,7 +31,6 @@ public class FilesystemMidiFileProvider {
     protected List<UUID> orderedSongList;
     protected Instant lastLoad = Instant.MIN;
     protected File selectedFolder = null;
-    protected String lastFolderHash = null;
 
     public FilesystemMidiFileProvider(Boolean isServer) {
         this.isServer = isServer;
@@ -110,8 +109,7 @@ public class FilesystemMidiFileProvider {
             }
         } else {
             this.clear();
-            this.lastFolderHash = null;
-            MIMIMod.LOGGER.error("MIMI MIDI Folder no longer exists: " + this.selectedFolder.getAbsolutePath());
+            MIMIMod.LOGGER.error("MIDI Folder no longer exists: " + this.selectedFolder.getAbsolutePath());
         }
     }
 
@@ -121,10 +119,10 @@ public class FilesystemMidiFileProvider {
 
     public File[] loadFiles() {
         File[] files = this.selectedFolder.listFiles(MIDI_FILTER);
-        Arrays.sort(files, (a, b) -> a.getName().compareTo(b.getName()));
 
         if(files.length > MAX_SONG_COUNT) {
             MIMIMod.LOGGER.warn("More than " + MAX_SONG_COUNT + " MIDI files found in current folder. MIMI can currently only load up to " + MAX_SONG_COUNT + ".");
+            Arrays.sort(files, (a, b) -> a.getName().compareTo(b.getName()));
             files = Arrays.copyOfRange(files, 0, MAX_SONG_COUNT);
         }
         

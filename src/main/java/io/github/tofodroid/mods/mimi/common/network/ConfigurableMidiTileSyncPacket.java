@@ -29,12 +29,13 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
     public final Byte instrumentId;
     public final Integer enabledChannelsInt;
     public final Boolean invertSignal;
+    public final Boolean analogMode;
     public final Boolean triggerNoteStart;
     public final Byte holdTicks;
     public final Byte broadcastRange;
     public final Byte[] channelMap;
 
-    private ConfigurableMidiTileSyncPacket(BlockPos tilePos, InteractionHand handIn, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertSignal, Boolean triggerNoteStart, Byte holdTicks, Byte broadcastRange, Byte channelMap[]) {
+    private ConfigurableMidiTileSyncPacket(BlockPos tilePos, InteractionHand handIn, UUID midiSource, String midiSourceName, Byte filterOct, Byte filterNote, Boolean invertNoteOct, Integer enabledChannelsInt, Byte instrumentId, Boolean invertSignal, Boolean analogMode, Boolean triggerNoteStart, Byte holdTicks, Byte broadcastRange, Byte channelMap[]) {
         this.handIn = handIn;
         this.tilePos = tilePos;
         this.midiSource = midiSource;
@@ -45,6 +46,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         this.enabledChannelsInt = enabledChannelsInt;
         this.instrumentId = instrumentId;
         this.invertSignal = invertSignal;
+        this.analogMode = analogMode;
         this.triggerNoteStart = triggerNoteStart;
         this.holdTicks = holdTicks;
         this.broadcastRange = broadcastRange;
@@ -62,6 +64,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         this.enabledChannelsInt = MidiNbtDataUtils.getEnabledChannelsInt(sourceStack);
         this.instrumentId = MidiNbtDataUtils.getFilterInstrument(sourceStack);
         this.invertSignal = MidiNbtDataUtils.getInvertSignal(sourceStack);
+        this.analogMode = MidiNbtDataUtils.getAnalogMode(sourceStack);
         this.triggerNoteStart = MidiNbtDataUtils.getTriggerNoteStart(sourceStack);
         this.holdTicks = MidiNbtDataUtils.getHoldTicks(sourceStack);
         this.broadcastRange = MidiNbtDataUtils.getBroadcastRange(sourceStack);
@@ -101,6 +104,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
             Integer enabledChannelsInt = buf.readInt();
             Byte instrumentId = buf.readByte();
             Boolean invertSignal = buf.readBoolean();
+            Boolean analogMode = buf.readBoolean();
             Boolean triggerNoteStart = buf.readBoolean();
             Byte holdTicks = buf.readByte();
             Byte broadcastRange = buf.readByte();
@@ -110,7 +114,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
                 channelMap[i] = buf.readByte();
             }
 
-            return new ConfigurableMidiTileSyncPacket(tilePos, handIn, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertSignal, triggerNoteStart, holdTicks, broadcastRange, channelMap);
+            return new ConfigurableMidiTileSyncPacket(tilePos, handIn, midiSource, midiSourceName, filterOct, filterNote, invertNoteOct, enabledChannelsInt, instrumentId, invertSignal, analogMode, triggerNoteStart, holdTicks, broadcastRange, channelMap);
         } catch(IndexOutOfBoundsException e) {
             MIMIMod.LOGGER.error("ConfigurableMidiTileSyncPacket did not contain enough bytes. Exception: " + e);
             return null;
@@ -149,6 +153,7 @@ public class ConfigurableMidiTileSyncPacket implements CustomPacketPayload {
         buf.writeInt(pkt.enabledChannelsInt);
         buf.writeByte(pkt.instrumentId);
         buf.writeBoolean(pkt.invertSignal);
+        buf.writeBoolean(pkt.analogMode);
         buf.writeBoolean(pkt.triggerNoteStart);
         buf.writeByte(pkt.holdTicks);
         buf.writeByte(pkt.broadcastRange);

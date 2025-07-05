@@ -59,6 +59,10 @@ public enum MidiEventType {
             || (msg.getData1() >= 64 && msg.getData1() <= 69) // Sustain Pedal
             || msg.getData1() == 84 // Portamento
             || (msg.getData1() >= 91 && msg.getData1() <= 95) // Effects
+            || msg.getData1() == 100 // RPN MSB
+            || msg.getData1() == 101 // RPN LSB
+            || msg.getData1() == 6 // DATA MSB
+            || msg.getData1() == 38 // DATA LSB
         );
     }
 

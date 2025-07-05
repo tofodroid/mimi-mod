@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.api.event.MidiEventType;
+import io.github.tofodroid.mods.mimi.common.api.event.note.NoteEvent;
 import io.github.tofodroid.mods.mimi.util.ByteUtils;
 import io.github.tofodroid.mods.mimi.util.NetworkUtils;
 import io.github.tofodroid.mods.mimi.util.ResourceUtils;
@@ -22,18 +23,18 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = ResourceUtils.newModLocation(MultiNoteEventPacket.class.getSimpleName().toLowerCase());
     public static final CustomPacketPayload.Type<MultiNoteEventPacket> TYPE = new Type<>(ID);
 
-    private final Map<Long, ArrayList<NetMidiEvent>> sourceMap;
+    private final Map<Long, ArrayList<NoteEvent>> sourceMap;
     public final TreeMap<Long, List<NoteEventPacket>> resultPackets;
 
-    public MultiNoteEventPacket(Map<Long, ArrayList<NetMidiEvent>> sourceMap) {
+    public MultiNoteEventPacket(Map<Long, ArrayList<NoteEvent>> sourceMap) {
         this.sourceMap = new HashMap<>(sourceMap);
         this.resultPackets = new TreeMap<>();
         
-        for(Map.Entry<Long, ArrayList<NetMidiEvent>> sourceEntry : sourceMap.entrySet()) {
+        for(Map.Entry<Long, ArrayList<NoteEvent>> sourceEntry : sourceMap.entrySet()) {
             List<NoteEventPacket> packets = new ArrayList<>();
 
-            for(NetMidiEvent event : sourceEntry.getValue()) {
-                packets.add(NoteEventPacket.fromNetMidiEvent(event, sourceEntry.getKey()));
+            for(NoteEvent event : sourceEntry.getValue()) {
+                packets.add(NoteEventPacket.fromNoteEvent(event));
             }
             resultPackets.put(sourceEntry.getKey(), packets);
         }
@@ -65,6 +66,7 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
 
                 for(Integer eventIndex = 0; eventIndex < numEvents; eventIndex++) {
                     MidiEventType type = MidiEventType.fromByte(buf.readByte());
+                    Byte channel = buf.readByte();
                     Byte data1 = ByteUtils.ZERO;
                     Byte data2 = ByteUtils.ZERO;
 
@@ -81,7 +83,12 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
                     Byte instrumentId = buf.readByte();
                     InteractionHand instrumentHand = NetworkUtils.decodeHand(buf.readByte());
 
-                    timePackets.add(new NoteEventPacket(type, data1, data2, instrumentId, playerId, pos, noteServerTime, instrumentHand));
+                    Integer extData = null;
+                    if(buf.readBoolean()) {
+                        extData = buf.readInt();
+                    }
+
+                    timePackets.add(new NoteEventPacket(type, channel, data1, data2, instrumentId, playerId, pos, noteServerTime, instrumentHand, extData));
                 }
             }
             return new MultiNoteEventPacket(resultMap);
@@ -96,7 +103,7 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
         buf.writeInt(pkt.resultPackets.size());
 
         // Second order
-        for(Map.Entry<Long, ArrayList<NetMidiEvent>> timeEntry : pkt.sourceMap.entrySet()) {
+        for(Map.Entry<Long, ArrayList<NoteEvent>> timeEntry : pkt.sourceMap.entrySet()) {
             if(timeEntry.getValue() != null && !timeEntry.getValue().isEmpty()) {
                 buf.writeLong(timeEntry.getKey());
 
@@ -104,8 +111,9 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
                 buf.writeInt(timeEntry.getValue().size());
 
                 // Third Order
-                for(NetMidiEvent noteEvent : timeEntry.getValue()) {
+                for(NoteEvent noteEvent : timeEntry.getValue()) {
                     buf.writeByte(noteEvent.type.toByte());
+                    buf.writeByte(noteEvent.channel);
 
                     if(noteEvent.type != MidiEventType.RESET) {
                         buf.writeByte(noteEvent.note);
@@ -115,10 +123,14 @@ public class MultiNoteEventPacket implements CustomPacketPayload {
                         buf.writeByte(noteEvent.velocity);
                     }
 
-                    buf.writeUUID(noteEvent.playerId);
+                    buf.writeUUID(noteEvent.senderId);
                     buf.writeBlockPos(noteEvent.pos);
                     buf.writeByte(noteEvent.instrumentId);
-                    buf.writeByte(NetworkUtils.encodeHand(noteEvent.instrumentHand));
+                    buf.writeByte(NetworkUtils.encodeHand(noteEvent.handIn));
+                    buf.writeBoolean(noteEvent.extData != null);
+                    if(noteEvent.extData != null) {
+                        buf.writeInt(noteEvent.extData);
+                    }
                 }
             }
         }
