@@ -696,19 +696,16 @@ public class GuiInstrument extends BaseGui {
         if(!held) {
             alpha -= Math.min(Math.abs(ChronoUnit.MILLIS.between(Instant.now(), releaseTime))/1000f, 1.0f);
         }
-        
-        CommonGuiUtils.setAlpha(alpha);
 
-        this.blitAbsolute(graphics, 
-            guiTexture, 
-            START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
-            START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
-            
-            342 - (keyNum % 2) * 13, 
-            0, 12, 41, 
-            TEXTURE_SIZE, TEXTURE_SIZE
+        graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
+        Integer startX = START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2;
+        Integer startY = START_Y + NOTE_OFFSET_Y + 44 + (keyNum % 2) * 42;
+        graphics.fill(
+            startX,
+            startY, 
+            startX+12, startY+40, -9044050
         );
-        
+
         return graphics;
     }
 
