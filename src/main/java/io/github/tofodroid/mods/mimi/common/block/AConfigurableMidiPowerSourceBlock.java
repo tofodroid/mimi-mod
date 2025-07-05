@@ -9,9 +9,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 public abstract class AConfigurableMidiPowerSourceBlock<B extends AConfigurableMidiPowerSourceTile> extends AConfigurableNoteResponsiveTileBlock<B> {
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final IntegerProperty POWER = BlockStateProperties.POWER;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
 
     public AConfigurableMidiPowerSourceBlock(Properties builder) {
@@ -22,7 +23,7 @@ public abstract class AConfigurableMidiPowerSourceBlock<B extends AConfigurableM
         super(builder);
         this.registerDefaultState(
             this.stateDefinition.any()
-                .setValue(POWERED, defaultPowerState)
+                .setValue(POWER, defaultPowerState ? 15 : 0)
                 .setValue(INVERTED, defaultInvertedState)
         );
     }
@@ -30,12 +31,12 @@ public abstract class AConfigurableMidiPowerSourceBlock<B extends AConfigurableM
     // POWER
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state) {
-        state.add(POWERED, INVERTED);
+        state.add(POWER, INVERTED);
     }
     
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction direction) {
-        return state.getValue(POWERED) != state.getValue(INVERTED) ? 15 : 0;
+        return Math.abs((state.getValue(INVERTED) ? 15 : 0) - state.getValue(POWER));
     }
 
     @Override

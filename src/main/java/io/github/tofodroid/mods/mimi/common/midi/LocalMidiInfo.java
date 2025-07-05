@@ -7,7 +7,6 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
-import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
 
 public class LocalMidiInfo {
     public final Boolean serverFile;
@@ -58,18 +57,7 @@ public class LocalMidiInfo {
 
     public static UUID createFileId(File file) {
         try {
-            String channelString = "";
-            Sequence sequence = MidiSystem.getSequence(file);
-            byte[] byteChannelMapping = MidiFileUtils.getChannelMapping(sequence);
-            for(int i = 0; i < byteChannelMapping.length; i++) {
-                channelString += Integer.valueOf(byteChannelMapping[i]).toString();
-            } 
-            return UUID.nameUUIDFromBytes(new StringBuilder()
-                .append("file:" + file.getName().trim() + ";")
-                .append("tempo:" + MidiFileUtils.getTempoBPM(sequence) + ";")
-                .append("length:" + MidiFileUtils.getSongLenghtSeconds(sequence) + ";")
-                .append("channels:" + channelString + ";")
-                .toString().getBytes());
+            return UUID.nameUUIDFromBytes(file.getAbsolutePath().getBytes());
         } catch(Exception e) {
             MIMIMod.LOGGER.error("Failed to create file ID for file: " + file.getAbsolutePath(), e);
             throw new RuntimeException(e);

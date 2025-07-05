@@ -396,7 +396,7 @@ public class GuiInstrument extends BaseGui {
         if(this.instrumentId != null) {
             Byte controller = 64;
             Byte value = on ? Byte.MAX_VALUE : 0;
-            NoteEventPacket packet = NoteEventPacket.createControlPacket(controller, value, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NoteEventPacket packet = NoteEventPacket.createControlPacket(ByteUtils.ZERO, controller, value, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
         }
@@ -495,7 +495,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNotePress(Byte midiNote, Byte velocity) {
         if(this.instrumentId != null) {
-            NoteEventPacket packet = NoteEventPacket.createNotePacket(midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NoteEventPacket packet = NoteEventPacket.createNotePacket(ByteUtils.ZERO, midiNote, MidiNbtDataUtils.applyInstrumentVolume(instrumentStack, velocity), instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
             this.releasedNotes.remove(midiNote);
@@ -505,7 +505,7 @@ public class GuiInstrument extends BaseGui {
 
     private void onGuiNoteRelease(Byte midiNote) {
         if(this.instrumentId != null) {
-            NoteEventPacket packet = NoteEventPacket.createNotePacket(midiNote, ByteUtils.ZERO, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
+            NoteEventPacket packet = NoteEventPacket.createNotePacket(ByteUtils.ZERO, midiNote, ByteUtils.ZERO, instrumentId, player.getUUID(), EntityUtils.getEntityHeadPos(player), handIn);
             NetworkProxy.sendToServer(packet);
             ((ClientProxy)MIMIMod.getProxy()).getMidiSynth().handleLocalPacketInstant(packet);
 
@@ -696,19 +696,16 @@ public class GuiInstrument extends BaseGui {
         if(!held) {
             alpha -= Math.min(Math.abs(ChronoUnit.MILLIS.between(Instant.now(), releaseTime))/1000f, 1.0f);
         }
-        
-        CommonGuiUtils.setAlpha(alpha);
 
-        this.blitAbsolute(graphics, 
-            guiTexture, 
-            START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2, 
-            START_Y + NOTE_OFFSET_Y + 43 + (keyNum % 2) * 42, 
-            
-            342 - (keyNum % 2) * 13, 
-            0, 12, 41, 
-            TEXTURE_SIZE, TEXTURE_SIZE
+        graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
+        Integer startX = START_X + NOTE_OFFSET_X + (keyNum - 1) * NOTE_WIDTH/2;
+        Integer startY = START_Y + NOTE_OFFSET_Y + 44 + (keyNum % 2) * 42;
+        graphics.fill(
+            startX,
+            startY, 
+            startX+12, startY+40, -9044050
         );
-        
+
         return graphics;
     }
 

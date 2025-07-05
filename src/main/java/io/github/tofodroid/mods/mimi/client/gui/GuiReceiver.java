@@ -1,7 +1,7 @@
 package io.github.tofodroid.mods.mimi.client.gui;
 
 import io.github.tofodroid.mods.mimi.util.Vector2Int;
-
+import io.github.tofodroid.mods.mimi.client.gui.widget.AnalogModeWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.MidiChannelToggleWidget;
@@ -27,12 +27,14 @@ public class GuiReceiver extends BaseGui {
     private static final Vector2Int TRIGGER_MODE_WIDGET_COORDS = new Vector2Int(6,104);
     private static final Vector2Int HOLD_TICKS_WIDGET_COORDS = new Vector2Int(180,104);
     private static final Vector2Int INVERT_POWER_WIDGET_COORDS = new Vector2Int(281,5);
+    private static final Vector2Int ANALOG_MODE_WIDGET_COORDS = new Vector2Int(4,5);
 
     // Widgets
     private MidiChannelToggleWidget midiChannelToggle;
     private NoteFilterWidget noteFilter;
     private TransmitterSourceWidget transmitSource;
     private InvertSignalWidget invertSignal;
+    private AnalogModeWidget analogMode;
     private TriggerModeWidget triggerMode;
     private HoldTicksWidget holdTicks;
 
@@ -65,6 +67,7 @@ public class GuiReceiver extends BaseGui {
         this.noteFilter = new NoteFilterWidget(receiverStack, new Vector2Int(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
         this.transmitSource = new TransmitterSourceWidget(receiverStack, player.getUUID(), player.getName().getString(), new Vector2Int(START_X, START_Y), TRANSMIT_SOURCE_WIDGET_COORDS);
         this.invertSignal = new InvertSignalWidget(receiverStack, new Vector2Int(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
+        this.analogMode = new AnalogModeWidget(receiverStack, new Vector2Int(START_X, START_Y), ANALOG_MODE_WIDGET_COORDS);
         this.triggerMode = new TriggerModeWidget(receiverStack, new Vector2Int(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
         this.holdTicks = new HoldTicksWidget(receiverStack, new Vector2Int(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
     }
@@ -87,6 +90,8 @@ public class GuiReceiver extends BaseGui {
             this.syncListenerToServer();
         } else if(invertSignal.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
+        } else if(analogMode.mouseClicked(imouseX, imouseY, mouseButton)) {
+            this.syncListenerToServer();
         } else if(triggerMode.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
         } else if(holdTicks.mouseClicked(imouseX, imouseY, mouseButton)) {
@@ -106,6 +111,7 @@ public class GuiReceiver extends BaseGui {
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
         this.transmitSource.renderGraphics(graphics, mouseX, mouseY);
         this.invertSignal.renderGraphics(graphics, mouseX, mouseY);
+        this.analogMode.renderGraphics(graphics, mouseX, mouseY);
         this.triggerMode.renderGraphics(graphics, mouseX, mouseY);
         this.holdTicks.renderGraphics(graphics, mouseX, mouseY);
         
@@ -118,6 +124,7 @@ public class GuiReceiver extends BaseGui {
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.transmitSource.renderText(graphics, font, mouseX, mouseY);
         this.invertSignal.renderText(graphics, font, mouseX, mouseY);
+        this.analogMode.renderText(graphics, font, mouseX, mouseY);
         this.triggerMode.renderText(graphics, font, mouseX, mouseY);
         this.holdTicks.renderText(graphics, font, mouseX, mouseY);
 
