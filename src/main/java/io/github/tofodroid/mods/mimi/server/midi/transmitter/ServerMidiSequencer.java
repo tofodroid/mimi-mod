@@ -54,7 +54,7 @@ public class ServerMidiSequencer {
         int newStatus = MidiUtils.isPitchBendRangeMessage(message, pitchBendSetStatusMap.get(message.getChannel()));
         pitchBendSetStatusMap.put(message.getChannel(), newStatus);
 
-        if(newStatus == 3) {
+        if(newStatus == 4) {
             pitchBendRangeChannelMap.put(message.getChannel(), message.getData2() * 128);
             pitchBendSetStatusMap.put(message.getChannel(), 0);
         }

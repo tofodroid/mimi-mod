@@ -64,35 +64,25 @@ public final class MidiUtils {
      * Returns whether a given message is a pitch bend range set message.
      *
      * @param message A shortmessage to check against
-     * @param flag1 If the 100 controller is set to 0
-     * @param flag2 If the 101 controller is set to 0
+     * @param flag Variable used to store the status flag for matching against pitch bend range set pattern
+     * 0 = no pattern
+     * 1 = RPN 100 set to 0
+     * 2 = RPN 101 set to 0
+     * 3 = RPN 100 and 101 set to 0
+     * 4 = Is pitch bend range
      * @return an exception instance
      */
-    public static Integer isPitchBendRangeMessage(ShortMessage message, Boolean flag1, Boolean flag2) {
+    public static Integer isPitchBendRangeMessage(ShortMessage message, Integer flag) {
         if(message.getCommand() == ShortMessage.CONTROL_CHANGE) {
             if(message.getData1() == 100 && message.getData2() == 0) {
-                return 1;
+                return flag == 0 ? 1 : flag == 2 ? 3 : 0;
             } else if(message.getData1() == 101 && message.getData2() == 0) {
-                if(flag1) {
-                    return 2;
-                } else {
-                    flag1 = false;
-                    flag2 = false;
-                }
-            } else if(message.getData1() == 6) {
-                if(flag1 && flag2) {
-                    return 3;
-                } else {
-                    flag1 = false;
-                    flag2 = false;
-                }
+                return flag == 0 ? 2 : flag == 1 ? 3 : 0;
+            } else if(message.getData1() == 6 && flag == 3) {
+                return 4;
             }
         }
         return 0;
-    }
-
-    public static Integer isPitchBendRangeMessage(ShortMessage message, Integer status) {
-        return isPitchBendRangeMessage(message, status > 0, status > 1);
     }
 
     public static byte[] sequenceToByteArray(Sequence sequence) throws IOException {

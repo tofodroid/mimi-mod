@@ -35,7 +35,7 @@ public class MidiDeviceInputReceiver implements Receiver {
 
             Integer pitchBendCheck = MidiUtils.isPitchBendRangeMessage(smsg, pitchBendStatus);
 
-            if(pitchBendCheck == 3) {
+            if(pitchBendCheck == 4) {
                 this.pitchBendRange = smsg.getData2();
                 pitchBendStatus = 0;
             }
