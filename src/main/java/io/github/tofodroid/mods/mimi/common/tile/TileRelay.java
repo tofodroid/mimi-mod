@@ -107,7 +107,12 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
     }
 
     public BroadcastEvent mapEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, Long noteTime) {
-        return new BroadcastEvent(type, channel == BroadcastEvent.ALL_CHANNELS ? BroadcastEvent.ALL_CHANNELS : channelMap[channel], note, velocity, this.getUUID(), this.getBroadcastDimension(), this.getBroadcastPos(), this.getBroadcastRange(), noteTime);
+        return mapEvent(type, channel, note, velocity, noteTime, null);
+    }
+
+    public BroadcastEvent mapEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, Long noteTime, Integer extData) {
+        BroadcastEvent event = new BroadcastEvent(type, channel == BroadcastEvent.ALL_CHANNELS ? BroadcastEvent.ALL_CHANNELS : channelMap[channel], note, velocity, this.getUUID(), this.getBroadcastDimension(), this.getBroadcastPos(), this.getBroadcastRange(), noteTime);
+        return extData != null ? event.withExtData(extData) : event;
     }
 
     @Override
@@ -164,7 +169,7 @@ public class TileRelay extends AConfigurableMidiNoteResponsiveTile implements IB
 
     @Override
     public void doHandleEvent(BroadcastEvent message) {
-        this.broadcast(mapEvent(message.type, message.channel, message.note, message.velocity, message.eventTime));
+        this.broadcast(mapEvent(message.type, message.channel, message.note, message.velocity, message.eventTime, message.extData));
     }
     
     @Override
