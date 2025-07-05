@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.tofodroid.mods.mimi.util.Vector2Int;
-
+import io.github.tofodroid.mods.mimi.client.gui.widget.AnalogModeWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.HoldTicksWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.InvertSignalWidget;
 import io.github.tofodroid.mods.mimi.client.gui.widget.NoteFilterWidget;
@@ -28,10 +28,12 @@ public class GuiListener extends BaseGui {
     private static final Vector2Int FILTER_INSTRUMENT_PREV_BUTTON_COORDS = new Vector2Int(9,40);
     private static final Vector2Int FILTER_INSTRUMENT_NEXT_BUTTON_COORDS = new Vector2Int(161,40);
     private static final Vector2Int INVERT_POWER_WIDGET_COORDS = new Vector2Int(281,5);
+    private static final Vector2Int ANALOG_MODE_WIDGET_COORDS = new Vector2Int(4,5);
 
     // Widgets
     private NoteFilterWidget noteFilter;
     private InvertSignalWidget invertSignal;
+    private AnalogModeWidget analogMode;
     private TriggerModeWidget triggerMode;
     private HoldTicksWidget holdTicks;
 
@@ -65,6 +67,7 @@ public class GuiListener extends BaseGui {
         this.filterInstrumentIndex = INSTRUMENT_ID_LIST().indexOf(MidiNbtDataUtils.getFilterInstrument(listenerStack));
         this.noteFilter = new NoteFilterWidget(listenerStack, new Vector2Int(START_X, START_Y), NOTE_FILTER_WIDGET_COORDS);
         this.invertSignal = new InvertSignalWidget(listenerStack, new Vector2Int(START_X, START_Y), INVERT_POWER_WIDGET_COORDS);
+        this.analogMode = new AnalogModeWidget(listenerStack, new Vector2Int(START_X, START_Y), ANALOG_MODE_WIDGET_COORDS);
         this.triggerMode = new TriggerModeWidget(listenerStack, new Vector2Int(START_X, START_Y), TRIGGER_MODE_WIDGET_COORDS);
         this.holdTicks = new HoldTicksWidget(listenerStack, new Vector2Int(START_X, START_Y), HOLD_TICKS_WIDGET_COORDS);
     }
@@ -89,6 +92,8 @@ public class GuiListener extends BaseGui {
             this.syncListenerToServer();
         } else if(invertSignal.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
+        } else if(analogMode.mouseClicked(imouseX, imouseY, mouseButton)) {
+            this.syncListenerToServer();
         } else if(triggerMode.mouseClicked(imouseX, imouseY, mouseButton)) {
             this.syncListenerToServer();
         } else if(holdTicks.mouseClicked(imouseX, imouseY, mouseButton)) {
@@ -106,6 +111,7 @@ public class GuiListener extends BaseGui {
     
         this.noteFilter.renderGraphics(graphics, mouseX, mouseY);
         this.invertSignal.renderGraphics(graphics, mouseX, mouseY);
+        this.analogMode.renderGraphics(graphics, mouseX, mouseY);
         this.triggerMode.renderGraphics(graphics, mouseX, mouseY);
         this.holdTicks.renderGraphics(graphics, mouseX, mouseY);
         
@@ -117,6 +123,7 @@ public class GuiListener extends BaseGui {
         this.drawStringAbsolute(graphics, font, MidiNbtDataUtils.getInstrumentName(MidiNbtDataUtils.getFilterInstrument(listenerStack)), START_X + 30, START_Y + 44, 0xFF00E600);
         this.noteFilter.renderText(graphics, font, mouseX, mouseY);
         this.invertSignal.renderText(graphics, font, mouseX, mouseY);
+        this.analogMode.renderText(graphics, font, mouseX, mouseY);
         this.triggerMode.renderText(graphics, font, mouseX, mouseY);
         this.holdTicks.renderText(graphics, font, mouseX, mouseY);
         return graphics;

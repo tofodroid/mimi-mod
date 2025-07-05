@@ -12,10 +12,13 @@ import io.github.tofodroid.com.sun.media.sound.MidiUtils;
 import io.github.tofodroid.com.sun.media.sound.SimpleThreadSequencer;
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
 import io.github.tofodroid.mods.mimi.common.midi.BasicMidiInfo;
+import io.github.tofodroid.mods.mimi.server.ServerExecutorProxy;
 import io.github.tofodroid.mods.mimi.util.MidiFileUtils;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 
 public class ServerMidiSequencer {
     private final Runnable sequenceEndCallback;
+    private final Consumer<ShortMessage> eventHandler;
     
     // MIDI Sequence
     private Sequence activeSequence;
@@ -25,13 +28,37 @@ public class ServerMidiSequencer {
 
     // Runtime
     private Long startPlayMicros = null;
+    private Int2IntArrayMap pitchBendRangeChannelMap = new Int2IntArrayMap(16);
+    private Int2IntArrayMap pitchBendSetStatusMap = new Int2IntArrayMap(16);
 
     // Midi System
     private SimpleThreadSequencer<ServerMidiInputReceiver> activeSequencer;
 
     public ServerMidiSequencer(Consumer<ShortMessage> eventHandler, Runnable sequenceEndCallback) {
-        initializeSequencer(new ServerMidiInputReceiver(eventHandler));
+        initializeSequencer(new ServerMidiInputReceiver(this::handleMessage));
         this.sequenceEndCallback = sequenceEndCallback;
+        this.eventHandler = eventHandler;
+        resetPitchBendRange();
+    }
+
+    private void resetPitchBendRange() {
+        pitchBendRangeChannelMap.clear();
+        pitchBendSetStatusMap.clear();
+        for(int i = 0; i < 16; i++) {
+            pitchBendRangeChannelMap.put(i, 2 << 7);
+            pitchBendSetStatusMap.put(i, 0);
+        }
+    }
+
+    protected void handleMessage(ShortMessage message) {
+        int newStatus = MidiUtils.isPitchBendRangeMessage(message, pitchBendSetStatusMap.get(message.getChannel()));
+        pitchBendSetStatusMap.put(message.getChannel(), newStatus);
+
+        if(newStatus == 4) {
+            pitchBendRangeChannelMap.put(message.getChannel(), message.getData2() * 128);
+            pitchBendSetStatusMap.put(message.getChannel(), 0);
+        }
+        this.eventHandler.accept(message);
     }
 
     public Boolean isPlaying() {
@@ -56,6 +83,7 @@ public class ServerMidiSequencer {
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
+        this.resetPitchBendRange();
     }
 
     public UUID getSequenceId() {
@@ -72,6 +100,10 @@ public class ServerMidiSequencer {
 
     public Integer getSongLengthSeconds() {
         return this.songLengthSeconds;
+    }
+
+    public Integer getPitchBendRange(int channel) {
+        return pitchBendRangeChannelMap.get(channel);
     }
 
     public byte[] getChannelMapping() {
@@ -166,6 +198,7 @@ public class ServerMidiSequencer {
         this.activeSequenceInfo = null;
         this.songLengthSeconds = null;
         this.channelMapping = null;
+        this.resetPitchBendRange();
     }
 
     protected Boolean initializeSequencer(ServerMidiInputReceiver receiver) {
@@ -176,8 +209,10 @@ public class ServerMidiSequencer {
                 @Override
                 public void meta(MetaMessage meta) {
                     if(MidiUtils.isMetaEndOfTrack(meta) && !activeSequencer.isRunning()) {
-                        self.stop();
-                        self.sequenceEndCallback.run();
+                        ServerExecutorProxy.executeOnServerThread(() -> {
+                            self.stop();
+                            self.sequenceEndCallback.run();
+                        });
                     }
                 }
             });

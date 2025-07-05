@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import io.github.tofodroid.com.sun.media.sound.SoftChannelProxy;
 import io.github.tofodroid.com.sun.media.sound.SoftSynthesizer;
 
-import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.SourceDataLine;
@@ -46,13 +46,13 @@ public class BroadcastedNoteMIMISynth extends AMIMISynth<MIMIChannel> {
     }
     
     @Override
-    protected MIMIChannel createChannel(Integer num, MidiChannel channel) {
+    protected MIMIChannel createChannel(Integer num, SoftChannelProxy channel) {
         return new MIMIChannel(num, channel);
     }
 
     @Override
     protected String createChannelId(NoteEventPacket message) {
-        return getChannelIdForUUIDAndInstrumentId(message.player, message.instrumentId);
+        return message.player.toString() + "$" + message.instrumentId.toString() + "$" + message.channel.toString();
     }
 
     protected UUID getUUIDFromChannelId(String channelId) {
@@ -60,11 +60,10 @@ public class BroadcastedNoteMIMISynth extends AMIMISynth<MIMIChannel> {
     }
 
     protected Byte getInstrumentIdFromChannelId(String channelId) {
-        return Byte.valueOf(channelId.substring(channelId.indexOf("$")+1));
+        return Byte.valueOf(channelId.substring(channelId.indexOf("$")+1, channelId.lastIndexOf("$")));
     }
 
-    protected String getChannelIdForUUIDAndInstrumentId(UUID id, Byte instrumentId) {
-        return id.toString() + "$" + instrumentId.toString();
+    protected Byte getChannelFromChannelId(String channelId) {
+        return Byte.valueOf(channelId.substring(channelId.lastIndexOf("$")+1));
     }
-
 }

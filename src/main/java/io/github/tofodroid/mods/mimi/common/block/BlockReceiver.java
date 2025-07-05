@@ -58,7 +58,7 @@ public class BlockReceiver extends AConfigurableMidiPowerSourceBlock<TileReceive
         tooltip.add(Component.literal(""));
         tooltip.add(Component.literal("MIDI Settings:").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
-        MidiNbtDataUtils.appendInvertSignalTooltip(blockItemStack, tooltip);
+        MidiNbtDataUtils.appendPowerModeTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendEnabledChannelsTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendMidiSourceTooltip(blockItemStack, tooltip);
         MidiNbtDataUtils.appendFilterNoteTooltip(blockItemStack, tooltip);

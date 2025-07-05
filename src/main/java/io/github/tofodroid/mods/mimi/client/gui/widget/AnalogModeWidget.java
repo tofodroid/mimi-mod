@@ -7,13 +7,13 @@ import io.github.tofodroid.mods.mimi.util.MidiNbtDataUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
-public class InvertSignalWidget extends BaseWidget {
+public class AnalogModeWidget extends BaseWidget {
     private static final Vector2Int BUTTON_COORDS = new Vector2Int(0, 0);
 
     private ItemStack midiStack;
 
-    public InvertSignalWidget(ItemStack midiStack, Vector2Int screenOffset, Vector2Int start) {
-        super("textures/gui/widget/invert_signal.png", 22, new Vector2Int(17,17), screenOffset, start);
+    public AnalogModeWidget(ItemStack midiStack, Vector2Int screenOffset, Vector2Int start) {
+        super("textures/gui/widget/analog_mode.png", 24, new Vector2Int(17,17), screenOffset, start);
         this.midiStack = midiStack;
     }
 
@@ -21,16 +21,16 @@ public class InvertSignalWidget extends BaseWidget {
     public void renderGraphics(GuiGraphics graphics, Integer mouseX, Integer mouseY) {
         super.renderGraphics(graphics, mouseX, mouseY);
 
-        // Inverted Light
-        if(MidiNbtDataUtils.getInvertSignal(midiStack)) {
-            this.blitAbsolute(graphics, GUI_TEXTURE, ABSOLUTE_START.x() + 6, ABSOLUTE_START.y() + 6, 17, 17, 5, 5, TEXTURE_SIZE, TEXTURE_SIZE);
+        // Analog Light
+        if(MidiNbtDataUtils.getAnalogMode(midiStack)) {
+            this.blitAbsolute(graphics, GUI_TEXTURE, ABSOLUTE_START.x() + 4, ABSOLUTE_START.y() + 5, 15, 17, 9, 7, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
 
     @Override
     protected Boolean mouseClicked(Vector2Int localMouseCoords, Integer mouseButton) {
         if(CommonGuiUtils.clickedBox(localMouseCoords.x(), localMouseCoords.y(), BUTTON_COORDS)) {
-            MidiNbtDataUtils.setInvertSignal(midiStack, !MidiNbtDataUtils.getInvertSignal(midiStack));
+            MidiNbtDataUtils.setAnalogMode(midiStack, !MidiNbtDataUtils.getAnalogMode(midiStack));
             return true;
         }
         

@@ -1,15 +1,99 @@
 {
     "variants": {
-        "powered=false,inverted=false": {
+        "power=0,inverted=false": {
             "model": "mimi:block/midi/listener"
         },
-        "powered=false,inverted=true": {
+        "power=0,inverted=true": {
             "model": "mimi:block/midi/listener_lit"
         },
-        "powered=true,inverted=false": {
+        "power=1,inverted=false": {
             "model": "mimi:block/midi/listener_lit"
         },
-        "powered=true,inverted=true": {
+        "power=1,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=2,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=2,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=3,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=3,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=4,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=4,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=5,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=5,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=6,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=6,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=7,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=7,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=8,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=8,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=9,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=9,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=10,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=10,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=11,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=11,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=12,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=12,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=13,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=13,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=14,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=14,inverted=true": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=15,inverted=false": {
+            "model": "mimi:block/midi/listener_lit"
+        },
+        "power=15,inverted=true": {
             "model": "mimi:block/midi/listener"
         }
     }

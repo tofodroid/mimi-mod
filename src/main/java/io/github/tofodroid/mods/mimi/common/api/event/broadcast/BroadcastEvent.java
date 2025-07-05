@@ -2,7 +2,6 @@ package io.github.tofodroid.mods.mimi.common.api.event.broadcast;
 
 import java.util.UUID;
 
-import javax.annotation.Nonnull;
 import javax.sound.midi.ShortMessage;
 
 import io.github.tofodroid.mods.mimi.common.MIMIMod;
@@ -13,14 +12,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public class BroadcastEvent extends AMidiEvent {
-    public static final Byte ALL_CHANNELS = Byte.MAX_VALUE;
-
-    public final @Nonnull Byte channel;
-
+public class BroadcastEvent extends AMidiEvent<BroadcastEvent> {
     public BroadcastEvent(MidiEventType type, Byte channel, Byte note, Byte velocity, UUID senderId, ResourceKey<Level> dimension, BlockPos pos, Integer range, Long eventTime) {
-        super(type, note, velocity, eventTime, senderId, dimension, pos, BroadcastEvent.getRealRange(type, range));
-        this.channel = channel;
+        super(type, channel, note, velocity, eventTime, senderId, dimension, pos, BroadcastEvent.getRealRange(type, range));
     }
 
     public static final BroadcastEvent fromShortMessage(ShortMessage message, UUID senderId, ResourceKey<Level> dimension, BlockPos pos, Integer range, Integer overrideVelocity) {
@@ -36,7 +30,7 @@ public class BroadcastEvent extends AMidiEvent {
                 dimension,
                 pos,
                 BroadcastEvent.getRealRange(type, range),
-                MIMIMod.getProxy().getCurrentServerMillis()
+                MIMIMod.getProxy().getCurrentServerMillis() + (type == MidiEventType.NOTE_ON ? 1 : 0)
             );
         } else {
             return null;
