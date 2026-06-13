@@ -48,7 +48,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         } catch(Exception e) {
             MIMIMod.LOGGER.error("Failed to initialize MIDI Synthesizer: ", e);
             this.internalSynth = null;
-            this.internalSynth.getVoiceStatus();
+            this.internalSynthReciver = null;
         }
 
         Builder<T> builder = ImmutableList.builder();
@@ -70,7 +70,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
     public abstract Boolean tick(Player clientPlayer);
     protected abstract T createChannel(Integer num, SoftChannelProxy channel);
     protected abstract String createChannelId(NoteEventPacket message);
-    
+
     @Override
     public void close() {
         closing = true;
@@ -149,7 +149,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
     public void controlChange(NoteEventPacket message, Long timestamp) {
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
-        
+
         if(channel != null) {
             try {
                 this.internalSynthReceiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
@@ -161,7 +161,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
     public void pitchBend(NoteEventPacket message, Long timestamp) {
         T channel = channelAssignmentMap.inverse().get(createChannelId(message));
-        
+
         if(channel != null) {
             try {
                 if(message.extData != null) {
@@ -195,18 +195,18 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
                 MIMIMod.LOGGER.warn("Opening fallback device.");
                 midiSynth.open(null, params);
             }
-            
+
             if(sounds != null) {
                 if(midiSynth.isSoundbankSupported(sounds)) {
                     midiSynth.loadAllInstruments(sounds);
                 }
             }
-            
+
             midiSynth.getReceiver();
-            
+
             return midiSynth;
         }
 
         throw new MidiUnavailableException("Midi Synth '" + midiSynth.getDeviceInfo().getName() + "' cannot support any receivers.");
-    } 
+    }
 }
