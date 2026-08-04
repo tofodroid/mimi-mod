@@ -48,7 +48,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         } catch(Exception e) {
             MIMIMod.LOGGER.error("Failed to initialize MIDI Synthesizer: ", e);
             this.internalSynth = null;
-            this.internalSynth.getVoiceStatus();
+            this.internalSynthReceiver = null;
         }
 
         Builder<T> builder = ImmutableList.builder();
@@ -112,7 +112,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         if(channel != null) {
             try {
                 channel.noteOn(message.pos);
-                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_ON, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
+                this.internalSynthReceiver.send(new ExtendedChannelShortMessage(ShortMessage.NOTE_ON, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle note on: ", e);
             }
@@ -128,7 +128,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
 
         if(channel != null) {
             try {
-                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.data1, 0), getSynthEventTimestamp(timestamp));
+                this.internalSynthReceiver.send(new ExtendedChannelShortMessage(ShortMessage.NOTE_OFF, channel.getChannelNumber(), message.data1, 0), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle note off: ", e);
             }
@@ -152,7 +152,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
         
         if(channel != null) {
             try {
-                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
+                this.internalSynthReceiver.send(new ExtendedChannelShortMessage(ShortMessage.CONTROL_CHANGE, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle control change. Packet: " + message.data1 + " | " + message.data2, e);
             }
@@ -167,7 +167,7 @@ public abstract class AMIMISynth<T extends MIMIChannel> implements AutoCloseable
                 if(message.extData != null) {
                     channel.setPitchBendRange(message.extData);
                 }
-                this.internalSynthReceiver.send(new ShortMessage(ShortMessage.PITCH_BEND, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
+                this.internalSynthReceiver.send(new ExtendedChannelShortMessage(ShortMessage.PITCH_BEND, channel.getChannelNumber(), message.data1, message.data2), getSynthEventTimestamp(timestamp));
             } catch(Exception e) {
                 MIMIMod.LOGGER.error("Failed to handle pitch bend. Packet: " + message.data1 + " | " + message.data2, e);
             }

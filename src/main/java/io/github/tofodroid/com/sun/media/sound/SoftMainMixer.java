@@ -440,10 +440,17 @@ public final class SoftMainMixer {
                 }
 
                 if(data != null) {
-                    int status = 0;
-                    if (data.length > 0)
-                        status = data[0] & 0xFF;
-                    int ch = (status & 0x0F);
+                    int ch;
+                    if(entry.getValue() instanceof ShortMessage) {
+                        // Use getChannel() rather than the raw status byte so channels beyond
+                        // the standard 0-15 range (see ExtendedChannelShortMessage) resolve correctly.
+                        ch = ((ShortMessage)entry.getValue()).getChannel();
+                    } else {
+                        int status = 0;
+                        if (data.length > 0)
+                            status = data[0] & 0xFF;
+                        ch = (status & 0x0F);
+                    }
 
                     if(ch == channel) {
                         try {
