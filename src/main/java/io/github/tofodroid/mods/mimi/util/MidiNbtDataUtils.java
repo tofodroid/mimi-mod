@@ -337,7 +337,9 @@ public abstract class MidiNbtDataUtils {
     public static String getFilteredNotesAsString(ItemStack stack) {
         Byte filterNoteLetter = getFilterNote(stack);
         Byte filterNoteOctave = getFilterOct(stack);
-        String filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave != FILTER_NOTE_OCT_ALL ? filterNoteOctave : "*");
+        // Displayed octave is shifted by -1 from the stored/internal octave so it matches the
+        // scientific pitch notation (middle C = C4, MIDI note 60) used by MIDI editors/DAWs.
+        String filterNoteString = noteLetterFromNum(filterNoteLetter) + (filterNoteOctave != FILTER_NOTE_OCT_ALL ? Integer.valueOf(filterNoteOctave - 1) : "*");
         return "**".equals(filterNoteString) ? "All" : filterNoteString;
     }
 
@@ -346,7 +348,8 @@ public abstract class MidiNbtDataUtils {
 
         if(note != null) {
             Byte filterNoteLetter = Integer.valueOf(note % 12).byteValue();
-            Byte filterNoteOctave = Integer.valueOf(note / 12).byteValue();
+            // -1 so the displayed octave matches scientific pitch notation (middle C = C4, MIDI note 60).
+            Integer filterNoteOctave = Integer.valueOf(note / 12) - 1;
             result = noteLetterFromNum(filterNoteLetter) + filterNoteOctave;
         }
 
