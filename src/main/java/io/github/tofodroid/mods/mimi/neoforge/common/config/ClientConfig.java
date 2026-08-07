@@ -52,7 +52,7 @@ public class ClientConfig {
             .define("audioOutputDevice", "");
         audioDeviceVolume = builder.comment("A multipler used to increase or decrease the base volume of all notes played by MIMI instruments.","Allowed values: 0-10")
             .translation(MIMIMod.MODID + ".config.audio.volume")
-            .defineInRange("audioDeviceVolume",5, 0, 10);
+            .defineInRange("audioDeviceVolume",7, 0, 10);
         builder.pop();
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")
@@ -86,7 +86,12 @@ public class ClientConfig {
         synthBitRate = builder.comment("What bitrate should the built-in midi synthesizer use (bits)? Smaller values may decrease latency but will also decrease quality.","Allowed values: [8,16,24,32]")
             .translation(MIMIMod.MODID + ".config.midi.synth.bitrate")
             .defineInList("synthBitRate", 16, Arrays.asList(8,16,24,32));
-        soundfontPath = builder.comment("Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.")
+        soundfontPath = builder.comment(
+                "Optional full path to an SF2 format SoundFont to be used by the MIDI Synthesizer. See project page for more information.",
+                "IMPORTANT (Windows users): backslashes (\\) are not allowed as-is in this file. If your path looks like",
+                "C:\\Users\\YourName\\soundfont.sf2 it will silently be reset to blank on next launch. Either use forward",
+                "slashes instead (C:/Users/YourName/soundfont.sf2) or double up every backslash (C:\\\\Users\\\\YourName\\\\soundfont.sf2)."
+            )
             .translation(MIMIMod.MODID + ".config.midi.synth.soundfont.path")
             .define("soundfontPath", "");
         localBufferms = builder.comment("How long to have notes from the server buffer locally before playing. Higher values may decrease stuttering on high-latency connections but will cause redstone effects to be slightly off-tempo.","Allowed values: 0-100")

@@ -743,11 +743,13 @@ public class GuiInstrument extends BaseGui {
     }
 
     private String buildNoteIdString() {
-        String result = "";    
-        result += noteLetterFromNum(visibleNoteShift % 7) + Integer.valueOf(visibleNoteShift / 7).toString();
-        result += "," + noteLetterFromNum((visibleNoteShift+10) % 7) + Integer.valueOf((visibleNoteShift+10) / 7).toString();
-        result += " | " + noteLetterFromNum((visibleNoteShift+11) % 7) + Integer.valueOf((visibleNoteShift+11) / 7).toString();
-        result += "," + noteLetterFromNum((visibleNoteShift+21) % 7) + Integer.valueOf((visibleNoteShift+21) / 7).toString();
+        String result = "";
+        // -1 on each octave number so it matches scientific pitch notation (middle C = C4, MIDI note 60),
+        // consistent with MidiNbtDataUtils#getMidiNoteAsString / getFilteredNotesAsString.
+        result += noteLetterFromNum(visibleNoteShift % 7) + Integer.valueOf(visibleNoteShift / 7 - 1).toString();
+        result += "," + noteLetterFromNum((visibleNoteShift+10) % 7) + Integer.valueOf((visibleNoteShift+10) / 7 - 1).toString();
+        result += " | " + noteLetterFromNum((visibleNoteShift+11) % 7) + Integer.valueOf((visibleNoteShift+11) / 7 - 1).toString();
+        result += "," + noteLetterFromNum((visibleNoteShift+21) % 7) + Integer.valueOf((visibleNoteShift+21) / 7 - 1).toString();
         return result;
     }
 
