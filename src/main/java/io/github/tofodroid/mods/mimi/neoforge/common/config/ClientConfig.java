@@ -52,7 +52,7 @@ public class ClientConfig {
             .define("audioOutputDevice", "");
         audioDeviceVolume = builder.comment("A multipler used to increase or decrease the base volume of all notes played by MIMI instruments.","Allowed values: 0-10")
             .translation(MIMIMod.MODID + ".config.audio.volume")
-            .defineInRange("audioDeviceVolume",5, 0, 10);
+            .defineInRange("audioDeviceVolume",7, 0, 10);
         builder.pop();
         builder.push(INSTRUMENT_GUI_CATEGORY_NAME);
         keyboardLayout = builder.comment("Instrument GUI keyboard layout for notes. MIMI uses its own layout by default but also supports the layout used by VirtualPiano.net.")

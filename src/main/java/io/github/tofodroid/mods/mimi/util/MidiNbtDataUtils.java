@@ -25,7 +25,7 @@ public abstract class MidiNbtDataUtils {
     public static final Byte MAX_BROADCAST_RANGE = 4;
     public static final Byte MAX_INSTRUMENT_VOLUME = 10;
     public static final Integer PERCUSSION_BANK = 120;
-    public static final Byte DEFAULT_INSTRUMENT_VOLUME = 5;
+    public static final Byte DEFAULT_INSTRUMENT_VOLUME = 10;
     public static final Byte MIN_INSTRUMENT_VOLUME = 0;
     public static final Integer ALL_CHANNELS_INT = 65535;
     public static final Integer ALL_BUT_10_CHANNELS_INT = 65023;
